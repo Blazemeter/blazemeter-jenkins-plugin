@@ -1,0 +1,29 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:section title="BlazeMeter Performance Cloud">
+
+        <f:entry
+            title="Name (optional)"
+            help="/plugin/snsnotify/help-awsSecretKey.html"
+            field="name">
+
+            <f:textbox name="name" />
+        </f:entry>
+
+        <f:entry
+            title="BlazeMeter API Key"
+            help="/plugin/snsnotify/help-awsAccessKey.html"
+            field="apiKey">
+
+            <f:password name="apiKey" />
+        </f:entry>
+
+        <f:entry
+            title="BlazeMeter URL"
+            help="/plugin/snsnotify/help-awsSecretKey.html"
+            field="blazeMeterURL">
+
+            <f:textbox name="blazeMeterURL" />
+        </f:entry>
+
+    </f:section>
+</j:jelly>

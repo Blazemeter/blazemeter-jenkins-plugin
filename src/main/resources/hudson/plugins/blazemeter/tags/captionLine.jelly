@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:e="/hudson/plugins/performance/tags">
+  <tr>
+    <th>${%URI}</th>
+    <th>${%samples}</th>
+    <th>${%samples diff}</th>
+    <th>${%Average} (ms)</th>
+    <th>${%Average diff} (ms)</th>
+    <th>${%Median} (ms)</th>
+    <th>${%Median diff} (ms)</th>
+    <th>${%Line90} (ms)</th>
+    <th>${%Minimun} (ms)</th>
+    <th>${%Maximun} (ms)</th>
+    <th>${%Http Code}</th>
+    <th>${%Previous Http Code}</th>
+    <th>${%Errors} (%)</th>
+    <th>${%Errors diff} (%)</th>
+  </tr>
+</j:jelly>

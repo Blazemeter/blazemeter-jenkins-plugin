@@ -1,0 +1,13 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">	
+  <l:layout css="/plugin/performance/css/style.css">
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1><a href="http://www.blazemeter.com">${%BlazeMeter Performance Trend}</a></h1>
+
+      <iframe width="900" height="2000" src="${it.lastBlazeMeterURL}/report/${it.lastReportSession}/iframe">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
