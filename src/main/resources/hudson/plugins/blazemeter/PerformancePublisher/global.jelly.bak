@@ -3,6 +3,7 @@
 
         <f:entry
             title="Name (optional)"
+            help="/plugin/snsnotify/help-awsSecretKey.html"
             field="name">
 
             <f:textbox name="name" />
@@ -10,21 +11,19 @@
 
         <f:entry
             title="BlazeMeter API Key"
+            help="/plugin/snsnotify/help-awsAccessKey.html"
             field="apiKey">
-            
+
             <f:password name="apiKey" />
         </f:entry>
 
         <f:entry
             title="BlazeMeter URL"
+            help="/plugin/snsnotify/help-awsSecretKey.html"
             field="blazeMeterURL">
-            
+
             <f:textbox name="blazeMeterURL" />
         </f:entry>
-        
-        <f:block>
-        <f:validateButton title="${%Test Connection}" with="blazeMeterURL,apiKey" method="validate"/>
-       </f:block>
 
     </f:section>
 </j:jelly>

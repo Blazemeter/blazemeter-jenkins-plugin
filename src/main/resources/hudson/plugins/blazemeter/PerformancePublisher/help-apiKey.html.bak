@@ -1,0 +1,4 @@
+<div>
+    Specify your BlazeMeter API access key, which you can <a href="https://www.blazemeter.com/profiles">retrieve from here</a>.
+    The API access key is a hexadecimal string of the form "<tt>2639f6ea-ec65-4ae0-b44a-41803464ad76</tt>".
+</div>
