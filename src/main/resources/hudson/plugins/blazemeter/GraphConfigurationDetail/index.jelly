@@ -27,10 +27,10 @@
             </f:block>
           </p>
           <p>
-            <f:entry title="${%first day}" description="${%DateFormat}: DD/MM/YYYY">
+            <f:entry title="${%first day}"     description="${%DateFormat}: DD/MM/YYYY">
               <f:textbox name="firstDayCountString" value="${it.firstDayCount}"/>
             </f:entry>
-            <f:entry title="${%last day}" description="${%DateFormat}: DD/MM/YYYY">
+            <f:entry title="${%last day}"  description="${%DateFormat}: DD/MM/YYYY">
               <f:textbox name="lastDayCountString" value="${it.lastDayCount}"/>
             </f:entry>
           </p>
@@ -40,7 +40,7 @@
             <label for="radioConfigType.date">${%LastBuilds}</label>
             <st:nbsp/>
           </f:block>
-          <f:entry title="${%builds}" description="${%NumberOfBuilds}">
+          <f:entry title="${%builds}"   description="${%NumberOfBuilds}">
             <f:textbox name="buildCountString" value="${it.buildCount}"/>
           </f:entry>
           <f:entry title="">
