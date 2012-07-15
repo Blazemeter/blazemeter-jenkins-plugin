@@ -5,7 +5,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Action;
+//import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.AggregateTestResult;
@@ -77,7 +77,7 @@ public class PerformancePublisher extends Notifier {
     /**
      * Configured report parsers.
      */
-    private List<PerformanceReportParser> parsers;
+    private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
     public PerformancePublisher(String testDuration,
@@ -109,12 +109,12 @@ public class PerformancePublisher extends Notifier {
 
     List<PerformanceProjectAction> performanceProjectActions = new ArrayList<PerformanceProjectAction>();
 
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        PerformanceProjectAction ret = new PerformanceProjectAction(project);
-        performanceProjectActions.add(ret);
-        return ret;
-    }
+//    @Override
+//    public Action getProjectAction(AbstractProject<?, ?> project) {
+//        PerformanceProjectAction ret = new PerformanceProjectAction(project);
+//        performanceProjectActions.add(ret);
+//        return ret;
+//    }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
@@ -131,6 +131,7 @@ public class PerformancePublisher extends Notifier {
      * </p>
      *
      * @param performanceReportWorkspaceName
+     * self explanatory.
      * @return the name of the PerformanceReport in the Build
      */
     public static String getPerformanceReportBuildFileName(
@@ -161,6 +162,7 @@ public class PerformancePublisher extends Notifier {
                 return Arrays.asList(ret);
             }
         } catch (IOException e) {
+            // Do nothing.
         }
 
         // If it fails, do a legacy search
@@ -183,8 +185,8 @@ public class PerformancePublisher extends Notifier {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-        Result      result = Result.SUCCESS;
-        String      session = "";
+        Result      result; // Result.SUCCESS;
+        String      session;
 
         int runDurationSeconds = Integer.parseInt(testDuration)*60;
 
@@ -196,7 +198,18 @@ public class PerformancePublisher extends Notifier {
 
         uploadDataFolderFiles(apiKey, testId, bmAPI, logger);
 
-        org.json.JSONObject json = bmAPI.startTest( apiKey, testId);
+        org.json.JSONObject json;
+        int countStartRequests = 0;
+        do {
+            json = bmAPI.startTest(apiKey, testId);
+            countStartRequests++;
+            if (countStartRequests > 5) {
+                logger.println("Could not start BlazeMeter Test");
+                result = Result.NOT_BUILT;
+                return false;
+            }
+        } while (json == null);
+
         try {
             if (!json.get("response_code").equals(200)) {
                 if (json.get("response_code").equals(500) && json.get("error").toString().startsWith("Test already running")) {
@@ -279,7 +292,7 @@ public class PerformancePublisher extends Notifier {
         json = bmAPI.aggregateReport(apiKey, session);
         for (int i = 0; i < 200; i++){
             try {
-                if (json.get("response_code").equals(new Integer(404)))
+                if (json.get("response_code").equals(404))
                     json = bmAPI.aggregateReport(apiKey, session);
                 else
                     break;
@@ -292,7 +305,7 @@ public class PerformancePublisher extends Notifier {
 
         for(int i = 0; i < 30; i++){
             try {
-                if (!json.get("response_code").equals(new Integer(200)))
+                if (!json.get("response_code").equals(200))
                     logger.println("Error: Requesting aggregate report response code:" + json.get("response_code"));
 
                 aggregate = json.getJSONObject("report").get("aggregate").toString();
@@ -596,7 +609,7 @@ public class PerformancePublisher extends Notifier {
 
     public static class BlazeMeterPerformancePublisherDescriptor extends BuildStepDescriptor<Publisher> {
 
-        private String blazeMeterURL = "http://a.blazemeter.com";
+        private String blazeMeterURL = "https://a.blazemeter.com";
         private String name = "My BlazeMeter Account";
         private String apiKey;
 

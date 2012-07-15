@@ -1,12 +1,16 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <l:layout xmlns:jm="/hudson/plugins/performance/tags" css="/plugin/performance/css/style.css">
-
-  <st:include it="${it.build}" page="sidepanel.jelly" />
-    <l:main-panel>
-      <iframe width="900" height="2000" src="${it.getBlazeMeterURL()}/${it.getSession()}/iframe">
-        <p>Your browser does not support iframes.</p>
-      </iframe>
-    </l:main-panel>
-  </l:layout>
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <l:layout xmlns:jm="/hudson/plugins/performance/tags" css="/plugin/performance/css/style.css">
+        <l:main-panel>
+            ${it.session != null}
+            <j:if test="${it.session == null}">
+                <p>Can't access the report.</p>
+            </j:if>
+            <j:if test= "${it.session != null}">
+                <iframe width="920" height="2000" src="${it.getBlazeMeterURL()}/report/${it.session}/iframe">
+                    <p>Your browser does not support iframes.</p>
+                </iframe>
+            </j:if>
+        </l:main-panel>
+    </l:layout>
 </j:jelly>

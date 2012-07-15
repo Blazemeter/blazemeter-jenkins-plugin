@@ -5,7 +5,7 @@
         <a href="http://www.blazemeter.com"> <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%" /></a>
     </f:entry>
 
-  <f:entry title="${%BlazeMeter Performance Test}" field="testId" help="/plugin/snsnotify/help-awsSecretKey.html">
+  <f:entry title="${%BlazeMeter Performance Test}" field="testId">
     <table width="350px">
       <thead>
         <tr>
@@ -88,7 +88,6 @@
 
     <f:advanced>
         <f:entry title="${%Test Duration}:"
-                 help="/plugin/BlazeMeterJenkinsPlugin/help/globalConfig/testDuration.html"
                  name="testDuration" field="testDuration">
           <select name="testDuration">
               <f:option value="20" selected="${'20'==instance.testDuration}">${%20 Minutes}</f:option>

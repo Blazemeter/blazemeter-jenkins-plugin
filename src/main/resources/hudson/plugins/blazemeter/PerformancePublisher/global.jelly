@@ -15,16 +15,5 @@
             <f:password name="apiKey" />
         </f:entry>
 
-        <f:entry
-            title="BlazeMeter URL"
-            field="blazeMeterURL">
-            
-            <f:textbox name="blazeMeterURL" />
-        </f:entry>
-        
-        <f:block>
-        <f:validateButton title="${%Test Connection}" with="blazeMeterURL,apiKey" method="validate"/>
-       </f:block>
-
     </f:section>
 </j:jelly>

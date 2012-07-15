@@ -9,6 +9,6 @@
       <a href="performance/"><img src="performance/respondingTimeGraph" /></a>
       <br/>
       <a href="performance/"><img src="performance/errorsGraph" /></a>
-    </div>	
+    </div>
   </j:if>
 </j:jelly>

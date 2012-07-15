@@ -50,6 +50,10 @@ public class PerformanceReportMap implements ModelObject {
         return buildAction.getSession();
     }
 
+    public String getBlazeMeterURL() {
+        return buildAction.getBlazeMeterURL();
+    }
+
     /**
      * Parses the reports and build a {@link PerformanceReportMap}.
      *
@@ -85,7 +89,10 @@ public class PerformanceReportMap implements ModelObject {
     }
 
     public String getDisplayName() {
-        return Messages.Report_DisplayName();
+        if ("".equals(Messages.Report_DisplayName())) {
+            return "https://a.blazemeter.com/";
+        }
+       return Messages.Report_DisplayName();
     }
 
     public List<PerformanceReport> getPerformanceListOrdered() {
