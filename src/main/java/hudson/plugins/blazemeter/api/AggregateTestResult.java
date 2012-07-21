@@ -7,7 +7,7 @@ import org.codehaus.jackson.type.TypeReference;
 import java.io.IOException;
 
 /**
- * Blazemeter.com
+ * BlazeMeter
  * User: moshe
  * Date: 5/28/12
  * Time: 12:51 PM

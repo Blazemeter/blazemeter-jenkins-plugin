@@ -250,7 +250,7 @@ public class PerformancePublisher extends Notifier {
 
             if (info.getStatus().equals(BlazemeterApi.TestStatus.Error)) {
                 build.setResult(Result.NOT_BUILT);
-                logger.println("Error while running a test - please try to run the same test on BlazeMeter.com");
+                logger.println("Error while running a test - please try to run the same test on BlazeMeter");
                 return true;
             }
 
@@ -451,38 +451,38 @@ public class PerformancePublisher extends Notifier {
     private Result validateThresholds(PrintStream logger) {
         Result result = Result.SUCCESS;
         if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
-            logger.println("BlazeMeter.com: Errors percentage greater or equal than "
+            logger.println("BlazeMeter: Errors percentage greater or equal than "
                     + errorUnstableThreshold + "% will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter.com: percentage should be between 0 to 100");
+            logger.println("BlazeMeter: percentage should be between 0 to 100");
             result = Result.NOT_BUILT;
         }
 
         if (errorFailedThreshold >= 0 && errorFailedThreshold <= 100) {
-            logger.println("BlazeMeter.com: Errors percentage greater or equal than "
+            logger.println("BlazeMeter: Errors percentage greater or equal than "
                     + errorFailedThreshold + "% will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter.com: percentage should be between 0 to 100");
+            logger.println("BlazeMeter: percentage should be between 0 to 100");
             result = Result.NOT_BUILT;
         }
 
         if (responseTimeUnstableThreshold >= 0 ) {
-            logger.println("BlazeMeter.com: Response time greater or equal than "
+            logger.println("BlazeMeter: Response time greater or equal than "
                     + responseTimeUnstableThreshold + "millis will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter.com: percentage should be greater or equal than 0");
+            logger.println("BlazeMeter: percentage should be greater or equal than 0");
             result = Result.NOT_BUILT;
         }
 
         if (responseTimeFailedThreshold >= 0 ) {
-            logger.println("BlazeMeter.com: Response time greater or equal than "
+            logger.println("BlazeMeter: Response time greater or equal than "
                     + responseTimeFailedThreshold + "millis will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter.com: percentage should be greater or equal than 0");
+            logger.println("BlazeMeter: percentage should be greater or equal than 0");
             result = Result.NOT_BUILT;
         }
         return result;
