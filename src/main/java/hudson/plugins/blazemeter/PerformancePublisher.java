@@ -267,13 +267,13 @@ public class PerformancePublisher extends Notifier {
                 long now = Calendar.getInstance().getTime().getTime();
                 long diffInSec = (now - start.getTime()) / 1000;
                 if(now-lastPrint>10000){ //print every 10 sec.
-                    logger.println("BlazeMeter Performance test running from " + start + " - for " + diffInSec + " seconds");
+                    logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
                     lastPrint=now;
                 }
 
                 if(diffInSec>=runDurationSeconds){
                     bmAPI.stopTest(apiKey, testId);
-                    logger.println("BlazeMeter Performance test stopped due to user test duration setup reached");
+                    logger.println("BlazeMeter test stopped due to user test duration setup reached");
                     break;
                 }
                 continue;
@@ -283,7 +283,7 @@ public class PerformancePublisher extends Notifier {
                 break;
         }
 
-        logger.println("BlazeMeter Performance test running terminated at "+Calendar.getInstance().getTime());
+        logger.println("BlazeMeter test running terminated at "+Calendar.getInstance().getTime());
 
         //TODO: loop probe with special response code. or loop for certain time on 404 error code.
         Thread.sleep(10*1000); // Wait for the report to generate.
@@ -625,7 +625,7 @@ public class PerformancePublisher extends Notifier {
 
         @Override
         public String getDisplayName() {
-            return "BlazeMeter Performance";
+            return "BlazeMeter";
         }
 
         @Override

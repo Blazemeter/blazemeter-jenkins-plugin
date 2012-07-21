@@ -5,7 +5,7 @@
         <a href="http://www.blazemeter.com"> <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%" /></a>
     </f:entry>
 
-  <f:entry title="${%BlazeMeter Performance Test}" field="testId">
+  <f:entry title="${%BlazeMeter Test}" field="testId">
     <table width="350px">
       <thead>
         <tr>
