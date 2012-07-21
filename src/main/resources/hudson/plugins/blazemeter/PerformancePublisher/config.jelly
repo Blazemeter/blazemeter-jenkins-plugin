@@ -42,7 +42,7 @@
       </thead>
       <tbody>
         <tr>
-          <td style="vertical-align:middle">${%Thresholds}:</td>
+          <td style="vertical-align:middle">${%Threshold}:</td>
           <td>
             <f:textbox field="errorUnstableThreshold" />
           </td>
