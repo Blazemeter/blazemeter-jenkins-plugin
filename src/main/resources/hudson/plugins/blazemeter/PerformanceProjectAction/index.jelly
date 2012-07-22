@@ -3,7 +3,7 @@
   <l:layout css="/plugin/performance/css/style.css">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1><a href="http://www.blazemeter.com">${%BlazeMeter Trend}</a></h1>
+      <h1><a href="http://www.blazemeter.com" target="_blank">${%BlazeMeter Trend}</a></h1>
       <j:if test="${it.lastReportSession == ''}">
           <p>Can't access the last report.</p>
       </j:if>

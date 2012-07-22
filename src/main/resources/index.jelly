@@ -4,5 +4,5 @@
   Since we don't really have anything dynamic here, let's just use static HTML. 
 -->
 <div>
-    This plugin integrates <a href="http://www.blazemeter.com">BlazeMeter</a> - the cloud load testing service to Jenkins.
+    This plugin integrates <a href="http://www.blazemeter.com" target="_blank">BlazeMeter</a> - the cloud load testing service to Jenkins.
 </div>

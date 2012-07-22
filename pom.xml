@@ -12,9 +12,9 @@
 
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>BlazeMeter Performance plugin</name>
-    <url>http://www.blazemeter.com</url>
+    <version>1.0-beta-1-SNAPSHOT</version>
+    <name>BlazeMeter plugin</name>
+        <url>http://www.blazemeter.com</url>
 
     <dependencies>
         <dependency>
