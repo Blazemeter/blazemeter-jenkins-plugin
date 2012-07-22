@@ -57,7 +57,7 @@
   </f:entry>
 
   <f:entry title="${%Response Time threshold}:"
-      description="${%Threshold.Description}">
+      description="${%Response.Description}">
     <table width="350px">
       <thead>
         <tr>
