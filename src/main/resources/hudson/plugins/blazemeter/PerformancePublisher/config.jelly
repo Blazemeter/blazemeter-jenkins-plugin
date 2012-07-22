@@ -19,7 +19,7 @@
         <tr>
           <td/>
           <td colspan="1">
-             <f:textbox field="testId" />
+             <j:include file="testList.jelly"  />
           </td>
         </tr>
       </tbody>
