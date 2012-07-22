@@ -370,6 +370,64 @@ public class BlazemeterApi {
         return getJson(url, null);
     }
 
+	   public synchronized ArrayList<TestInfo> getTests(String userKey) throws MessagingException, IOException {
+        if (userKey.trim().isEmpty()) {
+            logger.println("getTests userKey is empty");
+            return null;
+        }
+
+        String url = this.urlManager.getUrlForTestList(APP_KEY, userKey, "all");
+
+        JSONObject jo = getJson(url, null);
+        JSONArray arr;
+        try {
+            String r = jo.get("response_code").toString();
+            if (!r.equals("200"))
+                return null;
+            arr = (JSONArray) jo.get("tests");
+        } catch (JSONException e) {
+            return null;
+        }
+
+        FileOutputStream  fc   =  new  FileOutputStream("testList.jelly");
+        LineOutputStream li =  new LineOutputStream(fc);
+        li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
+        			"xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">"+
+        				"<f:entry name=\"testList\" title=\"Choose Test from List\" field=\"tests\">" +
+        					"<select name=\"testId\">" );
+        
+        
+        
+        ArrayList<TestInfo>  testList = new ArrayList<TestInfo>();
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject en;
+            try {
+                en = arr.getJSONObject(i);
+            } catch (JSONException e) {
+                System.err.format(e.getMessage());
+                continue;
+            }
+            String id = null;
+            String name = null;
+            try {
+                id = en.getString("test_id");
+                name = en.getString("test_name");
+              
+            } catch (JSONException ignored) {
+            }
+            TestInfo testInfo = new TestInfo();
+            testInfo.name = name;
+            testInfo.id = id;
+            li.writeln("<option value=\"" + id + "\">" + name +  "</option>");
+            testList.add(testInfo);
+        }
+        li.writeln("</select></f:entry></j:jelly>");
+        li.close();
+        
+        return testList;
+    }
+ 
+
     private boolean validate(String userKey, String testId) {
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("startTest userKey is empty");
