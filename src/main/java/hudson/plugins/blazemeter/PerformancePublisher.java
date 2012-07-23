@@ -412,6 +412,46 @@ public class PerformancePublisher extends Notifier {
         return true;
     }
 
+
+	 public ListBoxModel doFillListOfTests( ) throws IOException, JSONException {
+            ListBoxModel items = new ListBoxModel();
+            for (TestInfo tinfo : getAllTestsForUser()) {
+                items.add(tinfo.getName(), tinfo.getId());
+            }
+            return items;
+        }
+
+        public ArrayList<TestInfo> getAllTestsForUser() throws IOException, JSONException {
+            try {
+            	BlazemeterApi   bzm  = new  BlazemeterApi(getBlazeMeterURL());
+            	testList = bzm.getTests(getApiKey());
+                System.out.println(testList.toString());
+                return testList;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        
+        public FormValidation doTestConnection(@QueryParameter("name") final String name, 
+                @QueryParameter("apiKey") final String apiKey)  {
+            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
+            ArrayList<TestInfo>  testList = new  ArrayList<TestInfo>();     
+			try {
+				testList =   bzm.getTests(apiKey);
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if  ( testList != null ) {
+					return FormValidation.ok("Success");
+			}
+			return   FormValidation.errorWithMarkup("GOT  Exception");
+        }
+
+
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
         if( dataFolder == null || dataFolder.isEmpty())
