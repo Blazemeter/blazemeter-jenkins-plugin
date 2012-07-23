@@ -6,11 +6,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sun.mail.util.LineOutputStream;
+
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+
+import javax.mail.MessagingException;
 
 /**
  * User: Vitali
@@ -370,13 +376,13 @@ public class BlazemeterApi {
         return getJson(url, null);
     }
 
-	   public synchronized ArrayList<TestInfo> getTests(String userKey) throws MessagingException, IOException {
+	   public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONException, IOException {
         if (userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
             return null;
         }
 
-        String url = this.urlManager.getUrlForTestList(APP_KEY, userKey, "all");
+        String url =getUrlForTestList(APP_KEY, userKey, "all");
 
         JSONObject jo = getJson(url, null);
         JSONArray arr;
@@ -391,10 +397,15 @@ public class BlazemeterApi {
 
         FileOutputStream  fc   =  new  FileOutputStream("testList.jelly");
         LineOutputStream li =  new LineOutputStream(fc);
-        li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
-        			"xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">"+
-        				"<f:entry name=\"testList\" title=\"Choose Test from List\" field=\"tests\">" +
-        					"<select name=\"testId\">" );
+        try {
+			li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
+						"xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">"+
+							"<f:entry name=\"testList\" title=\"Choose Test from List\" field=\"tests\">" +
+								"<select name=\"testId\">" );
+		} catch (MessagingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         
         
         
@@ -418,17 +429,33 @@ public class BlazemeterApi {
             TestInfo testInfo = new TestInfo();
             testInfo.name = name;
             testInfo.id = id;
-            li.writeln("<option value=\"" + id + "\">" + name +  "</option>");
+            try {
+				li.writeln("<option value=\"" + id + "\">" + name +  "</option>");
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             testList.add(testInfo);
         }
-        li.writeln("</select></f:entry></j:jelly>");
+        try {
+			li.writeln("</select></f:entry></j:jelly>");
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         li.close();
         
         return testList;
     }
  
 
-    private boolean validate(String userKey, String testId) {
+    private String getUrlForTestList(String appKey, String userKey,
+			String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private boolean validate(String userKey, String testId) {
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("startTest userKey is empty");
             return false;
