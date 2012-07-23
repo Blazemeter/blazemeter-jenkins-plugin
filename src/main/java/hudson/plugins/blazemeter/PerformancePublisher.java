@@ -430,25 +430,7 @@ public class PerformancePublisher extends Notifier {
             }
         }
         
-        public FormValidation doTestConnection(@QueryParameter("name") final String name, 
-                @QueryParameter("apiKey") final String apiKey)  {
-            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
-            ArrayList<TestInfo>  testList = new  ArrayList<TestInfo>();     
-			try {
-				testList =   bzm.getTests(apiKey);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if  ( testList != null ) {
-					return FormValidation.ok("Success");
-			}
-			return   FormValidation.errorWithMarkup("GOT  Exception");
-        }
-
+       
 
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
@@ -664,6 +646,25 @@ public class PerformancePublisher extends Notifier {
         @Override
         public String getDisplayName() {
             return "BlazeMeter";
+        }
+
+		public FormValidation doTestConnection(@QueryParameter("name") final String name, 
+                @QueryParameter("apiKey") final String apiKey)  {
+            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
+            ArrayList<TestInfo>  testList = new  ArrayList<TestInfo>();     
+			try {
+				testList =   bzm.getTests(apiKey);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if  ( testList != null ) {
+					return FormValidation.ok("Success");
+			}
+			return   FormValidation.errorWithMarkup("GOT  Exception");
         }
 
         @Override

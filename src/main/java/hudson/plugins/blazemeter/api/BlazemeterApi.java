@@ -376,13 +376,13 @@ public class BlazemeterApi {
         return getJson(url, null);
     }
 
-	   public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONException, IOException {
+public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONException, IOException {
         if (userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
             return null;
         }
 
-        String url =getUrlForTestList(APP_KEY, userKey, "all");
+        String url =getUrlForTestList(APP_KEY, userKey);
 
         JSONObject jo = getJson(url, null);
         JSONArray arr;
@@ -449,10 +449,16 @@ public class BlazemeterApi {
     }
  
 
-    private String getUrlForTestList(String appKey, String userKey,
-			String string) {
+    private String getUrlForTestList(String appKey, String userKey) {
 		// TODO Auto-generated method stub
-		return null;
+		 try {
+                appKey = URLEncoder.encode(appKey, "UTF-8");
+                userKey = URLEncoder.encode(userKey, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
+
 	}
 
 	private boolean validate(String userKey, String testId) {
