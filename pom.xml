@@ -14,7 +14,7 @@
     <packaging>hpi</packaging>
     <version>1.0-beta-1-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
-        <url>http://www.blazemeter.com</url>
+    <url>http://www.blazemeter.com</url>
 
     <dependencies>
         <dependency>
@@ -81,7 +81,8 @@
             <url>http://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-<groupId>com.blazemeter.plugins</groupId>
+
+    <groupId>com.blazemeter.plugins</groupId>
     <organization>
     	<name>BlazeMeterInc</name>
     	<url>http://www.blazemeter.com</url>
@@ -89,18 +90,11 @@
     <scm>
     	<url>https://github.com/Blazemeter/blazemeter-jenkins-plugin</url>
     	<tag>master</tag>
-    	<developerConnection>dbolsch,pdam</developerConnection>
+    	<developerConnection>doron-bloch, pdam</developerConnection>
     </scm>
-    <issueManagement>
-    	<system>Jira</system>
-    	<url>https://blazemeter.com/jira</url>
-    </issueManagement>
-    <ciManagement>
-    	<system>Jenkins</system>
-    	<url>https://jenkins.blazemeter.com</url>
-    </ciManagement>
-    <inceptionYear>July   2012</inceptionYear>
-    <description>This   is  a   plugin  which  allows  a   developer  to  run  a    set  of  performance Tests  against   a   BlazeMeter   Cluster</description>
+
+    <inceptionYear>July 2012</inceptionYear>
+    <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
 </project>  
   
 

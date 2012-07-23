@@ -395,8 +395,8 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             return null;
         }
 
-        FileOutputStream  fc   =  new  FileOutputStream("testList.jelly");
-        LineOutputStream li =  new LineOutputStream(fc);
+        FileOutputStream fc = new FileOutputStream("testList.jelly");
+        LineOutputStream li = new LineOutputStream(fc);
         try {
 			li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
 						"xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">"+
@@ -406,9 +406,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-        
-        
-        
+
         ArrayList<TestInfo>  testList = new ArrayList<TestInfo>();
         for (int i = 0; i < arr.length(); i++) {
             JSONObject en;

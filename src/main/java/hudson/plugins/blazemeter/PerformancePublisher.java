@@ -418,20 +418,15 @@ public class PerformancePublisher extends Notifier {
         return true;
     }
 
-
-	 
-
-        public void  getAllTestsForUser(String   userKey)  {
-            try {
-            	BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
-            	bzm.getTests(userKey);
-            } catch (Exception e) {
-               
-            }
+    public void getAllTestsForUser(String   userKey)  {
+        try {
+            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
+            bzm.getTests(userKey);
+        } catch (Exception e) {
+          // Do nothing!
         }
+    }
         
-       
-
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
         if( dataFolder == null || dataFolder.isEmpty())
@@ -439,7 +434,7 @@ public class PerformancePublisher extends Notifier {
 
         File folder=new File(dataFolder);
         if(!folder.exists() || !folder.isDirectory())
-            logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check folder exist.");
+            logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
 
         File[] listOfFiles = folder.listFiles();
 
