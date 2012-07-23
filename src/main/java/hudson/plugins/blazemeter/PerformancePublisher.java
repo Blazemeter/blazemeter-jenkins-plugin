@@ -5,6 +5,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Api;
 //import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -12,9 +13,12 @@ import hudson.plugins.blazemeter.api.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.TestInfo;
 import hudson.tasks.*;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
@@ -108,6 +112,8 @@ public class PerformancePublisher extends Notifier {
     }
 
     List<PerformanceProjectAction> performanceProjectActions = new ArrayList<PerformanceProjectAction>();
+
+	private String blazeMeterURL;
 
 //    @Override
 //    public Action getProjectAction(AbstractProject<?, ?> project) {
@@ -413,22 +419,14 @@ public class PerformancePublisher extends Notifier {
     }
 
 
-	 public ListBoxModel doFillListOfTests( ) throws IOException, JSONException {
-            ListBoxModel items = new ListBoxModel();
-            for (TestInfo tinfo : getAllTestsForUser()) {
-                items.add(tinfo.getName(), tinfo.getId());
-            }
-            return items;
-        }
+	 
 
-        public ArrayList<TestInfo> getAllTestsForUser() throws IOException, JSONException {
+        public void  getAllTestsForUser(String   userKey)  {
             try {
-            	BlazemeterApi   bzm  = new  BlazemeterApi(getBlazeMeterURL());
-            	testList = bzm.getTests(getApiKey());
-                System.out.println(testList.toString());
-                return testList;
+            	BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
+            	bzm.getTests(userKey);
             } catch (Exception e) {
-                return null;
+               
             }
         }
         
@@ -438,7 +436,7 @@ public class PerformancePublisher extends Notifier {
             ArrayList<TestInfo>  testList = new  ArrayList<TestInfo>();     
 			try {
 				testList =   bzm.getTests(apiKey);
-			} catch (MessagingException e) {
+			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
