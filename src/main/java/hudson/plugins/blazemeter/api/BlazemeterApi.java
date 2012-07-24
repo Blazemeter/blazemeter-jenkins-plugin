@@ -395,7 +395,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             return null;
         }
 
-        FileOutputStream fc = new FileOutputStream("testList.jelly");
+        FileOutputStream fc = new FileOutputStream("src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly");
         LineOutputStream li = new LineOutputStream(fc);
         try {
 			li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
