@@ -506,19 +506,13 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
 
         private String SERVER_URL;
 
-//        public BmUrlManager() {
-//            this("https://a.blazemeter.com");
-//        }
-
         public BmUrlManager(String blazeMeterUrl) {
             SERVER_URL = blazeMeterUrl;
-            //logger.println("Server url is :" + SERVER_URL);
-
         }
 
-//        public String getServerUrl() {
-//            return SERVER_URL;
-//        }
+        public String getServerUrl() {
+            return SERVER_URL;
+        }
 
         public String testStatus(String appKey, String userKey, String testId) {
             try {

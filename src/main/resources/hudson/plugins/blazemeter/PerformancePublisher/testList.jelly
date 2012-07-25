@@ -1,2 +1,4 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"   xmlns:d="jelly:define"    xmlns:l="/lib/layout" xmlns:t="/lib/hudson"   xmlns:f="/lib/form"   xmlns:x="jelly:xml"   xmlns:html="jelly:html"><f:entry name="testList" title="Choose Test from List" field="tests"><select name="testId">
+<option value="76487">walla - 150cc - 10sec - Ireland</option>
+<option value="72978">rrtyuuu</option>
 </select></f:entry></j:jelly>

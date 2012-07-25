@@ -643,12 +643,11 @@ public class PerformancePublisher extends Notifier {
             return "BlazeMeter";
         }
 
-		public FormValidation doTestConnection(@QueryParameter("name") final String name, 
-                @QueryParameter("apiKey") final String apiKey)  {
-            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
-            ArrayList<TestInfo>  testList = new  ArrayList<TestInfo>();     
+		public FormValidation doTestConnection(@QueryParameter("apiKey") final String apiKey)  {
+            BlazemeterApi bzm = new BlazemeterApi(blazeMeterURL);
+            ArrayList<TestInfo> testList = new ArrayList<TestInfo>();
 			try {
-				testList =   bzm.getTests(apiKey);
+				testList = bzm.getTests(apiKey);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -656,10 +655,10 @@ public class PerformancePublisher extends Notifier {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if  ( testList != null ) {
-					return FormValidation.ok("Success");
+			if (testList != null) {
+                return FormValidation.ok("Success");
 			}
-			return   FormValidation.errorWithMarkup("GOT  Exception");
+			return FormValidation.errorWithMarkup("API key invalid or no available tests");
         }
 
         @Override
