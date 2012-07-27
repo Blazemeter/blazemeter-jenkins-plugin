@@ -13,6 +13,7 @@ import hudson.plugins.blazemeter.api.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.TestInfo;
 import hudson.tasks.*;
+import hudson.util.FormFieldValidator;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.ServletException;
 
 public class PerformancePublisher extends Notifier {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
@@ -426,7 +430,11 @@ public class PerformancePublisher extends Notifier {
           // Do nothing!
         }
     }
-        
+      
+    
+   
+    
+    
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
         if( dataFolder == null || dataFolder.isEmpty())
@@ -667,6 +675,17 @@ public class PerformancePublisher extends Notifier {
             blazeMeterURL = req.getParameter("blazeMeterURL");
             name = req.getParameter("name");
             apiKey = req.getParameter("apiKey");
+            BlazemeterApi bzm = new BlazemeterApi(blazeMeterURL);
+            ArrayList<TestInfo> testList = new ArrayList<TestInfo>();
+			try {
+				testList = bzm.getTests(apiKey);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             save();
             return super.configure(req, formData);
         }

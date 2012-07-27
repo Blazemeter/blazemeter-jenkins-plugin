@@ -504,7 +504,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
     
     public static class BmUrlManager {
 
-        private String SERVER_URL;
+        private String SERVER_URL=  "https://a.blazemeter.com/";
 
         public BmUrlManager(String blazeMeterUrl) {
             SERVER_URL = blazeMeterUrl;
@@ -522,7 +522,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s", SERVER_URL, appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s",  appKey, userKey, testId);
         }
 
 //        public String scriptCreation(String appKey, String userKey, String testName) {
@@ -545,7 +545,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s", SERVER_URL, appKey, userKey, testId, fileName);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s",  appKey, userKey, testId, fileName);
         }
 
         public String fileUpload(String appKey, String userKey, String testId, String fileName) {
@@ -557,7 +557,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s", SERVER_URL, appKey, userKey, testId, fileName);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s", appKey, userKey, testId, fileName);
         }
 
         public String testStart(String appKey, String userKey, String testId) {
@@ -568,7 +568,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s", SERVER_URL, appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s",  appKey, userKey, testId);
         }
 
         public String testStop(String appKey, String userKey, String testId) {
@@ -579,7 +579,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s", SERVER_URL, appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s", SERVER_URL, appKey, userKey, testId);
         }
 
 //        public String testReport(String appKey, String userKey, String reportId) {
@@ -624,7 +624,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("%s/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true", SERVER_URL, appKey, userKey, reportId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true", appKey, userKey, reportId);
         }
     }
 }
