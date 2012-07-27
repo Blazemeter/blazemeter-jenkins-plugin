@@ -10,9 +10,7 @@
       <thead>
         <tr>
           <td colspan="1">
-             <j:if test="${it.apiKey}==''">
-            		<j:entry name="${%Warning please configure your API Key }" >${%Warning please configure your API Key } </j:entry>
-			    </j:if> 
+             
           </td>
         </tr>
       </thead>
@@ -20,9 +18,13 @@
         <tr>
           <td/>
           <td colspan="1">
-
-            <j:include file="src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly"  />
-           
+             <j:choose>
+             <j:when test="${hudson.plugins.blazemeter.PerformancePublisher.DESCRIPTOR.apiKey==''}">
+    			No API Token detected Please configure your API Key <a href="/configure">here</a>
+    		      <j:if test="${hudson.plugins.blazemeter.PerformancePublisher.DESCRIPTOR.apiKey!=''}"> again</j:if>
+  			</j:when>
+  			  <j:otherwise><j:include  file="src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly"  /></j:otherwise>
+		</j:choose> 	
           </td>
         </tr>
       </tbody>
