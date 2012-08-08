@@ -1,150 +1,135 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
     <f:entry title="Provided by BlazeMeter">
-        <a href="http://www.blazemeter.com" target="_blank"> <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%" /></a>
+        <a href="http://www.blazemeter.com" target="_blank">
+            <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%"/>
+        </a>
     </f:entry>
 
-  <f:entry title="${%BlazeMeter Test}" field="testId">
-    <table width="350px">
-      <thead>
-        <tr>
-          <td colspan="1">
-             
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td/>
-          <td colspan="1">
-             <j:choose>
-             <j:when test="${hudson.plugins.blazemeter.PerformancePublisher.DESCRIPTOR.apiKey==''}">
-    			No API Token detected Please configure your API Key <a href="/configure">here</a>
-    		      <j:if test="${hudson.plugins.blazemeter.PerformancePublisher.DESCRIPTOR.apiKey!=''}"> again</j:if>
-  			</j:when>
-  			  <j:otherwise><j:include  file="src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly"  /></j:otherwise>
-		</j:choose> 	
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </f:entry>
+    <f:entry title="${%BlazeMeter Test}:" field="testId">
+        <f:select>
+        </f:select>
+    </f:entry>
 
-  <f:entry title="${%Error percentage threshold}:"
-      description="${%Threshold.Description}">
-    <table width="350px">
-      <thead>
-        <tr>
-          <td/>
-          <td colspan="2">
-            <img src="${rootURL}/images/16x16/yellow.gif" alt="100%" /> ${%Unstable}
-          </td>
-          <td colspan="2">
-            <img src="${rootURL}/images/16x16/red.gif" alt="100%" /> ${%Failed}
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="vertical-align:middle">${%Threshold}:</td>
-          <td>
-            <f:textbox field="errorUnstableThreshold" />
-          </td>
-          <td> % </td>
-          <td>
-            <f:textbox field="errorFailedThreshold" />
-          </td>
-          <td> % </td>
-        </tr>
-      </tbody>    
-    </table>  
-  </f:entry>
+    <f:entry title="${%Error percentage threshold}:"
+             description="${%Threshold.Description}">
+        <table width="350px">
+            <thead>
+                <tr>
+                    <td/>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/yellow.gif" alt="100%"/>
+                        ${%Unstable}
+                    </td>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/red.gif" alt="100%"/>
+                        ${%Failed}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="vertical-align:middle">${%Threshold}:</td>
+                    <td>
+                        <f:textbox field="errorUnstableThreshold"/>
+                    </td>
+                    <td>%</td>
+                    <td>
+                        <f:textbox field="errorFailedThreshold"/>
+                    </td>
+                    <td>%</td>
+                </tr>
+            </tbody>
+        </table>
+    </f:entry>
 
-  <f:entry title="${%Response Time threshold}:"
-      description="${%Response.Description}">
-    <table width="350px">
-      <thead>
-        <tr>
-          <td/>
-          <td colspan="2">
-            <img src="${rootURL}/images/16x16/yellow.gif" alt="100%" /> ${%Unstable}
-          </td>
-          <td colspan="2">
-            <img src="${rootURL}/images/16x16/red.gif" alt="100%" /> ${%Failed}
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="vertical-align:middle">${%Response Time}:</td>
-          <td>
-            <f:textbox field="responseTimeUnstableThreshold" />
-          </td>
-          <td> ms </td>
-          <td>
-            <f:textbox field="responseTimeFailedThreshold" />
-          </td>
-          <td> ms </td>
-        </tr>
-      </tbody>
-    </table>
-  </f:entry>
+    <f:entry title="${%Response Time threshold}:"
+             description="${%Response.Description}">
+        <table width="350px">
+            <thead>
+                <tr>
+                    <td/>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/yellow.gif" alt="100%"/>
+                        ${%Unstable}
+                    </td>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/red.gif" alt="100%"/>
+                        ${%Failed}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="vertical-align:middle">${%Response Time}:</td>
+                    <td>
+                        <f:textbox field="responseTimeUnstableThreshold"/>
+                    </td>
+                    <td>ms</td>
+                    <td>
+                        <f:textbox field="responseTimeFailedThreshold"/>
+                    </td>
+                    <td>ms</td>
+                </tr>
+            </tbody>
+        </table>
+    </f:entry>
 
     <f:advanced>
         <f:entry title="${%Test Duration}:"
-                 name="testDuration" field="testDuration">
-          <select name="testDuration">
-              <f:option value="20" selected="${'20'==instance.testDuration}">${%20 Minutes}</f:option>
-              <f:option value="30" selected="${'30'==instance.testDuration}">${%30 Minutes}</f:option>
-              <f:option value="40" selected="${'40'==instance.testDuration}">${%40 Minutes}</f:option>
-              <f:option value="50" selected="${'50'==instance.testDuration}">${%50 Minutes}</f:option>
-              <f:option value="60" selected="${'60'==instance.testDuration}">${%60 Minutes}</f:option>
-          </select>
+                 field="testDuration">
+            <select name="testDuration">
+                <f:option value="20" selected="${'20'==instance.testDuration}">${%20 Minutes}</f:option>
+                <f:option value="30" selected="${'30'==instance.testDuration}">${%30 Minutes}</f:option>
+                <f:option value="40" selected="${'40'==instance.testDuration}">${%40 Minutes}</f:option>
+                <f:option value="50" selected="${'50'==instance.testDuration}">${%50 Minutes}</f:option>
+                <f:option value="60" selected="${'60'==instance.testDuration}">${%60 Minutes}</f:option>
+            </select>
         </f:entry>
 
         <f:entry title="${%Data folder}:"
-            description="${%Data folder to be uploaded}">
+                 description="${%Data folder to be uploaded}">
             <table width="350px">
-            <thead>
-              <tr>
-                <td/>
-                <td colspan="1">
-                  Data folder
-                </td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td/>
-                <td colspan="1">
-                   <f:textbox field="dataFolder"/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                <thead>
+                    <tr>
+                        <td/>
+                        <td colspan="1">
+                            Data folder
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td/>
+                        <td colspan="1">
+                            <f:textbox field="dataFolder"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </f:entry>
 
         <f:entry title="${%Main JMX}:"
-            description="${%Main JMX name in data folder specified above}">
+                 description="${%Main JMX name in data folder specified above}">
             <table width="350px">
-            <thead>
-              <tr>
-                <td/>
-                <td colspan="1">
-                  Main JMX
-                </td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td/>
-                <td colspan="1">
-                   <f:textbox field="mainJMX"/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                <thead>
+                    <tr>
+                        <td/>
+                        <td colspan="1">
+                            Main JMX
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td/>
+                        <td colspan="1">
+                            <f:textbox field="mainJMX"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </f:entry>
     </f:advanced>
 </j:jelly>

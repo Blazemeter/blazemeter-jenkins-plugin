@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter.api;
 
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -10,28 +9,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.sun.mail.util.LineOutputStream;
-
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 
 /**
  * User: Vitali
  * Date: 4/2/12
  * Time: 14:05
  * <p/>
- * Updated - Platform independent
- * User: moshe
- * Date: 5/12/12
- * Time: 1:05 PM
- * <p/>
- * Updated - Minor fixes
+ * Updated
  * User: Doron
  * Date: 8/7/12
  */
+
 public class BlazemeterApi {
     PrintStream logger = new PrintStream(System.out);
 
@@ -46,11 +40,9 @@ public class BlazemeterApi {
     DefaultHttpClient httpClient;
     BmUrlManager urlManager;
 
-
-    public BlazemeterApi(String blazeMeterUrl) {
-        urlManager = new BmUrlManager(blazeMeterUrl);
+    public BlazemeterApi() {
+        urlManager = new BmUrlManager("https://a.blazemeter.com");
         try {
-            //logger = new PrintStream(new FileOutputStream("/Users/moshe/tests/jenkins.log"));
             httpClient = new DefaultHttpClient();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
@@ -78,7 +70,7 @@ public class BlazemeterApi {
                 throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
             }
         } catch (Exception e) {
-            System.err.format("Wrong response: %s", e);
+            System.err.format("Wrong response: %s\n", e);
         }
 
         return response;
@@ -234,9 +226,9 @@ public class BlazemeterApi {
      * @param testId   - test id
      * @param fileName - test name
      * @param pathName - jmx file path
-//     * @return test id
-//     * @throws java.io.IOException
-//     * @throws org.json.JSONException
+     *                 //     * @return test id
+     *                 //     * @throws java.io.IOException
+     *                 //     * @throws org.json.JSONException
      */
     public synchronized void uploadJmx(String userKey, String testId, String fileName, String pathName) {
 
@@ -256,14 +248,13 @@ public class BlazemeterApi {
     }
 
     /**
-     *
      * @param userKey  - user key
      * @param testId   - test id
      * @param fileName - name for file you like to upload
      * @param pathName - to the file you like to upload
      * @return test id
-//     * @throws java.io.IOException
-//     * @throws org.json.JSONException
+     *         //     * @throws java.io.IOException
+     *         //     * @throws org.json.JSONException
      */
     public synchronized JSONObject uploadFile(String userKey, String testId, String fileName, String pathName) {
 
@@ -376,90 +367,104 @@ public class BlazemeterApi {
         return getJson(url, null);
     }
 
-public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONException, IOException {
-        if (userKey.trim().isEmpty()) {
+    public int getTestCount(String userKey) throws JSONException, IOException, ServletException {
+        if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
-            return null;
+            return 0;
         }
 
-        String url =getUrlForTestList(APP_KEY, userKey);
+        String url = getUrlForTestList(APP_KEY, userKey);
 
         JSONObject jo = getJson(url, null);
-        JSONArray arr;
-        try {
-            String r = jo.get("response_code").toString();
-            if (!r.equals("200"))
-                return null;
-            arr = (JSONArray) jo.get("tests");
-        } catch (JSONException e) {
-            return null;
-        }
-
-        FileOutputStream fc = new FileOutputStream("src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly");
-        LineOutputStream li = new LineOutputStream(fc);
-        try {
-			li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +  
-						"xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">"+
-							"<f:entry name=\"testList\" title=\"Choose Test from List\" field=\"tests\">" +
-								"<select name=\"testId\">" );
-		} catch (MessagingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-        ArrayList<TestInfo>  testList = new ArrayList<TestInfo>();
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject en;
-            try {
-                en = arr.getJSONObject(i);
-            } catch (JSONException e) {
-                System.err.format(e.getMessage());
-                continue;
-            }
-            String id = null;
-            String name = null;
-            try {
-                id = en.getString("test_id");
-                name = en.getString("test_name");
-              
-            } catch (JSONException ignored) {
-            }
-            TestInfo testInfo = new TestInfo();
-            testInfo.name = name;
-            testInfo.id = id;
-            try {
-				li.writeln("<option value=\"" + id + "\">" + name +  "</option>");
-			} catch (MessagingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            testList.add(testInfo);
-        }
-        try {
-			li.writeln("</select></f:entry></j:jelly>");
-		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        li.close();
-        
-        return testList;
+        String r = jo.get("response_code").toString();
+        if (!r.equals("200"))
+            return 0;
+        JSONArray arr = (JSONArray) jo.get("tests");
+        return arr.length();
     }
- 
+
+//    public synchronized ArrayList<TestInfo> getTests(String userKey) throws JSONException, IOException {
+//        if (userKey.trim().isEmpty()) {
+//            logger.println("getTests userKey is empty");
+//            return null;
+//        }
+//
+//        String url = getUrlForTestList(APP_KEY, userKey);
+//
+//        JSONObject jo = getJson(url, null);
+//        JSONArray arr;
+//        try {
+//            String r = jo.get("response_code").toString();
+//            if (!r.equals("200"))
+//                return null;
+//            arr = (JSONArray) jo.get("tests");
+//        } catch (JSONException e) {
+//            return null;
+//        }
+//
+//        FileOutputStream fc = new FileOutputStream("src/main/resources/hudson/plugins/blazemeter/PerformancePublisher/testList.jelly");
+//        LineOutputStream li = new LineOutputStream(fc);
+//        try {
+//            li.writeln("<j:jelly xmlns:j=\"jelly:core\" xmlns:st=\"jelly:stapler\"   xmlns:d=\"jelly:define\"    " +
+//                    "xmlns:l=\"/lib/layout\" xmlns:t=\"/lib/hudson\"   xmlns:f=\"/lib/form\"   xmlns:x=\"jelly:xml\"   xmlns:html=\"jelly:html\">" +
+//                    "<f:entry name=\"testList\" title=\"Choose Test from List\" field=\"tests\">" +
+//                    "<select name=\"testId\">");
+//        } catch (MessagingException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//        }
+//
+//        ArrayList<TestInfo> testList = new ArrayList<TestInfo>();
+//        for (int i = 0; i < arr.length(); i++) {
+//            JSONObject en;
+//            try {
+//                en = arr.getJSONObject(i);
+//            } catch (JSONException e) {
+//                System.err.format(e.getMessage());
+//                continue;
+//            }
+//            String id = null;
+//            String name = null;
+//            try {
+//                id = en.getString("test_id");
+//                name = en.getString("test_name");
+//
+//            } catch (JSONException ignored) {
+//            }
+//            TestInfo testInfo = new TestInfo();
+//            testInfo.name = name;
+//            testInfo.id = id;
+//            try {
+//                li.writeln("<option value=\"" + id + "\">" + name + "</option>");
+//            } catch (MessagingException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//            testList.add(testInfo);
+//        }
+//        try {
+//            li.writeln("</select></f:entry></j:jelly>");
+//        } catch (MessagingException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        li.close();
+//
+//        return testList;
+//    }
 
     private String getUrlForTestList(String appKey, String userKey) {
-		// TODO Auto-generated method stub
-		 try {
-                appKey = URLEncoder.encode(appKey, "UTF-8");
-                userKey = URLEncoder.encode(userKey, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
 
-	}
+    }
 
-	private boolean validate(String userKey, String testId) {
+    private boolean validate(String userKey, String testId) {
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("startTest userKey is empty");
             return false;
@@ -473,11 +478,10 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
     }
 
     /**
-     *
      * @param userKey - user key
      * @param testId  - test id
-//     * @throws IOException
-//     * @throws ClientProtocolException
+     *                //     * @throws IOException
+     *                //     * @throws ClientProtocolException
      */
     public JSONObject stopTest(String userKey, String testId) {
         if (!validate(userKey, testId)) return null;
@@ -487,11 +491,10 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
     }
 
     /**
-     *
-     * @param userKey - user key
-     * @param reportId  - report Id same as Session Id, can be obtained from start stop status.
-//     * @throws IOException
-//     * @throws ClientProtocolException
+     * @param userKey  - user key
+     * @param reportId - report Id same as Session Id, can be obtained from start stop status.
+     *                 //     * @throws IOException
+     *                 //     * @throws ClientProtocolException
      */
     public JSONObject aggregateReport(String userKey, String reportId) {
         if (!validate(userKey, reportId)) return null;
@@ -500,11 +503,50 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
         return getJson(url, null);
     }
 
-    
-    
+    public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {
+
+        HashMap<String, String> testList = new HashMap<String, String>();
+
+        if (userKey == null || userKey.trim().isEmpty()) {
+            logger.println("getTests userKey is empty");
+        } else {
+            String url = getUrlForTestList(APP_KEY, userKey);
+            logger.println(url);
+            JSONObject jo = getJson(url, null);
+            try {
+                String r = jo.get("response_code").toString();
+                if (r.equals("200")) {
+                    JSONArray arr = (JSONArray) jo.get("tests");
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject en = null;
+                        try {
+                            en = arr.getJSONObject(i);
+                        } catch (JSONException e) {
+                        }
+                        String id;
+                        String name;
+                        try {
+                            if (en != null) {
+                                id = en.getString("test_id");
+                                name = en.getString("test_name").replaceAll("&", "&amp;");
+                                testList.put(name, id);
+
+                            }
+                        } catch (JSONException ie) {
+                        }
+                    }//  End   of   200  Check
+                }// end  try
+            }//    end  else
+            catch (Exception e) {
+            }
+        }// exception  for empty key
+
+        return testList;
+    }
+
     public static class BmUrlManager {
 
-        private String SERVER_URL=  "https://a.blazemeter.com/";
+        private String SERVER_URL = "https://a.blazemeter.com/";
 
         public BmUrlManager(String blazeMeterUrl) {
             SERVER_URL = blazeMeterUrl;
@@ -522,7 +564,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s",  appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s", appKey, userKey, testId);
         }
 
 //        public String scriptCreation(String appKey, String userKey, String testName) {
@@ -545,7 +587,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s",  appKey, userKey, testId, fileName);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s", appKey, userKey, testId, fileName);
         }
 
         public String fileUpload(String appKey, String userKey, String testId, String fileName) {
@@ -568,7 +610,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s",  appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s", appKey, userKey, testId);
         }
 
         public String testStop(String appKey, String userKey, String testId) {
@@ -579,7 +621,7 @@ public synchronized ArrayList<TestInfo> getTests(String userKey) throws 	JSONExc
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s", SERVER_URL, appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s", appKey, userKey, testId);
         }
 
 //        public String testReport(String appKey, String userKey, String reportId) {

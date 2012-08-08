@@ -5,7 +5,6 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Api;
 //import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -13,7 +12,6 @@ import hudson.plugins.blazemeter.api.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.TestInfo;
 import hudson.tasks.*;
-import hudson.util.FormFieldValidator;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
@@ -21,8 +19,9 @@ import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -31,8 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
 
 public class PerformancePublisher extends Notifier {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
@@ -63,7 +60,7 @@ public class PerformancePublisher extends Notifier {
 
     private String testId = "";
 
-    private String testDuration ="60";
+    private String testDuration = "60";
 
     private String mainJMX = "";
 
@@ -117,7 +114,7 @@ public class PerformancePublisher extends Notifier {
 
     List<PerformanceProjectAction> performanceProjectActions = new ArrayList<PerformanceProjectAction>();
 
-	private String blazeMeterURL;
+    private String blazeMeterURL;
 
 //    @Override
 //    public Action getProjectAction(AbstractProject<?, ?> project) {
@@ -140,8 +137,7 @@ public class PerformancePublisher extends Notifier {
      * Maven Performance plugin
      * </p>
      *
-     * @param performanceReportWorkspaceName
-     * self explanatory.
+     * @param performanceReportWorkspaceName self explanatory.
      * @return the name of the PerformanceReport in the Build
      */
     public static String getPerformanceReportBuildFileName(
@@ -195,16 +191,16 @@ public class PerformancePublisher extends Notifier {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-        Result      result; // Result.SUCCESS;
-        String      session;
+        Result result; // Result.SUCCESS;
+        String session;
 
-        int runDurationSeconds = Integer.parseInt(testDuration)*60;
+        int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        if((result=validateThresholds(logger))!=Result.SUCCESS) // input parameters error.
+        if ((result = validateThresholds(logger)) != Result.SUCCESS) // input parameters error.
             return true;
 
         String apiKey = DESCRIPTOR.apiKey;
-        BlazemeterApi bmAPI = new BlazemeterApi(DESCRIPTOR.blazeMeterURL);
+        BlazemeterApi bmAPI = new BlazemeterApi();
 
         uploadDataFolderFiles(apiKey, testId, bmAPI, logger);
 
@@ -251,7 +247,7 @@ public class PerformancePublisher extends Notifier {
 
         Date start = null;
 
-        long lastPrint=0;
+        long lastPrint = 0;
         while (true) {
             TestInfo info = bmAPI.getTestRunStatus(apiKey, testId);
 
@@ -271,17 +267,17 @@ public class PerformancePublisher extends Notifier {
             }
 
             if (info.getStatus().equals(BlazemeterApi.TestStatus.Running)) {
-                if(start==null)
-                    start=Calendar.getInstance().getTime();
+                if (start == null)
+                    start = Calendar.getInstance().getTime();
                 build.setResult(Result.SUCCESS);
                 long now = Calendar.getInstance().getTime().getTime();
                 long diffInSec = (now - start.getTime()) / 1000;
-                if(now-lastPrint>10000){ //print every 10 sec.
+                if (now - lastPrint > 10000) { //print every 10 sec.
                     logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
-                    lastPrint=now;
+                    lastPrint = now;
                 }
 
-                if(diffInSec>=runDurationSeconds){
+                if (diffInSec >= runDurationSeconds) {
                     bmAPI.stopTest(apiKey, testId);
                     logger.println("BlazeMeter test stopped due to user test duration setup reached");
                     break;
@@ -293,27 +289,27 @@ public class PerformancePublisher extends Notifier {
                 break;
         }
 
-        logger.println("BlazeMeter test running terminated at "+Calendar.getInstance().getTime());
+        logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
 
         //TODO: loop probe with special response code. or loop for certain time on 404 error code.
-        Thread.sleep(10*1000); // Wait for the report to generate.
+        Thread.sleep(10 * 1000); // Wait for the report to generate.
 
         //get testGetArchive information
         json = bmAPI.aggregateReport(apiKey, session);
-        for (int i = 0; i < 200; i++){
+        for (int i = 0; i < 200; i++) {
             try {
                 if (json.get("response_code").equals(404))
                     json = bmAPI.aggregateReport(apiKey, session);
                 else
                     break;
             } catch (JSONException e) {
-            }finally {
-                Thread.sleep(5*1000);
+            } finally {
+                Thread.sleep(5 * 1000);
             }
         }
         String aggregate = "null";
 
-        for(int i = 0; i < 30; i++){
+        for (int i = 0; i < 30; i++) {
             try {
                 if (!json.get("response_code").equals(200))
                     logger.println("Error: Requesting aggregate report response code:" + json.get("response_code"));
@@ -324,14 +320,14 @@ public class PerformancePublisher extends Notifier {
                 e.printStackTrace();
             }
 
-            if(!aggregate.equals("null"))
+            if (!aggregate.equals("null"))
                 break;
 
-            Thread.sleep(2*1000);
+            Thread.sleep(2 * 1000);
             json = bmAPI.aggregateReport(apiKey, session);
         }
 
-        if(aggregate==null){
+        if (aggregate == null) {
             logger.println("Error: Requesting aggregate is not available");
             build.setResult(Result.NOT_BUILT);
             return false;
@@ -339,9 +335,9 @@ public class PerformancePublisher extends Notifier {
 
         AggregateTestResult aggregateTestResult = AggregateTestResult.generate(aggregate);
 
-        if(performanceProjectActions.size()>0){
-            performanceProjectActions.get(performanceProjectActions.size()-1).lastReportSession = session;
-            performanceProjectActions.get(performanceProjectActions.size()-1).lastBlazeMeterURL = DESCRIPTOR.blazeMeterURL;
+        if (performanceProjectActions.size() > 0) {
+            performanceProjectActions.get(performanceProjectActions.size() - 1).lastReportSession = session;
+            performanceProjectActions.get(performanceProjectActions.size() - 1).lastBlazeMeterURL = DESCRIPTOR.blazeMeterURL;
         }
 
         double thresholdTolerance = 0.00005; //null hypothesis
@@ -350,22 +346,22 @@ public class PerformancePublisher extends Notifier {
 
         if (errorFailedThreshold >= 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
-            logger.println("Test ended with "+ Result.FAILURE + " on error percentage threshold");
+            logger.println("Test ended with " + Result.FAILURE + " on error percentage threshold");
         } else if (errorUnstableThreshold >= 0
                 && errorPercent - errorUnstableThreshold > thresholdTolerance) {
-            logger.println("Test ended with "+ Result.UNSTABLE + " on error percentage threshold");
+            logger.println("Test ended with " + Result.UNSTABLE + " on error percentage threshold");
             result = Result.UNSTABLE;
         }
 
         if (responseTimeFailedThreshold >= 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
             build.setResult(Result.FAILURE);
-            logger.println("Test ended with "+ Result.FAILURE + " on response time threshold");
+            logger.println("Test ended with " + Result.FAILURE + " on response time threshold");
 
         } else if (responseTimeUnstableThreshold >= 0
                 && AverageResponseTime - responseTimeUnstableThreshold > thresholdTolerance) {
             result = Result.UNSTABLE;
-            logger.println("Test ended with "+ Result.UNSTABLE + " on response time threshold");
+            logger.println("Test ended with " + Result.UNSTABLE + " on response time threshold");
         }
 
         build.setResult(result);
@@ -422,36 +418,33 @@ public class PerformancePublisher extends Notifier {
         return true;
     }
 
-    public void getAllTestsForUser(String   userKey)  {
-        try {
-            BlazemeterApi   bzm  = new  BlazemeterApi(blazeMeterURL);
-            bzm.getTests(userKey);
-        } catch (Exception e) {
-          // Do nothing!
-        }
-    }
-      
-    
-   
-    
-    
+//    public void getAllTestsForUser(String   userKey)  {
+//        try {
+//            BlazemeterApi   bzm  = new  BlazemeterApi();
+//            bzm.getTests(userKey);
+//        } catch (Exception e) {
+//          // Do nothing!
+//        }
+//    }
+
+
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
-        if( dataFolder == null || dataFolder.isEmpty())
+        if (dataFolder == null || dataFolder.isEmpty())
             return;
 
-        File folder=new File(dataFolder);
-        if(!folder.exists() || !folder.isDirectory())
+        File folder = new File(dataFolder);
+        if (!folder.exists() || !folder.isDirectory())
             logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
 
         File[] listOfFiles = folder.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++){
+        for (int i = 0; i < listOfFiles.length; i++) {
             String file;
-            if (listOfFiles[i].isFile()){
+            if (listOfFiles[i].isFile()) {
                 file = listOfFiles[i].getName();
-                if(file.endsWith(mainJMX))
-                    bmAPI.uploadJmx(apiKey, testId, mainJMX, dataFolder+File.separator+mainJMX);
+                if (file.endsWith(mainJMX))
+                    bmAPI.uploadJmx(apiKey, testId, mainJMX, dataFolder + File.separator + mainJMX);
                 else
                     uploadFile(apiKey, testId, bmAPI, file, logger);
             }
@@ -459,7 +452,7 @@ public class PerformancePublisher extends Notifier {
     }
 
     private void uploadFile(String apiKey, String testId, BlazemeterApi bmAPI, String fileName, PrintStream logger) {
-        org.json.JSONObject json = bmAPI.uploadFile(apiKey, testId, fileName, dataFolder+File.separator+fileName);
+        org.json.JSONObject json = bmAPI.uploadFile(apiKey, testId, fileName, dataFolder + File.separator + fileName);
         try {
             if (!json.get("response_code").equals(new Integer(200))) {
                 logger.println("Could not upload file " + fileName + " " + json.get("error").toString());
@@ -491,7 +484,7 @@ public class PerformancePublisher extends Notifier {
             result = Result.NOT_BUILT;
         }
 
-        if (responseTimeUnstableThreshold >= 0 ) {
+        if (responseTimeUnstableThreshold >= 0) {
             logger.println("BlazeMeter: Response time greater or equal than "
                     + responseTimeUnstableThreshold + "millis will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
@@ -500,7 +493,7 @@ public class PerformancePublisher extends Notifier {
             result = Result.NOT_BUILT;
         }
 
-        if (responseTimeFailedThreshold >= 0 ) {
+        if (responseTimeFailedThreshold >= 0) {
             logger.println("BlazeMeter: Response time greater or equal than "
                     + responseTimeFailedThreshold + "millis will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
@@ -636,7 +629,7 @@ public class PerformancePublisher extends Notifier {
         private String name = "My BlazeMeter Account";
         private String apiKey;
 
-        public BlazeMeterPerformancePublisherDescriptor(){
+        public BlazeMeterPerformancePublisherDescriptor() {
             super(PerformancePublisher.class);
             load();
         }
@@ -651,22 +644,38 @@ public class PerformancePublisher extends Notifier {
             return "BlazeMeter";
         }
 
-		public FormValidation doTestConnection(@QueryParameter("apiKey") final String apiKey)  {
-            BlazemeterApi bzm = new BlazemeterApi(blazeMeterURL);
-            ArrayList<TestInfo> testList = new ArrayList<TestInfo>();
-			try {
-				testList = bzm.getTests(apiKey);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (testList != null) {
-                return FormValidation.ok("Success");
-			}
-			return FormValidation.errorWithMarkup("API key invalid or no available tests");
+        // Used by config.jelly to display the test list.
+        public ListBoxModel doFillTestIdItems() {
+            ListBoxModel items = new ListBoxModel();
+            BlazemeterApi bzm = new BlazemeterApi();
+
+            try {
+                HashMap<String, String> testList = bzm.getTestList(getApiKey());
+                if (testList == null){
+                    items.add("No tests, or invalid User key ", "-1");
+                } else {
+                    Set set = testList.entrySet();
+                    for (Object test : set) {
+                        Map.Entry me = (Map.Entry) test;
+                        items.add((String) me.getKey(), String.valueOf(me.getValue()));
+                    }
+                }
+            } catch (Exception e) {
+                items.add("No tests, or User key invalid", "-1");
+                e.printStackTrace();
+            }
+            return items;
+        }
+
+        // Used by global.jelly to authenticate User key
+        public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
+            BlazemeterApi bzm = new BlazemeterApi();
+            int testCount = bzm.getTestCount(userKey);
+            if (testCount <= 0) {
+                return FormValidation.errorWithMarkup("User Key Invalid Or No Available Tests");
+            } else {
+                return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
+            }
         }
 
         @Override
@@ -675,17 +684,7 @@ public class PerformancePublisher extends Notifier {
             blazeMeterURL = req.getParameter("blazeMeterURL");
             name = req.getParameter("name");
             apiKey = req.getParameter("apiKey");
-            BlazemeterApi bzm = new BlazemeterApi(blazeMeterURL);
-            ArrayList<TestInfo> testList = new ArrayList<TestInfo>();
-			try {
-				testList = bzm.getTests(apiKey);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
             save();
             return super.configure(req, formData);
         }
