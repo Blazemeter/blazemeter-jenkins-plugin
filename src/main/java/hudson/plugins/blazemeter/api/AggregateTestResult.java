@@ -35,8 +35,7 @@ public class AggregateTestResult {
     }
 
     protected ObjectMapper mapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper;
+        return new ObjectMapper();
     }
 
     public AggregateTestResult fromJSON(String json) throws IOException {
@@ -45,8 +44,7 @@ public class AggregateTestResult {
         TypeReference<AggregateTestResult> typeRef
                 = new TypeReference<AggregateTestResult>() {
         };
-        AggregateTestResult r = mapper.readValue(json, typeRef);
-        return r;
+        return mapper.readValue(json, typeRef);
     }
 
     @Override

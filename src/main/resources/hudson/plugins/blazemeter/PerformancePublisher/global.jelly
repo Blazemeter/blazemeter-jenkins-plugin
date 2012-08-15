@@ -5,11 +5,11 @@
          xmlns:t="/lib/hudson"
          xmlns:f="/lib/form">
     <f:section title="BlazeMeter Cloud">
-        <f:entry
-            title="Name (optional)"
-            field="name">
-            <f:textbox name="name" />
-        </f:entry>
+        <!--<f:entry-->
+            <!--title="Name (optional)"-->
+            <!--field="name">-->
+            <!--<f:textbox name="name" />-->
+        <!--</f:entry>-->
 
         <f:entry
             title="BlazeMeter User Key"

@@ -335,6 +335,12 @@ public class PerformancePublisher extends Notifier {
 
         AggregateTestResult aggregateTestResult = AggregateTestResult.generate(aggregate);
 
+        if (aggregateTestResult == null) {
+            logger.println("Error: Requesting aggregate Test Result is not available");
+            build.setResult(Result.NOT_BUILT);
+            return false;
+        }
+
         if (performanceProjectActions.size() > 0) {
             performanceProjectActions.get(performanceProjectActions.size() - 1).lastReportSession = session;
             performanceProjectActions.get(performanceProjectActions.size() - 1).lastBlazeMeterURL = DESCRIPTOR.blazeMeterURL;
@@ -679,14 +685,12 @@ public class PerformancePublisher extends Notifier {
         }
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject formData)
-                throws FormException {
-            blazeMeterURL = req.getParameter("blazeMeterURL");
-            name = req.getParameter("name");
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+//            name = req.getParameter("name");
             apiKey = req.getParameter("apiKey");
 
             save();
-            return super.configure(req, formData);
+            return true;
         }
 
         public String getBlazeMeterURL() {
