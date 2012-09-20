@@ -10,11 +10,41 @@
         <version>1.424</version>
     </parent>
 
+    <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
     <version>1.0-beta-1-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
-    <url>http://www.blazemeter.com</url>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
+    <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
+    <inceptionYear>July 2012</inceptionYear>
+
+    <organization>
+        <name>BlazeMeterInc</name>
+        <url>http://www.blazemeter.com</url>
+    </organization>
+
+    <scm>
+        <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
+        <!--<tag>master</tag>-->
+        <url>https://github.com/jenkinsci/blazemeter-plugin</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>LGPL 3</name>
+            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>doron-bloch</id>
+            <name>Doron Bloch</name>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -82,19 +112,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <groupId>com.blazemeter.plugins</groupId>
-    <organization>
-    	<name>BlazeMeterInc</name>
-    	<url>http://www.blazemeter.com</url>
-    </organization>
-    <scm>
-    	<url>https://github.com/Blazemeter/blazemeter-jenkins-plugin</url>
-    	<tag>master</tag>
-    	<developerConnection>doron-bloch, pdam</developerConnection>
-    </scm>
-
-    <inceptionYear>July 2012</inceptionYear>
-    <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
 </project>  
   
 
