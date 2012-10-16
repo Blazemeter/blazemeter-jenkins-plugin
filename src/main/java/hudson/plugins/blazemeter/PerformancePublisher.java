@@ -60,7 +60,7 @@ public class PerformancePublisher extends Notifier {
 
     private String testId = "";
 
-    private String testDuration = "60";
+    private String testDuration = "180";
 
     private String mainJMX = "";
 
@@ -440,27 +440,34 @@ public class PerformancePublisher extends Notifier {
             return;
 
         File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory())
+        if (!folder.exists() || !folder.isDirectory()){
             logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
+            return;
+        }
 
         File[] listOfFiles = folder.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            String file;
-            if (listOfFiles[i].isFile()) {
-                file = listOfFiles[i].getName();
-                if (file.endsWith(mainJMX))
-                    bmAPI.uploadJmx(apiKey, testId, mainJMX, dataFolder + File.separator + mainJMX);
-                else
-                    uploadFile(apiKey, testId, bmAPI, file, logger);
+        if (listOfFiles != null) {
+            for (File listOfFile : listOfFiles) {
+                String fileName;
+                File file;
+                if (listOfFile.isFile()) {
+                    file = listOfFile;
+                    fileName = file.getName();
+                    if (fileName.endsWith(mainJMX))
+                        bmAPI.uploadJmx(apiKey, testId, mainJMX, dataFolder + File.separator + mainJMX);
+                    else
+                        uploadFile(apiKey, testId, bmAPI, file, logger);
+                }
             }
         }
     }
 
-    private void uploadFile(String apiKey, String testId, BlazemeterApi bmAPI, String fileName, PrintStream logger) {
-        org.json.JSONObject json = bmAPI.uploadFile(apiKey, testId, fileName, dataFolder + File.separator + fileName);
+    private void uploadFile(String apiKey, String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
+        String fileName = file.getName();
+        org.json.JSONObject json = bmAPI.uploadBinaryFile(apiKey, testId, file);
         try {
-            if (!json.get("response_code").equals(new Integer(200))) {
+            if (!json.get("response_code").equals(200)) {
                 logger.println("Could not upload file " + fileName + " " + json.get("error").toString());
             }
         } catch (JSONException e) {
@@ -468,7 +475,6 @@ public class PerformancePublisher extends Notifier {
             e.printStackTrace();
         }
     }
-
 
     private Result validateThresholds(PrintStream logger) {
         Result result = Result.SUCCESS;

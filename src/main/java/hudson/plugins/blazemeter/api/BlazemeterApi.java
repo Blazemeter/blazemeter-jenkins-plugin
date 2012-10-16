@@ -2,6 +2,7 @@ package hudson.plugins.blazemeter.api;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -76,6 +78,50 @@ public class BlazemeterApi {
         return response;
     }
 
+    private HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
+
+        logger.println("Requesting : " + url);
+        HttpPost postRequest = new HttpPost(url);
+        postRequest.setHeader("Accept", "application/json");
+        postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
+
+        if (file != null) {
+            postRequest.setEntity(new FileEntity(file, "text/plain; charset=\"UTF-8\""));
+        }
+
+        HttpResponse response = null;
+        try {
+            response = this.httpClient.execute(postRequest);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            String error = response.getStatusLine().getReasonPhrase();
+            if ((statusCode >= 300) || (statusCode < 200)) {
+                throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+            }
+        } catch (Exception e) {
+            System.err.format("Wrong response: %s\n", e);
+        }
+
+        return response;
+    }
+
+
+    private JSONObject getJsonForFileUpload(String url, File file) {
+        JSONObject jo = null;
+        try {
+            HttpResponse response = getResponseForFileUpload(url, file);
+            if (response != null) {
+                String output = EntityUtils.toString(response.getEntity());
+                logger.println(output);
+                jo = new JSONObject(output);
+            }
+        } catch (IOException e) {
+            logger.println("error decoding Json " + e);
+        } catch (JSONException e) {
+            logger.println("error decoding Json " + e);
+        }
+        return jo;
+    }
 
     private JSONObject getJson(String url, JSONObject data) {
         JSONObject jo = null;
@@ -250,28 +296,37 @@ public class BlazemeterApi {
     /**
      * @param userKey  - user key
      * @param testId   - test id
-     * @param fileName - name for file you like to upload
-     * @param pathName - to the file you like to upload
+     * @param file     - the file (Java class) you like to upload
      * @return test id
      *         //     * @throws java.io.IOException
      *         //     * @throws org.json.JSONException
      */
-    public synchronized JSONObject uploadFile(String userKey, String testId, String fileName, String pathName) {
+
+    public synchronized JSONObject uploadBinaryFile(String userKey, String testId, File file) {
 
         if (!validate(userKey, testId)) return null;
 
-        String url = this.urlManager.fileUpload(APP_KEY, userKey, testId, fileName);
-        JSONObject jmxData = new JSONObject();
-        String fileCon = getFileContents(pathName);
+        String url = this.urlManager.fileUpload(APP_KEY, userKey, testId, file.getName());
 
-        try {
-            jmxData.put("data", fileCon);
-        } catch (JSONException e) {
-            System.err.format(e.getMessage());
-        }
-
-        return getJson(url, jmxData);
+        return getJsonForFileUpload(url, file);
     }
+
+//    public synchronized JSONObject uploadFile(String userKey, String testId, String fileName, String pathName) {
+//
+//        if (!validate(userKey, testId)) return null;
+//
+//        String url = this.urlManager.fileUpload(APP_KEY, userKey, testId, fileName);
+//        JSONObject jmxData = new JSONObject();
+//        String fileCon = getFileContents(pathName);
+//
+//        try {
+//            jmxData.put("data", fileCon);
+//        } catch (JSONException e) {
+//            System.err.format(e.getMessage());
+//        }
+//
+//        return getJson(url, jmxData);
+//    }
 
 
     private String getFileContents(String fn) {
@@ -505,7 +560,7 @@ public class BlazemeterApi {
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {
 
-        HashMap<String, String> testList = new HashMap<String, String>();
+        LinkedHashMap<String, String> testListOrdered = null;
 
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
@@ -517,11 +572,13 @@ public class BlazemeterApi {
                 String r = jo.get("response_code").toString();
                 if (r.equals("200")) {
                     JSONArray arr = (JSONArray) jo.get("tests");
+                    testListOrdered = new LinkedHashMap<String, String>(arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject en = null;
                         try {
                             en = arr.getJSONObject(i);
                         } catch (JSONException e) {
+                            logger.println("Error with the JSON while populating test list, " + e);
                         }
                         String id;
                         String name;
@@ -529,19 +586,21 @@ public class BlazemeterApi {
                             if (en != null) {
                                 id = en.getString("test_id");
                                 name = en.getString("test_name").replaceAll("&", "&amp;");
-                                testList.put(name, id);
+                                testListOrdered.put(name, id);
 
                             }
                         } catch (JSONException ie) {
+                            logger.println("Error with the JSON while populating test list, " + ie);
                         }
-                    }//  End   of   200  Check
-                }// end  try
-            }//    end  else
-            catch (Exception e) {
+                    }
+                }
             }
-        }// exception  for empty key
+            catch (Exception e) {
+                logger.println("Error while populating test list, " + e);
+            }
+        }
 
-        return testList;
+        return testListOrdered;
     }
 
     public static class BmUrlManager {
