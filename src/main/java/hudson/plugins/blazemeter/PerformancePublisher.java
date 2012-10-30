@@ -448,14 +448,13 @@ public class PerformancePublisher extends Notifier {
         File[] listOfFiles = folder.listFiles();
 
         if (listOfFiles != null) {
-            for (File listOfFile : listOfFiles) {
+            for (File file : listOfFiles) {
                 String fileName;
-                File file;
-                if (listOfFile.isFile()) {
-                    file = listOfFile;
+                if (file.isFile()) {
                     fileName = file.getName();
+
                     if (fileName.endsWith(mainJMX))
-                        bmAPI.uploadJmx(apiKey, testId, mainJMX, dataFolder + File.separator + mainJMX);
+                        bmAPI.uploadJmx(apiKey, testId, file);
                     else
                         uploadFile(apiKey, testId, bmAPI, file, logger);
                 }

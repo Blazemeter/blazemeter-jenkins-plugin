@@ -270,27 +270,25 @@ public class BlazemeterApi {
     /**
      * @param userKey  - user key
      * @param testId   - test id
-     * @param fileName - test name
-     * @param pathName - jmx file path
+     * @param file     - jmx file
      *                 //     * @return test id
      *                 //     * @throws java.io.IOException
      *                 //     * @throws org.json.JSONException
      */
-    public synchronized void uploadJmx(String userKey, String testId, String fileName, String pathName) {
+    public synchronized void uploadJmx(String userKey, String testId, File file) {
 
         if (!validate(userKey, testId)) return;
 
-        String url = this.urlManager.scriptUpload(APP_KEY, userKey, testId, fileName);
-        JSONObject jmxData = new JSONObject();
-        String fileCon = getFileContents(pathName);
-
+        String url = this.urlManager.scriptUpload(APP_KEY, userKey, testId, file.getName());
+        JSONObject json = getJsonForFileUpload(url, file);
         try {
-            jmxData.put("data", fileCon);
+            if (!json.get("response_code").equals(200)) {
+                logger.println("Could not upload file " + file.getName() + " " + json.get("error").toString());
+            }
         } catch (JSONException e) {
-            System.err.format(e.getMessage());
+            logger.println("Could not upload file " + file.getName() + " " + e.getMessage());
+            e.printStackTrace();
         }
-
-        getJson(url, jmxData);
     }
 
     /**
