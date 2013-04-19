@@ -1,8 +1,7 @@
-target
-blazemeter.iml
-blazemeterPerformancePlugin.iml
-blazemeterPerformancePlugin.ipr
-blazemeterPerformancePlugin.iws
-.idea
+target/
+*.iml
+*.ipr
+*.iws
+.idea/
 .svn
-work
+work/
