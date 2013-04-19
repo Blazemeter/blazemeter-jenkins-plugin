@@ -7,6 +7,20 @@
         </a>
     </f:entry>
 
+    <j:set var="keys" value="${descriptor.getCredentials(it)}"/>
+    <j:if test="${keys.size() &gt; 1}">
+      <f:entry title="${%API Key}" field="apiKey">
+        <f:select style="width:32em;"/>
+      </f:entry>
+    </j:if>
+    <j:if test="${keys.size() &lt;= 1}">
+      <f:invisibleEntry>
+        <div style="display:none" name="apiKey">
+          <f:textbox value=""/>
+        </div>
+      </f:invisibleEntry>
+    </j:if>
+
     <f:entry title="${%BlazeMeter Test}:" field="testId">
         <f:select>
         </f:select>

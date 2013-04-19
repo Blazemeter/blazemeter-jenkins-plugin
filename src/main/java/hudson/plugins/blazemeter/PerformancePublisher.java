@@ -1,23 +1,33 @@
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-//import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.Item;
+import hudson.model.Job;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.TestInfo;
-import hudson.tasks.*;
+import hudson.security.ACL;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
+import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.mail.MessagingException;
@@ -27,7 +37,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +76,8 @@ public class PerformancePublisher extends Notifier {
     }
 */
 
+    private String apiKey;
+
     private String testId = "";
 
     private String testDuration = "180";
@@ -85,7 +105,8 @@ public class PerformancePublisher extends Notifier {
     private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
-    public PerformancePublisher(String testDuration,
+    public PerformancePublisher(String apiKey,
+                                String testDuration,
                                 String mainJMX,
                                 String dataFolder,
                                 String testId,
@@ -93,6 +114,7 @@ public class PerformancePublisher extends Notifier {
                                 int errorUnstableThreshold,
                                 int responseTimeFailedThreshold,
                                 int responseTimeUnstableThreshold) {
+        this.apiKey = apiKey;
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
@@ -199,7 +221,18 @@ public class PerformancePublisher extends Notifier {
         if ((result = validateThresholds(logger)) != Result.SUCCESS) // input parameters error.
             return true;
 
-        String apiKey = DESCRIPTOR.apiKey;
+        String apiKeyId = StringUtils.defaultIfEmpty(getApiKey(), getDescriptor().getApiKey());
+        String apiKey = null;
+        for (BlazemeterCredential c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
+            if (StringUtils.equals(apiKeyId, c.getId())) {
+                apiKey = c.getApiKey().getPlainText();
+                break;
+            }
+        }
+
+        // ideally, at this point we'd look up the credential based on the API key to find the secret
+        // but there are no secrets, so no need to!
         BlazemeterApi bmAPI = new BlazemeterApi();
 
         uploadDataFolderFiles(apiKey, testId, bmAPI, logger);
@@ -546,6 +579,10 @@ public class PerformancePublisher extends Notifier {
         return this;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
     public int getResponseTimeFailedThreshold() {
         return responseTimeFailedThreshold;
     }
@@ -620,7 +657,7 @@ public class PerformancePublisher extends Notifier {
     }
 
     @Override
-    public BuildStepDescriptor<Publisher> getDescriptor() {
+    public BlazeMeterPerformancePublisherDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
 
@@ -656,14 +693,32 @@ public class PerformancePublisher extends Notifier {
         }
 
         // Used by config.jelly to display the test list.
-        public ListBoxModel doFillTestIdItems() {
+        public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey) throws FormValidation {
+            if (StringUtils.isBlank(apiKey)) {
+                apiKey = getApiKey();
+            }
+
+            Secret apiSecret = null;
+            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            for (BlazemeterCredential c : CredentialsProvider
+                    .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+                if (StringUtils.equals(apiKey, c.getId())) {
+                    apiSecret = c.getApiKey();
+                    break;
+                }
+            }
             ListBoxModel items = new ListBoxModel();
+            if (apiSecret == null) {
+                items.add("No API Key", "-1");
+            } else {
             BlazemeterApi bzm = new BlazemeterApi();
 
             try {
-                HashMap<String, String> testList = bzm.getTestList(getApiKey());
+                HashMap<String, String> testList = bzm.getTestList(apiSecret.getPlainText());
                 if (testList == null){
-                    items.add("No tests, or invalid User key ", "-1");
+                    items.add("Invalid API key ", "-1");
+                } else if (testList.isEmpty()){
+                    items.add("No tests", "-1");
                 } else {
                     Set set = testList.entrySet();
                     for (Object test : set) {
@@ -672,14 +727,54 @@ public class PerformancePublisher extends Notifier {
                     }
                 }
             } catch (Exception e) {
-                items.add("No tests, or User key invalid", "-1");
-                e.printStackTrace();
+                throw FormValidation.error(e.getMessage(), e);
+            }
             }
             return items;
         }
 
+        public ListBoxModel doFillApiKeyItems() {
+            ListBoxModel items = new ListBoxModel();
+            Set<String> apiKeys = new HashSet<String>();
+
+            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            if (item instanceof Job) {
+                List<BlazemeterCredential> global = CredentialsProvider
+                        .lookupCredentials(BlazemeterCredential.class, Jenkins.getInstance(), ACL.SYSTEM);
+                if (!global.isEmpty() && !StringUtils.isEmpty(getApiKey())) {
+                    items.add("Default API Key", "");
+                }
+            }
+            for (BlazemeterCredential c : CredentialsProvider
+                    .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+                String id = c.getId();
+                if (!apiKeys.contains(id)) {
+                    items.add(StringUtils.defaultIfEmpty(c.getDescription(), id), id);
+                    apiKeys.add(id);
+                }
+            }
+            return items;
+        }
+
+        public List<BlazemeterCredential> getCredentials(Object scope) {
+            List<BlazemeterCredential> result = new ArrayList<BlazemeterCredential>();
+            Set<String> apiKeys = new HashSet<String>();
+
+            Item item = scope instanceof Item ? (Item) scope : null;
+            for (BlazemeterCredential c : CredentialsProvider
+                    .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+                String id = c.getId();
+                if (!apiKeys.contains(id)) {
+                    result.add(c);
+                    apiKeys.add(id);
+                }
+            }
+            return result;
+        }
+
         // Used by global.jelly to authenticate User key
-        public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
+        public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
+                throws MessagingException, IOException, JSONException, ServletException {
             BlazemeterApi bzm = new BlazemeterApi();
             int testCount = bzm.getTestCount(userKey);
             if (testCount <= 0) {
@@ -691,9 +786,7 @@ public class PerformancePublisher extends Notifier {
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-//            name = req.getParameter("name");
-            apiKey = req.getParameter("apiKey");
-
+            apiKey = formData.optString("apiKey");
             save();
             return true;
         }
@@ -715,7 +808,21 @@ public class PerformancePublisher extends Notifier {
         }
 
         public String getApiKey() {
-            return apiKey;
+            List<BlazemeterCredential> credentials = CredentialsProvider
+                    .lookupCredentials(BlazemeterCredential.class, Jenkins.getInstance(), ACL.SYSTEM);
+            if (StringUtils.isBlank(apiKey) && !credentials.isEmpty()) {
+                return credentials.get(0).getId();
+            }
+            if (credentials.size() == 1) {
+                return credentials.get(0).getId();
+            }
+            for (BlazemeterCredential c: credentials) {
+                if (StringUtils.equals(c.getId(), apiKey)) {
+                    return apiKey;
+                }
+            }
+            // API key is not valid any more
+            return "";
         }
 
         public void setApiKey(String apiKey) {
