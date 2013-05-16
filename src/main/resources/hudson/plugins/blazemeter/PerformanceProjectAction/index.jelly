@@ -8,7 +8,7 @@
           <p>Can't access the last report.</p>
       </j:if>
       <j:if test2="${!it.lastReportSession == ''}">
-          <iframe width="920" height="2000" src="https://a.blazemeter.com/report/${it.lastReportSession}/iframe">
+          <iframe width="1040" height="2000" src="https://a.blazemeter.com/report/${it.lastReportSession}/iframe">
               <p>Your browser does not support iframes.</p>
           </iframe>
      </j:if>
