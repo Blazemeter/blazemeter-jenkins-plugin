@@ -1,7 +1,28 @@
 package hudson.plugins.blazemeter.api;
 
+import hudson.ProxyConfiguration;
+import hudson.model.Hudson;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -9,14 +30,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.*;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 
 /**
  * User: Vitali
@@ -26,6 +39,11 @@ import javax.servlet.ServletException;
  * Updated
  * User: Doron
  * Date: 8/7/12
+ *
+ * Updated (proxy)
+ * User: Marcel
+ * Date: 9/23/13
+
  */
 
 public class BlazemeterApi {
@@ -46,11 +64,27 @@ public class BlazemeterApi {
         urlManager = new BmUrlManager("https://a.blazemeter.com");
         try {
             httpClient = new DefaultHttpClient();
+            configureProxy();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
     }
 
+    private void configureProxy(){
+    	if (Hudson.getInstance() != null && Hudson.getInstance().proxy != null) {
+    		ProxyConfiguration proxy = Hudson.getInstance().proxy;
+        	// Configure the proxy if necessary
+            if (proxy.name != null && !proxy.name.isEmpty() && proxy.port > 0) {
+                if (proxy.getUserName() != null && !proxy.getUserName().isEmpty()){
+                	Credentials cred = new UsernamePasswordCredentials(proxy.getUserName(), proxy.getPassword());
+                    httpClient.getCredentialsProvider().setCredentials(new AuthScope(proxy.name, proxy.port), cred);
+                }
+                HttpHost proxyHost = new HttpHost(proxy.name, proxy.port);
+                httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
+            }    	
+        } 
+    }
+    
     private HttpResponse getResponse(String url, JSONObject data) throws IOException {
 
         logger.println("Requesting : " + url);
@@ -428,12 +462,24 @@ public class BlazemeterApi {
 
         String url = getUrlForTestList(APP_KEY, userKey);
 
-        JSONObject jo = getJson(url, null);
-        String r = jo.get("response_code").toString();
-        if (!r.equals("200"))
-            return 0;
-        JSONArray arr = (JSONArray) jo.get("tests");
-        return arr.length();
+        try {
+            JSONObject jo = getJson(url, null);
+            if (jo == null){
+                return -1;
+            }
+            else {
+                String r = jo.get("response_code").toString();
+                if (!r.equals("200")) {
+                    return 0;
+                }
+                JSONArray arr = (JSONArray) jo.get("tests");
+                return arr.length();
+            }
+        } catch (JSONException e) {
+            logger.println("Error getting response from server: ");
+            e.printStackTrace();
+            return -1;
+        }
     }
 
 //    public synchronized ArrayList<TestInfo> getTests(String userKey) throws JSONException, IOException {
