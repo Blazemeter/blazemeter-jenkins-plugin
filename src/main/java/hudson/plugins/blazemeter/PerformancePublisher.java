@@ -240,6 +240,7 @@ public class PerformancePublisher extends Notifier {
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
+            logger.print(".");
             json = bmAPI.startTest(apiKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
@@ -258,7 +259,13 @@ public class PerformancePublisher extends Notifier {
                     return false;
                 }
                 //Try again.
+                logger.print(".");
                 json = bmAPI.startTest(apiKey, testId);
+                if (json == null) {
+                    logger.println("Could not start BlazeMeter Test");
+                    result = Result.NOT_BUILT;
+                    return false;
+                }
                 if (!json.get("response_code").equals(200)) {
                     logger.println("Could not start BlazeMeter Test -" + json.get("error").toString());
                     result = Result.NOT_BUILT;
