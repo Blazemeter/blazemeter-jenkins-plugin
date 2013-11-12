@@ -88,54 +88,65 @@ public class BlazemeterApi {
     private HttpResponse getResponse(String url, JSONObject data) throws IOException {
 
         logger.println("Requesting : " + url);
-        HttpPost postRequest = new HttpPost(url);
-        postRequest.setHeader("Accept", "application/json");
-        postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
-
-        if (data != null) {
-            postRequest.setEntity(new StringEntity(data.toString()));
-        }
-
         HttpResponse response = null;
+
         try {
+            HttpPost postRequest = new HttpPost(url);
+            postRequest.setHeader("Accept", "application/json");
+            postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
+
+            if (data != null) {
+                postRequest.setEntity(new StringEntity(data.toString()));
+            }
+
             response = this.httpClient.execute(postRequest);
 
-            int statusCode = response.getStatusLine().getStatusCode();
-            String error = response.getStatusLine().getReasonPhrase();
-            if ((statusCode >= 300) || (statusCode < 200)) {
-                throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+            if (response != null && response.getStatusLine() != null) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String error = response.getStatusLine().getReasonPhrase();
+                if ((statusCode >= 300) || (statusCode < 200)) {
+                    throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+                }
+            } else {
+                logger.format("Erroneous response (Probably null) for url: %s", url);
+                response = null;
             }
         } catch (Exception e) {
-            System.err.format("Wrong response: %s\n", e);
+            logger.format("Wrong response: %s\n", e);
+            response = null;
         }
-
         return response;
     }
 
     private HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
 
         logger.println("Requesting : " + url);
-        HttpPost postRequest = new HttpPost(url);
-        postRequest.setHeader("Accept", "application/json");
-        postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
-
-        if (file != null) {
-            postRequest.setEntity(new FileEntity(file, "text/plain; charset=\"UTF-8\""));
-        }
-
         HttpResponse response = null;
+
         try {
+            HttpPost postRequest = new HttpPost(url);
+            postRequest.setHeader("Accept", "application/json");
+            postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
+
+            if (file != null) {
+                postRequest.setEntity(new FileEntity(file, "text/plain; charset=\"UTF-8\""));
+            }
+
             response = this.httpClient.execute(postRequest);
 
-            int statusCode = response.getStatusLine().getStatusCode();
-            String error = response.getStatusLine().getReasonPhrase();
-            if ((statusCode >= 300) || (statusCode < 200)) {
-                throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+            if (response != null && response.getStatusLine() != null) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String error = response.getStatusLine().getReasonPhrase();
+                if ((statusCode >= 300) || (statusCode < 200)) {
+                    throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+                }
+            } else {
+                logger.format("Erroneous response (Probably null) for url: %s", url);
+                response = null;
             }
         } catch (Exception e) {
-            System.err.format("Wrong response: %s\n", e);
+            logger.format("Wrong response: %s\n", e);
         }
-
         return response;
     }
 
@@ -432,9 +443,9 @@ public class BlazemeterApi {
             String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
             JSONObject jo = getJson(url, null);
 
-            if (jo.get("status") == "Test not found")
+            if ("Test not found".equals(jo.get("error"))) {
                 ti.status = TestStatus.NotFound;
-            else {
+            } else {
                 ti.id = jo.getString("test_id");
                 ti.name = jo.getString("test_name");
                 ti.status = jo.getString("status");
