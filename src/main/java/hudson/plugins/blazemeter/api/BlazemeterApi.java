@@ -101,19 +101,23 @@ public class BlazemeterApi {
 
             response = this.httpClient.execute(postRequest);
 
-            if (response != null && response.getStatusLine() != null) {
-                int statusCode = response.getStatusLine().getStatusCode();
-                String error = response.getStatusLine().getReasonPhrase();
-                if ((statusCode >= 300) || (statusCode < 200)) {
-                    throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
-                }
-            } else {
+//            if (response != null && response.getStatusLine() != null) {
+//                int statusCode = response.getStatusLine().getStatusCode();
+//                String error = response.getStatusLine().getReasonPhrase();
+//                if ((statusCode >= 300) || (statusCode < 200)) {
+//                    throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+//                }
+//            } else {
+//                logger.format("Erroneous response (Probably null) for url: %s", url);
+//                response = null;
+//            }
+
+            if (response == null || response.getStatusLine() == null) {
                 logger.format("Erroneous response (Probably null) for url: %s", url);
                 response = null;
             }
         } catch (Exception e) {
             logger.format("Wrong response: %s\n", e);
-            response = null;
         }
         return response;
     }

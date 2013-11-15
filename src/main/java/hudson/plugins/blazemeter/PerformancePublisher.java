@@ -243,9 +243,9 @@ public class PerformancePublisher extends Notifier {
             logger.print(".");
             json = bmAPI.startTest(apiKey, testId);
             countStartRequests++;
-            if (countStartRequests > 5) {
+            if (json == null && countStartRequests > 5) {
                 logger.println("Could not start BlazeMeter Test");
-                result = Result.NOT_BUILT;
+                build.setResult(Result.NOT_BUILT);
                 return false;
             }
         } while (json == null);
@@ -255,7 +255,7 @@ public class PerformancePublisher extends Notifier {
                 if (json.get("response_code").equals(500) && json.get("error").toString().startsWith("Test already running")) {
 //                    bmAPI.stopTest(apiKey, testId);
                     logger.println("Test already running, please stop it first");
-                    result = Result.NOT_BUILT;
+                    build.setResult(Result.NOT_BUILT);
                     return false;
                 }
                 //Try again.
@@ -263,12 +263,12 @@ public class PerformancePublisher extends Notifier {
                 json = bmAPI.startTest(apiKey, testId);
                 if (json == null) {
                     logger.println("Could not start BlazeMeter Test");
-                    result = Result.NOT_BUILT;
+                    build.setResult(Result.NOT_BUILT);
                     return false;
                 }
                 if (!json.get("response_code").equals(200)) {
                     logger.println("Could not start BlazeMeter Test -" + json.get("error").toString());
-                    result = Result.NOT_BUILT;
+                    build.setResult(Result.NOT_BUILT);
                     return false;
                 }
             }
