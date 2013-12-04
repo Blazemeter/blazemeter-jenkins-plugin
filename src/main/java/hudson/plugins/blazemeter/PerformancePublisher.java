@@ -351,13 +351,16 @@ public class PerformancePublisher extends Notifier {
 
         for (int i = 0; i < 30; i++) {
             try {
-                if (!json.get("response_code").equals(200))
+                if (!json.get("response_code").equals(200)) {
                     logger.println("Error: Requesting aggregate report response code:" + json.get("response_code"));
+                } else if (json.has("error") && !json.getString("error").equals("null")){
+                    logger.println("Error: Requesting aggregate report. Error received :" + json.getString("error"));
+                } else {
+                    aggregate = json.getJSONObject("report").get("aggregate").toString();
+                }
 
-                aggregate = json.getJSONObject("report").get("aggregate").toString();
             } catch (JSONException e) {
-                logger.println("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
-                e.printStackTrace();
+                logger.println("Error: Exception while parsing aggregate report [" + e.getMessage() + "]");
             }
 
             if (!aggregate.equals("null"))
@@ -367,7 +370,7 @@ public class PerformancePublisher extends Notifier {
             json = bmAPI.aggregateReport(apiKey, session);
         }
 
-        if (aggregate == null) {
+        if (aggregate == null || aggregate.equals("null")) {
             logger.println("Error: Requesting aggregate is not available");
             build.setResult(Result.NOT_BUILT);
             return false;
