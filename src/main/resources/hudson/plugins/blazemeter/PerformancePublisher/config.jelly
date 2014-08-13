@@ -86,14 +86,15 @@
     <f:advanced>
         <f:entry title="${%Test Duration}:"
                  field="testDuration">
-            <select name="testDuration">
+            <f:textbox field="instance.testDuration"/>
+            <!--<select name="testDuration">
                 <f:option value="180" selected="${'180'==instance.testDuration}">${%180 Minutes}</f:option>
                 <f:option value="120" selected="${'120'==instance.testDuration}">${%120 Minutes}</f:option>
                 <f:option value="60" selected="${'60'==instance.testDuration}">${%60 Minutes}</f:option>
                 <f:option value="50" selected="${'50'==instance.testDuration}">${%50 Minutes}</f:option>
                 <f:option value="30" selected="${'30'==instance.testDuration}">${%30 Minutes}</f:option>
                 <f:option value="10" selected="${'10'==instance.testDuration}">${%10 Minutes}</f:option>
-            </select>
+            </select>-->
         </f:entry>
 
         <f:entry title="${%Data folder}:"
