@@ -1,5 +1,8 @@
 package hudson.plugins.blazemeter;
 
+import hudson.model.AbstractProject;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -9,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by dzmitrykashlach on 8/13/14.
  */
-public class ResponseTimeValidation {
+public  final class TextBoxValueValidationDescriptor extends BuildStepDescriptor<Builder> {
 
 //descriptor's code
 
@@ -21,10 +24,20 @@ public class ResponseTimeValidation {
  * @return Indicates the outcome of the validation. This is sent to the
  *         browser.
  */
-public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
+public FormValidation checkValue(@QueryParameter String value) throws IOException, ServletException {
         if(value.equals("0")) {
         return FormValidation.warning("Response time should be more than ZERO");
         }
         return FormValidation.ok();
         }
-        }
+
+    @Override
+    public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+        return false;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return null;
+    }
+}

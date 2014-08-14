@@ -86,7 +86,8 @@
     <f:advanced>
         <f:entry title="${%Test Duration}:"
                  field="testDuration">
-            <f:textbox field="instance.testDuration"/>
+            <f:textbox field="instance.testDuration"
+                       checkUrl="'descriptorByName/TextBoxValueValidationDescriptor/checkValue?value='+escape(this.value)" />
             <!--<select name="testDuration">
                 <f:option value="180" selected="${'180'==instance.testDuration}">${%180 Minutes}</f:option>
                 <f:option value="120" selected="${'120'==instance.testDuration}">${%120 Minutes}</f:option>
