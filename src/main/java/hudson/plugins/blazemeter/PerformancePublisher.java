@@ -702,7 +702,7 @@ public class PerformancePublisher extends Notifier {
 
         public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
             if(value.equals("0")) {
-                return FormValidation.errorWithMarkup("Value should be more than ZERO");
+                return FormValidation.error("Value should be more than ZERO");
             }
             return FormValidation.ok();
         }
