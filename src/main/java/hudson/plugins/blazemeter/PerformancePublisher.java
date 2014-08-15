@@ -433,6 +433,11 @@ public class PerformancePublisher extends Notifier {
 
     private Result validateThresholds(PrintStream logger) {
         Result result = Result.SUCCESS;
+        if(testDuration.equals("0")){
+            logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
+                    +Result.NOT_BUILT.toString().toLowerCase());
+
+        }
         if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
             logger.println("BlazeMeter: Errors percentage greater or equal than "
                     + errorUnstableThreshold + "% will be considered as "
@@ -702,7 +707,7 @@ public class PerformancePublisher extends Notifier {
 
         public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
             if(value.equals("0")) {
-                return FormValidation.error("Value should be more than ZERO");
+                return FormValidation.warning("Value should be more than ZERO");
             }
             return FormValidation.ok();
         }
