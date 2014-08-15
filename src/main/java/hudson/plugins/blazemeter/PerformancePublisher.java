@@ -52,29 +52,6 @@ import java.util.regex.Pattern;
 public class PerformancePublisher extends Notifier {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
 
-/*
-    @Extension
-    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-        @Override
-        public String getDisplayName() {
-            return Messages.Publisher_DisplayName();
-        }
-
-        @Override
-        public String getHelpFile() {
-            return "/plugin/BlazeMeterJenkinsPlugin/help.html";
-        }
-
-        public List<PerformanceReportParserDescriptor> getParserDescriptors() {
-            return PerformanceReportParserDescriptor.all();
-        }
-
-        @Override
-        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return true;
-        }
-    }
-*/
 
     private String apiKey;
 
@@ -138,12 +115,6 @@ public class PerformancePublisher extends Notifier {
 
     private String blazeMeterURL;
 
-//    @Override
-//    public Action getProjectAction(AbstractProject<?, ?> project) {
-//        PerformanceProjectAction ret = new PerformanceProjectAction(project);
-//        performanceProjectActions.add(ret);
-//        return ret;
-//    }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
@@ -415,67 +386,9 @@ public class PerformancePublisher extends Notifier {
 
         build.setResult(result);
 
-/*
-        for (PerformanceReportParser parser : parsers) {
-            String glob = parser.glob;
-            logger.println("Performance: Recording " + parser.getReportName()
-                    + " reports '" + glob + "'");
-
-            List<FilePath> files = locatePerformanceReports(build.getWorkspace(),
-                    glob);
-
-            if (files.isEmpty()) {
-                if (build.getResult().isWorseThan(Result.UNSTABLE)) {
-                    return true;
-                }
-                build.setResult(Result.FAILURE);
-                logger.println("Performance: no " + parser.getReportName()
-                        + " files matching '" + glob
-                        + "' have been found. Has the report generated?. Setting Build to "
-                        + build.getResult());
-                return true;
-            }
-
-            List<File> localReports = copyReportsToMaster(build, logger, files,
-                    parser.getDescriptor().getDisplayName());
-            Collection<PerformanceReport> parsedReports = parser.parse(build,
-                    localReports, listener);
-
-            // mark the build as unstable or failure depending on the outcome.
-            for (PerformanceReport r : parsedReports) {
-                r.setBuildAction(a);
-                double errorPercent = r.errorPercent();
-                Result result = Result.SUCCESS;
-                if (errorFailedThreshold >= 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
-                    result = Result.FAILURE;
-                    build.setResult(Result.FAILURE);
-                } else if (errorUnstableThreshold >= 0
-                        && errorPercent - errorUnstableThreshold > thresholdTolerance) {
-                    result = Result.UNSTABLE;
-                }
-                if (result.isWorseThan(build.getResult())) {
-                    build.setResult(result);
-                }
-                logger.println("Performance: File " + r.getReportFileName()
-                        + " reported " + errorPercent
-                        + "% of errors [" + result + "]. Build status is: "
-                        + build.getResult());
-            }
-        }
-*/
 
         return true;
     }
-
-//    public void getAllTestsForUser(String   userKey)  {
-//        try {
-//            BlazemeterApi   bzm  = new  BlazemeterApi();
-//            bzm.getTests(userKey);
-//        } catch (Exception e) {
-//          // Do nothing!
-//        }
-//    }
-
 
     private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
@@ -577,15 +490,6 @@ public class PerformancePublisher extends Notifier {
     }
 
     public Object readResolve() {
-        // data format migration
-/*
-        if (parsers == null)
-            parsers = new ArrayList<PerformanceReportParser>();
-        if (filename != null) {
-            parsers.add(new LoadReportParser(filename));
-            filename = null;
-        }
-*/
         return this;
     }
 
@@ -795,6 +699,14 @@ public class PerformancePublisher extends Notifier {
                 return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
             }
         }
+
+        public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
+            if(value.equals("0")) {
+                return FormValidation.errorWithMarkup("Value should be more than ZERO");
+            }
+            return FormValidation.ok();
+        }
+
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
