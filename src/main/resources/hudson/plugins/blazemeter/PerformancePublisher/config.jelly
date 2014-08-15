@@ -3,7 +3,7 @@
 
     <f:entry title="Provided by BlazeMeter">
         <a href="http://www.blazemeter.com" target="_blank">
-            <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/blazemeter2.png" alt="200"/>
+            <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%"/>
         </a>
     </f:entry>
 
@@ -87,7 +87,7 @@
         <f:entry title="${%Test Duration}:"
                  field="testDuration">
             <f:textbox field="instance.testDuration"
-                       checkUrl="'descriptorByName/PerformancePublisher/checkValue?value='+escape(this.value)" />
+                       checkUrl="'descriptorByName/PerformancePublisher/checkTestDuration?value='+escape(this.value)" />
         </f:entry>
 
         <f:entry title="${%Data folder}:"

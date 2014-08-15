@@ -705,9 +705,9 @@ public class PerformancePublisher extends Notifier {
             }
         }
 
-        public FormValidation doCheckValue(@QueryParameter String value) throws IOException, ServletException {
+        public FormValidation doCheckTestDuration(@QueryParameter String value) throws IOException, ServletException {
             if(value.equals("0")) {
-                return FormValidation.warning("Value should be more than ZERO");
+                return FormValidation.warning("TestDuration should be more than ZERO");
             }
             return FormValidation.ok();
         }
