@@ -189,8 +189,11 @@ public class PerformancePublisher extends Notifier {
 
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        if ((result = validateThresholds(logger)) != Result.SUCCESS) // input parameters error.
+        if ((result = validateThresholds(logger)) != Result.SUCCESS){
+            // input parameters error.
+            build.setResult(Result.ABORTED);
             return true;
+        }
 
         String apiKeyId = StringUtils.defaultIfEmpty(getApiKey(), getDescriptor().getApiKey());
         String apiKey = null;
@@ -436,42 +439,42 @@ public class PerformancePublisher extends Notifier {
         if(testDuration.equals("0")){
             logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
                     +Result.NOT_BUILT.toString().toLowerCase());
-
+            return Result.ABORTED;
         }
         if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
             logger.println("BlazeMeter: Errors percentage greater or equal than "
-                    + errorUnstableThreshold + "% will be considered as "
+                    + errorUnstableThreshold + " % will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter: percentage should be between 0 to 100");
-            result = Result.NOT_BUILT;
+            logger.println("BlazeMeter: ErrorUnstableThreshold percentage should be between 0 to 100");
+            return Result.ABORTED;
         }
 
         if (errorFailedThreshold >= 0 && errorFailedThreshold <= 100) {
-            logger.println("BlazeMeter: Errors percentage greater or equal than "
-                    + errorFailedThreshold + "% will be considered as "
+            logger.println("BlazeMeter: ErrorFailedThreshold percentage greater or equal than "
+                    + errorFailedThreshold + " % will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter: percentage should be between 0 to 100");
-            result = Result.NOT_BUILT;
+            logger.println("BlazeMeter: ErrorFailedThreshold percentage should be between 0 to 100");
+            return Result.ABORTED;
         }
 
-        if (responseTimeUnstableThreshold >= 0) {
-            logger.println("BlazeMeter: Response time greater or equal than "
-                    + responseTimeUnstableThreshold + "millis will be considered as "
+        if (responseTimeUnstableThreshold > 0) {
+            logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
+                    + responseTimeUnstableThreshold + " millis will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter: percentage should be greater or equal than 0");
-            result = Result.NOT_BUILT;
+            logger.println("BlazeMeter: ResponseTimeUnstable should be greater than 0");
+            return Result.ABORTED;
         }
 
-        if (responseTimeFailedThreshold >= 0) {
-            logger.println("BlazeMeter: Response time greater or equal than "
-                    + responseTimeFailedThreshold + "millis will be considered as "
+        if (responseTimeFailedThreshold > 0) {
+            logger.println("BlazeMeter: ResponseTimeFailed greater than "
+                    + responseTimeFailedThreshold + " millis will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
         } else {
-            logger.println("BlazeMeter: percentage should be greater or equal than 0");
-            result = Result.NOT_BUILT;
+            logger.println("BlazeMeter: ResponseTimeFailed should be greater than 0");
+            return Result.ABORTED;
         }
         return result;
     }
@@ -711,7 +714,13 @@ public class PerformancePublisher extends Notifier {
             }
             return FormValidation.ok();
         }
-
+/*
+        public FormValidation doCheckResponseTimeUnstableThreshold(@QueryParameter String value) throws IOException, ServletException {
+            if(value.equals("0")) {
+                return FormValidation.warning("Value should be more than ZERO");
+            }
+            return FormValidation.ok();
+        }*/
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
