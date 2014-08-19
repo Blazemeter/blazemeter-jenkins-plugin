@@ -29,7 +29,7 @@ public abstract class PerformanceReportParser implements
     public final String glob;
 
     @DataBoundConstructor
-    protected PerformanceReportParser(String glob) {
+    public PerformanceReportParser(String glob) {
         this.glob = (glob == null || glob.length() == 0) ? getDefaultGlobPattern()
                 : glob;
     }
