@@ -87,7 +87,7 @@
         <f:entry title="${%Test Duration}:"
                  field="testDuration">
             <f:textbox field="instance.testDuration"
-                       checkUrl="'descriptorByName/PerformancePublisher/checkTestDuration?value='+escape(this.value)" />
+                       checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformancePublisher/checkTestDuration?value='+escape(this.value)" />
         </f:entry>
 
         <f:entry title="${%Data folder}:"
