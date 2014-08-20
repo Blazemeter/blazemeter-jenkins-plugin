@@ -187,13 +187,21 @@ public class PerformancePublisher extends Notifier {
         Result result; // Result.SUCCESS;
         String session;
 
-        int runDurationSeconds = Integer.parseInt(testDuration) * 60;
+        if(testDuration==null||testDuration.isEmpty()){
+            build.setResult(Result.ABORTED);
+            logger.println("Build was aborted due to incorrect values of test duration: null or empty");
+            return true;
+        }
 
         if ((result = validateThresholds(logger)) != Result.SUCCESS){
             // input parameters error.
             build.setResult(Result.ABORTED);
+            logger.println("Build was aborted due to incorrect values of tresholds");
             return true;
         }
+        logger.println("Expected test duration="+testDuration);
+
+        int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
         String apiKeyId = StringUtils.defaultIfEmpty(getApiKey(), getDescriptor().getApiKey());
         String apiKey = null;
