@@ -375,21 +375,21 @@ public class PerformancePublisher extends Notifier {
         double errorPercent = aggregateTestResult.getErrorPercentage();
         double AverageResponseTime = aggregateTestResult.getAverage();
 
-        if (errorFailedThreshold >= 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
+        if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
             logger.println("Test ended with " + Result.FAILURE + " on error percentage threshold");
-        } else if (errorUnstableThreshold >= 0
+        } else if (errorUnstableThreshold > 0
                 && errorPercent - errorUnstableThreshold > thresholdTolerance) {
             logger.println("Test ended with " + Result.UNSTABLE + " on error percentage threshold");
             result = Result.UNSTABLE;
         }
 
-        if (responseTimeFailedThreshold >= 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
+        if (responseTimeFailedThreshold > 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
             build.setResult(Result.FAILURE);
             logger.println("Test ended with " + Result.FAILURE + " on response time threshold");
 
-        } else if (responseTimeUnstableThreshold >= 0
+        } else if (responseTimeUnstableThreshold > 0
                 && AverageResponseTime - responseTimeUnstableThreshold > thresholdTolerance) {
             result = Result.UNSTABLE;
             logger.println("Test ended with " + Result.UNSTABLE + " on response time threshold");
@@ -471,19 +471,19 @@ public class PerformancePublisher extends Notifier {
             logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
                     + responseTimeUnstableThreshold + " millis will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
-        } else {
+        } /*else {
             logger.println("BlazeMeter: ResponseTimeUnstable should be greater than 0");
             return Result.ABORTED;
-        }
+        }*/
 
         if (responseTimeFailedThreshold > 0) {
             logger.println("BlazeMeter: ResponseTimeFailed greater than "
                     + responseTimeFailedThreshold + " millis will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
-        } else {
+        } /*else {
             logger.println("BlazeMeter: ResponseTimeFailed should be greater than 0");
             return Result.ABORTED;
-        }
+        }*/
         return result;
     }
 
