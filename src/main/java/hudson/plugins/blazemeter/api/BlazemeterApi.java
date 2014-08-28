@@ -451,7 +451,8 @@ public class BlazemeterApi {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&"+CLIENT_IDENTIFICATION, appKey, userKey, testId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&",
+                    appKey, userKey, testId)+CLIENT_IDENTIFICATION;
         }
 
 
@@ -464,7 +465,8 @@ public class BlazemeterApi {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&"+CLIENT_IDENTIFICATION, appKey, userKey, testId, fileName);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
+                    appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
         }
 
         public String fileUpload(String appKey, String userKey, String testId, String fileName) {
@@ -476,7 +478,8 @@ public class BlazemeterApi {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&"+CLIENT_IDENTIFICATION, appKey, userKey, testId, fileName);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
+                    appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
         }
 
         public String testStart(String appKey, String userKey, String testId) {
@@ -512,7 +515,8 @@ public class BlazemeterApi {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&"+CLIENT_IDENTIFICATION, appKey, userKey, reportId);
+            return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
+                    appKey, userKey, reportId)+CLIENT_IDENTIFICATION;
         }
     }
 }
