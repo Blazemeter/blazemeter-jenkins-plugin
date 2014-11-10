@@ -10,8 +10,9 @@ import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.entities.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.entities.AggregateTestResult;
+import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
@@ -220,7 +221,7 @@ public class PerformancePublisher extends Notifier {
 
         // ideally, at this point we'd look up the credential based on the API key to find the secret
         // but there are no secrets, so no need to!
-        BlazemeterApi bmAPI = new BlazemeterApi();
+        BlazemeterApiV2Impl bmAPI = new BlazemeterApiV2Impl();
 
         uploadDataFolderFiles(apiKey, testId, bmAPI, logger);
 
@@ -406,7 +407,7 @@ public class PerformancePublisher extends Notifier {
         return true;
     }
 
-    private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
+    private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApiV2Impl bmAPI, PrintStream logger) {
 
         if (dataFolder == null || dataFolder.isEmpty())
             return;
@@ -654,7 +655,7 @@ public class PerformancePublisher extends Notifier {
             if (apiSecret == null) {
                 items.add("No API Key", "-1");
             } else {
-            BlazemeterApi bzm = new BlazemeterApi();
+            BlazemeterApiV2Impl bzm = new BlazemeterApiV2Impl();
 
             try {
                 HashMap<String, String> testList = bzm.getTestList(apiSecret.getPlainText());
@@ -718,7 +719,7 @@ public class PerformancePublisher extends Notifier {
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
                 throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterApi bzm = new BlazemeterApi();
+            BlazemeterApi bzm = new BlazemeterApiV2Impl();
             int testCount = bzm.getTestCount(userKey);
             if (testCount < 0) {
                 return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");

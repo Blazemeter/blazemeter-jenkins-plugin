@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.api;
+package hudson.plugins.blazemeter.api.url;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -7,7 +7,7 @@ import java.net.URLEncoder;
 /**
  * Created by dzmitrykashlach on 10/11/14.
  */
-public class BmUrlManager {
+public class BmUrlManagerV2Impl implements BmUrlManager {
 
     private String SERVER_URL = "https://a.blazemeter.com/";
     private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.08-1-SNAPSHOT&​";
@@ -23,7 +23,7 @@ public class BmUrlManager {
         }
     }
 
-    public BmUrlManager(String blazeMeterUrl) {
+    public BmUrlManagerV2Impl(String blazeMeterUrl) {
         SERVER_URL = blazeMeterUrl;
     }
 
@@ -43,6 +43,16 @@ public class BmUrlManager {
                 appKey, userKey, testId)+CLIENT_IDENTIFICATION;
     }
 
+    public String getTests(String appKey, String userKey) {
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
+
+    }
 
     public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
         try {

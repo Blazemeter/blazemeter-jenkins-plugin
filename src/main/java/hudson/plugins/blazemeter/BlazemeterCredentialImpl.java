@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
@@ -64,7 +65,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
 
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterApi bzm = new BlazemeterApi();
+            BlazemeterApi bzm = BlazemeterApiV2Impl.getBlazemeterApiV2();
             int testCount = bzm.getTestCount(userKey);
             if (testCount < 0) {
                 return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
