@@ -57,6 +57,8 @@ public class PerformancePublisher extends Notifier {
 
     private String testId = "";
 
+    private String apiVersion = "";
+
     private String testDuration = "180";
 
     private String mainJMX = "";
@@ -87,6 +89,7 @@ public class PerformancePublisher extends Notifier {
                                 String mainJMX,
                                 String dataFolder,
                                 String testId,
+                                String apiVersion,
                                 int errorFailedThreshold,
                                 int errorUnstableThreshold,
                                 int responseTimeFailedThreshold,
@@ -95,6 +98,7 @@ public class PerformancePublisher extends Notifier {
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
+        this.apiVersion = apiVersion;
         this.testDuration = testDuration;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
@@ -535,6 +539,14 @@ public class PerformancePublisher extends Notifier {
 
     public void setTestDuration(String testDuration) {
         this.testDuration = testDuration;
+    }
+
+    public String getApiVersion() {
+        return apiVersion;
+    }
+
+    public void setApiVersion(String apiVersion) {
+        this.apiVersion = apiVersion;
     }
 
     public String getMainJMX() {
