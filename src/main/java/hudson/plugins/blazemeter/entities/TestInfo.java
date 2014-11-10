@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.api;
+package hudson.plugins.blazemeter.entities;
 
 /**
  * User: Vitali
@@ -11,9 +11,9 @@ package hudson.plugins.blazemeter.api;
  * Time: 1:05 PM
  */
 public class TestInfo {
-    String id;
-    String name;
-    String status;
+    private String id;
+    private String name;
+    private String status;
 
     public TestInfo() {
     }

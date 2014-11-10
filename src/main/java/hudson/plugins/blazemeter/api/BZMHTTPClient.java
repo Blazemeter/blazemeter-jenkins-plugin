@@ -1,0 +1,157 @@
+package hudson.plugins.blazemeter.api;
+
+import hudson.ProxyConfiguration;
+import hudson.model.Hudson;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+
+/**
+ * Created by dzmitrykashlach on 10/11/14.
+ */
+public class BZMHTTPClient {
+    PrintStream logger = new PrintStream(System.out);
+
+    private static BZMHTTPClient instance=null;
+
+    private DefaultHttpClient httpClient=null;
+
+    private BZMHTTPClient(){
+        this.httpClient=new DefaultHttpClient();
+    };
+
+    public static BZMHTTPClient getInstance(){
+        if(instance==null){
+           instance=new BZMHTTPClient();
+        }
+        return instance;
+
+
+
+    }
+
+
+    HttpResponse getResponse(String url, JSONObject data) throws IOException {
+
+        logger.println("Requesting : " + url);
+        HttpResponse response = null;
+
+        try {
+            HttpPost postRequest = new HttpPost(url);
+            postRequest.setHeader("Accept", "application/json");
+            postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
+
+            if (data != null) {
+                postRequest.setEntity(new StringEntity(data.toString()));
+            }
+
+            response = this.httpClient.execute(postRequest);
+
+
+            if (response == null || response.getStatusLine() == null) {
+                logger.format("Erroneous response (Probably null) for url: %s", url);
+                response = null;
+            }
+        } catch (Exception e) {
+            logger.format("Problems with creating and sending request: %s\n", e);
+        }
+        return response;
+    }
+
+    HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
+
+        logger.println("Requesting : " + url);
+        HttpResponse response = null;
+
+        try {
+            HttpPost postRequest = new HttpPost(url);
+            postRequest.setHeader("Accept", "application/json");
+            postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
+
+            if (file != null) {
+                postRequest.setEntity(new FileEntity(file, "text/plain; charset=\"UTF-8\""));
+            }
+
+            response = this.httpClient.execute(postRequest);
+
+            if (response != null && response.getStatusLine() != null) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String error = response.getStatusLine().getReasonPhrase();
+                if ((statusCode >= 300) || (statusCode < 200)) {
+                    throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
+                }
+            } else {
+                logger.format("Erroneous response (Probably null) for url: %s", url);
+                response = null;
+            }
+        } catch (Exception e) {
+            logger.format("Wrong response: %s\n", e);
+        }
+        return response;
+    }
+
+    JSONObject getJsonForFileUpload(String url, File file) {
+        JSONObject jo = null;
+        try {
+            HttpResponse response = getResponseForFileUpload(url, file);
+            if (response != null) {
+                String output = EntityUtils.toString(response.getEntity());
+                logger.println(output);
+                jo = new JSONObject(output);
+            }
+        } catch (IOException e) {
+            logger.println("error decoding Json " + e);
+        } catch (JSONException e) {
+            logger.println("error decoding Json " + e);
+        }
+        return jo;
+    }
+
+    JSONObject getJson(String url, JSONObject data) {
+        JSONObject jo = null;
+        try {
+            HttpResponse response = getResponse(url, data);
+            if (response != null) {
+                String output = EntityUtils.toString(response.getEntity());
+                logger.println(output);
+                jo = new JSONObject(output);
+            }
+        } catch (IOException e) {
+            logger.println("error decoding Json " + e);
+        } catch (JSONException e) {
+            logger.println("error decoding Json " + e);
+        }
+        return jo;
+    }
+
+    void configureProxy(){
+        if (Hudson.getInstance() != null && Hudson.getInstance().proxy != null) {
+            ProxyConfiguration proxy = Hudson.getInstance().proxy;
+            // Configure the proxy if necessary
+            if (proxy.name != null && !proxy.name.isEmpty() && proxy.port > 0) {
+                if (proxy.getUserName() != null && !proxy.getUserName().isEmpty()){
+                    Credentials cred = new UsernamePasswordCredentials(proxy.getUserName(), proxy.getPassword());
+                    httpClient.getCredentialsProvider().setCredentials(new AuthScope(proxy.name, proxy.port), cred);
+                }
+                HttpHost proxyHost = new HttpHost(proxy.name, proxy.port);
+                httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
+            }
+        }
+    }
+
+
+}

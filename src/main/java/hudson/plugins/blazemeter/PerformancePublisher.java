@@ -10,9 +10,10 @@ import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.api.AggregateTestResult;
+import hudson.plugins.blazemeter.entities.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.TestInfo;
+import hudson.plugins.blazemeter.entities.TestInfo;
+import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -280,19 +281,19 @@ public class PerformancePublisher extends Notifier {
             //if drupal works hard
             //Thread.sleep(1000);
 
-            if (info.getStatus().equals(BlazemeterApi.TestStatus.Error)) {
+            if (info.getStatus().equals(TestStatus.Error)) {
                 build.setResult(Result.NOT_BUILT);
                 logger.println("Error while running a test - please try to run the same test on BlazeMeter");
                 return true;
             }
 
-            if (info.getStatus().equals(BlazemeterApi.TestStatus.NotFound)) {
+            if (info.getStatus().equals(TestStatus.NotFound)) {
                 build.setResult(Result.NOT_BUILT);
                 logger.println("Test not found error");
                 return true;
             }
 
-            if (info.getStatus().equals(BlazemeterApi.TestStatus.Running)) {
+            if (info.getStatus().equals(TestStatus.Running)) {
                 if (start == null)
                     start = Calendar.getInstance().getTime();
                 build.setResult(Result.SUCCESS);
@@ -311,7 +312,7 @@ public class PerformancePublisher extends Notifier {
                 continue;
             }
 
-            if (info.getStatus().equals(BlazemeterApi.TestStatus.NotRunning))
+            if (info.getStatus().equals(TestStatus.NotRunning))
                 break;
         }
 

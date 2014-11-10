@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.api;
+package hudson.plugins.blazemeter.entities;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
