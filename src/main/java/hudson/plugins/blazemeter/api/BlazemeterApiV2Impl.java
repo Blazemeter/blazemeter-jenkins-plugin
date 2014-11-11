@@ -103,7 +103,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
         try {
             String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
-            JSONObject jo = this.bzmhc.getJson(url, null);
+            JSONObject jo = this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
 
             if ("Test not found".equals(jo.get("error"))) {
                 ti.setStatus(TestStatus.NotFound);
@@ -124,7 +124,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (!validate(userKey, testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        return this.bzmhc.getJson(url, null);
+        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
     }
 
     public int getTestCount(String userKey) throws JSONException, IOException, ServletException {
@@ -136,7 +136,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         String url = this.urlManager.getTests(APP_KEY, userKey);
 
         try {
-            JSONObject jo = this.bzmhc.getJson(url, null);
+            JSONObject jo = this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
             if (jo == null){
                 return -1;
             }
@@ -179,7 +179,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (!validate(userKey, testId)) return null;
 
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        return this.bzmhc.getJson(url, null);
+        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
     }
 
     /**
@@ -192,7 +192,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (!validate(userKey, reportId)) return null;
 
         String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
-        return this.bzmhc.getJson(url, null);
+        return this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
     }
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {
@@ -204,7 +204,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         } else {
             String url = this.urlManager.getTests(APP_KEY, userKey);
             logger.println(url);
-            JSONObject jo = this.bzmhc.getJson(url, null);
+            JSONObject jo = this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
             try {
                 String r = jo.get("response_code").toString();
                 if (r.equals("200")) {

@@ -7,7 +7,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
@@ -26,6 +28,7 @@ import java.io.PrintStream;
 public class BZMHTTPClient {
     PrintStream logger = new PrintStream(System.out);
 
+    public enum Method{GET,POST}
     private static BZMHTTPClient instance=null;
 
     private transient DefaultHttpClient httpClient=null;
@@ -45,22 +48,26 @@ public class BZMHTTPClient {
     }
 
 
-    HttpResponse getResponse(String url, JSONObject data) throws IOException {
+    HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
 
         logger.println("Requesting : " + url);
         HttpResponse response = null;
+        HttpRequestBase request=null;
 
         try {
-            HttpPost postRequest = new HttpPost(url);
-//            postRequest.setHeader("Accept", "application/json");
-            postRequest.setHeader("Accept", "*/*");
-            postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
-
-            if (data != null) {
-                postRequest.setEntity(new StringEntity(data.toString()));
+            if(method==Method.GET){
+                request = new HttpGet(url);
             }
+            if(method==Method.POST){
+                request = new HttpPost(url);
+                if (data != null) {
+                    ((HttpPost)request).setEntity(new StringEntity(data.toString()));
+                }
+            }
+           request.setHeader("Accept", "application/json");
+           request.setHeader("Content-type", "application/json; charset=UTF-8");
 
-            response = this.httpClient.execute(postRequest);
+           response = this.httpClient.execute(request);
 
 
             if (response == null || response.getStatusLine() == null) {
@@ -122,10 +129,10 @@ public class BZMHTTPClient {
         return jo;
     }
 
-    JSONObject getJson(String url, JSONObject data) {
+    JSONObject getJson(String url, JSONObject data,Method method) {
         JSONObject jo = null;
         try {
-            HttpResponse response = getResponse(url, data);
+            HttpResponse response = getResponse(url, data, method);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
                 logger.println(output);
