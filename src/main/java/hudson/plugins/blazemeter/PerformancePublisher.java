@@ -10,9 +10,10 @@ import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Result;
+import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.entities.AggregateTestResult;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
+import hudson.plugins.blazemeter.entities.AggregateTestResult;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
@@ -39,15 +40,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,6 +68,7 @@ public class PerformancePublisher extends Notifier {
 
     private int responseTimeUnstableThreshold = 0;
 
+    private BlazemeterApi api=null;
     /**
      * @deprecated as of 1.3. for compatibility
      */
@@ -106,6 +100,7 @@ public class PerformancePublisher extends Notifier {
         this.dataFolder = dataFolder;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
+        this.api=APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.valueOf(apiVersion));
     }
 
 
@@ -221,7 +216,7 @@ public class PerformancePublisher extends Notifier {
 
         // ideally, at this point we'd look up the credential based on the API key to find the secret
         // but there are no secrets, so no need to!
-        BlazemeterApiV2Impl bmAPI = new BlazemeterApiV2Impl();
+        BlazemeterApi bmAPI = APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.valueOf(apiVersion));
 
         uploadDataFolderFiles(apiKey, testId, bmAPI, logger);
 
@@ -407,7 +402,7 @@ public class PerformancePublisher extends Notifier {
         return true;
     }
 
-    private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApiV2Impl bmAPI, PrintStream logger) {
+    private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
         if (dataFolder == null || dataFolder.isEmpty())
             return;
@@ -655,7 +650,7 @@ public class PerformancePublisher extends Notifier {
             if (apiSecret == null) {
                 items.add("No API Key", "-1");
             } else {
-            BlazemeterApiV2Impl bzm = new BlazemeterApiV2Impl();
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.v2);
 
             try {
                 HashMap<String, String> testList = bzm.getTestList(apiSecret.getPlainText());
@@ -719,7 +714,7 @@ public class PerformancePublisher extends Notifier {
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
                 throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterApi bzm = new BlazemeterApiV2Impl();
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.v2);
             int testCount = bzm.getTestCount(userKey);
             if (testCount < 0) {
                 return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
@@ -736,6 +731,7 @@ public class PerformancePublisher extends Notifier {
             }
             return FormValidation.ok();
         }
+
 /*
         public FormValidation doCheckResponseTimeUnstableThreshold(@QueryParameter String value) throws IOException, ServletException {
             if(value.equals("0")) {

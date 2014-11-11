@@ -36,7 +36,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
     BmUrlManagerV2Impl urlManager;
     private BZMHTTPClient bzmhc = null;
-    public BlazemeterApiV2Impl() {
+    BlazemeterApiV2Impl() {
         urlManager = new BmUrlManagerV2Impl("https://a.blazemeter.com");
         try {
             bzmhc = BZMHTTPClient.getInstance();
@@ -45,7 +45,6 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
     }
-
 
 
     /**

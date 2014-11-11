@@ -28,7 +28,7 @@ public class BZMHTTPClient {
 
     private static BZMHTTPClient instance=null;
 
-    private DefaultHttpClient httpClient=null;
+    private transient DefaultHttpClient httpClient=null;
 
     private BZMHTTPClient(){
         this.httpClient=new DefaultHttpClient();
