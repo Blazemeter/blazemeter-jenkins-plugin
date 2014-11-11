@@ -1,8 +1,4 @@
-package hudson.plugins.blazemeter.api.url;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+package hudson.plugins.blazemeter.api.urlmanager;
 
 /**
  * Created by dzmitrykashlach on 10/11/14.

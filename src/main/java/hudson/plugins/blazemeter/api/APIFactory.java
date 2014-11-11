@@ -11,6 +11,7 @@ public class APIFactory {
     public static APIFactory apiFactory = null;
 
     private BlazemeterApiV2Impl apiV2=null;
+    private BlazemeterApiV3Impl apiV3=null;
 
     private APIFactory() {
     }
@@ -28,10 +29,15 @@ public class APIFactory {
         switch (version) {
             case v2:
             if(apiV2==null){
-                api = new BlazemeterApiV2Impl();
+                apiV2 = new BlazemeterApiV2Impl();
             }
+                api=apiV2;
                 break;
             case v3:
+                if(apiV3==null){
+                    apiV3 = new BlazemeterApiV3Impl();
+                }
+                api=apiV3;
                 break;
         }
         return api;

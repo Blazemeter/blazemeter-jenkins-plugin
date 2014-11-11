@@ -52,7 +52,8 @@ public class BZMHTTPClient {
 
         try {
             HttpPost postRequest = new HttpPost(url);
-            postRequest.setHeader("Accept", "application/json");
+//            postRequest.setHeader("Accept", "application/json");
+            postRequest.setHeader("Accept", "*/*");
             postRequest.setHeader("Content-type", "application/json; charset=UTF-8");
 
             if (data != null) {
@@ -131,9 +132,9 @@ public class BZMHTTPClient {
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
-            logger.println("error decoding Json " + e);
+            logger.println("Error decoding Json " + e);
         } catch (JSONException e) {
-            logger.println("error decoding Json " + e);
+            logger.println("Error decoding Json " + e);
         }
         return jo;
     }

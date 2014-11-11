@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.api.url;
+package hudson.plugins.blazemeter.api.urlmanager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -23,7 +23,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         }
     }
 
-    public BmUrlManagerV2Impl(String blazeMeterUrl) {
+    BmUrlManagerV2Impl(String blazeMeterUrl) {
         SERVER_URL = blazeMeterUrl;
     }
 

@@ -65,7 +65,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
 
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.v2);
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(APIFactory.ApiVersion.v3);
             int testCount = bzm.getTestCount(userKey);
             if (testCount < 0) {
                 return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");

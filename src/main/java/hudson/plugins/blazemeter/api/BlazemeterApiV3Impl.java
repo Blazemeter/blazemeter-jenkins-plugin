@@ -1,22 +1,20 @@
 package hudson.plugins.blazemeter.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV2Impl;
 import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * User: Vitali
@@ -33,14 +31,14 @@ import org.json.JSONObject;
 
  */
 
-public class BlazemeterApiV2Impl implements BlazemeterApi{
+public class BlazemeterApiV3Impl implements BlazemeterApi{
     PrintStream logger = new PrintStream(System.out);
 
     BmUrlManager urlManager;
     private BZMHTTPClient bzmhc = null;
-    BlazemeterApiV2Impl() {
+    BlazemeterApiV3Impl() {
         urlManager = URLFactory.getURLFactory().
-                getURLManager(URLFactory.ApiVersion.v2,"https://a.blazemeter.com");
+                getURLManager(URLFactory.ApiVersion.v3, "https://a.blazemeter.com");
         try {
             bzmhc = BZMHTTPClient.getInstance();
             bzmhc.configureProxy();
