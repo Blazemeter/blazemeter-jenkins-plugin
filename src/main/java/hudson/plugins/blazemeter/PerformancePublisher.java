@@ -5,36 +5,21 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
-import hudson.model.Item;
-import hudson.model.Job;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.entities.AggregateTestResult;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
-import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
-import hudson.tasks.Publisher;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import hudson.util.Secret;
-import jenkins.model.Jenkins;
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -236,28 +221,22 @@ public class PerformancePublisher extends Notifier {
         } while (json == null);
 
         try {
-            if (!json.get("response_code").equals(200)) {
-                if (json.get("response_code").equals(500) && json.get("error").toString().startsWith("Test already running")) {
-//                    bmAPI.stopTest(apiKey, testId);
+            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())&&!json.get("response_code").equals(200)) {
+                if (json.get("response_code").equals(500) && json.get("error").toString()
+                        .startsWith("Test already running")) {
                     logger.println("Test already running, please stop it first");
                     build.setResult(Result.NOT_BUILT);
                     return false;
                 }
-                //Try again.
-                logger.print(".");
-                json = this.api.startTest(apiKey, testId);
-                if (json == null) {
-                    logger.println("Could not start BlazeMeter Test");
-                    build.setResult(Result.NOT_BUILT);
-                    return false;
-                }
-                if (!json.get("response_code").equals(200)) {
-                    logger.println("Could not start BlazeMeter Test -" + json.get("error").toString());
-                    build.setResult(Result.NOT_BUILT);
-                    return false;
-                }
+
             }
-            session = json.get("session_id").toString();
+            if(apiVersion.equals(APIFactory.ApiVersion.v2.name())){
+                session = json.get("session_id").toString();
+
+            }else{
+                JSONObject startJO = (JSONObject)json.get("result");
+                session = ((JSONArray)startJO.get("sessionsId")).get(0).toString();
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
