@@ -202,16 +202,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         } else {
             String url = this.urlManager.getTests(APP_KEY, userKey);
             logger.println(url);
-            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
             try {
-                String r = jo.get("response_code").toString();
-                if (r.equals("200")) {
-                    JSONArray arr = (JSONArray) jo.get("tests");
-                    testListOrdered = new LinkedHashMap<String, String>(arr.length());
-                    for (int i = 0; i < arr.length(); i++) {
+                JSONArray result =(JSONArray)jo.get("result");
+                if (result!=null&&result.length()>0) {
+                    testListOrdered = new LinkedHashMap<String, String>(result.length());
+                    for (int i = 0; i < result.length(); i++) {
                         JSONObject en = null;
                         try {
-                            en = arr.getJSONObject(i);
+                            en = result.getJSONObject(i);
                         } catch (JSONException e) {
                             logger.println("Error with the JSON while populating test list, " + e);
                         }
@@ -219,8 +218,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
                         String name;
                         try {
                             if (en != null) {
-                                id = en.getString("test_id");
-                                name = en.getString("test_name").replaceAll("&", "&amp;");
+                                id = en.getString("id");
+                                name = en.getString("name").replaceAll("&", "&amp;");
                                 testListOrdered.put(name, id);
 
                             }

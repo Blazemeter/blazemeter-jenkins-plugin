@@ -12,6 +12,8 @@ public class APIFactory {
 
     private BlazemeterApiV2Impl apiV2=null;
     private BlazemeterApiV3Impl apiV3=null;
+    private BlazemeterApi api = null;
+    private ApiVersion version =null;
 
     private APIFactory() {
     }
@@ -24,22 +26,36 @@ public class APIFactory {
         return apiFactory;
     }
 
-    public BlazemeterApi getAPI(ApiVersion version) {
-        BlazemeterApi api = null;
+    public BlazemeterApi getAPI() {
+        if(version==null){
+            version=ApiVersion.v3;
+        }
         switch (version) {
             case v2:
-            if(apiV2==null){
-                apiV2 = new BlazemeterApiV2Impl();
-            }
-                api=apiV2;
+                if (api == null || api instanceof BlazemeterApiV3Impl) {
+                    if(apiV2==null){
+                     apiV2 = new BlazemeterApiV2Impl();
+                    }
+                    api = apiV2;
+                }
                 break;
             case v3:
-                if(apiV3==null){
-                    apiV3 = new BlazemeterApiV3Impl();
+                if (api == null || api instanceof BlazemeterApiV2Impl) {
+                    if(apiV3==null){
+                        apiV3 = new BlazemeterApiV3Impl();
+                    }
+                    api = apiV3;
                 }
-                api=apiV3;
                 break;
         }
         return api;
+    }
+
+    public ApiVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(ApiVersion version) {
+        this.version = version;
     }
 }
