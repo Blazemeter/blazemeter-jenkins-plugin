@@ -31,17 +31,16 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return SERVER_URL;
     }
 
-    public String testStatus(String appKey, String userKey, String testId) {
+    public String testStatus(String appKey, String userKey, String sessionId) {
         String testStatus=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
-            testId = URLEncoder.encode(testId, "UTF-8");
+            sessionId = URLEncoder.encode(sessionId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStatus=SERVER_URL+"/api/latest/tests/"
-                +testId+"/sessions?api_key="+userKey+"&app_key="+appKey;
+        testStatus=SERVER_URL+"/api/latest/sessions/"+sessionId+"?api_key="+userKey+"&app_key="+appKey;
          return testStatus;
     }
 

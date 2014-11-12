@@ -253,7 +253,7 @@ public class PerformancePublisher extends Notifier {
 
         long lastPrint = 0;
         while (true) {
-            TestInfo info = this.api.getTestRunStatus(apiKey, testId);
+            TestInfo info = this.api.getTestRunStatus(apiKey, session);
 
             //if drupal works hard
             //Thread.sleep(1000);
