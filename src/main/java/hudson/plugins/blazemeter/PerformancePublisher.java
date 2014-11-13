@@ -301,7 +301,7 @@ public class PerformancePublisher extends Notifier {
         Thread.sleep(10 * 1000); // Wait for the report to generate.
 
         //get testGetArchive information
-        String aggregate = this.api.aggregateReport(apiKey, session).toString();
+        JSONObject aggregate = this.api.aggregateReport(apiKey, session);
 
 
         if (aggregate == null || aggregate.equals("null")) {
@@ -318,6 +318,8 @@ public class PerformancePublisher extends Notifier {
 
         }catch (IOException ioe){
             logger.println("Error: Failed to generate AggregateTestResult: "+ioe);
+        }catch (JSONException je){
+            logger.println("Error: Failed to generate AggregateTestResult: "+je);
         }
 
         if (aggregateTestResult == null) {

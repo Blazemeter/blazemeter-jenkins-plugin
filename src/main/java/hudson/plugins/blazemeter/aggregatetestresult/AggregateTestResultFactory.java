@@ -1,6 +1,8 @@
 package hudson.plugins.blazemeter.aggregatetestresult;
 
 import hudson.plugins.blazemeter.api.APIFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -27,7 +29,7 @@ public class AggregateTestResultFactory {
         return resultFactory;
     }
 
-    public AggregateTestResult getAggregateTestResult(String json) throws IOException{
+    public AggregateTestResult getAggregateTestResult(JSONObject json) throws IOException, JSONException{
         if(version==null){
             version= APIFactory.ApiVersion.v3;
         }
@@ -54,6 +56,8 @@ public class AggregateTestResultFactory {
 
         }catch(IOException ioe){
             throw ioe;
+        }catch(JSONException je){
+            throw je;
         }
 
         return result;

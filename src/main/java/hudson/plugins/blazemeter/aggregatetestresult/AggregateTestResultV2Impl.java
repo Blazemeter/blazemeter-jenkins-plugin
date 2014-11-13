@@ -1,8 +1,7 @@
 package hudson.plugins.blazemeter.aggregatetestresult;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -14,13 +13,20 @@ import java.io.IOException;
  */
 public class AggregateTestResultV2Impl extends AggregateTestResult{
 
-    AggregateTestResultV2Impl(String json) throws IOException {
-        JsonFactory factory = new JsonFactory();
-        ObjectMapper mapper = new ObjectMapper(factory);
-        TypeReference<AggregateTestResultV2Impl> typeRef
-                = new TypeReference<AggregateTestResultV2Impl>() {
-        };
-        mapper.readValue(json, typeRef);
+    AggregateTestResultV2Impl(JSONObject json) throws IOException, JSONException {
+
+        this.std = json.getDouble("std");
+        this.average = json.getDouble("average");
+        this.min = json.getDouble("min");
+        this.max = json.getDouble("max");
+        this.samples = json.getDouble("samples");
+        this.median = json.getDouble("median");
+        this.percentile90 = json.getDouble("percentile90");
+        this.errorPercentage = json.getDouble("errorPercentage");
+        this.hits = json.getDouble("hits");
+        this.kbs = json.getDouble("kbs");
+        this.n = json.getLong("n");
+
     }
 
     @Override

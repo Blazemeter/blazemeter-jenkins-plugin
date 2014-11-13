@@ -3,6 +3,7 @@ package hudson.plugins.blazemeter.aggregatetestresult;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -14,14 +15,14 @@ import java.io.IOException;
  */
 public class AggregateTestResultV3Impl extends AggregateTestResult{
 
-    AggregateTestResultV3Impl(String json) throws IOException {
-        JsonFactory factory = new JsonFactory();
+    AggregateTestResultV3Impl(JSONObject json) throws IOException {
+     /*   JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper(factory);
         TypeReference<AggregateTestResultV2Impl> typeRef
                 = new TypeReference<AggregateTestResultV2Impl>() {
         };
         mapper.readValue(json, typeRef);
-
+*/
     }
 
     @Override

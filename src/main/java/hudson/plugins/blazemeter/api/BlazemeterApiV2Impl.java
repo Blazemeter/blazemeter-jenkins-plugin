@@ -192,7 +192,14 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (!validate(userKey, reportId)) return null;
 
         String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
-        return this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
+        JSONObject response = this.bzmhc.getJson(url, null,BZMHTTPClient.Method.GET);
+        JSONObject aggregate=null;
+        try {
+            aggregate = response.getJSONObject("report").getJSONObject("aggregate");
+        } catch (JSONException e) {
+            logger.println("Error while parsing aggregate report V2: "+e);
+        }
+        return aggregate;
 
         //####### if failed to getAggregateReport - retry. Move this check to API for V2
 /*        for (int i = 0; i < 200; i++) {
