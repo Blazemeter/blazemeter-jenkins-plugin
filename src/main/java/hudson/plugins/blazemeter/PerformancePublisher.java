@@ -7,9 +7,10 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.plugins.blazemeter.aggregatetestresult.AggregateTestResultFactory;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.entities.AggregateTestResult;
+import hudson.plugins.blazemeter.aggregatetestresult.AggregateTestResult;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
@@ -253,7 +254,8 @@ public class PerformancePublisher extends Notifier {
 
         long lastPrint = 0;
         while (true) {
-            TestInfo info = this.api.getTestRunStatus(apiKey, session);
+            TestInfo info = this.api.getTestRunStatus(apiKey,
+                    apiVersion.equals("v2")?testId:session);
 
             //if drupal works hard
             //Thread.sleep(1000);
@@ -308,7 +310,15 @@ public class PerformancePublisher extends Notifier {
             return false;
         }
 
-        AggregateTestResult aggregateTestResult = AggregateTestResult.generate(aggregate);
+        AggregateTestResultFactory testResultFactory = AggregateTestResultFactory.getAggregateTestResultFactory();
+        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
+        AggregateTestResult aggregateTestResult=null;
+        try{
+            aggregateTestResult = testResultFactory.getAggregateTestResult(aggregate);
+
+        }catch (IOException ioe){
+            logger.println("Error: Failed to generate AggregateTestResult: "+ioe);
+        }
 
         if (aggregateTestResult == null) {
             logger.println("Error: Requesting aggregate Test Result is not available");

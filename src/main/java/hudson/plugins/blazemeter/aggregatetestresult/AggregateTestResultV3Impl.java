@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.entities;
+package hudson.plugins.blazemeter.aggregatetestresult;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -12,39 +12,16 @@ import java.io.IOException;
  * Date: 5/28/12
  * Time: 12:51 PM
  */
-public class AggregateTestResult {
+public class AggregateTestResultV3Impl extends AggregateTestResult{
 
-    double std              ;
-    double average          ;
-    double min              ;
-    double max              ;
-    double samples          ;
-    double median           ;
-    double percentile90     ;
-    double percentile99     ;
-    double errorPercentage  ;
-    double hits             ;
-    double kbs              ;
-    long   n                ;
-
-    public AggregateTestResult() {
-    }
-
-    public static AggregateTestResult generate(String json) throws IOException {
-        return new AggregateTestResult().fromJSON(json);
-    }
-
-    protected ObjectMapper mapper() {
-        return new ObjectMapper();
-    }
-
-    public AggregateTestResult fromJSON(String json) throws IOException {
+    AggregateTestResultV3Impl(String json) throws IOException {
         JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper(factory);
-        TypeReference<AggregateTestResult> typeRef
-                = new TypeReference<AggregateTestResult>() {
+        TypeReference<AggregateTestResultV2Impl> typeRef
+                = new TypeReference<AggregateTestResultV2Impl>() {
         };
-        return mapper.readValue(json, typeRef);
+        mapper.readValue(json, typeRef);
+
     }
 
     @Override
@@ -157,26 +134,6 @@ public class AggregateTestResult {
 
     public void setN(long n) {
         this.n = n;
-    }
-
-    public static void main(String[] args) throws IOException {
-        String json =
-                    "{\"std\":3578.43," +
-                    " \"average\":586.3," +
-                    " \"min\":22," +
-                    " \"max\":57759," +
-                    " \"samples\":7998," +
-                    " \"median\":76," +
-                    " \"percentile90\":581.1," +
-                    " \"percentile99\":10122.05," +
-                    " \"errorPercentage\":0," +
-                    " \"hits\":17.77," +
-                    " \"kbs\":2801.14," +
-                    " \"n\":45}" ;
-
-        AggregateTestResult atr = new AggregateTestResult();
-        atr = atr.fromJSON(json);
-        System.out.println(atr.average);
     }
 
 }
