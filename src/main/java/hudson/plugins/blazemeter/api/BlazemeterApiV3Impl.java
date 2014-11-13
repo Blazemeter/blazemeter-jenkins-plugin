@@ -24,18 +24,18 @@ import java.util.LinkedHashMap;
  * Updated
  * User: Doron
  * Date: 8/7/12
- *
+ * <p/>
  * Updated (proxy)
  * User: Marcel
  * Date: 9/23/13
-
  */
 
-public class BlazemeterApiV3Impl implements BlazemeterApi{
+public class BlazemeterApiV3Impl implements BlazemeterApi {
     PrintStream logger = new PrintStream(System.out);
 
     BmUrlManager urlManager;
     private BZMHTTPClient bzmhc = null;
+
     BlazemeterApiV3Impl() {
         urlManager = URLFactory.getURLFactory().
                 getURLManager(URLFactory.ApiVersion.v3, "https://a.blazemeter.com");
@@ -49,12 +49,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     /**
-     * @param userKey  - user key
-     * @param testId   - test id
-     * @param file     - jmx file
-     *                 //     * @return test id
-     *                 //     * @throws java.io.IOException
-     *                 //     * @throws org.json.JSONException
+     * @param userKey - user key
+     * @param testId  - test id
+     * @param file    - jmx file
+     *                //     * @return test id
+     *                //     * @throws java.io.IOException
+     *                //     * @throws org.json.JSONException
      */
     public synchronized void uploadJmx(String userKey, String testId, File file) {
 
@@ -73,12 +73,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     /**
-     * @param userKey  - user key
-     * @param testId   - test id
-     * @param file     - the file (Java class) you like to upload
+     * @param userKey - user key
+     * @param testId  - test id
+     * @param file    - the file (Java class) you like to upload
      * @return test id
-     *         //     * @throws java.io.IOException
-     *         //     * @throws org.json.JSONException
+     * //     * @throws java.io.IOException
+     * //     * @throws org.json.JSONException
      */
 
     public synchronized JSONObject uploadBinaryFile(String userKey, String testId, File file) {
@@ -102,13 +102,17 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         try {
             String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
-            JSONObject result = (JSONObject)jo.get("result");
-            if (result.get("dataUrl")==null) {
+            JSONObject result = (JSONObject) jo.get("result");
+            if (result.get("dataUrl") == null) {
                 ti.setStatus(TestStatus.NotFound);
             } else {
                 ti.setId(result.getString("testId"));
                 ti.setName(result.getString("name"));
-                ti.setStatus(result.getString("status"));
+                if (!result.getString("status").equals("ENDED")) {
+                    ti.setStatus(TestStatus.Running);
+                }else{
+                    ti.setStatus(TestStatus.NotRunning);
+                }
             }
         } catch (Exception e) {
             logger.println("error getting status " + e);
@@ -135,14 +139,13 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
         try {
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
-            if (jo == null){
+            if (jo == null) {
                 return -1;
-            }
-            else {
-                JSONArray result = (JSONArray)jo.get("result");
-                if (result.length()==0) {
+            } else {
+                JSONArray result = (JSONArray) jo.get("result");
+                if (result.length() == 0) {
                     return 0;
-                }else{
+                } else {
                     return result.length();
                 }
             }
@@ -204,8 +207,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             logger.println(url);
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
             try {
-                JSONArray result =(JSONArray)jo.get("result");
-                if (result!=null&&result.length()>0) {
+                JSONArray result = (JSONArray) jo.get("result");
+                if (result != null && result.length() > 0) {
                     testListOrdered = new LinkedHashMap<String, String>(result.length());
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject en = null;
@@ -228,8 +231,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
                         }
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.println("Error while populating test list, " + e);
             }
         }
