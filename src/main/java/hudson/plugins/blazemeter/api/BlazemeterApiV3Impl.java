@@ -193,7 +193,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         if (!validate(userKey, reportId)) return null;
 
         String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
-        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
     }
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {

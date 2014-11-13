@@ -193,6 +193,45 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
         String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
         return this.bzmhc.getJson(url, null,BZMHTTPClient.Method.POST);
+
+        //####### if failed to getAggregateReport - retry. Move this check to API for V2
+/*        for (int i = 0; i < 200; i++) {
+            try {
+                if (json.get("response_code").equals(404))
+                    json = this.api.aggregateReport(apiKey, session);
+                else
+                    break;
+            } catch (JSONException e) {
+            } finally {
+                Thread.sleep(5 * 1000);
+            }
+        }*/
+        //####### if failed to getAggregateReport - retry. Move this check to API for V2
+
+//################  Make checkAggregate report method to API for V2 ################################
+        /*for (int i = 0; i < 30; i++) {
+            try {
+                if (!json.get("response_code").equals(200)) {
+                    logger.println("Error: Requesting aggregate report response code:" + json.get("response_code"));
+                } else if (json.has("error") && !json.getString("error").equals("null")){
+                    logger.println("Error: Requesting aggregate report. Error received :" + json.getString("error"));
+                } else {
+                    aggregate = json.getJSONObject("report").get("aggregate").toString();
+                }
+
+            } catch (JSONException e) {
+                logger.println("Error: Exception while parsing aggregate report [" + e.getMessage() + "]");
+            }
+
+            if (!aggregate.equals("null"))
+                break;
+
+            Thread.sleep(2 * 1000);
+            json = this.api.aggregateReport(apiKey, session);
+        }*/
+//################  Make checkAggregate report method to API for V2 ################################
+
+
     }
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {

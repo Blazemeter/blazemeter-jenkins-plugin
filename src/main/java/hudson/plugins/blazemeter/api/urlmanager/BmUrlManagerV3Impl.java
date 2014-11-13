@@ -115,16 +115,19 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
 
-    public String testAggregateReport(String appKey, String userKey, String reportId) {
+    public String testAggregateReport(String appKey, String userKey, String sessionId) {
+        String testAggregateReport=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
-            reportId = URLEncoder.encode(reportId, "UTF-8");
+            sessionId = URLEncoder.encode(sessionId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
-                appKey, userKey, reportId)+CLIENT_IDENTIFICATION;
+        testAggregateReport=SERVER_URL+"/api/latest/sessions/"
+                +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey;
+
+        return testAggregateReport;
     }
 }
 
