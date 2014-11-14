@@ -7,10 +7,10 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.aggregatetestresult.AggregateTestResultFactory;
+import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.aggregatetestresult.AggregateTestResult;
+import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
@@ -38,9 +38,9 @@ public class PerformanceBuilder extends Builder {
 
     private String testId = "";
 
-    private String apiVersion = "";
+    private String apiVersion = "v3";
 
-    private String testDuration = "180";
+    private String testDuration = "";
 
     private String mainJMX = "";
 
@@ -222,6 +222,8 @@ public class PerformanceBuilder extends Builder {
         } while (json == null);
 
         try {
+            //if test was not started(check) - build.setResult(Result.NOT_BUILT); add to interface
+            // add to API implementations;
             if (apiVersion.equals(APIFactory.ApiVersion.v2.name())&&!json.get("response_code").equals(200)) {
                 if (json.get("response_code").equals(500) && json.get("error").toString()
                         .startsWith("Test already running")) {
@@ -231,6 +233,7 @@ public class PerformanceBuilder extends Builder {
                 }
 
             }
+            // get sessionId add to interface
             if(apiVersion.equals(APIFactory.ApiVersion.v2.name())){
                 session = json.get("session_id").toString();
 
@@ -310,11 +313,11 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        AggregateTestResultFactory testResultFactory = AggregateTestResultFactory.getAggregateTestResultFactory();
+        TestResultFactory testResultFactory = TestResultFactory.getAggregateTestResultFactory();
         testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
-        AggregateTestResult aggregateTestResult=null;
+        TestResult testResult =null;
         try{
-            aggregateTestResult = testResultFactory.getAggregateTestResult(testReport);
+            testResult = testResultFactory.getAggregateTestResult(testReport);
 
         }catch (IOException ioe){
             logger.println("Error: Failed to generate AggregateTestResult: "+ioe);
@@ -322,7 +325,7 @@ public class PerformanceBuilder extends Builder {
             logger.println("Error: Failed to generate AggregateTestResult: "+je);
         }
 
-        if (aggregateTestResult == null) {
+        if (testResult == null) {
             logger.println("Error: Requesting aggregate Test Result is not available");
             build.setResult(Result.NOT_BUILT);
             return false;
@@ -334,8 +337,8 @@ public class PerformanceBuilder extends Builder {
         }
 
         double thresholdTolerance = 0.00005; //null hypothesis
-        double errorPercent = aggregateTestResult.getErrorPercentage();
-        double AverageResponseTime = aggregateTestResult.getAverage();
+        double errorPercent = testResult.getErrorPercentage();
+        double AverageResponseTime = testResult.getAverage();
 
         if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
@@ -433,19 +436,12 @@ public class PerformanceBuilder extends Builder {
             logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
                     + responseTimeUnstableThreshold + " millis will be considered as "
                     + Result.UNSTABLE.toString().toLowerCase());
-        } /*else {
-            logger.println("BlazeMeter: ResponseTimeUnstable should be greater than 0");
-            return Result.ABORTED;
-        }*/
-
+        }
         if (responseTimeFailedThreshold > 0) {
             logger.println("BlazeMeter: ResponseTimeFailed greater than "
                     + responseTimeFailedThreshold + " millis will be considered as "
                     + Result.FAILURE.toString().toLowerCase());
-        } /*else {
-            logger.println("BlazeMeter: ResponseTimeFailed should be greater than 0");
-            return Result.ABORTED;
-        }*/
+        }
         return result;
     }
 

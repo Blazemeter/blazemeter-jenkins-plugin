@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.aggregatetestresult;
+package hudson.plugins.blazemeter.testresult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,9 +11,9 @@ import java.io.IOException;
  * Date: 5/28/12
  * Time: 12:51 PM
  */
-public class AggregateTestResultV2Impl extends AggregateTestResult{
+public class TestResultV2Impl extends TestResult {
 
-    AggregateTestResultV2Impl(JSONObject json) throws IOException, JSONException {
+    TestResultV2Impl(JSONObject json) throws IOException, JSONException {
 
         this.std = json.getDouble("std");
         this.average = json.getDouble("average");

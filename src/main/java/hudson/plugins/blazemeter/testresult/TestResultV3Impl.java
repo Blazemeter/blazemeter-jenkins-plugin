@@ -1,8 +1,5 @@
-package hudson.plugins.blazemeter.aggregatetestresult;
+package hudson.plugins.blazemeter.testresult;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,9 +11,9 @@ import java.io.IOException;
  * Date: 5/28/12
  * Time: 12:51 PM
  */
-public class AggregateTestResultV3Impl extends AggregateTestResult{
+public class TestResultV3Impl extends TestResult {
 
-    AggregateTestResultV3Impl(JSONObject json) throws IOException, JSONException {
+    TestResultV3Impl(JSONObject json) throws IOException, JSONException {
         this.std = json.getDouble("std");
         this.average = json.getDouble("avg");
         this.min = json.getDouble("min");

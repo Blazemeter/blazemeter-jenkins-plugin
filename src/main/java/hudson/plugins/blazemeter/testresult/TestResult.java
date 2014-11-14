@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.aggregatetestresult;
+package hudson.plugins.blazemeter.testresult;
 
 /**
  * BlazeMeter
@@ -6,7 +6,7 @@ package hudson.plugins.blazemeter.aggregatetestresult;
  * Date: 5/28/12
  * Time: 12:51 PM
  */
-public abstract class AggregateTestResult {
+public abstract class TestResult {
     protected double std              ;
     protected double average          ;
     protected double min              ;

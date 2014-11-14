@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter.aggregatetestresult;
+package hudson.plugins.blazemeter.testresult;
 
 import hudson.plugins.blazemeter.api.APIFactory;
 import org.json.JSONException;
@@ -9,44 +9,44 @@ import java.io.IOException;
 /**
  * Created by dzmitrykashlach on 13/11/14.
  */
-public class AggregateTestResultFactory {
+public class TestResultFactory {
 
-    public static AggregateTestResultFactory resultFactory = null;
+    public static TestResultFactory resultFactory = null;
 
-    private AggregateTestResultV2Impl resultV2=null;
-    private AggregateTestResultV3Impl resultV3=null;
-    private AggregateTestResult result = null;
+    private TestResultV2Impl resultV2=null;
+    private TestResultV3Impl resultV3=null;
+    private TestResult result = null;
     private APIFactory.ApiVersion version =null;
 
-    private AggregateTestResultFactory() {
+    private TestResultFactory() {
     }
 
 
-    public static AggregateTestResultFactory getAggregateTestResultFactory() {
+    public static TestResultFactory getAggregateTestResultFactory() {
         if (resultFactory == null) {
-            resultFactory = new AggregateTestResultFactory();
+            resultFactory = new TestResultFactory();
         }
         return resultFactory;
     }
 
-    public AggregateTestResult getAggregateTestResult(JSONObject json) throws IOException, JSONException{
+    public TestResult getAggregateTestResult(JSONObject json) throws IOException, JSONException{
         if(version==null){
             version= APIFactory.ApiVersion.v3;
         }
         try{
             switch (version) {
                 case v2:
-                    if (result == null || result instanceof AggregateTestResultV3Impl) {
+                    if (result == null || result instanceof TestResultV3Impl) {
                         if(resultV2==null){
-                            resultV2 = new AggregateTestResultV2Impl(json);
+                            resultV2 = new TestResultV2Impl(json);
                         }
                         result = resultV2;
                     }
                     break;
                 case v3:
-                    if (result == null || result instanceof AggregateTestResultV2Impl) {
+                    if (result == null || result instanceof TestResultV2Impl) {
                         if(resultV3==null){
-                            resultV3 = new AggregateTestResultV3Impl(json);
+                            resultV3 = new TestResultV3Impl(json);
                         }
                         result = resultV3;
                     }
