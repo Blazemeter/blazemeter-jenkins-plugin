@@ -10,12 +10,12 @@ import java.net.URLEncoder;
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
     private String SERVER_URL = "https://a.blazemeter.com/";
-    private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.08-1-SNAPSHOT&​";
+    private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
 
     static{
         try{
             CLIENT_IDENTIFICATION= URLEncoder.encode(CLIENT_IDENTIFICATION, "UTF-8");
-            CLIENT_IDENTIFICATION=CLIENT_IDENTIFICATION.substring(0,57);
+            CLIENT_IDENTIFICATION=CLIENT_IDENTIFICATION.substring(0,47);
             CLIENT_IDENTIFICATION= URLDecoder.decode(CLIENT_IDENTIFICATION, "UTF-8");
 
         }catch (UnsupportedEncodingException e) {

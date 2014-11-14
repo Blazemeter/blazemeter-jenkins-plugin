@@ -10,12 +10,12 @@ import java.net.URLEncoder;
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
     private String SERVER_URL = "https://a.blazemeter.com/";
-    private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.08-1-SNAPSHOT&​";
+    private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
 
     static{
         try{
             CLIENT_IDENTIFICATION= URLEncoder.encode(CLIENT_IDENTIFICATION, "UTF-8");
-            CLIENT_IDENTIFICATION=CLIENT_IDENTIFICATION.substring(0,57);
+            CLIENT_IDENTIFICATION=CLIENT_IDENTIFICATION.substring(0,47);
             CLIENT_IDENTIFICATION= URLDecoder.decode(CLIENT_IDENTIFICATION, "UTF-8");
 
         }catch (UnsupportedEncodingException e) {
@@ -40,7 +40,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStatus=SERVER_URL+"/api/latest/sessions/"+sessionId+"?api_key="+userKey+"&app_key="+appKey;
+        testStatus=SERVER_URL+"/api/latest/sessions/"+sessionId+"?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
          return testStatus;
     }
 
@@ -52,7 +52,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        getTests=SERVER_URL+"/api/latest/tests?api_key="+userKey+"&app_key="+appKey;
+        getTests=SERVER_URL+"/api/latest/tests?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
 
         return getTests;
     }
@@ -94,7 +94,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         }
 
         testStart=SERVER_URL+"/api/latest/tests/"
-                +testId+"/start?api_key="+userKey+"&app_key="+appKey;
+                +testId+"/start?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
 
         return testStart;
     }
@@ -109,7 +109,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
             e.printStackTrace();
         }
         testStop=SERVER_URL+"/api/latest/tests/"
-                +testId+"/stop?api_key="+userKey+"&app_key="+appKey;
+                +testId+"/stop?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
 
         return testStop;
     }
@@ -125,7 +125,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
             e.printStackTrace();
         }
         testAggregateReport=SERVER_URL+"/api/latest/sessions/"
-                +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey;
+                +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
 
         return testAggregateReport;
     }
