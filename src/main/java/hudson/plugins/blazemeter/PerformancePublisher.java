@@ -15,7 +15,7 @@ import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Notifier;
+import hudson.tasks.Builder;
 import org.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PerformancePublisher extends Notifier {
+public class PerformancePublisher extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
 
 
@@ -557,16 +557,16 @@ public class PerformancePublisher extends Notifier {
     }
 
     @Override
-    public BlazeMeterPerformancePublisherDescriptor getDescriptor() {
+    public BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
 
     @Extension
-    public static final BlazeMeterPerformancePublisherDescriptor DESCRIPTOR = new BlazeMeterPerformancePublisherDescriptor();
+    public static final BlazeMeterPerformanceBuilderDescriptor DESCRIPTOR = new BlazeMeterPerformanceBuilderDescriptor();
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})
     public static final class DescriptorImpl
-            extends BlazeMeterPerformancePublisherDescriptor {
+            extends BlazeMeterPerformanceBuilderDescriptor {
     }
 }

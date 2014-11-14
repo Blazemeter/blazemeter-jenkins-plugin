@@ -8,6 +8,7 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -28,7 +29,7 @@ import java.util.*;
 /**
  * Created by dzmitrykashlach on 12/11/14.
  */
-public class BlazeMeterPerformancePublisherDescriptor extends BuildStepDescriptor<Publisher> {
+public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL = "https://a.blazemeter.com";
     private String name = "My BlazeMeter Account";
@@ -36,7 +37,7 @@ public class BlazeMeterPerformancePublisherDescriptor extends BuildStepDescripto
 
 
 
-    public BlazeMeterPerformancePublisherDescriptor() {
+    public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformancePublisher.class);
         load();
     }
