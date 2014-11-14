@@ -177,15 +177,15 @@ public class PerformanceBuilder extends Builder {
         String session;
 
         if(testDuration==null||testDuration.isEmpty()){
-            build.setResult(Result.ABORTED);
-            logger.println("Build was aborted due to incorrect values of test duration: null or empty");
+            build.setResult(Result.FAILURE);
+            logger.println("Build was failed due to incorrect values of test duration: null or empty");
             return true;
         }
 
         if ((result = validateThresholds(logger)) != Result.SUCCESS){
             // input parameters error.
-            build.setResult(Result.ABORTED);
-            logger.println("Build was aborted due to incorrect values of tresholds");
+            build.setResult(Result.FAILURE);
+            logger.println("Build was failed due to incorrect values of tresholds");
             return true;
         }
         logger.println("Expected test duration="+testDuration);
@@ -216,7 +216,7 @@ public class PerformanceBuilder extends Builder {
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
                 logger.println("Could not start BlazeMeter Test");
-                build.setResult(Result.NOT_BUILT);
+                build.setResult(Result.FAILURE);
                 return false;
             }
         } while (json == null);
@@ -228,7 +228,7 @@ public class PerformanceBuilder extends Builder {
                 if (json.get("response_code").equals(500) && json.get("error").toString()
                         .startsWith("Test already running")) {
                     logger.println("Test already running, please stop it first");
-                    build.setResult(Result.NOT_BUILT);
+                    build.setResult(Result.FAILURE);
                     return false;
                 }
 
@@ -264,13 +264,13 @@ public class PerformanceBuilder extends Builder {
             //Thread.sleep(1000);
 
             if (info.getStatus().equals(TestStatus.Error)) {
-                build.setResult(Result.NOT_BUILT);
+                build.setResult(Result.FAILURE);
                 logger.println("Error while running a test - please try to run the same test on BlazeMeter");
                 return true;
             }
 
             if (info.getStatus().equals(TestStatus.NotFound)) {
-                build.setResult(Result.NOT_BUILT);
+                build.setResult(Result.FAILURE);
                 logger.println("Test not found error");
                 return true;
             }
@@ -309,7 +309,7 @@ public class PerformanceBuilder extends Builder {
 
         if (testReport == null || testReport.equals("null")) {
             logger.println("Error: Requesting aggregate is not available");
-            build.setResult(Result.NOT_BUILT);
+            build.setResult(Result.FAILURE);
             return false;
         }
 
@@ -327,7 +327,7 @@ public class PerformanceBuilder extends Builder {
 
         if (testResult == null) {
             logger.println("Error: Requesting aggregate Test Result is not available");
-            build.setResult(Result.NOT_BUILT);
+            build.setResult(Result.FAILURE);
             return false;
         }
 
