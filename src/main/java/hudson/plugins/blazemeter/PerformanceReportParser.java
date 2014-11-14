@@ -14,7 +14,7 @@ import java.util.Collection;
 
 /**
  * Parses blazemeter result files into {@link PerformanceReport}s.
- * This object is persisted with {@link PerformancePublisher} into the project configuration.
+ * This object is persisted with {@link PerformanceBuilder} into the project configuration.
  * <p/>
  * <p/>
  * Subtypes can define additional parser-specific parameters as instance fields.

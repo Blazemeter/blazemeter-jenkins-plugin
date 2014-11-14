@@ -15,7 +15,7 @@ import static java.util.Arrays.asList;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class PerformancePublisherTest extends HudsonTestCase {
+public class PerformanceBuilderTest extends HudsonTestCase {
 	public void testConfigRoundtrip() throws Exception {
 /*
 		PerformancePublisher before = new PerformancePublisher(10, 20,

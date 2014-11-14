@@ -9,7 +9,6 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
@@ -38,7 +37,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
 
     public BlazeMeterPerformanceBuilderDescriptor() {
-        super(PerformancePublisher.class);
+        super(PerformanceBuilder.class);
         load();
     }
 

@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PerformancePublisher extends Builder {
+public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
 
 
@@ -66,16 +66,16 @@ public class PerformancePublisher extends Builder {
     private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
-    public PerformancePublisher(String apiKey,
-                                String testDuration,
-                                String mainJMX,
-                                String dataFolder,
-                                String testId,
-                                String apiVersion,
-                                int errorFailedThreshold,
-                                int errorUnstableThreshold,
-                                int responseTimeFailedThreshold,
-                                int responseTimeUnstableThreshold) {
+    public PerformanceBuilder(String apiKey,
+                              String testDuration,
+                              String mainJMX,
+                              String dataFolder,
+                              String testId,
+                              String apiVersion,
+                              int errorFailedThreshold,
+                              int errorUnstableThreshold,
+                              int responseTimeFailedThreshold,
+                              int responseTimeUnstableThreshold) {
         this.apiKey = apiKey;
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
