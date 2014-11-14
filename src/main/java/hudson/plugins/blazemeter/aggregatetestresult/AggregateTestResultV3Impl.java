@@ -3,6 +3,7 @@ package hudson.plugins.blazemeter.aggregatetestresult;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -15,14 +16,29 @@ import java.io.IOException;
  */
 public class AggregateTestResultV3Impl extends AggregateTestResult{
 
-    AggregateTestResultV3Impl(JSONObject json) throws IOException {
-     /*   JsonFactory factory = new JsonFactory();
-        ObjectMapper mapper = new ObjectMapper(factory);
-        TypeReference<AggregateTestResultV2Impl> typeRef
-                = new TypeReference<AggregateTestResultV2Impl>() {
-        };
-        mapper.readValue(json, typeRef);
-*/
+    AggregateTestResultV3Impl(JSONObject json) throws IOException, JSONException {
+        this.std = json.getDouble("std");
+        this.average = json.getDouble("avg");
+        this.min = json.getDouble("min");
+        this.max = json.getDouble("max");
+
+        // not implemented because such field is absent in JSON
+//        this.samples = json.getDouble("samples");
+
+        // not implemented because such field is absent in JSON
+//        this.median = json.getDouble("median");
+
+        this.percentile90 = json.getDouble("tp90");
+
+        // not implemented because such field is absent in JSON
+//        this.errorPercentage = json.getDouble("errorPercentage");
+
+        this.hits = json.getDouble("hits");
+        this.kbs = json.getDouble("bytes")/1024;
+
+        // not implemented because such field is absent in JSON
+//        this.n = json.getLong("n");
+
     }
 
     @Override

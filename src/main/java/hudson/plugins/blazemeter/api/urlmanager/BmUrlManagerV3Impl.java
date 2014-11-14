@@ -115,7 +115,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
 
-    public String testAggregateReport(String appKey, String userKey, String sessionId) {
+    public String testReport(String appKey, String userKey, String sessionId) {
         String testAggregateReport=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");

@@ -10,7 +10,6 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV2Impl;
 import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
@@ -34,7 +33,6 @@ import org.json.JSONObject;
  */
 
 public class BlazemeterApiV2Impl implements BlazemeterApi{
-    PrintStream logger = new PrintStream(System.out);
 
     BmUrlManager urlManager;
     private BZMHTTPClient bzmhc = null;
@@ -188,10 +186,10 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
      *                 //     * @throws IOException
      *                 //     * @throws ClientProtocolException
      */
-    public JSONObject aggregateReport(String userKey, String reportId) {
+    public JSONObject testReport(String userKey, String reportId) {
         if (!validate(userKey, reportId)) return null;
 
-        String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
+        String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
         JSONObject response = this.bzmhc.getJson(url, null,BZMHTTPClient.Method.GET);
         JSONObject aggregate=null;
         try {
@@ -205,7 +203,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 /*        for (int i = 0; i < 200; i++) {
             try {
                 if (json.get("response_code").equals(404))
-                    json = this.api.aggregateReport(apiKey, session);
+                    json = this.api.testReport(apiKey, session);
                 else
                     break;
             } catch (JSONException e) {
@@ -234,7 +232,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
                 break;
 
             Thread.sleep(2 * 1000);
-            json = this.api.aggregateReport(apiKey, session);
+            json = this.api.testReport(apiKey, session);
         }*/
 //################  Make checkAggregate report method to API for V2 ################################
 

@@ -301,10 +301,10 @@ public class PerformancePublisher extends Notifier {
         Thread.sleep(10 * 1000); // Wait for the report to generate.
 
         //get testGetArchive information
-        JSONObject aggregate = this.api.aggregateReport(apiKey, session);
+        JSONObject testReport = this.api.testReport(apiKey, session);
 
 
-        if (aggregate == null || aggregate.equals("null")) {
+        if (testReport == null || testReport.equals("null")) {
             logger.println("Error: Requesting aggregate is not available");
             build.setResult(Result.NOT_BUILT);
             return false;
@@ -314,7 +314,7 @@ public class PerformancePublisher extends Notifier {
         testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
         AggregateTestResult aggregateTestResult=null;
         try{
-            aggregateTestResult = testResultFactory.getAggregateTestResult(aggregate);
+            aggregateTestResult = testResultFactory.getAggregateTestResult(testReport);
 
         }catch (IOException ioe){
             logger.println("Error: Failed to generate AggregateTestResult: "+ioe);

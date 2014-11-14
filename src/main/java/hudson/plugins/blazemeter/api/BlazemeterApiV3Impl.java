@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
  */
 
 public class BlazemeterApiV3Impl implements BlazemeterApi {
-    PrintStream logger = new PrintStream(System.out);
 
     BmUrlManager urlManager;
     private BZMHTTPClient bzmhc = null;
@@ -180,7 +179,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         if (!validate(userKey, testId)) return null;
 
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
     }
 
     /**
@@ -189,11 +188,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      *                 //     * @throws IOException
      *                 //     * @throws ClientProtocolException
      */
-    public JSONObject aggregateReport(String userKey, String reportId) {
+    public JSONObject testReport(String userKey, String reportId) {
         if (!validate(userKey, reportId)) return null;
 
-        String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
-        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
+        JSONObject summary = null;
+        try {
+            summary = (JSONObject) this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET).getJSONObject("result")
+                    .getJSONArray("summary")
+                    .get(0);
+        } catch (JSONException je) {
+            logger.println("Error while parsing summary for V3 API:" + je);
+        }
+        return summary;
     }
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException {

@@ -1,8 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.entities.TestInfo;
-import hudson.plugins.blazemeter.entities.TestStatus;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * User: Vitali
@@ -46,7 +43,7 @@ public interface BlazemeterApi {
 
     public JSONObject stopTest(String userKey, String testId);
 
-    public JSONObject aggregateReport(String userKey, String reportId);
+    public JSONObject testReport(String userKey, String reportId);
 
     public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException;
 }
