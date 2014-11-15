@@ -83,7 +83,8 @@
         </table>
     </f:entry>
     <f:entry title="${%Test Duration}:"
-             field="testDuration">
+             field="testDuration"
+             description="${%TestDuration}">
         <f:textbox field="testDuration"
                    checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)" />
     </f:entry>

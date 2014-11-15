@@ -148,6 +148,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public FormValidation doCheckTestDuration(@QueryParameter String value) throws IOException, ServletException {
         if(value.equals("0")) {
             return FormValidation.warning("TestDuration should be more than ZERO");
+        }if(value.equals("")) {
+            return FormValidation.warning("Default value '50' will be used");
         }
         return FormValidation.ok();
     }

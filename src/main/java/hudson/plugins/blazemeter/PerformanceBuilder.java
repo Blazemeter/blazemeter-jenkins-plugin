@@ -81,7 +81,7 @@ public class PerformanceBuilder extends Builder {
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion;
-        this.testDuration = testDuration;
+        this.testDuration = (testDuration!=null&&!testDuration.isEmpty())?testDuration:"50";
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
