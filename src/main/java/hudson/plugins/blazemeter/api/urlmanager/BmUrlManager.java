@@ -20,5 +20,8 @@ public interface BmUrlManager {
 
 
     public String testReport(String appKey, String userKey, String reportId);
+
+    public String getUser(String appKey, String userKey);
+
 }
 

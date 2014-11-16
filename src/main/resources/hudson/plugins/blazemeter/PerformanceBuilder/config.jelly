@@ -135,8 +135,8 @@
         </f:entry>
         <f:entry name="apiVersionSelector" title="Select API version">
             <select name="apiVersion" field="instance.apiVersion">
-               <!-- <option value="autoDetect">Auto Detect</option> -->
-                <option value="v3">V3</option>
+                <option value="autoDetect">Auto Detect</option>
+                <option value="v3">V3(force)</option>
                 <option value="v2">V2(deprecated)</option>
             </select>
         </f:entry>

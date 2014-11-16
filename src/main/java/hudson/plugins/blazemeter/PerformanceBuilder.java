@@ -78,7 +78,10 @@ public class PerformanceBuilder extends Builder {
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
-        this.apiVersion = apiVersion;
+        this.apiVersion = autoDetectApiVersion(apiVersion,apiKey);
+
+
+
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : "50";
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
@@ -89,6 +92,16 @@ public class PerformanceBuilder extends Builder {
         this.api = apiFactory.getAPI(apiKey);
     }
 
+
+    private String autoDetectApiVersion(String apiVersion, String apiKey){
+        APIFactory apiFactory = APIFactory.getApiFactory();
+        String detectedApiVersion = !apiVersion.equals("autoDetect")?apiVersion:"";
+        if(apiVersion.equals("autoDetect")){
+            this.api=apiFactory.getApiFactory().getAPI(apiKey);
+//            api.
+        }
+        return detectedApiVersion;
+    }
 
     public static File getPerformanceReport(AbstractBuild<?, ?> build,
                                             String parserDisplayName, String performanceReportName) {

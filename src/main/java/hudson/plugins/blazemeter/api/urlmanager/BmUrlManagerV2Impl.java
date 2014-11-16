@@ -116,5 +116,16 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         return String.format("https://a.blazemeter.com/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
                 appKey, userKey, reportId)+CLIENT_IDENTIFICATION;
     }
+
+    @Override
+    public String getUser(String appKey, String userKey) {
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return String.format("%s/api/rest/blazemeter/getUserInfo/?app_key=%s&user_key=%s", SERVER_URL, appKey, userKey);
+    }
 }
 

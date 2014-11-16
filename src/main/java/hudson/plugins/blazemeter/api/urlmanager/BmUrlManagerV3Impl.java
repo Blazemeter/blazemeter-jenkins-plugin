@@ -129,5 +129,19 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
 
         return testAggregateReport;
     }
+
+    @Override
+    public String getUser(String appKey, String userKey) {
+        String getUser=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getUser=SERVER_URL+"/api/latest/user?api_key="+userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
+
+        return getUser;
+    }
 }
 
