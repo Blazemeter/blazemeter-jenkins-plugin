@@ -22,27 +22,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-/**
- * Created by dzmitrykashlach on 10/11/14.
- */
 public class BZMHTTPClient {
     PrintStream logger = new PrintStream(System.out);
 
-    public enum Method{GET,POST}
-    private static BZMHTTPClient instance=null;
+    public enum Method {GET, POST}
 
-    private transient DefaultHttpClient httpClient=null;
+    private static BZMHTTPClient instance = null;
 
-    private BZMHTTPClient(){
-        this.httpClient=new DefaultHttpClient();
-    };
+    private transient DefaultHttpClient httpClient = null;
 
-    public static BZMHTTPClient getInstance(){
-        if(instance==null){
-           instance=new BZMHTTPClient();
+    private BZMHTTPClient() {
+        this.httpClient = new DefaultHttpClient();
+    }
+
+    public static BZMHTTPClient getInstance() {
+        if (instance == null) {
+            instance = new BZMHTTPClient();
         }
         return instance;
-
 
 
     }
@@ -52,22 +49,23 @@ public class BZMHTTPClient {
 
         logger.println("Requesting : " + url);
         HttpResponse response = null;
-        HttpRequestBase request=null;
+        HttpRequestBase request = null;
 
         try {
-            if(method==Method.GET){
+            if (method == Method.GET) {
                 request = new HttpGet(url);
-            }
-            if(method==Method.POST){
+            } else if (method == Method.POST) {
                 request = new HttpPost(url);
                 if (data != null) {
-                    ((HttpPost)request).setEntity(new StringEntity(data.toString()));
+                    ((HttpPost) request).setEntity(new StringEntity(data.toString()));
                 }
+            } else {
+                throw new Exception("Unsupported method: " + method.toString());
             }
-           request.setHeader("Accept", "application/json");
-           request.setHeader("Content-type", "application/json; charset=UTF-8");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json; charset=UTF-8");
 
-           response = this.httpClient.execute(request);
+            response = this.httpClient.execute(request);
 
 
             if (response == null || response.getStatusLine() == null) {
@@ -129,7 +127,7 @@ public class BZMHTTPClient {
         return jo;
     }
 
-    JSONObject getJson(String url, JSONObject data,Method method) {
+    JSONObject getJson(String url, JSONObject data, Method method) {
         JSONObject jo = null;
         try {
             HttpResponse response = getResponse(url, data, method);
@@ -146,12 +144,12 @@ public class BZMHTTPClient {
         return jo;
     }
 
-    void configureProxy(){
+    void configureProxy() {
         if (Hudson.getInstance() != null && Hudson.getInstance().proxy != null) {
             ProxyConfiguration proxy = Hudson.getInstance().proxy;
             // Configure the proxy if necessary
             if (proxy.name != null && !proxy.name.isEmpty() && proxy.port > 0) {
-                if (proxy.getUserName() != null && !proxy.getUserName().isEmpty()){
+                if (proxy.getUserName() != null && !proxy.getUserName().isEmpty()) {
                     Credentials cred = new UsernamePasswordCredentials(proxy.getUserName(), proxy.getPassword());
                     httpClient.getCredentialsProvider().setCredentials(new AuthScope(proxy.name, proxy.port), cred);
                 }

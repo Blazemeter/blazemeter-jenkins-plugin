@@ -1,8 +1,5 @@
 package hudson.plugins.blazemeter.api;
 
-/**
- * Created by dzmitrykashlach on 11/11/14.
- */
 public class APIFactory {
     public enum ApiVersion {
         v3, v2
@@ -26,7 +23,7 @@ public class APIFactory {
         return apiFactory;
     }
 
-    public BlazemeterApi getAPI() {
+    public BlazemeterApi getAPI(String apiKey) {
         if(version==null){
             version=ApiVersion.v3;
         }
@@ -34,7 +31,7 @@ public class APIFactory {
             case v2:
                 if (api == null || api instanceof BlazemeterApiV3Impl) {
                     if(apiV2==null){
-                     apiV2 = new BlazemeterApiV2Impl();
+                     apiV2 = new BlazemeterApiV2Impl(apiKey);
                     }
                     api = apiV2;
                 }
@@ -42,7 +39,7 @@ public class APIFactory {
             case v3:
                 if (api == null || api instanceof BlazemeterApiV2Impl) {
                     if(apiV3==null){
-                        apiV3 = new BlazemeterApiV3Impl();
+                        apiV3 = new BlazemeterApiV3Impl(apiKey);
                     }
                     api = apiV3;
                 }

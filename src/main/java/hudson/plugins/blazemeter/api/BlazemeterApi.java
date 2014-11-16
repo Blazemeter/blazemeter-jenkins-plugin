@@ -31,19 +31,19 @@ public interface BlazemeterApi {
 
     public static final String APP_KEY = "jnk100x987c06f4e10c4";
 
-    public void uploadJmx(String userKey, String testId, File file);
+    public void uploadJmx(String testId, File file);
 
-    public JSONObject uploadBinaryFile(String userKey, String testId, File file);
+    public JSONObject uploadBinaryFile(String testId, File file);
 
-    public TestInfo getTestRunStatus(String userKey, String testId);
+    public TestInfo getTestRunStatus(String testId);
 
-    public JSONObject startTest(String userKey, String testId);
+    public JSONObject startTest(String testId);
 
-    public int getTestCount(String userKey) throws JSONException, IOException, ServletException;
+    public int getTestCount() throws JSONException, IOException, ServletException;
 
-    public JSONObject stopTest(String userKey, String testId);
+    public JSONObject stopTest(String testId);
 
-    public JSONObject testReport(String userKey, String reportId);
+    public JSONObject testReport(String reportId);
 
-    public HashMap<String, String> getTestList(String userKey) throws IOException, MessagingException;
+    public HashMap<String, String> getTestList() throws IOException, MessagingException;
 }

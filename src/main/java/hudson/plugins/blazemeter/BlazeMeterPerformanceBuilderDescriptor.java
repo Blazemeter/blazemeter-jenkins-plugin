@@ -25,9 +25,6 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created by dzmitrykashlach on 12/11/14.
- */
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL = "https://a.blazemeter.com";
@@ -70,10 +67,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         if (apiSecret == null) {
             items.add("No API Key", "-1");
         } else {
-            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI();
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey);
 
             try {
-                HashMap<String, String> testList = bzm.getTestList(apiSecret.getPlainText());
+                HashMap<String, String> testList = bzm.getTestList();
                 if (testList == null){
                     items.add("Invalid API key ", "-1");
                 } else if (testList.isEmpty()){
@@ -134,8 +131,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI();
-        int testCount = bzm.getTestCount(userKey);
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey);
+        int testCount = bzm.getTestCount();
         if (testCount < 0) {
             return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
         } else if (testCount == 0) {

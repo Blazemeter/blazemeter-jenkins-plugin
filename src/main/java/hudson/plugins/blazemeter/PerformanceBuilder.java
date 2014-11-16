@@ -7,20 +7,21 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
-import org.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -33,8 +34,6 @@ import java.util.regex.Pattern;
 public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
 
-
-    private String apiKey;
 
     private String testId = "";
 
@@ -54,7 +53,7 @@ public class PerformanceBuilder extends Builder {
 
     private int responseTimeUnstableThreshold = 0;
 
-    private BlazemeterApi api=null;
+    private BlazemeterApi api = null;
     /**
      * @deprecated as of 1.3. for compatibility
      */
@@ -76,19 +75,18 @@ public class PerformanceBuilder extends Builder {
                               int errorUnstableThreshold,
                               int responseTimeFailedThreshold,
                               int responseTimeUnstableThreshold) {
-        this.apiKey = apiKey;
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion;
-        this.testDuration = (testDuration!=null&&!testDuration.isEmpty())?testDuration:"50";
+        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : "50";
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
-        this.api=apiFactory.getAPI();
+        this.api = apiFactory.getAPI(apiKey);
     }
 
 
@@ -176,23 +174,23 @@ public class PerformanceBuilder extends Builder {
         Result result; // Result.SUCCESS;
         String session;
 
-        if(testDuration==null||testDuration.isEmpty()){
+        if (testDuration == null || testDuration.isEmpty()) {
             build.setResult(Result.FAILURE);
             logger.println("Build was failed due to incorrect values of test duration: null or empty");
             return true;
         }
 
-        if ((result = validateThresholds(logger)) != Result.SUCCESS){
+        if ((result = validateThresholds(logger)) != Result.SUCCESS) {
             // input parameters error.
             build.setResult(Result.FAILURE);
             logger.println("Build was failed due to incorrect values of tresholds");
             return true;
         }
-        logger.println("Expected test duration="+testDuration);
+        logger.println("Expected test duration=" + testDuration);
 
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        String apiKeyId = StringUtils.defaultIfEmpty(getApiKey(), getDescriptor().getApiKey());
+        String apiKeyId = getDescriptor().getApiKey();
         String apiKey = null;
         for (BlazemeterCredential c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
@@ -204,7 +202,7 @@ public class PerformanceBuilder extends Builder {
 
         // ideally, at this point we'd look up the credential based on the API key to find the secret
         // but there are no secrets, so no need to!
-        this.api = APIFactory.getApiFactory().getAPI();
+        this.api = APIFactory.getApiFactory().getAPI(apiKey);
 
         uploadDataFolderFiles(apiKey, testId, this.api, logger);
 
@@ -212,7 +210,7 @@ public class PerformanceBuilder extends Builder {
         int countStartRequests = 0;
         do {
             logger.print(".");
-            json = this.api.startTest(apiKey, testId);
+            json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
                 logger.println("Could not start BlazeMeter Test");
@@ -224,7 +222,7 @@ public class PerformanceBuilder extends Builder {
         try {
             //if test was not started(check) - build.setResult(Result.NOT_BUILT); add to interface
             // add to API implementations;
-            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())&&!json.get("response_code").equals(200)) {
+            if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
                 if (json.get("response_code").equals(500) && json.get("error").toString()
                         .startsWith("Test already running")) {
                     logger.println("Test already running, please stop it first");
@@ -234,12 +232,12 @@ public class PerformanceBuilder extends Builder {
 
             }
             // get sessionId add to interface
-            if(apiVersion.equals(APIFactory.ApiVersion.v2.name())){
+            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
                 session = json.get("session_id").toString();
 
-            }else{
-                JSONObject startJO = (JSONObject)json.get("result");
-                session = ((JSONArray)startJO.get("sessionsId")).get(0).toString();
+            } else {
+                JSONObject startJO = (JSONObject) json.get("result");
+                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
             }
 
         } catch (JSONException e) {
@@ -257,11 +255,7 @@ public class PerformanceBuilder extends Builder {
 
         long lastPrint = 0;
         while (true) {
-            TestInfo info = this.api.getTestRunStatus(apiKey,
-                    apiVersion.equals("v2")?testId:session);
-
-            //if drupal works hard
-            //Thread.sleep(1000);
+            TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (info.getStatus().equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
@@ -287,7 +281,7 @@ public class PerformanceBuilder extends Builder {
                 }
 
                 if (diffInSec >= runDurationSeconds) {
-                    this.api.stopTest(apiKey, testId);
+                    this.api.stopTest(testId);
                     logger.println("BlazeMeter test stopped due to user test duration setup reached");
                     break;
                 }
@@ -304,7 +298,7 @@ public class PerformanceBuilder extends Builder {
         Thread.sleep(10 * 1000); // Wait for the report to generate.
 
         //get testGetArchive information
-        JSONObject testReport = this.api.testReport(apiKey, session);
+        JSONObject testReport = this.api.testReport(session);
 
 
         if (testReport == null || testReport.equals("null")) {
@@ -315,14 +309,14 @@ public class PerformanceBuilder extends Builder {
 
         TestResultFactory testResultFactory = TestResultFactory.getAggregateTestResultFactory();
         testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
-        TestResult testResult =null;
-        try{
+        TestResult testResult = null;
+        try {
             testResult = testResultFactory.getAggregateTestResult(testReport);
 
-        }catch (IOException ioe){
-            logger.println("Error: Failed to generate AggregateTestResult: "+ioe);
-        }catch (JSONException je){
-            logger.println("Error: Failed to generate AggregateTestResult: "+je);
+        } catch (IOException ioe) {
+            logger.println("Error: Failed to generate AggregateTestResult: " + ioe);
+        } catch (JSONException je) {
+            logger.println("Error: Failed to generate AggregateTestResult: " + je);
         }
 
         if (testResult == null) {
@@ -372,7 +366,7 @@ public class PerformanceBuilder extends Builder {
             return;
 
         File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory()){
+        if (!folder.exists() || !folder.isDirectory()) {
             logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
             return;
         }
@@ -386,17 +380,17 @@ public class PerformanceBuilder extends Builder {
                     fileName = file.getName();
 
                     if (fileName.endsWith(mainJMX))
-                        bmAPI.uploadJmx(apiKey, testId, file);
+                        bmAPI.uploadJmx(testId, file);
                     else
-                        uploadFile(apiKey, testId, bmAPI, file, logger);
+                        uploadFile(testId, bmAPI, file, logger);
                 }
             }
         }
     }
 
-    private void uploadFile(String apiKey, String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
+    private void uploadFile(String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
         String fileName = file.getName();
-        org.json.JSONObject json = bmAPI.uploadBinaryFile(apiKey, testId, file);
+        org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
         try {
             if (!json.get("response_code").equals(200)) {
                 logger.println("Could not upload file " + fileName + " " + json.get("error").toString());
@@ -409,9 +403,9 @@ public class PerformanceBuilder extends Builder {
 
     private Result validateThresholds(PrintStream logger) {
         Result result = Result.SUCCESS;
-        if(testDuration.equals("0")){
+        if (testDuration.equals("0")) {
             logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
-                    +Result.NOT_BUILT.toString().toLowerCase());
+                    + Result.NOT_BUILT.toString().toLowerCase());
             return Result.ABORTED;
         }
         if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
@@ -465,10 +459,6 @@ public class PerformanceBuilder extends Builder {
 
     public Object readResolve() {
         return this;
-    }
-
-    public String getApiKey() {
-        return apiKey;
     }
 
     public int getResponseTimeFailedThreshold() {
