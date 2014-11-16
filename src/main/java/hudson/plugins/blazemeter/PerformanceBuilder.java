@@ -171,40 +171,21 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-        Result result; // Result.SUCCESS;
-        String session;
 
-        if (testDuration == null || testDuration.isEmpty()) {
-            build.setResult(Result.FAILURE);
-            logger.println("Build was failed due to incorrect values of test duration: null or empty");
-            return true;
-        }
-
-        if ((result = validateThresholds(logger)) != Result.SUCCESS) {
+        if (validateThresholds(logger) != Result.SUCCESS) {
             // input parameters error.
             build.setResult(Result.FAILURE);
-            logger.println("Build was failed due to incorrect values of tresholds");
+            logger.println("Build was failed due to incorrect values of parameters");
             return true;
         }
+
         logger.println("Expected test duration=" + testDuration);
 
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        String apiKeyId = getDescriptor().getApiKey();
-        String apiKey = null;
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
-            if (StringUtils.equals(apiKeyId, c.getId())) {
-                apiKey = c.getApiKey().getPlainText();
-                break;
-            }
-        }
+        this.api = getAPIClient(build);
 
-        // ideally, at this point we'd look up the credential based on the API key to find the secret
-        // but there are no secrets, so no need to!
-        this.api = APIFactory.getApiFactory().getAPI(apiKey);
-
-        uploadDataFolderFiles(apiKey, testId, this.api, logger);
+        uploadDataFolderFiles(testId, this.api, logger);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
@@ -219,6 +200,7 @@ public class PerformanceBuilder extends Builder {
             }
         } while (json == null);
 
+        String session;
         try {
             //if test was not started(check) - build.setResult(Result.NOT_BUILT); add to interface
             // add to API implementations;
@@ -245,55 +227,89 @@ public class PerformanceBuilder extends Builder {
             logger.println("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
             return false;
         }
+
         // add the report to the build object.
         PerformanceBuildAction a = new PerformanceBuildAction(build, logger, parsers);
         a.setSession(session);
         a.setBlazeMeterURL(DESCRIPTOR.getBlazeMeterURL());
         build.addAction(a);
 
+        try {
+            this.wait_for_finish(logger, session, runDurationSeconds);
+
+            logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
+
+            Result result = this.postProcess(session, logger);
+
+            build.setResult(result);
+
+            return true;
+        } finally {
+            TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
+
+            String status = info.getStatus();
+            if (status.equals(TestStatus.Running)) {
+                logger.println("Shutting down test");
+                this.api.stopTest(testId);
+            } else if (status.equals(TestStatus.Error)) {
+                build.setResult(Result.FAILURE);
+                logger.println("Error while running a test - please try to run the same test on BlazeMeter");
+            } else if (status.equals(TestStatus.NotFound)) {
+                build.setResult(Result.FAILURE);
+                logger.println("Test not found error");
+            }
+        }
+    }
+
+    private void wait_for_finish(PrintStream logger, String session, int runDurationSeconds) throws InterruptedException {
         Date start = null;
 
         long lastPrint = 0;
         while (true) {
             TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
-            if (info.getStatus().equals(TestStatus.Error)) {
-                build.setResult(Result.FAILURE);
-                logger.println("Error while running a test - please try to run the same test on BlazeMeter");
-                return true;
-            }
-
-            if (info.getStatus().equals(TestStatus.NotFound)) {
-                build.setResult(Result.FAILURE);
-                logger.println("Test not found error");
-                return true;
-            }
-
-            if (info.getStatus().equals(TestStatus.Running)) {
-                if (start == null)
-                    start = Calendar.getInstance().getTime();
-                build.setResult(Result.SUCCESS);
-                long now = Calendar.getInstance().getTime().getTime();
-                long diffInSec = (now - start.getTime()) / 1000;
-                if (now - lastPrint > 10000) { //print every 10 sec.
-                    logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
-                    lastPrint = now;
-                }
-
-                if (diffInSec >= runDurationSeconds) {
-                    this.api.stopTest(testId);
-                    logger.println("BlazeMeter test stopped due to user test duration setup reached");
-                    break;
-                }
-                continue;
-            }
-
-            if (info.getStatus().equals(TestStatus.NotRunning))
+            if (!info.getStatus().equals(TestStatus.Running)) {
                 break;
+            }
+
+            if (start == null)
+                start = Calendar.getInstance().getTime();
+            long now = Calendar.getInstance().getTime().getTime();
+            long diffInSec = (now - start.getTime()) / 1000;
+            if (now - lastPrint > 10000) { //print every 10 sec.
+                logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
+                lastPrint = now;
+            }
+
+            if (diffInSec >= runDurationSeconds) {
+                this.api.stopTest(testId);
+                logger.println("BlazeMeter test stopped due to user test duration setup reached");
+                break;
+            }
+
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
+        }
+    }
+
+    private BlazemeterApi getAPIClient(AbstractBuild<?, ?> build) {
+        String apiKeyId = getDescriptor().getApiKey();
+        String apiKey = null;
+        for (BlazemeterCredential c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
+            if (StringUtils.equals(apiKeyId, c.getId())) {
+                apiKey = c.getApiKey().getPlainText();
+                break;
+            }
         }
 
-        logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
+        // ideally, at this point we'd look up the credential based on the API key to find the secret
+        // but there are no secrets, so no need to!
+        return APIFactory.getApiFactory().getAPI(apiKey);
+    }
 
+    private Result postProcess(String session, PrintStream logger) throws InterruptedException {
         //TODO: loop probe with special response code. or loop for certain time on 404 error code.
         Thread.sleep(10 * 1000); // Wait for the report to generate.
 
@@ -303,8 +319,7 @@ public class PerformanceBuilder extends Builder {
 
         if (testReport == null || testReport.equals("null")) {
             logger.println("Error: Requesting aggregate is not available");
-            build.setResult(Result.FAILURE);
-            return false;
+            return Result.FAILURE;
         }
 
         TestResultFactory testResultFactory = TestResultFactory.getAggregateTestResultFactory();
@@ -321,8 +336,7 @@ public class PerformanceBuilder extends Builder {
 
         if (testResult == null) {
             logger.println("Error: Requesting aggregate Test Result is not available");
-            build.setResult(Result.FAILURE);
-            return false;
+            return Result.FAILURE;
         }
 
         if (performanceProjectActions.size() > 0) {
@@ -334,6 +348,7 @@ public class PerformanceBuilder extends Builder {
         double errorPercent = testResult.getErrorPercentage();
         double AverageResponseTime = testResult.getAverage();
 
+        Result result = Result.SUCCESS;
         if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
             logger.println("Test ended with " + Result.FAILURE + " on error percentage threshold");
@@ -345,7 +360,6 @@ public class PerformanceBuilder extends Builder {
 
         if (responseTimeFailedThreshold > 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
-            build.setResult(Result.FAILURE);
             logger.println("Test ended with " + Result.FAILURE + " on response time threshold");
 
         } else if (responseTimeUnstableThreshold > 0
@@ -353,14 +367,10 @@ public class PerformanceBuilder extends Builder {
             result = Result.UNSTABLE;
             logger.println("Test ended with " + Result.UNSTABLE + " on response time threshold");
         }
-
-        build.setResult(result);
-
-
-        return true;
+        return result;
     }
 
-    private void uploadDataFolderFiles(String apiKey, String testId, BlazemeterApi bmAPI, PrintStream logger) {
+    private void uploadDataFolderFiles(String testId, BlazemeterApi bmAPI, PrintStream logger) {
 
         if (dataFolder == null || dataFolder.isEmpty())
             return;
@@ -402,8 +412,9 @@ public class PerformanceBuilder extends Builder {
     }
 
     private Result validateThresholds(PrintStream logger) {
+
         Result result = Result.SUCCESS;
-        if (testDuration.equals("0")) {
+        if (testDuration == null || testDuration.isEmpty() || testDuration.equals("0")) {
             logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
                     + Result.NOT_BUILT.toString().toLowerCase());
             return Result.ABORTED;

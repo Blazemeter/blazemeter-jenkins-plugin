@@ -1,8 +1,6 @@
 package hudson.plugins.blazemeter.entities;
 
-/**
- * Created by dzmitrykashlach on 10/11/14.
- */
+// FIXME: better use Enum for this purpose
 public class TestStatus {
     public static final String Running = "Running";
     public static final String NotRunning = "Not Running";
