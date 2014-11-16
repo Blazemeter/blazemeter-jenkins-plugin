@@ -243,4 +243,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return testListOrdered;
     }
 
+
+    @Override
+    public JSONObject getUser() {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = this.urlManager.getUser(APP_KEY, apiKey);
+        JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        return jo;
+    }
 }

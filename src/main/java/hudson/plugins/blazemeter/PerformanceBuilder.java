@@ -78,10 +78,7 @@ public class PerformanceBuilder extends Builder {
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
-        this.apiVersion = autoDetectApiVersion(apiVersion,apiKey);
-
-
-
+        this.apiVersion = apiVersion.equals("autoDetect")?autoDetectApiVersion(apiVersion,apiKey):apiVersion;
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : "50";
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
@@ -97,8 +94,20 @@ public class PerformanceBuilder extends Builder {
         APIFactory apiFactory = APIFactory.getApiFactory();
         String detectedApiVersion = !apiVersion.equals("autoDetect")?apiVersion:"";
         if(apiVersion.equals("autoDetect")){
+            apiFactory.setVersion(APIFactory.ApiVersion.v3);
             this.api=apiFactory.getApiFactory().getAPI(apiKey);
-//            api.
+        boolean isV3=false;
+            try {
+             isV3=api.getUser().getJSONObject("features").getBoolean("v3");
+            if(isV3){
+
+                return "v3";
+            }else{
+                return "v2";
+            }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return detectedApiVersion;
     }

@@ -46,4 +46,6 @@ public interface BlazemeterApi {
     public JSONObject testReport(String reportId);
 
     public HashMap<String, String> getTestList() throws IOException, MessagingException;
+
+    public JSONObject getUser();
 }
