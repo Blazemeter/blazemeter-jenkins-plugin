@@ -202,26 +202,11 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-            //if test was not started(check) - build.setResult(Result.NOT_BUILT); add to interface
-            // add to API implementations;
-            if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
-                if (json.get("response_code").equals(500) && json.get("error").toString()
-                        .startsWith("Test already running")) {
-                    logger.println("Test already running, please stop it first");
-                    build.setResult(Result.FAILURE);
-                    return false;
-                }
-
+             session=getTestSession(json,logger,build);
+            if(session.isEmpty()){
+                build.setResult(Result.FAILURE);
+                return false;
             }
-            // get sessionId add to interface
-            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
-                session = json.get("session_id").toString();
-
-            } else {
-                JSONObject startJO = (JSONObject) json.get("result");
-                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-            }
-
         } catch (JSONException e) {
             e.printStackTrace();
             logger.println("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
@@ -308,6 +293,31 @@ public class PerformanceBuilder extends Builder {
         // but there are no secrets, so no need to!
         return APIFactory.getApiFactory().getAPI(apiKey);
     }
+
+
+   private String getTestSession(JSONObject json, PrintStream logger, AbstractBuild<?, ?> build) throws JSONException{
+       String session="";
+       if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
+           if (json.get("response_code").equals(500) && json.get("error").toString()
+                   .startsWith("Test already running")) {
+               logger.println("Test already running, please stop it first");
+               build.setResult(Result.FAILURE);
+               return session;
+           }
+
+       }
+       // get sessionId add to interface
+       if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
+           session = json.get("session_id").toString();
+
+
+
+       } else {
+           JSONObject startJO = (JSONObject) json.get("result");
+           session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
+       }
+   return session;
+   }
 
     private Result postProcess(String session, PrintStream logger) throws InterruptedException {
         //TODO: loop probe with special response code. or loop for certain time on 404 error code.

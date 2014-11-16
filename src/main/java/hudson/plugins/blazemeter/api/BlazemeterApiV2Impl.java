@@ -205,7 +205,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
             logger.println(url);
-            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
             try {
                 String r = jo.get("response_code").toString();
                 if (r.equals("200")) {
