@@ -202,7 +202,7 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=getTestSession(json,logger,build);
+             session=this.getTestSession(json, logger, build);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
@@ -315,6 +315,7 @@ public class PerformanceBuilder extends Builder {
        } else {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
+           logger.println("Blazemeter test report will be available at " +  "https://a.blazemeter.com/app/#report/"+session+"/loadreport");
        }
    return session;
    }
