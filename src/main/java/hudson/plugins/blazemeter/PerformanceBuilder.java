@@ -85,7 +85,7 @@ public class PerformanceBuilder extends Builder {
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
+        apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
     }
 

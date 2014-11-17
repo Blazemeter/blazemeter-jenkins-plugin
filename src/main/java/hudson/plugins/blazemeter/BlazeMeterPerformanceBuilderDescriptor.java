@@ -67,8 +67,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         if (apiSecret == null) {
             items.add("No API Key", "-1");
         } else {
-            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey);
-
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret.getPlainText());
             try {
                 HashMap<String, String> testList = bzm.getTestList();
                 if (testList == null){
