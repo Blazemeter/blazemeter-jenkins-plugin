@@ -145,7 +145,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         if(value.equals("0")) {
             return FormValidation.warning("TestDuration should be more than ZERO");
         }if(value.equals("")) {
-            return FormValidation.warning("Default value '50' will be used");
+            return FormValidation.warning("Default value will be fetched from server");
         }
         return FormValidation.ok();
     }

@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
+import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
@@ -251,6 +252,16 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             return null;
         }
         String url = this.urlManager.getUser(APP_KEY, apiKey);
+        JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        return jo;
+    }
+
+    public JSONObject getTestInfo(String testId){
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = ((BmUrlManagerV3Impl)this.urlManager).getTestInfo(APP_KEY, apiKey,testId);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
     }

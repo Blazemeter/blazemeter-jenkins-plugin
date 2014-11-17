@@ -9,6 +9,8 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
+import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -79,7 +81,6 @@ public class PerformanceBuilder extends Builder {
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?autoDetectApiVersion(apiVersion,apiKey):apiVersion;
-        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : "50";
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
@@ -87,6 +88,7 @@ public class PerformanceBuilder extends Builder {
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
+        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : requestTestDuration();
     }
 
 
@@ -110,6 +112,29 @@ public class PerformanceBuilder extends Builder {
             }
         }
         return detectedApiVersion;
+    }
+
+    private String requestTestDuration(){
+        String duration=null;
+        try{
+        if(this.api instanceof BlazemeterApiV2Impl){
+            throw new Exception("Can't fetch test duration from server: select API V3");
+        }
+
+            JSONObject jo = ((BlazemeterApiV3Impl)this.api).getTestInfo(this.testId);
+            JSONObject result = jo.getJSONObject("result");
+            JSONObject configuration = result.getJSONObject("configuration");
+            JSONObject plugins = configuration.getJSONObject("plugins");
+            String type = configuration.getString("type");
+            JSONObject options = plugins.getJSONObject(type);
+            JSONObject override = options.getJSONObject("override");
+            duration = override.getString("duration");
+        }catch(JSONException je){
+            je.printStackTrace();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return duration;
     }
 
     public static File getPerformanceReport(AbstractBuild<?, ?> build,
