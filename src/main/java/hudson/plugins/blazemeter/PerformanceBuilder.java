@@ -114,13 +114,38 @@ public class PerformanceBuilder extends Builder {
         return detectedApiVersion;
     }
 
-    private String requestTestDuration(){
-        String duration=null;
+    private void saveTestDuration(String updDuration){
         try{
+            checkAPIisV3version();
+            JSONObject jo = ((BlazemeterApiV3Impl)this.api).getTestInfo(this.testId);
+            JSONObject result = jo.getJSONObject("result");
+            JSONObject configuration = result.getJSONObject("configuration");
+            JSONObject plugins = configuration.getJSONObject("plugins");
+            String type = configuration.getString("type");
+            JSONObject options = plugins.getJSONObject(type);
+            JSONObject override = options.getJSONObject("override");
+            override.put("duration", updDuration);
+            override.put("threads", JSONObject.NULL);
+            configuration.put("serversCount",JSONObject.NULL);
+            ((BlazemeterApiV3Impl)this.api).putTestInfo(this.testId,result);
+
+        }catch(JSONException je){
+            je.printStackTrace();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void checkAPIisV3version() throws Exception{
         if(this.api instanceof BlazemeterApiV2Impl){
             throw new Exception("Can't fetch test duration from server: select API V3");
         }
+    }
 
+    private String requestTestDuration(){
+        String duration=null;
+        try{
+            checkAPIisV3version();
             JSONObject jo = ((BlazemeterApiV3Impl)this.api).getTestInfo(this.testId);
             JSONObject result = jo.getJSONObject("result");
             JSONObject configuration = result.getJSONObject("configuration");
@@ -129,6 +154,7 @@ public class PerformanceBuilder extends Builder {
             JSONObject options = plugins.getJSONObject(type);
             JSONObject override = options.getJSONObject("override");
             duration = override.getString("duration");
+
         }catch(JSONException je){
             je.printStackTrace();
         }catch(Exception e){
@@ -218,7 +244,6 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-
         if (validateThresholds(logger) != Result.SUCCESS) {
             // input parameters error.
             build.setResult(Result.FAILURE);
@@ -226,18 +251,19 @@ public class PerformanceBuilder extends Builder {
             return true;
         }
 
+        //update testDuration on server
         logger.println("Expected test duration=" + testDuration);
-
+        this.api = getAPIClient(build);
+        saveTestDuration(testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        this.api = getAPIClient(build);
 
         uploadDataFolderFiles(testId, this.api, logger);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
-            logger.print(".");
+            logger.print("### About to start Blazemeter Test.....  ");
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {

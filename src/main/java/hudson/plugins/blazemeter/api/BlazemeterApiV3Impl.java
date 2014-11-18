@@ -265,4 +265,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
     }
+
+    public JSONObject putTestInfo(String testId, JSONObject data){
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = ((BmUrlManagerV3Impl)this.urlManager).getTestInfo(APP_KEY, apiKey,testId);
+        JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.PUT);
+        return jo;
+    }
 }

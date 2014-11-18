@@ -9,6 +9,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.FileEntity;
@@ -25,7 +26,7 @@ import java.io.PrintStream;
 public class BZMHTTPClient {
     PrintStream logger = new PrintStream(System.out);
 
-    public enum Method {GET, POST}
+    public enum Method {GET, POST, PUT}
 
     private static BZMHTTPClient instance = null;
 
@@ -59,7 +60,13 @@ public class BZMHTTPClient {
                 if (data != null) {
                     ((HttpPost) request).setEntity(new StringEntity(data.toString()));
                 }
-            } else {
+            } else if (method == Method.PUT) {
+                request = new HttpPut(url);
+                if (data != null) {
+                    ((HttpPut) request).setEntity(new StringEntity(data.toString()));
+                }
+            }
+            else {
                 throw new Exception("Unsupported method: " + method.toString());
             }
             request.setHeader("Accept", "application/json");
