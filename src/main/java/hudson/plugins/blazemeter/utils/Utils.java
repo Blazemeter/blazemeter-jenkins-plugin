@@ -4,11 +4,15 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.entities.TestInfo;
+import hudson.plugins.blazemeter.entities.TestStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
@@ -119,6 +123,40 @@ public class Utils {
             }
         }
     }
+
+    public static void wait_for_finish(BlazemeterApi api,String apiVersion,String testId,PrintStream logger,
+                                       String session, int runDurationSeconds) throws InterruptedException {
+        Date start = null;
+
+        long lastPrint = 0;
+        while (true) {
+            TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
+
+            if (!info.getStatus().equals(TestStatus.Running)) {
+                break;
+            }
+
+            if (start == null)
+                start = Calendar.getInstance().getTime();
+            long now = Calendar.getInstance().getTime().getTime();
+            long diffInSec = (now - start.getTime()) / 1000;
+            if (now - lastPrint > 10000) { //print every 10 sec.
+                logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
+                lastPrint = now;
+            }
+
+            if (diffInSec >= runDurationSeconds) {
+                api.stopTest(testId);
+                logger.println("BlazeMeter test stopped due to user test duration setup reached");
+                break;
+            }
+
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
+        }
+    }
+
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
         String fileName = file.getName();

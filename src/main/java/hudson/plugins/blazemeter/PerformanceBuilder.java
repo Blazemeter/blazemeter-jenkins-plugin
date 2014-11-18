@@ -9,8 +9,6 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -228,7 +226,8 @@ public class PerformanceBuilder extends Builder {
         build.addAction(a);
 
         try {
-            this.wait_for_finish(logger, session, runDurationSeconds);
+            Utils.wait_for_finish(this.api, this.apiVersion, this.testId,
+                    logger, session, runDurationSeconds);
 
             logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
 
@@ -253,39 +252,6 @@ public class PerformanceBuilder extends Builder {
             }
         }
     }
-
-    private void wait_for_finish(PrintStream logger, String session, int runDurationSeconds) throws InterruptedException {
-        Date start = null;
-
-        long lastPrint = 0;
-        while (true) {
-            TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
-
-            if (!info.getStatus().equals(TestStatus.Running)) {
-                break;
-            }
-
-            if (start == null)
-                start = Calendar.getInstance().getTime();
-            long now = Calendar.getInstance().getTime().getTime();
-            long diffInSec = (now - start.getTime()) / 1000;
-            if (now - lastPrint > 10000) { //print every 10 sec.
-                logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
-                lastPrint = now;
-            }
-
-            if (diffInSec >= runDurationSeconds) {
-                this.api.stopTest(testId);
-                logger.println("BlazeMeter test stopped due to user test duration setup reached");
-                break;
-            }
-
-            if (Thread.interrupted()) {
-                throw new InterruptedException();
-            }
-        }
-    }
-
     private BlazemeterApi getAPIClient(AbstractBuild<?, ?> build) {
         String apiKeyId = getDescriptor().getApiKey();
         String apiKey = null;
