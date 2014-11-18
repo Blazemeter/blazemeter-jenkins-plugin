@@ -15,6 +15,7 @@ import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.testresult.TestResultFactory;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -80,7 +81,8 @@ public class PerformanceBuilder extends Builder {
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
-        this.apiVersion = apiVersion.equals("autoDetect")?autoDetectApiVersion(apiVersion,apiKey):apiVersion;
+        this.apiVersion = apiVersion.equals("autoDetect")?
+                Utils.autoDetectApiVersion(apiVersion, apiKey):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
@@ -88,80 +90,13 @@ public class PerformanceBuilder extends Builder {
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
-        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ? testDuration : requestTestDuration();
+        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
+                testDuration : Utils.requestTestDuration(this.api, this.testId);
     }
 
 
-    private String autoDetectApiVersion(String apiVersion, String apiKey){
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        String detectedApiVersion = !apiVersion.equals("autoDetect")?apiVersion:"";
-        if(apiVersion.equals("autoDetect")){
-            apiFactory.setVersion(APIFactory.ApiVersion.v3);
-            this.api=apiFactory.getApiFactory().getAPI(apiKey);
-        boolean isV3=false;
-            try {
-             isV3=api.getUser().getJSONObject("features").getBoolean("v3");
-            if(isV3){
 
-                return "v3";
-            }else{
-                return "v2";
-            }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return detectedApiVersion;
-    }
 
-    private void saveTestDuration(String updDuration){
-        try{
-            checkAPIisV3version();
-            JSONObject jo = ((BlazemeterApiV3Impl)this.api).getTestInfo(this.testId);
-            JSONObject result = jo.getJSONObject("result");
-            JSONObject configuration = result.getJSONObject("configuration");
-            JSONObject plugins = configuration.getJSONObject("plugins");
-            String type = configuration.getString("type");
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject("override");
-            override.put("duration", updDuration);
-            override.put("threads", JSONObject.NULL);
-            configuration.put("serversCount",JSONObject.NULL);
-            ((BlazemeterApiV3Impl)this.api).putTestInfo(this.testId,result);
-
-        }catch(JSONException je){
-            je.printStackTrace();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void checkAPIisV3version() throws Exception{
-        if(this.api instanceof BlazemeterApiV2Impl){
-            throw new Exception("Can't fetch test duration from server: select API V3");
-        }
-    }
-
-    private String requestTestDuration(){
-        String duration=null;
-        try{
-            checkAPIisV3version();
-            JSONObject jo = ((BlazemeterApiV3Impl)this.api).getTestInfo(this.testId);
-            JSONObject result = jo.getJSONObject("result");
-            JSONObject configuration = result.getJSONObject("configuration");
-            JSONObject plugins = configuration.getJSONObject("plugins");
-            String type = configuration.getString("type");
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject("override");
-            duration = override.getString("duration");
-
-        }catch(JSONException je){
-            je.printStackTrace();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return duration;
-    }
 
     public static File getPerformanceReport(AbstractBuild<?, ?> build,
                                             String parserDisplayName, String performanceReportName) {
@@ -254,11 +189,11 @@ public class PerformanceBuilder extends Builder {
         //update testDuration on server
         logger.println("Expected test duration=" + testDuration);
         this.api = getAPIClient(build);
-        saveTestDuration(testDuration);
+        Utils.saveTestDuration(this.api, this.testId, testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
 
-        uploadDataFolderFiles(testId, this.api, logger);
+        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api, logger);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
@@ -454,46 +389,6 @@ public class PerformanceBuilder extends Builder {
         return result;
     }
 
-    private void uploadDataFolderFiles(String testId, BlazemeterApi bmAPI, PrintStream logger) {
-
-        if (dataFolder == null || dataFolder.isEmpty())
-            return;
-
-        File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory()) {
-            logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
-            return;
-        }
-
-        File[] listOfFiles = folder.listFiles();
-
-        if (listOfFiles != null) {
-            for (File file : listOfFiles) {
-                String fileName;
-                if (file.isFile()) {
-                    fileName = file.getName();
-
-                    if (fileName.endsWith(mainJMX))
-                        bmAPI.uploadJmx(testId, file);
-                    else
-                        uploadFile(testId, bmAPI, file, logger);
-                }
-            }
-        }
-    }
-
-    private void uploadFile(String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
-        String fileName = file.getName();
-        org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
-        try {
-            if (!json.get("response_code").equals(200)) {
-                logger.println("Could not upload file " + fileName + " " + json.get("error").toString());
-            }
-        } catch (JSONException e) {
-            logger.println("Could not upload file " + fileName + " " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     private Result validateThresholds(PrintStream logger) {
 
