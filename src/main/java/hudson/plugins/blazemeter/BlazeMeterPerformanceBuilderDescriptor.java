@@ -27,7 +27,7 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL = "https://a.blazemeter.com";
+    private String blazeMeterURL = "";
     private String name = "My BlazeMeter Account";
     private String apiKey;
 
@@ -161,6 +161,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         apiKey = formData.optString("apiKey");
+        String bzm = formData.optString("blazeMeterURL");
+        blazeMeterURL = !bzm.isEmpty()?bzm:"https://a.blazemeter.com";
         save();
         return true;
     }
@@ -168,6 +170,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public String getBlazeMeterURL() {
         return blazeMeterURL;
     }
+
+
 
     public void setBlazeMeterURL(String blazeMeterURL) {
         this.blazeMeterURL = blazeMeterURL;
@@ -202,6 +206,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
+
 
 }
 

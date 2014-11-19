@@ -1,5 +1,7 @@
 package hudson.plugins.blazemeter.utils;
 
+import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
+import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
@@ -171,5 +173,11 @@ public class Utils {
         }
     }
 
+    public static void updateBZMUrl(BlazeMeterPerformanceBuilderDescriptor descriptor,
+                                    BlazemeterApi api, PrintStream logger){
+        String url=descriptor.getBlazeMeterURL();
+        api.setBlazeMeterURL(url);
+        logger.println("BlazeMeterURL=" + url+" will be used for test");
+    }
 
 }

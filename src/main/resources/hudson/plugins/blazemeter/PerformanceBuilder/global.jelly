@@ -30,5 +30,10 @@
       </f:entry>
     </f:section>
   </j:if>
+    <f:entry title="Server URL"
+             field="blazeMeterURL"
+             description="${%Server URL}">
+        <f:textbox field="blazeMeterURL"/>
+    </f:entry>
 
 </j:jelly>

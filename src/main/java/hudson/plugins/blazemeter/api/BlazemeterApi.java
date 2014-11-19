@@ -48,4 +48,8 @@ public interface BlazemeterApi {
     public HashMap<String, String> getTestList() throws IOException, MessagingException;
 
     public JSONObject getUser();
+
+    public void setBlazeMeterURL(String blazeMeterURL);
+
+    public String getBlazeMeterURL();
 }

@@ -90,7 +90,7 @@ public class PerformanceBuilder extends Builder {
         this.api = apiFactory.getAPI(apiKey);
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
                 testDuration : Utils.requestTestDuration(this.api, this.testId);
-    }
+}
 
 
 
@@ -184,7 +184,10 @@ public class PerformanceBuilder extends Builder {
             return true;
         }
 
+
+        BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
+        Utils.updateBZMUrl(descriptor,this.api,logger);
         logger.println("Expected test duration=" + testDuration);
         this.api = getAPIClient(build);
         Utils.saveTestDuration(this.api, this.testId, testDuration);

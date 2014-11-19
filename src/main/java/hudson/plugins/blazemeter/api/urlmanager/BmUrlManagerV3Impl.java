@@ -157,5 +157,9 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return getTestInfo;
     }
 
+    @Override
+    public void setServerUrl(String serverUrl) {
+        this.SERVER_URL=serverUrl;
+    }
 }
 

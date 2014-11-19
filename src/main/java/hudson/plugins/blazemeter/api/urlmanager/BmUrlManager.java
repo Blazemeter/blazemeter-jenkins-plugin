@@ -4,8 +4,10 @@ package hudson.plugins.blazemeter.api.urlmanager;
  * Created by dzmitrykashlach on 10/11/14.
  */
 public interface BmUrlManager {
-
+    public String SERVER_URL = "https://a.blazemeter.com/";
     public String getServerUrl();
+
+    public void setServerUrl(String serverUrl);
 
     public String testStatus(String appKey, String userKey, String testId);
 

@@ -249,4 +249,14 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
         }
+
+    @Override
+    public void setBlazeMeterURL(String blazeMeterURL) {
+        this.urlManager.setServerUrl(blazeMeterURL);
+    }
+
+    @Override
+    public String getBlazeMeterURL() {
+        return this.urlManager.getServerUrl();
+    }
 }
