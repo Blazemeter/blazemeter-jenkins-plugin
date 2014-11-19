@@ -46,6 +46,8 @@ public class PerformanceBuilder extends Builder {
 
     private String dataFolder = "";
 
+    private String jsonConfig = "";
+
     private int errorFailedThreshold = 0;
 
     private int errorUnstableThreshold = 0;
@@ -72,6 +74,7 @@ public class PerformanceBuilder extends Builder {
                               String dataFolder,
                               String testId,
                               String apiVersion,
+                              String jsonConfig,
                               int errorFailedThreshold,
                               int errorUnstableThreshold,
                               int responseTimeFailedThreshold,
@@ -83,6 +86,7 @@ public class PerformanceBuilder extends Builder {
                 Utils.autoDetectApiVersion(apiVersion, apiKey):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
+        this.jsonConfig = jsonConfig;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
@@ -188,9 +192,15 @@ public class PerformanceBuilder extends Builder {
         BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
         Utils.updateBZMUrl(descriptor,this.api,logger);
-        logger.println("Expected test duration=" + testDuration);
         this.api = getAPIClient(build);
-        Utils.saveTestDuration(this.api, this.testId, testDuration);
+        if(!this.jsonConfig.isEmpty()){
+            FilePath workspace=build.getWorkspace();
+            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace,logger);
+
+        }else{
+            Utils.saveTestDuration(this.api, this.testId, testDuration);
+        }
+        logger.println("Expected test duration=" + testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
 
@@ -292,7 +302,7 @@ public class PerformanceBuilder extends Builder {
        } else {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-           logger.println("Blazemeter test report will be available at " +  "https://a.blazemeter.com/app/#report/"+session+"/loadreport");
+           logger.println("Blazemeter test report will be available at " +  this.api.getBlazeMeterURL()+"/app/#report/"+session+"/loadreport");
        }
    return session;
    }

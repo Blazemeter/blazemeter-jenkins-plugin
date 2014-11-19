@@ -6,6 +6,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -70,6 +71,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret.getPlainText());
             try {
                 HashMap<String, String> testList = bzm.getTestList();
+                items.add("Create new test using JSON configuration", "createTestFromJSON");
+
                 if (testList == null){
                     items.add("Invalid API key ", "-1");
                 } else if (testList.isEmpty()){
@@ -162,7 +165,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         apiKey = formData.optString("apiKey");
         String bzm = formData.optString("blazeMeterURL");
-        blazeMeterURL = !bzm.isEmpty()?bzm:"https://a.blazemeter.com";
+        blazeMeterURL = !bzm.isEmpty()?bzm: Constants.DEFAULT_BLAZEMETER_URL;
         save();
         return true;
     }

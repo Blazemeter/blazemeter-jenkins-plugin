@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.utils;
 
+import hudson.FilePath;
 import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
 import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
@@ -12,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +44,9 @@ public class Utils {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+                return "v3";
             }
         }
         return detectedApiVersion;
@@ -132,6 +137,7 @@ public class Utils {
 
         long lastPrint = 0;
         while (true) {
+            Thread.sleep(5000);
             TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
@@ -159,6 +165,23 @@ public class Utils {
         }
     }
 
+    public static String createTestFromJSON(BlazemeterApi api, String jsonConfig, FilePath workspace,PrintStream logger){
+        FilePath newTestPath=workspace.child(jsonConfig);
+        String testId=null;
+        try {
+            String jsonConfigStr=newTestPath.readToString();
+            JSONObject configNode = new JSONObject(jsonConfigStr);
+            JSONObject jo=((BlazemeterApiV3Impl)api).createYahooTest(configNode);
+            //get created testId;
+        testId=jo.getJSONObject("result").getString("id");
+        } catch (IOException e) {
+            logger.println("Failed to read JSON configuration from file"+newTestPath.getName()+": "+e.getMessage());
+        } catch (JSONException je) {
+            logger.println("Failed to read JSON configuration from file"+newTestPath.getName()+": "+je.getMessage());
+        }finally{
+            return testId;
+        }
+    }
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
         String fileName = file.getName();

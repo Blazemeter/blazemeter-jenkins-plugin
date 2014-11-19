@@ -1,5 +1,7 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
+import hudson.plugins.blazemeter.utils.Constants;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -9,7 +11,7 @@ import java.net.URLEncoder;
  */
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
-    private String SERVER_URL = "https://a.blazemeter.com/";
+    private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
     private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
 
     static{
@@ -156,6 +158,22 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
 
         return getTestInfo;
     }
+
+    public String createYahooTest(String appKey, String userKey){
+        String createYahooTest=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        createYahooTest=SERVER_URL+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
+                +userKey;
+//                +"&app_key="+appKey+CLIENT_IDENTIFICATION;
+
+        return createYahooTest;
+    }
+
 
     @Override
     public void setServerUrl(String serverUrl) {

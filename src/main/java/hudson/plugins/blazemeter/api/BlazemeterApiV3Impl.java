@@ -5,6 +5,7 @@ import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BlazemeterApiV3Impl(String apiKey) {
         this.apiKey = apiKey;
         urlManager = URLFactory.getURLFactory().
-                getURLManager(URLFactory.ApiVersion.v3, "https://a.blazemeter.com");
+                getURLManager(URLFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         try {
             bzmhc = BZMHTTPClient.getInstance();
             bzmhc.configureProxy();
@@ -273,6 +274,16 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         }
         String url = ((BmUrlManagerV3Impl)this.urlManager).getTestInfo(APP_KEY, apiKey,testId);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.PUT);
+        return jo;
+    }
+
+    public JSONObject createYahooTest(JSONObject data){
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = ((BmUrlManagerV3Impl)this.urlManager).createYahooTest(APP_KEY, apiKey);
+        JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
     }
 

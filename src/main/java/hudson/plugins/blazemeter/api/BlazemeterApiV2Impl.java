@@ -4,6 +4,7 @@ import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +39,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     BlazemeterApiV2Impl(String apiKey) {
         this.apiKey = apiKey;
         urlManager = URLFactory.getURLFactory().
-                getURLManager(URLFactory.ApiVersion.v2, "https://a.blazemeter.com");
+                getURLManager(URLFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
         try {
             bzmhc = BZMHTTPClient.getInstance();
             bzmhc.configureProxy();

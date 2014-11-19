@@ -1,5 +1,7 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
+import hudson.plugins.blazemeter.utils.Constants;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -9,7 +11,7 @@ import java.net.URLEncoder;
  */
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
-    private String SERVER_URL = "https://a.blazemeter.com/";
+    private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
     private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
 
     static{

@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.ChartUtil;
 import hudson.util.ChartUtil.NumberOnlyBuildLabel;
 import hudson.util.DataSetBuilder;
@@ -91,7 +92,7 @@ public class PerformanceReportMap implements ModelObject {
 
     public String getDisplayName() {
         if ("".equals(Messages.Report_DisplayName())) {
-            return "https://a.blazemeter.com/";
+            return Constants.DEFAULT_BLAZEMETER_URL;
         }
        return Messages.Report_DisplayName();
     }

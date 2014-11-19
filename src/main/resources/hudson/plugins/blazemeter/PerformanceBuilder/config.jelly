@@ -18,6 +18,12 @@
         <f:select>
         </f:select>
     </f:entry>
+    <f:entry title="${%Path to JSON configuration}:"
+             field="jsonConfig"
+             description="${%This path will be used for obtaining JSON configuration}">
+        <f:textbox field="jsonConfig"/>
+                   <!--checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)" />-->
+    </f:entry>
 
     <f:entry title="${%Error percentage threshold}:"
              description="${%Threshold.Description}">

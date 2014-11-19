@@ -1,10 +1,12 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
+import hudson.plugins.blazemeter.utils.Constants;
+
 /**
  * Created by dzmitrykashlach on 10/11/14.
  */
 public interface BmUrlManager {
-    public String SERVER_URL = "https://a.blazemeter.com/";
+    public String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
     public String getServerUrl();
 
     public void setServerUrl(String serverUrl);
