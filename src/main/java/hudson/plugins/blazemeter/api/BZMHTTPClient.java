@@ -151,6 +151,20 @@ public class BZMHTTPClient {
         return jo;
     }
 
+    String getString(String url, JSONObject data, Method method){
+        String  str = null;
+        try {
+            HttpResponse response = getResponse(url, data, method);
+            if (response != null) {
+                str = EntityUtils.toString(response.getEntity());
+                logger.println(str);
+            }
+        } catch (IOException e) {
+            logger.println("Error decoding Json " + e);
+        }
+        return str;
+    }
+
     void configureProxy() {
         if (Hudson.getInstance() != null && Hudson.getInstance().proxy != null) {
             ProxyConfiguration proxy = Hudson.getInstance().proxy;

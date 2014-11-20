@@ -226,7 +226,7 @@ public class PerformanceBuilder extends Builder {
 
             logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
 
-            Result result = this.postProcess(session, logger);
+            Result result = this.postProcess(session, logger,build);
 
             build.setResult(result);
 
@@ -287,7 +287,7 @@ public class PerformanceBuilder extends Builder {
    return session;
    }
 
-    private Result postProcess(String session, PrintStream logger) throws InterruptedException {
+    private Result postProcess(String session, PrintStream logger,AbstractBuild<?, ?> build) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         JSONObject jo = this.api.getTresholds(session);
@@ -324,7 +324,11 @@ public class PerformanceBuilder extends Builder {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             logger.println(testResult.toString());
-            Utils.validateLocalTresholds(testResult,logger,this);
+            String junitReport = this.api.retrieveJUNITXML(session);
+            logger.println("Received Junit report from server.... Saving it to the disc...");
+            Utils.saveReport(session,junitReport,build.getWorkspace(),logger);
+//            Utils.validateLocalTresholds(testResult,logger,this);
+
         } catch (IOException ioe) {
             logger.println("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {

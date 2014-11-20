@@ -33,5 +33,7 @@ public interface BmUrlManager {
 
     public String createYahooTest(String appKey, String userKey);
 
+    public String retrieveJUNITXML(String appKey, String userKey, String sessionId);
+
 }
 

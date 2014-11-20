@@ -256,7 +256,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             logger.println("User apiKey is empty");
             return null;
         }
-        String url = ((BmUrlManagerV3Impl)this.urlManager).getTestInfo(APP_KEY, apiKey,testId);
+        String url = this.urlManager.getTestInfo(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
     }
@@ -267,7 +267,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             logger.println("User apiKey is empty");
             return null;
         }
-        String url = ((BmUrlManagerV3Impl)this.urlManager).getTestInfo(APP_KEY, apiKey,testId);
+        String url = this.urlManager.getTestInfo(APP_KEY, apiKey,testId);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.PUT);
         return jo;
     }
@@ -278,7 +278,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             logger.println("User apiKey is empty");
             return null;
         }
-        String url = ((BmUrlManagerV3Impl)this.urlManager).createYahooTest(APP_KEY, apiKey);
+        String url = this.urlManager.createYahooTest(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
       }
@@ -289,7 +289,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             logger.println("User apiKey is empty");
             return null;
         }
-        String url = ((BmUrlManagerV3Impl)this.urlManager).getTresholds(APP_KEY, apiKey,sessionId);
+        String url = this.urlManager.getTresholds(APP_KEY, apiKey, sessionId);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
     }
@@ -319,5 +319,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return true;
     }
 
+    @Override
+    public String retrieveJUNITXML(String sessionId) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, sessionId);
+        String xmlJunit = this.bzmhc.getString(url, null, BZMHTTPClient.Method.GET);
 
+        return xmlJunit;
+    }
 }

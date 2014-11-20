@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter.utils;
 
 import hudson.FilePath;
+import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
 import hudson.plugins.blazemeter.PerformanceBuilder;
@@ -14,9 +15,7 @@ import hudson.plugins.blazemeter.testresult.TestResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -195,6 +194,30 @@ public class Utils {
         String url=descriptor.getBlazeMeterURL();
         api.setBlazeMeterURL(url);
         logger.println("BlazeMeterURL=" + url+" will be used for test");
+    }
+
+    public static void saveReport(String filename,
+                                  String report,
+                                  FilePath filePath,
+                                  PrintStream logger) {
+        File reportFile=new File(filePath.getParent()
+                +"/"+filePath.getName()+"/"+filename+".xml");
+        try {
+            if(!reportFile.exists()){
+                reportFile.createNewFile();
+            }
+            BufferedWriter out = new BufferedWriter(new FileWriter(reportFile));
+            out.write(report);
+            out.close();
+
+        }catch (FileNotFoundException fnfe)
+        {
+            logger.println("ERROR: Failed to save XML report to workspace "+ fnfe.getMessage());
+        }
+        catch (IOException e)
+        {
+            logger.println("ERROR: Failed to save XML report to workspace "+ e.getMessage());
+        }
     }
 
 

@@ -195,5 +195,22 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     public void setServerUrl(String serverUrl) {
         this.SERVER_URL=serverUrl;
     }
+
+    @Override
+    public String retrieveJUNITXML(String appKey, String userKey, String sessionId) {
+        String retrieveJUNITXML=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        retrieveJUNITXML=SERVER_URL+"/api/latest/sessions/"+sessionId+
+                "/reports/thresholds/data?format=junit&api_key="
+                +userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
+
+        return retrieveJUNITXML;
+    }
 }
 
