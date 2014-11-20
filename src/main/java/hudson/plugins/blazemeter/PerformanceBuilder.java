@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DateFormat;
@@ -99,16 +98,6 @@ public class PerformanceBuilder extends Builder {
 
 
 
-
-    public static File getPerformanceReport(AbstractBuild<?, ?> build,
-                                            String parserDisplayName, String performanceReportName) {
-        return new File(build.getRootDir(),
-                PerformanceReportMap.getPerformanceReportFileRelativePath(
-                        parserDisplayName,
-                        getPerformanceReportBuildFileName(performanceReportName)));
-    }
-
-    List<PerformanceProjectAction> performanceProjectActions = new ArrayList<PerformanceProjectAction>();
 
     private String blazeMeterURL;
 
@@ -337,17 +326,23 @@ public class PerformanceBuilder extends Builder {
             return Result.FAILURE;
         }
 
-        if (performanceProjectActions.size() > 0) {
-            performanceProjectActions.get(performanceProjectActions.size() - 1).lastReportSession = session;
-            performanceProjectActions.get(performanceProjectActions.size() - 1).lastBlazeMeterURL = DESCRIPTOR.getBlazeMeterURL();
-        }
-
         double thresholdTolerance = 0.00005; //null hypothesis
         double errorPercent = testResult.getErrorPercentage();
         double AverageResponseTime = testResult.getAverage();
 
-        Result result = Result.SUCCESS;
-        if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
+
+        JSONObject jo = this.api.getTresholds(session);
+        boolean success=false;
+        try {
+            success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
+        } catch (JSONException je) {
+            logger.println("Error: Failed to get tresholds: " + je);
+        }
+        logger.println("Validating tresholds from server...");
+
+        Result result = success?Result.SUCCESS:Result.FAILURE;
+
+        /*if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
             result = Result.FAILURE;
             logger.println("Test ended with " + Result.FAILURE + " on error percentage threshold");
         } else if (errorUnstableThreshold > 0
@@ -364,7 +359,7 @@ public class PerformanceBuilder extends Builder {
                 && AverageResponseTime - responseTimeUnstableThreshold > thresholdTolerance) {
             result = Result.UNSTABLE;
             logger.println("Test ended with " + Result.UNSTABLE + " on response time threshold");
-        }
+        }*/
         return result;
     }
 
@@ -408,27 +403,6 @@ public class PerformanceBuilder extends Builder {
         return result;
     }
 
-    private List<File> copyReportsToMaster(AbstractBuild<?, ?> build,
-                                           PrintStream logger, List<FilePath> files, String parserDisplayName)
-            throws IOException, InterruptedException {
-        List<File> localReports = new ArrayList<File>();
-        for (FilePath src : files) {
-            final File localReport = getPerformanceReport(build, parserDisplayName,
-                    src.getName());
-            if (src.isDirectory()) {
-                logger.println("Performance: File '" + src.getName()
-                        + "' is a directory, not a Performance Report");
-                continue;
-            }
-            src.copyTo(new FilePath(localReport));
-            localReports.add(localReport);
-        }
-        return localReports;
-    }
-
-    public Object readResolve() {
-        return this;
-    }
 
     public int getResponseTimeFailedThreshold() {
         return responseTimeFailedThreshold;

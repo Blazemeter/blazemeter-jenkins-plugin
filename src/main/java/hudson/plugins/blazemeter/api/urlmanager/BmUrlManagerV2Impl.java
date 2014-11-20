@@ -13,7 +13,6 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
 
     private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
     private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
-
     static{
         try{
             CLIENT_IDENTIFICATION= URLEncoder.encode(CLIENT_IDENTIFICATION, "UTF-8");
@@ -29,10 +28,12 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         SERVER_URL = blazeMeterUrl;
     }
 
+    @Override
     public String getServerUrl() {
         return SERVER_URL;
     }
 
+    @Override
     public String testStatus(String appKey, String userKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -45,6 +46,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
                 SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
     }
 
+    @Override
     public String getTests(String appKey, String userKey) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -57,6 +59,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
 
     }
 
+    @Override
     public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -70,6 +73,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
                 SERVER_URL,appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
     }
 
+    @Override
     public String fileUpload(String appKey, String userKey, String testId, String fileName) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -83,6 +87,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
                 SERVER_URL,appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
     }
 
+    @Override
     public String testStart(String appKey, String userKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -95,6 +100,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
                 SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
     }
 
+    @Override
     public String testStop(String appKey, String userKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -107,7 +113,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
                 SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
     }
 
-
+    @Override
     public String testReport(String appKey, String userKey, String reportId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -135,6 +141,21 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     @Override
     public void setServerUrl(String serverUrl) {
         this.SERVER_URL=serverUrl;
+    }
+
+    @Override
+    public String getTresholds(String appKey, String userKey, String sessionId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public String getTestInfo(String appKey, String userKey, String testId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public String createYahooTest(String appKey, String userKey) {
+        return Constants.NOT_IMPLEMENTED;
     }
 }
 

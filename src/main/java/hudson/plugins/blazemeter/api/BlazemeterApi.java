@@ -52,4 +52,12 @@ public interface BlazemeterApi {
     public void setBlazeMeterURL(String blazeMeterURL);
 
     public String getBlazeMeterURL();
+
+    public JSONObject getTresholds(String sessionId);
+
+    public JSONObject getTestInfo(String testId);
+
+    public JSONObject putTestInfo(String testId, JSONObject data);
+
+    public JSONObject createYahooTest(JSONObject data);
 }

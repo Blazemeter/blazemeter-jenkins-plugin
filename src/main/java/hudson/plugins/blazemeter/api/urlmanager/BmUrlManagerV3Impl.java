@@ -146,6 +146,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return getUser;
     }
 
+    @Override
     public String getTestInfo(String appKey, String userKey, String testId){
         String getTestInfo=null;
         try {
@@ -159,6 +160,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return getTestInfo;
     }
 
+    @Override
     public String createYahooTest(String appKey, String userKey){
         String createYahooTest=null;
         try {
@@ -168,12 +170,26 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
             e.printStackTrace();
         }
         createYahooTest=SERVER_URL+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey;
-//                +"&app_key="+appKey+CLIENT_IDENTIFICATION;
+                +userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
 
         return createYahooTest;
     }
 
+    @Override
+    public String getTresholds(String appKey, String userKey, String sessionId){
+        String getTresholds=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getTresholds=SERVER_URL+"/api/latest/sessions/"+sessionId+"/reports/thresholds?api_key="
+                +userKey+"&app_key="+appKey+CLIENT_IDENTIFICATION;
+
+        return getTresholds;
+
+    }
 
     @Override
     public void setServerUrl(String serverUrl) {

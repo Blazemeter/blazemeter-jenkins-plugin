@@ -52,17 +52,10 @@ public class Utils {
         return detectedApiVersion;
     }
 
-    public static void checkAPIisV3version(BlazemeterApi api) throws Exception{
-        if(api instanceof BlazemeterApiV2Impl){
-            throw new Exception("Can't fetch test duration from server: select API V3");
-        }
-    }
-
 
     public static void saveTestDuration(BlazemeterApi api, String testId, String updDuration){
         try{
-            checkAPIisV3version(api);
-            JSONObject jo = ((BlazemeterApiV3Impl)api).getTestInfo(testId);
+            JSONObject jo =api.getTestInfo(testId);
             JSONObject result = jo.getJSONObject("result");
             JSONObject configuration = result.getJSONObject("configuration");
             JSONObject plugins = configuration.getJSONObject("plugins");
@@ -72,7 +65,7 @@ public class Utils {
             override.put("duration", updDuration);
             override.put("threads", JSONObject.NULL);
             configuration.put("serversCount",JSONObject.NULL);
-            ((BlazemeterApiV3Impl)api).putTestInfo(testId,result);
+            api.putTestInfo(testId,result);
 
         }catch(JSONException je){
             je.printStackTrace();
@@ -84,8 +77,7 @@ public class Utils {
     public static String requestTestDuration(BlazemeterApi api, String testId){
         String duration=null;
         try{
-            checkAPIisV3version(api);
-            JSONObject jo = ((BlazemeterApiV3Impl)api).getTestInfo(testId);
+            JSONObject jo = api.getTestInfo(testId);
             JSONObject result = jo.getJSONObject("result");
             JSONObject configuration = result.getJSONObject("configuration");
             JSONObject plugins = configuration.getJSONObject("plugins");
@@ -171,7 +163,7 @@ public class Utils {
         try {
             String jsonConfigStr=newTestPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
-            JSONObject jo=((BlazemeterApiV3Impl)api).createYahooTest(configNode);
+            JSONObject jo=api.createYahooTest(configNode);
             //get created testId;
         testId=jo.getJSONObject("result").getString("id");
         } catch (IOException e) {

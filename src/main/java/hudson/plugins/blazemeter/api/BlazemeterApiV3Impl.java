@@ -57,6 +57,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      *               //     * @throws java.io.IOException
      *               //     * @throws org.json.JSONException
      */
+    @Override
     public synchronized void uploadJmx(String testId, File file) {
 
         if (!validate(apiKey, testId)) return;
@@ -81,6 +82,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      * //     * @throws org.json.JSONException
      */
 
+    @Override
     public synchronized JSONObject uploadBinaryFile(String testId, File file) {
 
         if (!validate(apiKey, testId)) return null;
@@ -91,6 +93,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
 
+    @Override
     public TestInfo getTestRunStatus(String testId) {
         TestInfo ti = new TestInfo();
 
@@ -121,6 +124,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return ti;
     }
 
+    @Override
     public synchronized JSONObject startTest(String testId) {
 
         if (!validate(apiKey, testId)) return null;
@@ -129,6 +133,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
     }
 
+    @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("getTests apiKey is empty");
@@ -156,25 +161,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         }
     }
 
-
-    private boolean validate(String apiKey, String testId) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.println("startTest apiKey is empty");
-            return false;
-        }
-
-        if (testId == null || testId.trim().isEmpty()) {
-            logger.println("testId is empty");
-            return false;
-        }
-        return true;
-    }
-
     /**
      * @param testId - test id
      *               //     * @throws IOException
      *               //     * @throws ClientProtocolException
      */
+    @Override
     public JSONObject stopTest(String testId) {
         if (!validate(apiKey, testId)) return null;
 
@@ -187,6 +179,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      *                 //     * @throws IOException
      *                 //     * @throws ClientProtocolException
      */
+    @Override
     public JSONObject testReport(String reportId) {
         if (!validate(apiKey, reportId)) return null;
 
@@ -201,7 +194,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         }
         return summary;
     }
-
+    @Override
     public HashMap<String, String> getTestList() throws IOException, MessagingException {
 
         LinkedHashMap<String, String> testListOrdered = null;
@@ -257,6 +250,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return jo;
     }
 
+    @Override
     public JSONObject getTestInfo(String testId){
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("User apiKey is empty");
@@ -267,6 +261,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return jo;
     }
 
+    @Override
     public JSONObject putTestInfo(String testId, JSONObject data){
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("User apiKey is empty");
@@ -277,6 +272,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return jo;
     }
 
+    @Override
     public JSONObject createYahooTest(JSONObject data){
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("User apiKey is empty");
@@ -285,7 +281,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         String url = ((BmUrlManagerV3Impl)this.urlManager).createYahooTest(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
+      }
+
+    @Override
+    public JSONObject getTresholds(String sessionId){
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("User apiKey is empty");
+            return null;
+        }
+        String url = ((BmUrlManagerV3Impl)this.urlManager).getTresholds(APP_KEY, apiKey,sessionId);
+        JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        return jo;
     }
+
 
     @Override
     public void setBlazeMeterURL(String blazeMeterURL) {
@@ -296,4 +304,20 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public String getBlazeMeterURL() {
         return this.urlManager.getServerUrl();
     }
+
+
+    private boolean validate(String apiKey, String testId) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.println("startTest apiKey is empty");
+            return false;
+        }
+
+        if (testId == null || testId.trim().isEmpty()) {
+            logger.println("testId is empty");
+            return false;
+        }
+        return true;
+    }
+
+
 }

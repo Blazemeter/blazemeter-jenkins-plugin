@@ -31,7 +31,7 @@ import java.util.LinkedHashMap;
  */
 
 public class BlazemeterApiV2Impl implements BlazemeterApi {
-
+    private final JSONObject not_implemented;
     private final String apiKey;
     BmUrlManager urlManager;
     private BZMHTTPClient bzmhc = null;
@@ -40,11 +40,15 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         this.apiKey = apiKey;
         urlManager = URLFactory.getURLFactory().
                 getURLManager(URLFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        not_implemented=new JSONObject();
         try {
+            not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);
             bzmhc = BZMHTTPClient.getInstance();
             bzmhc.configureProxy();
+        } catch (JSONException je) {
+            logger.format("Error NOT_IMPLEMENTED Object: ", je);
         } catch (Exception ex) {
-            logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
+            logger.format("Error Instantiating HTTPClient. Exception received: %s", ex);
         }
     }
 
@@ -56,6 +60,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
      *                //     * @throws java.io.IOException
      *                //     * @throws org.json.JSONException
      */
+    @Override
     public synchronized void uploadJmx(String testId, File file) {
 
         if (!validate(apiKey, testId)) return;
@@ -80,6 +85,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
      * //     * @throws org.json.JSONException
      */
 
+    @Override
     public synchronized JSONObject uploadBinaryFile(String testId, File file) {
 
         if (!validate(apiKey, testId)) return null;
@@ -90,6 +96,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
 
+    @Override
     public TestInfo getTestRunStatus(String testId) {
         TestInfo ti = new TestInfo();
 
@@ -116,6 +123,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         return ti;
     }
 
+    @Override
     public synchronized JSONObject startTest(String testId) {
 
         if (!validate(apiKey, testId)) return null;
@@ -124,6 +132,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
     }
 
+    @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("getTests apiKey is empty");
@@ -151,7 +160,6 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         }
     }
 
-
     private boolean validate(String apiKey, String testId) {
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("startTest apiKey is empty");
@@ -170,6 +178,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
      *                //     * @throws IOException
      *                //     * @throws ClientProtocolException
      */
+    @Override
     public JSONObject stopTest(String testId) {
         if (!validate(apiKey, testId)) return null;
 
@@ -182,6 +191,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
      *                 //     * @throws IOException
      *                 //     * @throws ClientProtocolException
      */
+    @Override
     public JSONObject testReport(String reportId) {
         if (!validate(apiKey, reportId)) return null;
 
@@ -197,6 +207,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     }
 
+    @Override
     public HashMap<String, String> getTestList() throws IOException, MessagingException {
 
         LinkedHashMap<String, String> testListOrdered = null;
@@ -241,6 +252,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         return testListOrdered;
     }
 
+    @Override
     public JSONObject getUser() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.println("User apiKey is empty");
@@ -259,5 +271,25 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public String getBlazeMeterURL() {
         return this.urlManager.getServerUrl();
+    }
+
+    @Override
+    public JSONObject getTresholds(String sessionId) {
+        return not_implemented;
+    }
+
+    @Override
+    public JSONObject getTestInfo(String testId) {
+        return not_implemented;
+    }
+
+    @Override
+    public JSONObject putTestInfo(String testId, JSONObject data) {
+        return not_implemented;
+    }
+
+    @Override
+    public JSONObject createYahooTest(JSONObject data) {
+        return not_implemented;
     }
 }
