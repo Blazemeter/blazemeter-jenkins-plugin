@@ -22,14 +22,14 @@ public class TestResultFactory {
     }
 
 
-    public static TestResultFactory getAggregateTestResultFactory() {
+    public static TestResultFactory getTestResultFactory() {
         if (resultFactory == null) {
             resultFactory = new TestResultFactory();
         }
         return resultFactory;
     }
 
-    public TestResult getAggregateTestResult(JSONObject json) throws IOException, JSONException{
+    public TestResult getTestResult(JSONObject json) throws IOException, JSONException{
         if(version==null){
             version= APIFactory.ApiVersion.v3;
         }

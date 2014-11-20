@@ -170,13 +170,6 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-        if (validateThresholds(logger) != Result.SUCCESS) {
-            // input parameters error.
-            build.setResult(Result.FAILURE);
-            logger.println("Build was failed due to incorrect values of parameters");
-            return true;
-        }
-
 
         BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
@@ -286,8 +279,6 @@ public class PerformanceBuilder extends Builder {
        if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
            session = json.get("session_id").toString();
 
-
-
        } else {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
@@ -297,40 +288,8 @@ public class PerformanceBuilder extends Builder {
    }
 
     private Result postProcess(String session, PrintStream logger) throws InterruptedException {
-        //TODO: loop probe with special response code. or loop for certain time on 404 error code.
-        Thread.sleep(10 * 1000); // Wait for the report to generate.
-
-        //get testGetArchive information
-        JSONObject testReport = this.api.testReport(session);
-
-
-        if (testReport == null || testReport.equals("null")) {
-            logger.println("Error: Requesting aggregate is not available");
-            return Result.FAILURE;
-        }
-
-        TestResultFactory testResultFactory = TestResultFactory.getAggregateTestResultFactory();
-        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
-        TestResult testResult = null;
-        try {
-            testResult = testResultFactory.getAggregateTestResult(testReport);
-
-        } catch (IOException ioe) {
-            logger.println("Error: Failed to generate AggregateTestResult: " + ioe);
-        } catch (JSONException je) {
-            logger.println("Error: Failed to generate AggregateTestResult: " + je);
-        }
-
-        if (testResult == null) {
-            logger.println("Error: Requesting aggregate Test Result is not available");
-            return Result.FAILURE;
-        }
-
-        double thresholdTolerance = 0.00005; //null hypothesis
-        double errorPercent = testResult.getErrorPercentage();
-        double AverageResponseTime = testResult.getAverage();
-
-
+        Thread.sleep(10000); // Wait for the report to generate.
+        //get tresholds from server and check if test is success
         JSONObject jo = this.api.getTresholds(session);
         boolean success=false;
         try {
@@ -341,66 +300,38 @@ public class PerformanceBuilder extends Builder {
         logger.println("Validating tresholds from server...");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
-
-        /*if (errorFailedThreshold > 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
-            result = Result.FAILURE;
-            logger.println("Test ended with " + Result.FAILURE + " on error percentage threshold");
-        } else if (errorUnstableThreshold > 0
-                && errorPercent - errorUnstableThreshold > thresholdTolerance) {
-            logger.println("Test ended with " + Result.UNSTABLE + " on error percentage threshold");
-            result = Result.UNSTABLE;
+        if(result.equals(Result.FAILURE)){
+            return result;
         }
 
-        if (responseTimeFailedThreshold > 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
-            result = Result.FAILURE;
-            logger.println("Test ended with " + Result.FAILURE + " on response time threshold");
+        /*if tresholds were defined on GUI, get testReport from server and re-calculate
+          Server tresholds have higher priority, than local ones.
+         */
 
-        } else if (responseTimeUnstableThreshold > 0
-                && AverageResponseTime - responseTimeUnstableThreshold > thresholdTolerance) {
-            result = Result.UNSTABLE;
-            logger.println("Test ended with " + Result.UNSTABLE + " on response time threshold");
-        }*/
-        return result;
-    }
+        //get testGetArchive information
+        JSONObject testReport = this.api.testReport(session);
 
 
-    private Result validateThresholds(PrintStream logger) {
-
-        Result result = Result.SUCCESS;
-        if (testDuration == null || testDuration.isEmpty() || testDuration.equals("0")) {
-            logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
-                    + Result.NOT_BUILT.toString().toLowerCase());
-            return Result.ABORTED;
-        }
-        if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
-            logger.println("BlazeMeter: Errors percentage greater or equal than "
-                    + errorUnstableThreshold + " % will be considered as "
-                    + Result.UNSTABLE.toString().toLowerCase());
-        } else {
-            logger.println("BlazeMeter: ErrorUnstableThreshold percentage should be between 0 to 100");
-            return Result.ABORTED;
+        if (testReport == null || testReport.equals("null")) {
+            logger.println("ERROR: Requesting aggregate is not available. " +
+                    "Build won't be validated against local tresholds");
+            return result;
         }
 
-        if (errorFailedThreshold >= 0 && errorFailedThreshold <= 100) {
-            logger.println("BlazeMeter: ErrorFailedThreshold percentage greater or equal than "
-                    + errorFailedThreshold + " % will be considered as "
-                    + Result.FAILURE.toString().toLowerCase());
-        } else {
-            logger.println("BlazeMeter: ErrorFailedThreshold percentage should be between 0 to 100");
-            return Result.ABORTED;
+        TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
+        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
+        TestResult testResult = null;
+        try {
+            testResult = testResultFactory.getTestResult(testReport);
+            logger.println(testResult.toString());
+            Utils.validateLocalTresholds(testResult,logger,this);
+        } catch (IOException ioe) {
+            logger.println("ERROR: Failed to generate TestResult: " + ioe);
+        } catch (JSONException je) {
+            logger.println("ERROR: Failed to generate TestResult: " + je);
+        }finally{
+            return result;
         }
-
-        if (responseTimeUnstableThreshold > 0) {
-            logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
-                    + responseTimeUnstableThreshold + " millis will be considered as "
-                    + Result.UNSTABLE.toString().toLowerCase());
-        }
-        if (responseTimeFailedThreshold > 0) {
-            logger.println("BlazeMeter: ResponseTimeFailed greater than "
-                    + responseTimeFailedThreshold + " millis will be considered as "
-                    + Result.FAILURE.toString().toLowerCase());
-        }
-        return result;
     }
 
 

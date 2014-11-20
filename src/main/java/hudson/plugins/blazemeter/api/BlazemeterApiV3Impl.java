@@ -190,7 +190,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                     .getJSONArray("summary")
                     .get(0);
         } catch (JSONException je) {
-            logger.println("Error while parsing summary for V3 API:" + je);
+            logger.println("Error while parsing summary :" + je);
         }
         return summary;
     }

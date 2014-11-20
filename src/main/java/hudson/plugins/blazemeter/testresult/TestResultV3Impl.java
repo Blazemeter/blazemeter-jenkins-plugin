@@ -21,37 +21,29 @@ public class TestResultV3Impl extends TestResult {
 
         // not implemented because such field is absent in JSON
 //        this.samples = json.getDouble("samples");
-
+        this.samples=-1;
         // not implemented because such field is absent in JSON
 //        this.median = json.getDouble("median");
-
+        this.median=-1;
         this.percentile90 = json.getDouble("tp90");
 
         // not implemented because such field is absent in JSON
 //        this.errorPercentage = json.getDouble("errorPercentage");
-
+        this.errorPercentage=-1;
         this.hits = json.getDouble("hits");
         this.kbs = json.getDouble("bytes")/1024;
 
         // not implemented because such field is absent in JSON
 //        this.n = json.getLong("n");
-
+          this.n=-1;
     }
 
     @Override
     public String toString() {
-        return "AggregateTestResult{" +
-                "average=" + average +
-                ", min=" + min +
-                ", max=" + max +
-                ", samples=" + samples +
-                ", median=" + median +
-                ", percentile90=" + percentile90 +
-                ", percentile99=" + percentile99 +
-                ", errorPercentage=" + errorPercentage +
-                ", hits=" + hits +
-                ", kbs=" + kbs +
-                '}';
+        return "######### AggregateTestResult ####################" +
+                "\n average=" + average +
+                ",\n min=" + min +
+                ",\n max=" + max;
     }
 
     public double getStd() {

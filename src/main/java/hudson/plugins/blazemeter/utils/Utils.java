@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter.utils;
 
 import hudson.FilePath;
+import hudson.model.Result;
 import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
 import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
@@ -9,6 +10,7 @@ import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.testresult.TestResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -194,5 +196,81 @@ public class Utils {
         api.setBlazeMeterURL(url);
         logger.println("BlazeMeterURL=" + url+" will be used for test");
     }
+
+
+    public static Result validateLocalTresholds(TestResult testResult,
+                                              PrintStream logger,
+                                              PerformanceBuilder builder){
+        int responseTimeUnstable=builder.getResponseTimeUnstableThreshold();
+        int responseTimeFailed=builder.getResponseTimeFailedThreshold();
+
+        Result result=Result.SUCCESS;
+        if(testResult.getAverage()>responseTimeUnstable&
+                testResult.getAverage()<responseTimeFailed){
+        logger.println("Average response time is higher than responseTimeUnstable treshold\n");
+        logger.println("Marking build as unstable");
+            result=Result.UNSTABLE;
+        }
+
+        if(testResult.getAverage()>=responseTimeFailed){
+            logger.println("Average response time is higher than responseTimeFailure treshold\n");
+            logger.println("Marking build as failed");
+            result=Result.FAILURE;
+        }
+
+        return result;
+    }
+
+
+/*    public static  boolean updateTresholds(String testDuration,
+                                    int errorUnstableThreshold,
+                                    int errorFailedThreshold,
+                                    int responseTimeFailedThreshold,
+                                    int responseTimeUnstableThreshold,
+                                    PrintStream logger) {
+
+        boolean updateTresholds=true;
+        Result result = Result.SUCCESS;
+        if (testDuration == null || testDuration.isEmpty() || testDuration.equals("0")) {
+            logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
+                    + Result.NOT_BUILT.toString().toLowerCase());
+            updateTresholds=false;
+            return updateTresholds;
+        }
+        if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
+            logger.println("BlazeMeter: Errors percentage greater or equal than "
+                    + errorUnstableThreshold + " % will be considered as "
+                    + Result.UNSTABLE.toString().toLowerCase());
+        } else {
+            logger.println("BlazeMeter: ErrorUnstableThreshold percentage should be between 0 to 100");
+            updateTresholds=false;
+            return updateTresholds;
+        }
+
+        if (errorFailedThreshold >= 0 && errorFailedThreshold <= 100) {
+            logger.println("BlazeMeter: ErrorFailedThreshold percentage greater or equal than "
+                    + errorFailedThreshold + " % will be considered as "
+                    + Result.FAILURE.toString().toLowerCase());
+        } else {
+            logger.println("BlazeMeter: ErrorFailedThreshold percentage should be between 0 to 100");
+            updateTresholds=false;
+            return updateTresholds;
+        }
+
+        if (responseTimeUnstableThreshold > 0) {
+            logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
+                    + responseTimeUnstableThreshold + " millis will be considered as "
+                    + Result.UNSTABLE.toString().toLowerCase());
+        }
+        if (responseTimeFailedThreshold > 0) {
+            logger.println("BlazeMeter: ResponseTimeFailed greater than "
+                    + responseTimeFailedThreshold + " millis will be considered as "
+                    + Result.FAILURE.toString().toLowerCase());
+        }
+        updateTresholds=false;
+        return updateTresholds;
+    }*/
+
+
 
 }
