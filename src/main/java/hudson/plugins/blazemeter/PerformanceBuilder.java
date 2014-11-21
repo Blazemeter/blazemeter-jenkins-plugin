@@ -297,6 +297,10 @@ public class PerformanceBuilder extends Builder {
         } catch (JSONException je) {
             logger.println("Error: Failed to get tresholds: " + je);
         }
+        String junitReport = this.api.retrieveJUNITXML(session);
+        logger.println("Received Junit report from server.... Saving it to the disc...");
+        Utils.saveReport(session,junitReport,build.getWorkspace(),logger);
+
         logger.println("Validating tresholds from server...");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
@@ -324,9 +328,6 @@ public class PerformanceBuilder extends Builder {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             logger.println(testResult.toString());
-            String junitReport = this.api.retrieveJUNITXML(session);
-            logger.println("Received Junit report from server.... Saving it to the disc...");
-            Utils.saveReport(session,junitReport,build.getWorkspace(),logger);
 //            Utils.validateLocalTresholds(testResult,logger,this);
 
         } catch (IOException ioe) {
