@@ -7,7 +7,6 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import hudson.util.Secret;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -26,12 +25,13 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
      */
     private static final long serialVersionUID = 1L;
 
-    private final Secret apiKey;
+    //private final Secret apiKey;
+    private final String apiKey;
     private final String description;
 
     @DataBoundConstructor
     public BlazemeterCredentialImpl(String apiKey, String description) {
-        this.apiKey = Secret.fromString(apiKey);
+        this.apiKey = apiKey;
         this.description = description;
     }
 
@@ -39,7 +39,13 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
         return description;
     }
 
+    /* Converted Secret into String
     public Secret getApiKey() {
+    */
+//        return apiKey;
+//  }
+
+    public String getApiKey() {
         return apiKey;
     }
 

@@ -12,7 +12,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -55,7 +54,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             apiKey = getApiKey();
         }
 
+/*  Converted Secret into String
         Secret apiSecret = null;
+         */
+        String apiSecret = null;
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredential c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
@@ -68,7 +70,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         if (apiSecret == null) {
             items.add("No API Key", "-1");
         } else {
+/*  Converted Secret into String
             BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret.getPlainText());
+             */
+            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret);
             try {
                 HashMap<String, String> testList = bzm.getTestList();
                 items.add("Create new test using JSON configuration", "createTestFromJSON");

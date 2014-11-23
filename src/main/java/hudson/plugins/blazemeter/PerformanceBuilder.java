@@ -253,7 +253,10 @@ public class PerformanceBuilder extends Builder {
         for (BlazemeterCredential c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
             if (StringUtils.equals(apiKeyId, c.getId())) {
+/*  Converted Secret into String
                 apiKey = c.getApiKey().getPlainText();
+                 */
+                apiKey = c.getApiKey();
                 break;
             }
         }
