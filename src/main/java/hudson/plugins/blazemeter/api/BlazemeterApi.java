@@ -49,10 +49,6 @@ public interface BlazemeterApi {
 
     public JSONObject getUser();
 
-    public void setBlazeMeterURL(String blazeMeterURL);
-
-    public String getBlazeMeterURL();
-
     public JSONObject getTresholds(String sessionId);
 
     public JSONObject getTestInfo(String testId);
