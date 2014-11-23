@@ -54,9 +54,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             apiKey = getApiKey();
         }
 
-/*  Converted Secret into String
-        Secret apiSecret = null;
-         */
         String apiSecret = null;
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredential c : CredentialsProvider
@@ -70,9 +67,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         if (apiSecret == null) {
             items.add("No API Key", "-1");
         } else {
-/*  Converted Secret into String
-            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret.getPlainText());
-             */
             BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret);
             try {
                 HashMap<String, String> testList = bzm.getTestList();
@@ -170,7 +164,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         apiKey = formData.optString("apiKey");
         blazeMeterURL = formData.optString("blazeMeterURL");
-        APIFactory.getApiFactory().setBlazeMeterUrl(blazeMeterURL.isEmpty()?blazeMeterURL:
+        APIFactory.getApiFactory().setBlazeMeterUrl(!blazeMeterURL.isEmpty()?blazeMeterURL:
                 Constants.DEFAULT_BLAZEMETER_URL);
         save();
         return true;

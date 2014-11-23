@@ -67,5 +67,12 @@ public class APIFactory {
 
     public void setBlazeMeterUrl(String blazeMeterUrl) {
         this.blazeMeterUrl = blazeMeterUrl;
+        if(this.apiV3!=null){
+            this.apiV3.setBlazeMeterURL(this.blazeMeterUrl);
+        }
+        if(this.apiV2!=null){
+            this.apiV2.setBlazeMeterURL(this.blazeMeterUrl);
+        }
+
     }
 }

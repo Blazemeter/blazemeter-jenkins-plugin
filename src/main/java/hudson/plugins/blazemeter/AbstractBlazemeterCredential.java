@@ -18,9 +18,6 @@ public abstract  class AbstractBlazemeterCredential extends BaseCredentials impl
     }
 
     public String getId() {
-      /*  Converted Secret into String
-        final String apiKey = getApiKey().getPlainText();
-       */
         final String apiKey = getApiKey();
         return StringUtils.left(apiKey,4) + "..." + StringUtils.right(apiKey, 4);
     }

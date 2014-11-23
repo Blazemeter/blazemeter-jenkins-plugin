@@ -14,9 +14,6 @@ public interface BlazemeterCredential extends Credentials {
 
     public String getId();
 
-   /*  Converted Secret into String
-   public Secret getApiKey();
-   */
     public String getApiKey();
 
 }

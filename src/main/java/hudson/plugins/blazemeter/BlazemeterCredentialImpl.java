@@ -39,11 +39,6 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
         return description;
     }
 
-    /* Converted Secret into String
-    public Secret getApiKey() {
-    */
-//        return apiKey;
-//  }
 
     public String getApiKey() {
         return apiKey;

@@ -91,8 +91,6 @@ public class PerformanceBuilder extends Builder {
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
-        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
-                testDuration : Utils.requestTestDuration(this.api, this.testId);
 }
 
 
@@ -182,6 +180,8 @@ public class PerformanceBuilder extends Builder {
         }else{
             Utils.saveTestDuration(this.api, this.testId, testDuration);
         }
+        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
+                testDuration : Utils.requestTestDuration(this.api, this.testId);
         logger.println("Expected test duration=" + testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
@@ -254,10 +254,7 @@ public class PerformanceBuilder extends Builder {
         for (BlazemeterCredential c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
             if (StringUtils.equals(apiKeyId, c.getId())) {
-/*  Converted Secret into String
-                apiKey = c.getApiKey().getPlainText();
-                 */
-                apiKey = c.getApiKey();
+             apiKey = c.getApiKey();
                 break;
             }
         }
