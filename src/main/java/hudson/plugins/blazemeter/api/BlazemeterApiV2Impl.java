@@ -263,13 +263,11 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         return jo;
         }
 
-    @Override
-    public void setBlazeMeterURL(String blazeMeterURL) {
+    void setBlazeMeterURL(String blazeMeterURL) {
         this.urlManager.setServerUrl(blazeMeterURL);
     }
 
-    @Override
-    public String getBlazeMeterURL() {
+    String getBlazeMeterURL() {
         return this.urlManager.getServerUrl();
     }
 

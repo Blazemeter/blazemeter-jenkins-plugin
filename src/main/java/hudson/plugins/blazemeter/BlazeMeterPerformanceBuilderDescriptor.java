@@ -169,21 +169,24 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         apiKey = formData.optString("apiKey");
-        String bzm = formData.optString("blazeMeterURL");
-        blazeMeterURL = !bzm.isEmpty()?bzm: Constants.DEFAULT_BLAZEMETER_URL;
+        blazeMeterURL = formData.optString("blazeMeterURL");
+        APIFactory.getApiFactory().setBlazeMeterUrl(blazeMeterURL.isEmpty()?blazeMeterURL:
+                Constants.DEFAULT_BLAZEMETER_URL);
         save();
         return true;
     }
 
-    public String getBlazeMeterURL() {
-        return blazeMeterURL;
-    }
+//    public String getBlazeMeterURL() {
+//        return blazeMeterURL;
+//    }
 
 
 
+/*
     public void setBlazeMeterURL(String blazeMeterURL) {
         this.blazeMeterURL = blazeMeterURL;
     }
+*/
 
     public String getName() {
         return name;

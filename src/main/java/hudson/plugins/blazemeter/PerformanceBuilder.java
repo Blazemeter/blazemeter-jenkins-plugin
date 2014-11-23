@@ -173,7 +173,7 @@ public class PerformanceBuilder extends Builder {
 
         BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
-        Utils.updateBZMUrl(descriptor,this.api,logger);
+//        Utils.updateBZMUrl(descriptor,this.api,logger);
         this.api = getAPIClient(build);
         if(!this.jsonConfig.isEmpty()){
             FilePath workspace=build.getWorkspace();
@@ -217,7 +217,8 @@ public class PerformanceBuilder extends Builder {
         // add the report to the build object.
         PerformanceBuildAction a = new PerformanceBuildAction(build, logger, parsers);
         a.setSession(session);
-        a.setBlazeMeterURL(DESCRIPTOR.getBlazeMeterURL());
+        APIFactory apiFactory=APIFactory.getApiFactory();
+        a.setBlazeMeterURL(apiFactory.getBlazeMeterUrl());
         build.addAction(a);
 
         try {
@@ -285,7 +286,8 @@ public class PerformanceBuilder extends Builder {
        } else {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-           logger.println("Blazemeter test report will be available at " +  this.api.getBlazeMeterURL()+"/app/#report/"+session+"/loadreport");
+           APIFactory apiFactory=APIFactory.getApiFactory();
+           logger.println("Blazemeter test report will be available at " +  apiFactory.getBlazeMeterUrl()+"/app/#report/"+session+"/loadreport");
        }
    return session;
    }

@@ -77,6 +77,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
                 return FormValidation.errorWithMarkup("User Key Invalid Or No Available Tests");
             } else {
                 return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
+
             }
         }
 

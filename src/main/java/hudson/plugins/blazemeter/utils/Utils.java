@@ -189,12 +189,12 @@ public class Utils {
         }
     }
 
-    public static void updateBZMUrl(BlazeMeterPerformanceBuilderDescriptor descriptor,
+    /*public static void updateBZMUrl(BlazeMeterPerformanceBuilderDescriptor descriptor,
                                     BlazemeterApi api, PrintStream logger){
         String url=descriptor.getBlazeMeterURL();
         api.setBlazeMeterURL(url);
         logger.println("BlazeMeterURL=" + url+" will be used for test");
-    }
+    }*/
 
     public static void saveReport(String filename,
                                   String report,
