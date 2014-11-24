@@ -1,14 +1,10 @@
 package hudson.plugins.blazemeter.utils;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
 import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -18,6 +14,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
@@ -244,6 +241,15 @@ public class Utils {
         return result;
     }
 
+    public static String getVersion() {
+        Properties props = new Properties();
+        try {
+            props.load(Utils.class.getResourceAsStream("hudson/plugins/blazemeter/utils/version.properties"));
+        } catch (IOException ex) {
+            props.setProperty("version", "N/A");
+        }
+        return props.getProperty("version");
+    }
 
 /*    public static  boolean updateTresholds(String testDuration,
                                     int errorUnstableThreshold,
