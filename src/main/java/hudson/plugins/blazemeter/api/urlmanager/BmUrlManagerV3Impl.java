@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
     private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
-    private static String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion=1.1.0&​";
+    private static String CLIENT_IDENTIFICATION = Constants.CLIENT_IDENTIFICATION;
 
     static{
         try{
