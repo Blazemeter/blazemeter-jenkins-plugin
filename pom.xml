@@ -105,7 +105,7 @@
                                 <resources>
                                     <resource>
                                         <directory>${basedir}/src/main/java/hudson/plugins/blazemeter/utils</directory>
-                                        <filtering>false</filtering>
+                                        <filtering>true</filtering>
                                         <includes>
                                             <include>version.properties</include>
                                         </includes>

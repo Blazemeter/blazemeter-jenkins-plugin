@@ -244,7 +244,7 @@ public class Utils {
     public static String getVersion() {
         Properties props = new Properties();
         try {
-            props.load(Utils.class.getResourceAsStream("hudson/plugins/blazemeter/utils/version.properties"));
+            props.load(Utils.class.getResourceAsStream("version.properties"));
         } catch (IOException ex) {
             props.setProperty("version", "N/A");
         }
