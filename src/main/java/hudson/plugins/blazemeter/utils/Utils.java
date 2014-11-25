@@ -216,20 +216,32 @@ public class Utils {
                                               PerformanceBuilder builder){
         int responseTimeUnstable=builder.getResponseTimeUnstableThreshold();
         int responseTimeFailed=builder.getResponseTimeFailedThreshold();
+        int errorUnstable=builder.getErrorUnstableThreshold();
+        int errorFailed=builder.getErrorFailedThreshold();
 
 
         Result result=Result.SUCCESS;
         if(responseTimeUnstable>=0&testResult.getAverage()>responseTimeUnstable&
                 testResult.getAverage()<responseTimeFailed){
+        logger.println("Validating reponseTimeUnstable...\n");
         logger.println("Average response time is higher than responseTimeUnstable treshold\n");
         logger.println("Marking build as unstable");
             result=Result.UNSTABLE;
         }
 
         if(responseTimeFailed>=0&testResult.getAverage()>=responseTimeFailed){
+            logger.println("Validating reponseTimeFailed...\n");
             logger.println("Average response time is higher than responseTimeFailure treshold\n");
             logger.println("Marking build as failed");
             result=Result.FAILURE;
+        }
+
+        if(errorUnstable<0){
+            logger.println("ErrorUnstable percentage validation was skipped: value was not set in configuration");
+        }
+
+        if(errorFailed<0){
+            logger.println("ErrorFailed percentage validation was skipped: value was not set in configuration");
         }
 
         if(responseTimeUnstable<0){
