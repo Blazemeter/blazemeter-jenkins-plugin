@@ -1,11 +1,15 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.Utils;
 
 /**
  * Created by dzmitrykashlach on 10/11/14.
  */
 public interface BmUrlManager {
+
+    String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion="
+            + Utils.getVersion()+"&​";
 
     public String getServerUrl();
 

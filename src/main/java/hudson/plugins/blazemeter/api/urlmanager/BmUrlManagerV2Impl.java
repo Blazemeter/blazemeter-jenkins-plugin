@@ -3,7 +3,6 @@ package hudson.plugins.blazemeter.api.urlmanager;
 import hudson.plugins.blazemeter.utils.Constants;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 /**
@@ -12,17 +11,6 @@ import java.net.URLEncoder;
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
     private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
-    private static String CLIENT_IDENTIFICATION = Constants.CLIENT_IDENTIFICATION;
-    static{
-        try{
-            CLIENT_IDENTIFICATION= URLEncoder.encode(CLIENT_IDENTIFICATION, "UTF-8");
-            CLIENT_IDENTIFICATION=CLIENT_IDENTIFICATION.substring(0,47);
-            CLIENT_IDENTIFICATION= URLDecoder.decode(CLIENT_IDENTIFICATION, "UTF-8");
-
-        }catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
 
     BmUrlManagerV2Impl(String blazeMeterUrl) {
         SERVER_URL = blazeMeterUrl;
@@ -43,7 +31,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -55,7 +43,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all",
-                SERVER_URL, appKey, userKey)+CLIENT_IDENTIFICATION;
+                SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
 
     }
 
@@ -70,7 +58,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
-                SERVER_URL,appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -84,7 +72,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
-                SERVER_URL,appKey, userKey, testId, fileName)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -97,7 +85,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -110,7 +98,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -123,7 +111,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
-                SERVER_URL,appKey, userKey, reportId)+CLIENT_IDENTIFICATION;
+                SERVER_URL,appKey, userKey, reportId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -135,7 +123,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%sapi/rest/blazemeter/getUserInfo/?app_key=%s&user_key=%s",
-                SERVER_URL, appKey, userKey)+CLIENT_IDENTIFICATION;
+                SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
