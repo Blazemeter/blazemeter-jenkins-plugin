@@ -186,13 +186,6 @@ public class Utils {
         }
     }
 
-    /*public static void updateBZMUrl(BlazeMeterPerformanceBuilderDescriptor descriptor,
-                                    BlazemeterApi api, PrintStream logger){
-        String url=descriptor.getBlazeMeterURL();
-        api.setBlazeMeterURL(url);
-        logger.println("BlazeMeterURL=" + url+" will be used for test");
-    }*/
-
     public static void saveReport(String filename,
                                   String report,
                                   FilePath filePath,
@@ -224,20 +217,28 @@ public class Utils {
         int responseTimeUnstable=builder.getResponseTimeUnstableThreshold();
         int responseTimeFailed=builder.getResponseTimeFailedThreshold();
 
+
         Result result=Result.SUCCESS;
-        if(testResult.getAverage()>responseTimeUnstable&
+        if(responseTimeUnstable>=0&testResult.getAverage()>responseTimeUnstable&
                 testResult.getAverage()<responseTimeFailed){
         logger.println("Average response time is higher than responseTimeUnstable treshold\n");
         logger.println("Marking build as unstable");
             result=Result.UNSTABLE;
         }
 
-        if(testResult.getAverage()>=responseTimeFailed){
+        if(responseTimeFailed>=0&testResult.getAverage()>=responseTimeFailed){
             logger.println("Average response time is higher than responseTimeFailure treshold\n");
             logger.println("Marking build as failed");
             result=Result.FAILURE;
         }
 
+        if(responseTimeUnstable<0){
+            logger.println("ResponseTimeUnstable validation was skipped: value was not set in configuration");
+        }
+
+        if(responseTimeFailed<0){
+            logger.println("ResponseTimeFailed validation was skipped: value was not set in configuration");
+        }
         return result;
     }
 
@@ -299,7 +300,5 @@ public class Utils {
         updateTresholds=false;
         return updateTresholds;
     }*/
-
-
 
 }

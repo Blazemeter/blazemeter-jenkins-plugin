@@ -74,30 +74,28 @@ public class PerformanceBuilder extends Builder {
                               String testId,
                               String apiVersion,
                               String jsonConfig,
-                              int errorFailedThreshold,
-                              int errorUnstableThreshold,
-                              int responseTimeFailedThreshold,
-                              int responseTimeUnstableThreshold) {
-        this.errorFailedThreshold = errorFailedThreshold;
-        this.errorUnstableThreshold = errorUnstableThreshold;
+                              String errorFailedThreshold,
+                              String errorUnstableThreshold,
+                              String responseTimeFailedThreshold,
+                              String responseTimeUnstableThreshold) {
+        this.errorFailedThreshold = Integer.valueOf(errorFailedThreshold.isEmpty()
+                ?"-1":errorFailedThreshold);
+        this.errorUnstableThreshold = Integer.valueOf(errorUnstableThreshold.isEmpty()
+                ?"-1":errorUnstableThreshold);
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
                 Utils.autoDetectApiVersion(apiVersion, apiKey):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;
-        this.responseTimeFailedThreshold = responseTimeFailedThreshold;
-        this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
+        this.responseTimeFailedThreshold = Integer.valueOf(responseTimeFailedThreshold.isEmpty()
+                ?"-1":responseTimeFailedThreshold);
+        this.responseTimeUnstableThreshold = Integer.valueOf(responseTimeUnstableThreshold.isEmpty()
+                ?"-1":responseTimeUnstableThreshold);
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
 }
-
-
-
-
-
-    private String blazeMeterURL;
 
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -171,7 +169,6 @@ public class PerformanceBuilder extends Builder {
 
         BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
-//        Utils.updateBZMUrl(descriptor,this.api,logger);
         this.api = getAPIClient(build);
         if(!this.jsonConfig.isEmpty()){
             FilePath workspace=build.getWorkspace();
@@ -303,16 +300,12 @@ public class PerformanceBuilder extends Builder {
         logger.println("Received Junit report from server.... Saving it to the disc...");
         Utils.saveReport(session,junitReport,build.getWorkspace(),logger);
 
-        logger.println("Validating tresholds from server...");
+        logger.println("Validating server tresholds: "+(success?"PASSED":"FAILED")+"\n");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
             return result;
         }
-
-        /*if tresholds were defined on GUI, get testReport from server and re-calculate
-          Server tresholds have higher priority, than local ones.
-         */
 
         //get testGetArchive information
         JSONObject testReport = this.api.testReport(session);
@@ -330,7 +323,8 @@ public class PerformanceBuilder extends Builder {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             logger.println(testResult.toString());
-//            Utils.validateLocalTresholds(testResult,logger,this);
+            logger.println("Validating local tresholds...\n");
+            result=Utils.validateLocalTresholds(testResult,logger,this);
 
         } catch (IOException ioe) {
             logger.println("ERROR: Failed to generate TestResult: " + ioe);
