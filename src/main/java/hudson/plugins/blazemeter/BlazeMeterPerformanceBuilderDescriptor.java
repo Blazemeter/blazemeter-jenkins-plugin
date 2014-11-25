@@ -36,6 +36,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         load();
+        APIFactory.getApiFactory().setBlazeMeterUrl(!blazeMeterURL.isEmpty()?blazeMeterURL:
+                Constants.DEFAULT_BLAZEMETER_URL);
+
     }
 
     @Override
@@ -68,8 +71,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add("No API Key", "-1");
         } else {
             APIFactory apiFactory=APIFactory.getApiFactory();
-            apiFactory.setBlazeMeterUrl(this.blazeMeterURL);
-            BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiSecret);
+            BlazemeterApi bzm = apiFactory.getAPI(apiSecret);
             try {
                 HashMap<String, String> testList = bzm.getTestList();
                 items.add("Create new test using JSON configuration", "createTestFromJSON");
@@ -154,13 +156,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return FormValidation.ok();
     }
 
-/*
-        public FormValidation doCheckResponseTimeUnstableThreshold(@QueryParameter String value) throws IOException, ServletException {
-            if(value.equals("0")) {
-                return FormValidation.warning("Value should be more than ZERO");
-            }
-            return FormValidation.ok();
-        }*/
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
@@ -172,17 +167,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-//    public String getBlazeMeterURL() {
-//        return blazeMeterURL;
-//    }
-
-
-
-/*
-    public void setBlazeMeterURL(String blazeMeterURL) {
-        this.blazeMeterURL = blazeMeterURL;
-    }
-*/
 
     public String getName() {
         return name;
