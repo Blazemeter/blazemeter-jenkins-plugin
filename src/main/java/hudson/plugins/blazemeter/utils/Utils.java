@@ -229,9 +229,25 @@ public class Utils {
             result=Result.UNSTABLE;
         }
 
+        if(errorUnstable>=0&testResult.getErrorPercentage()>errorUnstable&
+                testResult.getAverage()<errorFailed){
+            logger.println("Validating errorPercentageUnstable...\n");
+            logger.println("Error percentage is higher than errorPercentageUnstable treshold\n");
+            logger.println("Marking build as unstable");
+            result=Result.UNSTABLE;
+        }
+
+
         if(responseTimeFailed>=0&testResult.getAverage()>=responseTimeFailed){
             logger.println("Validating reponseTimeFailed...\n");
             logger.println("Average response time is higher than responseTimeFailure treshold\n");
+            logger.println("Marking build as failed");
+            result=Result.FAILURE;
+        }
+
+        if(errorFailed>=0&testResult.getAverage()>=errorFailed){
+            logger.println("Validating errorPercentageUnstable...\n");
+            logger.println("Error percentage is higher than errorPercentageUnstable treshold\n");
             logger.println("Marking build as failed");
             result=Result.FAILURE;
         }
