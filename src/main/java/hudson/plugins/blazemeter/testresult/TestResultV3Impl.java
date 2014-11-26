@@ -29,7 +29,7 @@ public class TestResultV3Impl extends TestResult {
 
         // not implemented because such field is absent in JSON
 //        this.errorPercentage = json.getDouble("errorPercentage");
-        this.errorPercentage=-1;
+        this.errorPercentage=json.getDouble("failed")/json.getDouble("hits");
         this.hits = json.getDouble("hits");
         this.kbs = json.getDouble("bytes")/1024;
 
@@ -41,9 +41,13 @@ public class TestResultV3Impl extends TestResult {
     @Override
     public String toString() {
         return "######### AggregateTestResult ####################" +
-                "\n average=" + average +
-                ",\n min=" + min +
-                ",\n max=" + max;
+               "\nhits=" + hits +
+               "\nerrors percentage=" + errorPercentage+
+               "\naverage=" + average +
+               "\naverage=" + average +
+               "\nmin=" + min +
+               "\nmax=" + max+"\n"+
+               "#################################################";
     }
 
     public double getStd() {
