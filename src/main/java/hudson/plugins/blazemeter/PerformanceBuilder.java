@@ -190,7 +190,8 @@ public class PerformanceBuilder extends Builder {
         int countStartRequests = 0;
         do {
             logger.println("### About to start Blazemeter test # "+this.testId);
-            logger.println("Attempt# "+countStartRequests+1);
+            logger.println("Attempt# "+(countStartRequests+1));
+            logger.println("Timestamp: "+Calendar.getInstance().getTime());
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
@@ -224,14 +225,20 @@ public class PerformanceBuilder extends Builder {
             Utils.wait_for_finish(this.api, this.apiVersion, this.testId,
                     logger, session, runDurationSeconds);
 
-            logger.println("BlazeMeter test running terminated at " + Calendar.getInstance().getTime());
+            logger.println("BlazeMeter test# "+this.testId+" was terminated at " + Calendar.getInstance().getTime());
 
             Result result = this.postProcess(session, logger,build);
 
             build.setResult(result);
 
             return true;
-        } finally {
+        } catch (Exception e){
+            e.printStackTrace(logger);
+            return true;
+
+        }
+
+        finally {
             TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             String status = info.getStatus();
@@ -294,9 +301,11 @@ public class PerformanceBuilder extends Builder {
         JSONObject jo = this.api.getTresholds(session);
         boolean success=false;
         try {
+            logger.println("PerformanceBuilder.postProcess line # 304- Timestamp: "+Calendar.getInstance().getTime());
+            logger.println("Treshold object = "+jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
         } catch (JSONException je) {
-            logger.println("Error: Failed to get tresholds: " + je);
+            logger.println("Error: Failed to get tresholds: " + je+"\n"+jo.toString());
         }
         String junitReport = this.api.retrieveJUNITXML(session);
         logger.println("Received Junit report from server.... Saving it to the disc...");
