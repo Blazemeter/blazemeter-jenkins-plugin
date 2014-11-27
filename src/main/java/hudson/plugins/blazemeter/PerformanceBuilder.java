@@ -95,7 +95,8 @@ public class PerformanceBuilder extends Builder {
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
-}
+        this.testDuration=testDuration;
+    }
 
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -188,11 +189,12 @@ public class PerformanceBuilder extends Builder {
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
-            logger.print("### About to start Blazemeter Test.....  ");
+            logger.println("### About to start Blazemeter test # "+this.testId);
+            logger.println("Attempt# "+countStartRequests+1);
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
-                logger.println("Could not start BlazeMeter Test");
+                logger.println("Could not start BlazeMeter Test with 5 attempts");
                 build.setResult(Result.FAILURE);
                 return false;
             }
