@@ -28,21 +28,10 @@ public class BZMHTTPClient {
 
     public enum Method {GET, POST, PUT}
 
-    private static BZMHTTPClient instance = null;
-
     private transient DefaultHttpClient httpClient = null;
 
-    private BZMHTTPClient() {
+    public BZMHTTPClient() {
         this.httpClient = new DefaultHttpClient();
-    }
-
-    public static BZMHTTPClient getInstance() {
-        if (instance == null) {
-            instance = new BZMHTTPClient();
-        }
-        return instance;
-
-
     }
 
 

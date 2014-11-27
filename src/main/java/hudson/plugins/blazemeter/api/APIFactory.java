@@ -10,9 +10,6 @@ public class APIFactory {
     public static APIFactory apiFactory = null;
 
     private String blazeMeterUrl= Constants.DEFAULT_BLAZEMETER_URL;
-    private BlazemeterApiV2Impl apiV2=null;
-    private BlazemeterApiV3Impl apiV3=null;
-    private BlazemeterApi api = null;
     private ApiVersion version =null;
 
     private APIFactory() {
@@ -30,24 +27,15 @@ public class APIFactory {
         if(version==null){
             version=ApiVersion.v3;
         }
+        BlazemeterApi api=null;
         switch (version) {
             case v2:
-                if (api == null || api instanceof BlazemeterApiV3Impl) {
-                    if(apiV2==null){
-                     apiV2 = new BlazemeterApiV2Impl(apiKey);
-                    }
-                    apiV2.setBlazeMeterURL(this.blazeMeterUrl);
-                    api = apiV2;
-                }
+                api=new BlazemeterApiV2Impl(apiKey);
+                ((BlazemeterApiV2Impl)api).setBlazeMeterURL(this.blazeMeterUrl);
                 break;
             case v3:
-                if (api == null || api instanceof BlazemeterApiV2Impl) {
-                    if(apiV3==null){
-                        apiV3 = new BlazemeterApiV3Impl(apiKey);
-                    }
-                    apiV3.setBlazeMeterURL(this.blazeMeterUrl);
-                    api = apiV3;
-                }
+                api=new BlazemeterApiV3Impl(apiKey);
+                ((BlazemeterApiV3Impl)api).setBlazeMeterURL(this.blazeMeterUrl);
                 break;
         }
         return api;
@@ -67,12 +55,5 @@ public class APIFactory {
 
     public void setBlazeMeterUrl(String blazeMeterUrl) {
         this.blazeMeterUrl = blazeMeterUrl;
-        if(this.apiV3!=null){
-            this.apiV3.setBlazeMeterURL(this.blazeMeterUrl);
-        }
-        if(this.apiV2!=null){
-            this.apiV2.setBlazeMeterURL(this.blazeMeterUrl);
-        }
-
     }
 }

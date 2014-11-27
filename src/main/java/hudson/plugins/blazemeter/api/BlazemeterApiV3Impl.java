@@ -42,7 +42,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         urlManager = URLFactory.getURLFactory().
                 getURLManager(URLFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         try {
-            bzmhc = BZMHTTPClient.getInstance();
+            bzmhc = new BZMHTTPClient();
             bzmhc.configureProxy();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);

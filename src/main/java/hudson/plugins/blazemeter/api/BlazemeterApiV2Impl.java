@@ -43,7 +43,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         not_implemented=new JSONObject();
         try {
             not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);
-            bzmhc = BZMHTTPClient.getInstance();
+            bzmhc = new BZMHTTPClient();
             bzmhc.configureProxy();
         } catch (JSONException je) {
             logger.format("Error NOT_IMPLEMENTED Object: ", je);
