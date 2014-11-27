@@ -123,9 +123,7 @@ public class Utils {
 
     public static void wait_for_finish(BlazemeterApi api,String apiVersion,String testId,PrintStream logger,
                                        String session, int runDurationSeconds) throws InterruptedException {
-        logger.println("Utils.wait_for_finish: line # 126");
         Date start = null;
-        logger.println("Utils.wait_for_finish: line # 128");
         long lastPrint = 0;
         while (true) {
             Thread.sleep(5000);
@@ -140,10 +138,8 @@ public class Utils {
             long now = Calendar.getInstance().getTime().getTime();
             long diffInSec = (now - start.getTime()) / 1000;
             if (now - lastPrint > 10000) { //print every 10 sec.
-                logger.println("Utils.wait_for_finish: line # 143");
                 logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
                 lastPrint = now;
-                logger.println("Utils.wait_for_finish: line # 146");
             }
 
             if (diffInSec >= runDurationSeconds) {
@@ -153,13 +149,11 @@ public class Utils {
                 logger.println("BlazeMeter test stopped due to user test duration setup reached");
                 break;
             }
-            logger.println("Utils.wait_for_finish: line # 154");
             if (Thread.interrupted()) {
                 logger.println("Test was interrupted: throwing Interrupted Exception");
                 throw new InterruptedException();
             }
         }
-        logger.println("Utils.wait_for_finish: line # 160");
     }
 
     public static String createTestFromJSON(BlazemeterApi api, String jsonConfig, FilePath workspace,PrintStream logger){
