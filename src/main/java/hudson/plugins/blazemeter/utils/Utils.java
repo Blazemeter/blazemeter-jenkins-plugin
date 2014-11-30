@@ -130,6 +130,12 @@ public class Utils {
             TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
+                logger.println("TestStatus for session "+(apiVersion.equals("v2") ? testId : session)
+                        +info.getStatus());
+                logger.println("BlazeMeter TestStatus for session"+
+                        (apiVersion.equals("v2") ? testId : session)
+                        +" is not 'Running': finishing build.... ");
+                logger.println("Timestamp: "+Calendar.getInstance().getTime());
                 break;
             }
 

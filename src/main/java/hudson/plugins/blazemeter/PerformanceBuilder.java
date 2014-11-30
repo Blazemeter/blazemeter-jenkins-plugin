@@ -301,7 +301,6 @@ public class PerformanceBuilder extends Builder {
         JSONObject jo = this.api.getTresholds(session);
         boolean success=false;
         try {
-            logger.println("PerformanceBuilder.postProcess line # 304- Timestamp: "+Calendar.getInstance().getTime());
             logger.println("Treshold object = "+jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
         } catch (JSONException je) {
