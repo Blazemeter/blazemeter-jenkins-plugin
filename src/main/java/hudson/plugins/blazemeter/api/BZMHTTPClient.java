@@ -2,6 +2,7 @@ package hudson.plugins.blazemeter.api;
 
 import hudson.ProxyConfiguration;
 import hudson.model.Hudson;
+import hudson.plugins.blazemeter.utils.Constants;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -16,15 +17,15 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 public class BZMHTTPClient {
-    PrintStream logger = new PrintStream(System.out);
+    JavaUtilLog logger = new JavaUtilLog(Constants.BZM_JEN);
 
     public enum Method {GET, POST, PUT}
 
@@ -37,7 +38,7 @@ public class BZMHTTPClient {
 
     HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
 
-        logger.println("Requesting : " + url);
+        logger.warn("Requesting : " + url);
         HttpResponse response = null;
         HttpRequestBase request = null;
 
@@ -65,18 +66,18 @@ public class BZMHTTPClient {
 
 
             if (response == null || response.getStatusLine() == null) {
-                logger.format("Erroneous response (Probably null) for url: %s", url);
+                logger.warn("Erroneous response (Probably null) for url: \n", url);
                 response = null;
             }
         } catch (Exception e) {
-            logger.format("Problems with creating and sending request: %s\n", e);
+            logger.warn("Problems with creating and sending request: \n", e);
         }
         return response;
     }
 
     HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
 
-        logger.println("Requesting : " + url);
+        logger.warn("Requesting : " + url);
         HttpResponse response = null;
 
         try {
@@ -97,11 +98,11 @@ public class BZMHTTPClient {
                     throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
                 }
             } else {
-                logger.format("Erroneous response (Probably null) for url: %s", url);
+                logger.warn("Erroneous response (Probably null) for url: "+ url);
                 response = null;
             }
         } catch (Exception e) {
-            logger.format("Wrong response: %s\n", e);
+            logger.warn("Wrong response: \n", e);
         }
         return response;
     }
@@ -112,13 +113,13 @@ public class BZMHTTPClient {
             HttpResponse response = getResponseForFileUpload(url, file);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
-                logger.println(output);
+                logger.warn(output);
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
-            logger.println("error decoding Json " + e);
+            logger.warn("ERROR decoding Json ", e);
         } catch (JSONException e) {
-            logger.println("error decoding Json " + e);
+            logger.warn("ERROR decoding Json ", e);
         }
         return jo;
     }
@@ -129,13 +130,13 @@ public class BZMHTTPClient {
             HttpResponse response = getResponse(url, data, method);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
-                logger.println(output);
+                logger.warn(output);
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
-            logger.println("Error decoding Json " + e);
+            logger.warn("ERROR decoding Json ", e);
         } catch (JSONException e) {
-            logger.println("Error decoding Json " + e);
+            logger.warn("ERROR decoding Json ", e);
         }
         return jo;
     }
@@ -146,10 +147,10 @@ public class BZMHTTPClient {
             HttpResponse response = getResponse(url, data, method);
             if (response != null) {
                 str = EntityUtils.toString(response.getEntity());
-                logger.println(str);
+                logger.warn(str);
             }
         } catch (IOException e) {
-            logger.println("Error decoding Json " + e);
+            logger.warn("ERROR decoding Json ", e);
         }
         return str;
     }

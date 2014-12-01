@@ -46,9 +46,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             bzmhc = new BZMHTTPClient();
             bzmhc.configureProxy();
         } catch (JSONException je) {
-            logger.format("Error NOT_IMPLEMENTED Object: ", je);
+            logger.warn("Error NOT_IMPLEMENTED Object: ", je);
         } catch (Exception ex) {
-            logger.format("Error Instantiating HTTPClient. Exception received: %s", ex);
+            logger.warn("Error Instantiating HTTPClient. Exception received: ", ex);
         }
     }
 
@@ -69,10 +69,10 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         JSONObject json = this.bzmhc.getJsonForFileUpload(url, file);
         try {
             if (!json.get("response_code").equals(200)) {
-                logger.println("Could not upload file " + file.getName() + " " + json.get("error").toString());
+                logger.warn("Could not upload file " + file.getName() + " " + json.get("error").toString());
             }
         } catch (JSONException e) {
-            logger.println("Could not upload file " + file.getName() + " " + e.getMessage());
+            logger.warn("Could not upload file " + file.getName() + " ", e);
             e.printStackTrace();
         }
     }
@@ -117,7 +117,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                 ti.setStatus(jo.getString("status"));
             }
         } catch (Exception e) {
-            logger.println("error getting status " + e);
+            logger.warn("ERROR getting status " + e);
             ti.setStatus(TestStatus.Error);
         }
         return ti;
@@ -135,7 +135,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.println("getTests apiKey is empty");
+            logger.warn("ERROR: getTests apiKey is empty");
             return 0;
         }
 
@@ -154,20 +154,19 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                 return arr.length();
             }
         } catch (JSONException e) {
-            logger.println("Error getting response from server: ");
-            e.printStackTrace();
+            logger.warn("Error getting response from server: ",e);
             return -1;
         }
     }
 
     private boolean validate(String apiKey, String testId) {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.println("startTest apiKey is empty");
+            logger.warn("ERROR: startTest apiKey is empty");
             return false;
         }
 
         if (testId == null || testId.trim().isEmpty()) {
-            logger.println("testId is empty");
+            logger.warn("ERROR: testId is empty");
             return false;
         }
         return true;
@@ -201,7 +200,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         try {
             aggregate = response.getJSONObject("report").getJSONObject("aggregate");
         } catch (JSONException e) {
-            logger.println("Error while parsing aggregate report V2: " + e);
+            logger.warn("Error while parsing aggregate report V2: " + e);
         }
         return aggregate;
 
@@ -213,10 +212,10 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         LinkedHashMap<String, String> testListOrdered = null;
 
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.println("getTests apiKey is empty");
+            logger.warn("getTests apiKey is empty");
         } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
-            logger.println(url);
+            logger.warn("Getting testLists via URL="+url);
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
             try {
                 String r = jo.get("response_code").toString();
@@ -228,7 +227,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                         try {
                             en = arr.getJSONObject(i);
                         } catch (JSONException e) {
-                            logger.println("Error with the JSON while populating test list, " + e);
+                            logger.warn("Error with the JSON while populating test list, ", e);
                         }
                         String id;
                         String name;
@@ -240,12 +239,12 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
                             }
                         } catch (JSONException ie) {
-                            logger.println("Error with the JSON while populating test list, " + ie);
+                            logger.warn("Error with the JSON while populating test list, ", ie);
                         }
                     }
                 }
             } catch (Exception e) {
-                logger.println("Error while populating test list, " + e);
+                logger.warn("Error while populating test list, ", e);
             }
         }
 
@@ -255,7 +254,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public JSONObject getUser() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.println("User apiKey is empty");
+            logger.warn("ERROR: User apiKey is empty");
             return null;
         }
         String url = this.urlManager.getUser(APP_KEY, apiKey);

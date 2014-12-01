@@ -170,7 +170,6 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-
         BlazeMeterPerformanceBuilderDescriptor descriptor=getDescriptor();
         //update testDuration on server
         this.api = getAPIClient(build);
@@ -237,7 +236,7 @@ public class PerformanceBuilder extends Builder {
 
             return true;
         } catch (Exception e){
-            e.printStackTrace(logger);
+            this.logger.warn("Test execution was interrupted: ",e);
             return true;
 
         }

@@ -1,6 +1,8 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.entities.TestInfo;
+import hudson.plugins.blazemeter.utils.Constants;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,7 +10,6 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.HashMap;
 
 /**
@@ -27,7 +28,7 @@ import java.util.HashMap;
  */
 
 public interface BlazemeterApi {
-    PrintStream logger = new PrintStream(System.out);
+    JavaUtilLog logger = new JavaUtilLog(Constants.BZM_JEN);
 
     public static final String APP_KEY = "jnk100x987c06f4e10c4";
 
