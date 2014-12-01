@@ -233,10 +233,10 @@ public class PerformanceReportMap implements ModelObject {
             }
         });
         // this may fail, if the build itself failed, we need to recover gracefully
-        if (files != null) {
+        /*if (files != null) {
             addAll(new LoadReportParser("").parse(build,
                     Arrays.asList(files), listener));
-        }
+        }*/
 
         // otherwise subdirectory name designates the parser ID.
         File[] dirs = repo.listFiles(new FileFilter() {

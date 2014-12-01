@@ -8,6 +8,7 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +24,7 @@ public class Utils {
 
     private Utils(){}
 
+    private static JavaUtilLog javaUtillogger=new JavaUtilLog(Constants.BZM_JEN);
 
     public static String autoDetectApiVersion(String apiVersion, String apiKey){
         BlazemeterApi api=null;
@@ -40,10 +42,10 @@ public class Utils {
                 }else{
                     return "v2";
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException je) {
+                javaUtillogger.warn("Received JSONException while auto-detecting version: ",je);
             } catch (NullPointerException npe) {
-                npe.printStackTrace();
+                javaUtillogger.warn("Received JSONException while auto-detecting version: ",npe);
                 return "v3";
             }
         }
@@ -66,9 +68,9 @@ public class Utils {
             api.putTestInfo(testId,result);
 
         }catch(JSONException je){
-            je.printStackTrace();
+            javaUtillogger.warn("Received JSONException while saving testDuration: ",je);
         }catch(Exception e){
-            e.printStackTrace();
+            javaUtillogger.warn("Received JSONException while saving testDuration: ",e);
         }
     }
 
@@ -85,22 +87,22 @@ public class Utils {
             duration = override.getString("duration");
 
         }catch(JSONException je){
-            je.printStackTrace();
+            javaUtillogger.warn("Received JSONException while requesting testDuration: ",je);
         }catch(Exception e){
-            e.printStackTrace();
+            javaUtillogger.warn("Received Exception while requesting testDuration: ",e);
         }
         return duration;
     }
 
     public static void uploadDataFolderFiles(String dataFolder, String mainJMX,String testId,
-                                             BlazemeterApi bmAPI, PrintStream logger) {
+                                             BlazemeterApi bmAPI) {
 
         if (dataFolder == null || dataFolder.isEmpty())
             return;
 
         File folder = new File(dataFolder);
         if (!folder.exists() || !folder.isDirectory()) {
-            logger.println("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
+            javaUtillogger.info("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
             return;
         }
 
@@ -115,7 +117,7 @@ public class Utils {
                     if (fileName.endsWith(mainJMX))
                         bmAPI.uploadJmx(testId, file);
                     else
-                        uploadFile(testId, bmAPI, file, logger);
+                        uploadFile(testId, bmAPI, file);
                 }
             }
         }
@@ -130,12 +132,12 @@ public class Utils {
             TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
-                logger.println("TestStatus for session "+(apiVersion.equals("v2") ? testId : session)
+                javaUtillogger.info("TestStatus for session "+(apiVersion.equals("v2") ? testId : session)
                         +info.getStatus());
-                logger.println("BlazeMeter TestStatus for session"+
+                javaUtillogger.info("BlazeMeter TestStatus for session"+
                         (apiVersion.equals("v2") ? testId : session)
                         +" is not 'Running': finishing build.... ");
-                logger.println("Timestamp: "+Calendar.getInstance().getTime());
+                javaUtillogger.info("Timestamp: "+Calendar.getInstance().getTime());
                 break;
             }
 
@@ -144,25 +146,26 @@ public class Utils {
             long now = Calendar.getInstance().getTime().getTime();
             long diffInSec = (now - start.getTime()) / 1000;
             if (now - lastPrint > 10000) { //print every 10 sec.
-                logger.println("BlazeMeter test running from " + start + " - for " + diffInSec + " seconds");
+                javaUtillogger.info("BlazeMeter test# "+testId+", session # "+session+" running from " + start + " - for " + diffInSec + " seconds");
                 lastPrint = now;
             }
 
             if (diffInSec >= runDurationSeconds) {
-                logger.println("About to stop Blazemeter test...");
-                logger.println("Timestamp: "+Calendar.getInstance().getTime());
+                javaUtillogger.info("About to stop Blazemeter test...");
+                javaUtillogger.info("Timestamp: "+Calendar.getInstance().getTime());
                 api.stopTest(testId);
+                javaUtillogger.info("BlazeMeter test stopped due to user test duration setup reached");
                 logger.println("BlazeMeter test stopped due to user test duration setup reached");
                 break;
             }
             if (Thread.interrupted()) {
-                logger.println("Test was interrupted: throwing Interrupted Exception");
+                javaUtillogger.info("Test was interrupted: throwing Interrupted Exception");
                 throw new InterruptedException();
             }
         }
     }
 
-    public static String createTestFromJSON(BlazemeterApi api, String jsonConfig, FilePath workspace,PrintStream logger){
+    public static String createTestFromJSON(BlazemeterApi api, String jsonConfig, FilePath workspace){
         FilePath newTestPath=workspace.child(jsonConfig);
         String testId=null;
         try {
@@ -172,31 +175,29 @@ public class Utils {
             //get created testId;
         testId=jo.getJSONObject("result").getString("id");
         } catch (IOException e) {
-            logger.println("Failed to read JSON configuration from file"+newTestPath.getName()+": "+e.getMessage());
+            javaUtillogger.info("Failed to read JSON configuration from file"+newTestPath.getName()+": "+e.getMessage());
         } catch (JSONException je) {
-            logger.println("Failed to read JSON configuration from file"+newTestPath.getName()+": "+je.getMessage());
+            javaUtillogger.info("Failed to read JSON configuration from file"+newTestPath.getName()+": "+je.getMessage());
         }finally{
             return testId;
         }
     }
 
-    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, PrintStream logger) {
+    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file) {
         String fileName = file.getName();
         org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
         try {
             if (!json.get("response_code").equals(200)) {
-                logger.println("Could not upload file " + fileName + " " + json.get("error").toString());
+                javaUtillogger.info("Could not upload file " + fileName + " " + json.get("error").toString());
             }
         } catch (JSONException e) {
-            logger.println("Could not upload file " + fileName + " " + e.getMessage());
-            e.printStackTrace();
+            javaUtillogger.info("Could not upload file " + fileName + " " + e.getMessage());
         }
     }
 
     public static void saveReport(String filename,
                                   String report,
-                                  FilePath filePath,
-                                  PrintStream logger) {
+                                  FilePath filePath) {
         File reportFile=new File(filePath.getParent()
                 +"/"+filePath.getName()+"/"+filename+".xml");
         try {
@@ -209,11 +210,11 @@ public class Utils {
 
         }catch (FileNotFoundException fnfe)
         {
-            logger.println("ERROR: Failed to save XML report to workspace "+ fnfe.getMessage());
+            javaUtillogger.info("ERROR: Failed to save XML report to workspace "+ fnfe.getMessage());
         }
         catch (IOException e)
         {
-            logger.println("ERROR: Failed to save XML report to workspace "+ e.getMessage());
+            javaUtillogger.info("ERROR: Failed to save XML report to workspace "+ e.getMessage());
         }
     }
 
@@ -231,47 +232,63 @@ public class Utils {
         if(responseTimeUnstable>=0&testResult.getAverage()>responseTimeUnstable&
                 testResult.getAverage()<responseTimeFailed){
         logger.println("Validating reponseTimeUnstable...\n");
+        javaUtillogger.info("Validating reponseTimeUnstable...\n");
         logger.println("Average response time is higher than responseTimeUnstable treshold\n");
+        javaUtillogger.info("Average response time is higher than responseTimeUnstable treshold\n");
         logger.println("Marking build as unstable");
+        javaUtillogger.info("Marking build as unstable");
             result=Result.UNSTABLE;
         }
 
         if(errorUnstable>=0&testResult.getErrorPercentage()>errorUnstable&
                 testResult.getAverage()<errorFailed){
             logger.println("Validating errorPercentageUnstable...\n");
+            javaUtillogger.info("Validating errorPercentageUnstable...\n");
             logger.println("Error percentage is higher than errorPercentageUnstable treshold\n");
+            javaUtillogger.info("Error percentage is higher than errorPercentageUnstable treshold\n");
             logger.println("Marking build as unstable");
+            javaUtillogger.info("Marking build as unstable");
             result=Result.UNSTABLE;
         }
 
 
         if(responseTimeFailed>=0&testResult.getAverage()>=responseTimeFailed){
             logger.println("Validating reponseTimeFailed...\n");
+            javaUtillogger.info("Validating reponseTimeFailed...\n");
             logger.println("Average response time is higher than responseTimeFailure treshold\n");
+            javaUtillogger.info("Average response time is higher than responseTimeFailure treshold\n");
             logger.println("Marking build as failed");
+            javaUtillogger.info("Marking build as failed");
             result=Result.FAILURE;
         }
 
         if(errorFailed>=0&testResult.getAverage()>=errorFailed){
             logger.println("Validating errorPercentageUnstable...\n");
+            javaUtillogger.info("Validating errorPercentageUnstable...\n");
             logger.println("Error percentage is higher than errorPercentageUnstable treshold\n");
+            javaUtillogger.info("Error percentage is higher than errorPercentageUnstable treshold\n");
             logger.println("Marking build as failed");
+            javaUtillogger.info("Marking build as failed");
             result=Result.FAILURE;
         }
 
         if(errorUnstable<0){
+            javaUtillogger.info("ErrorUnstable percentage validation was skipped: value was not set in configuration");
             logger.println("ErrorUnstable percentage validation was skipped: value was not set in configuration");
         }
 
         if(errorFailed<0){
+            javaUtillogger.info("ErrorFailed percentage validation was skipped: value was not set in configuration");
             logger.println("ErrorFailed percentage validation was skipped: value was not set in configuration");
         }
 
         if(responseTimeUnstable<0){
+            javaUtillogger.info("ResponseTimeUnstable validation was skipped: value was not set in configuration");
             logger.println("ResponseTimeUnstable validation was skipped: value was not set in configuration");
         }
 
         if(responseTimeFailed<0){
+            javaUtillogger.info("ResponseTimeFailed validation was skipped: value was not set in configuration");
             logger.println("ResponseTimeFailed validation was skipped: value was not set in configuration");
         }
         return result;
@@ -286,54 +303,4 @@ public class Utils {
         }
         return props.getProperty("version");
     }
-
-/*    public static  boolean updateTresholds(String testDuration,
-                                    int errorUnstableThreshold,
-                                    int errorFailedThreshold,
-                                    int responseTimeFailedThreshold,
-                                    int responseTimeUnstableThreshold,
-                                    PrintStream logger) {
-
-        boolean updateTresholds=true;
-        Result result = Result.SUCCESS;
-        if (testDuration == null || testDuration.isEmpty() || testDuration.equals("0")) {
-            logger.println("BlazeMeter: Test duration should be more than ZERO, build is considered as "
-                    + Result.NOT_BUILT.toString().toLowerCase());
-            updateTresholds=false;
-            return updateTresholds;
-        }
-        if (errorUnstableThreshold >= 0 && errorUnstableThreshold <= 100) {
-            logger.println("BlazeMeter: Errors percentage greater or equal than "
-                    + errorUnstableThreshold + " % will be considered as "
-                    + Result.UNSTABLE.toString().toLowerCase());
-        } else {
-            logger.println("BlazeMeter: ErrorUnstableThreshold percentage should be between 0 to 100");
-            updateTresholds=false;
-            return updateTresholds;
-        }
-
-        if (errorFailedThreshold >= 0 && errorFailedThreshold <= 100) {
-            logger.println("BlazeMeter: ErrorFailedThreshold percentage greater or equal than "
-                    + errorFailedThreshold + " % will be considered as "
-                    + Result.FAILURE.toString().toLowerCase());
-        } else {
-            logger.println("BlazeMeter: ErrorFailedThreshold percentage should be between 0 to 100");
-            updateTresholds=false;
-            return updateTresholds;
-        }
-
-        if (responseTimeUnstableThreshold > 0) {
-            logger.println("BlazeMeter: ResponseTimeUnstable greater or equal than "
-                    + responseTimeUnstableThreshold + " millis will be considered as "
-                    + Result.UNSTABLE.toString().toLowerCase());
-        }
-        if (responseTimeFailedThreshold > 0) {
-            logger.println("BlazeMeter: ResponseTimeFailed greater than "
-                    + responseTimeFailedThreshold + " millis will be considered as "
-                    + Result.FAILURE.toString().toLowerCase());
-        }
-        updateTresholds=false;
-        return updateTresholds;
-    }*/
-
 }

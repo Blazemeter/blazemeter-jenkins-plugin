@@ -13,11 +13,13 @@ import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.testresult.TestResultFactory;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +35,7 @@ import java.util.regex.Pattern;
 
 public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
+    private static JavaUtilLog logger=new JavaUtilLog(Constants.BZM_JEN);
 
 
     private String testId = "";
@@ -173,7 +176,7 @@ public class PerformanceBuilder extends Builder {
         this.api = getAPIClient(build);
         if(!this.jsonConfig.isEmpty()){
             FilePath workspace=build.getWorkspace();
-            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace,logger);
+            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace);
 
         }else{
             Utils.saveTestDuration(this.api, this.testId, testDuration);
@@ -181,21 +184,22 @@ public class PerformanceBuilder extends Builder {
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
                 testDuration : Utils.requestTestDuration(this.api, this.testId);
         logger.println("Expected test duration=" + testDuration);
+        this.logger.info("Expected test duration=" + testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
 
-        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api, logger);
+        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
-            logger.println("### About to start Blazemeter test # "+this.testId);
-            logger.println("Attempt# "+(countStartRequests+1));
-            logger.println("Timestamp: "+Calendar.getInstance().getTime());
+            this.logger.info("### About to start Blazemeter test # "+this.testId);
+            this.logger.info("Attempt# "+(countStartRequests+1));
+            this.logger.info("Timestamp: "+Calendar.getInstance().getTime());
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
-                logger.println("Could not start BlazeMeter Test with 5 attempts");
+                this.logger.info("Could not start BlazeMeter Test with 5 attempts");
                 build.setResult(Result.FAILURE);
                 return false;
             }
@@ -209,8 +213,7 @@ public class PerformanceBuilder extends Builder {
                 return false;
             }
         } catch (JSONException e) {
-            e.printStackTrace();
-            logger.println("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
+            this.logger.warn("Exception while starting BlazeMeter Test ", e);
             return false;
         }
 
@@ -226,6 +229,7 @@ public class PerformanceBuilder extends Builder {
                     logger, session, runDurationSeconds);
 
             logger.println("BlazeMeter test# "+this.testId+" was terminated at " + Calendar.getInstance().getTime());
+            this.logger.info("BlazeMeter test# "+this.testId+" was terminated at " + Calendar.getInstance().getTime());
 
             Result result = this.postProcess(session, logger,build);
 
@@ -243,14 +247,14 @@ public class PerformanceBuilder extends Builder {
 
             String status = info.getStatus();
             if (status.equals(TestStatus.Running)) {
-                logger.println("Shutting down test");
+                this.logger.info("Shutting down test");
                 this.api.stopTest(testId);
             } else if (status.equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
-                logger.println("Error while running a test - please try to run the same test on BlazeMeter");
+                this.logger.warn("Error while running a test - please try to run the same test on BlazeMeter");
             } else if (status.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
-                logger.println("Test not found error");
+                this.logger.warn("Test not found error");
             }
         }
     }
@@ -277,6 +281,7 @@ public class PerformanceBuilder extends Builder {
            if (json.get("response_code").equals(500) && json.get("error").toString()
                    .startsWith("Test already running")) {
                logger.println("Test already running, please stop it first");
+               this.logger.warn("Test already running, please stop it first");
                build.setResult(Result.FAILURE);
                return session;
            }
@@ -290,6 +295,7 @@ public class PerformanceBuilder extends Builder {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
            APIFactory apiFactory=APIFactory.getApiFactory();
+           this.logger.info("Blazemeter test report will be available at " +  apiFactory.getBlazeMeterUrl()+"/app/#report/"+session+"/loadreport");
            logger.println("Blazemeter test report will be available at " +  apiFactory.getBlazeMeterUrl()+"/app/#report/"+session+"/loadreport");
        }
    return session;
@@ -301,16 +307,16 @@ public class PerformanceBuilder extends Builder {
         JSONObject jo = this.api.getTresholds(session);
         boolean success=false;
         try {
-            logger.println("Treshold object = "+jo.toString());
+            this.logger.info("Treshold object = "+jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
         } catch (JSONException je) {
-            logger.println("Error: Failed to get tresholds: " + je+"\n"+jo.toString());
+            this.logger.warn("Error: Failed to get tresholds: " + je+"\n"+jo.toString());
         }
         String junitReport = this.api.retrieveJUNITXML(session);
-        logger.println("Received Junit report from server.... Saving it to the disc...");
-        Utils.saveReport(session,junitReport,build.getWorkspace(),logger);
+        this.logger.info("Received Junit report from server.... Saving it to the disc...");
+        Utils.saveReport(session,junitReport,build.getWorkspace());
 
-        logger.println("Validating server tresholds: "+(success?"PASSED":"FAILED")+"\n");
+        this.logger.info("Validating server tresholds: "+(success?"PASSED":"FAILED")+"\n");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
@@ -322,7 +328,7 @@ public class PerformanceBuilder extends Builder {
 
 
         if (testReport == null || testReport.equals("null")) {
-            logger.println("ERROR: Requesting aggregate is not available. " +
+            this.logger.warn("Requesting aggregate is not available. " +
                     "Build won't be validated against local tresholds");
             return result;
         }
@@ -333,12 +339,16 @@ public class PerformanceBuilder extends Builder {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             logger.println(testResult.toString());
+            this.logger.info(testResult.toString());
             logger.println("Validating local tresholds...\n");
+            this.logger.warn("Validating local tresholds...\n");
             result=Utils.validateLocalTresholds(testResult,logger,this);
 
         } catch (IOException ioe) {
+            this.logger.warn("Failed to generate TestResult: ", ioe);
             logger.println("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
+            this.logger.warn("ERROR: Failed to generate TestResult: ", je);
             logger.println("ERROR: Failed to generate TestResult: " + je);
         }finally{
             return result;
