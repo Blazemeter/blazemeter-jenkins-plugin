@@ -3,6 +3,7 @@ package hudson.plugins.blazemeter.api;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,6 @@ import java.util.HashMap;
  */
 
 public interface BlazemeterApi {
-    JavaUtilLog logger = new JavaUtilLog(Constants.BZM_JEN);
 
     public static final String APP_KEY = "jnk100x987c06f4e10c4";
 
@@ -60,4 +60,7 @@ public interface BlazemeterApi {
 
     public String retrieveJUNITXML(String sessionId);
 
+    public StdErrLog getLogger();
+
+    public void setLogger(StdErrLog logger);
 }

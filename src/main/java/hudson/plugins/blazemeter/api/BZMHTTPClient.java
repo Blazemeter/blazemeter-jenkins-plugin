@@ -18,6 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class BZMHTTPClient {
-    JavaUtilLog logger = new JavaUtilLog(Constants.BZM_JEN);
+    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
     public enum Method {GET, POST, PUT}
 
@@ -33,12 +34,14 @@ public class BZMHTTPClient {
 
     public BZMHTTPClient() {
         this.httpClient = new DefaultHttpClient();
+        this.logger.setDebugEnabled(false);
     }
 
 
     HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
 
-        logger.warn("Requesting : " + url);
+        if(logger.isDebugEnabled())
+            logger.debug("Requesting : " + url);
         HttpResponse response = null;
         HttpRequestBase request = null;
 
@@ -66,18 +69,20 @@ public class BZMHTTPClient {
 
 
             if (response == null || response.getStatusLine() == null) {
-                logger.warn("Erroneous response (Probably null) for url: \n", url);
+                if(logger.isDebugEnabled())
+                    logger.debug("Erroneous response (Probably null) for url: \n", url);
                 response = null;
             }
         } catch (Exception e) {
-            logger.warn("Problems with creating and sending request: \n", e);
+            if(logger.isDebugEnabled())
+                logger.debug("Problems with creating and sending request: \n", e);
         }
         return response;
     }
 
     HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
-
-        logger.warn("Requesting : " + url);
+        if(logger.isDebugEnabled())
+            logger.debug("Requesting : " + url);
         HttpResponse response = null;
 
         try {
@@ -98,11 +103,13 @@ public class BZMHTTPClient {
                     throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
                 }
             } else {
-                logger.warn("Erroneous response (Probably null) for url: "+ url);
+                if(logger.isDebugEnabled())
+                    logger.debug("Erroneous response (Probably null) for url: " + url);
                 response = null;
             }
         } catch (Exception e) {
-            logger.warn("Wrong response: \n", e);
+            if(logger.isDebugEnabled())
+                logger.debug("Wrong response: \n", e);
         }
         return response;
     }
@@ -113,13 +120,16 @@ public class BZMHTTPClient {
             HttpResponse response = getResponseForFileUpload(url, file);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
-                logger.warn(output);
+                if(logger.isDebugEnabled())
+                    logger.debug(output);
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
-            logger.warn("ERROR decoding Json ", e);
+            if(logger.isDebugEnabled())
+                logger.debug("ERROR decoding Json ", e);
         } catch (JSONException e) {
-            logger.warn("ERROR decoding Json ", e);
+            if(logger.isDebugEnabled())
+                logger.debug("ERROR decoding Json ", e);
         }
         return jo;
     }
@@ -130,13 +140,16 @@ public class BZMHTTPClient {
             HttpResponse response = getResponse(url, data, method);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
-                logger.warn(output);
+                if(logger.isDebugEnabled())
+                    logger.debug(output);
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
-            logger.warn("ERROR decoding Json ", e);
+            if(logger.isDebugEnabled())
+                logger.debug("ERROR decoding Json ", e);
         } catch (JSONException e) {
-            logger.warn("ERROR decoding Json ", e);
+            if(logger.isDebugEnabled())
+            logger.debug("ERROR decoding Json ", e);
         }
         return jo;
     }
@@ -147,10 +160,12 @@ public class BZMHTTPClient {
             HttpResponse response = getResponse(url, data, method);
             if (response != null) {
                 str = EntityUtils.toString(response.getEntity());
-                logger.warn(str);
+                if(logger.isDebugEnabled())
+                    logger.debug(str);
             }
         } catch (IOException e) {
-            logger.warn("ERROR decoding Json ", e);
+            if(logger.isDebugEnabled())
+                logger.debug("ERROR decoding Json ", e);
         }
         return str;
     }
@@ -169,6 +184,4 @@ public class BZMHTTPClient {
             }
         }
     }
-
-
 }

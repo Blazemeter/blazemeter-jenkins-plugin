@@ -5,6 +5,7 @@ import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.LinkedHashMap;
  */
 
 public class BlazemeterApiV2Impl implements BlazemeterApi {
+    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final JSONObject not_implemented;
     private final String apiKey;
     BmUrlManager urlManager;
@@ -154,7 +156,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                 return arr.length();
             }
         } catch (JSONException e) {
-            logger.warn("Error getting response from server: ",e);
+            logger.warn("Error getting response from server: ", e);
             return -1;
         }
     }
@@ -215,7 +217,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             logger.warn("getTests apiKey is empty");
         } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
-            logger.warn("Getting testLists via URL="+url);
+            logger.warn("Getting testLists via URL=" + url);
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
             try {
                 String r = jo.get("response_code").toString();
@@ -293,5 +295,15 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public String retrieveJUNITXML(String sessionId) {
         return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public StdErrLog getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(StdErrLog logger) {
+        this.logger = logger;
     }
 }

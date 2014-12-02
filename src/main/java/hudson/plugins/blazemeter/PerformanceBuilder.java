@@ -19,6 +19,7 @@ import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -37,9 +38,9 @@ import java.util.regex.Pattern;
 
 public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
-    private static JavaUtilLog jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
-    private static StdErrLog bzmBuildLogger =new StdErrLog(Constants.BZM_JEN);
-    private static PrintStream jenBuildLogStream =null;
+    private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
+    private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
+    private static StdErrLog jenBuildLog =new StdErrLog(Constants.BUILD_JEN);
 
     private String testId = "";
 
@@ -90,7 +91,7 @@ public class PerformanceBuilder extends Builder {
                 ?"-1":errorUnstableThreshold);
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
-                Utils.autoDetectApiVersion(apiVersion, apiKey):apiVersion;
+                Utils.autoDetectApiVersion(apiVersion, apiKey,jenCommonLog):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;
@@ -172,42 +173,42 @@ public class PerformanceBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
-        jenBuildLogStream=listener.getLogger();
-        File bzmJenLogFile = new File(build.getLogFile().getParentFile()+"/"+Constants.BZM_JEN_LOG);
-        if(!bzmJenLogFile.exists()){
-            bzmJenLogFile.createNewFile();
+        jenBuildLog.setStdErrStream(listener.getLogger());
+        File bzmLogFile = new File(build.getLogFile().getParentFile()+"/"+Constants.BZM_JEN_LOG);
+        if(!bzmLogFile.exists()){
+            bzmLogFile.createNewFile();
         }
-        PrintStream bzmBuildLogStream = new PrintStream(bzmJenLogFile);
-        bzmBuildLogger.setStdErrStream(bzmBuildLogStream);
+        PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
+        bzmBuildLog.setStdErrStream(bzmBuildLogStream);
+        this.api.setLogger(bzmBuildLog);
 
         //update testDuration on server
         this.api = getAPIClient(build);
         if(!this.jsonConfig.isEmpty()){
             FilePath workspace=build.getWorkspace();
-            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace);
+            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace,bzmBuildLog);
 
         }else{
-            Utils.saveTestDuration(this.api, this.testId, testDuration);
+            Utils.saveTestDuration(this.api, this.testId, testDuration,bzmBuildLog);
         }
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
-                testDuration : Utils.requestTestDuration(this.api, this.testId);
-        bzmBuildLogger.info("Expected test duration=" + testDuration);
-        jenCommonLog.info("Expected test duration=" + testDuration);
+                testDuration : Utils.requestTestDuration(this.api, this.testId,bzmBuildLog);
+        bzmBuildLog.info("Expected test duration=" + testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
 
-        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api);
+        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api,bzmBuildLog);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
-            jenCommonLog.info("### About to start Blazemeter test # " + this.testId);
-            jenCommonLog.info("Attempt# " + (countStartRequests + 1));
-            jenCommonLog.info("Timestamp: " + Calendar.getInstance().getTime());
+            bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
+            bzmBuildLog.info("Attempt# " + (countStartRequests + 1));
+            bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {
-                jenCommonLog.info("Could not start BlazeMeter Test with 5 attempts");
+                bzmBuildLog.info("Could not start BlazeMeter Test with 5 attempts");
                 build.setResult(Result.FAILURE);
                 return false;
             }
@@ -215,13 +216,13 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=this.getTestSession(json, bzmBuildLogStream, build);
+             session=this.getTestSession(json, bzmBuildLog, build);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
             }
         } catch (JSONException e) {
-            jenCommonLog.warn("Exception while starting BlazeMeter Test ", e);
+            bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);
             return false;
         }
 
@@ -234,12 +235,11 @@ public class PerformanceBuilder extends Builder {
 
         try {
             Utils.waitForFinish(this.api, this.apiVersion, this.testId,
-                    bzmBuildLogger, session, runDurationSeconds);
+                    bzmBuildLog, session, runDurationSeconds);
 
-            bzmBuildLogger.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
-            jenCommonLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
+            bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = this.postProcess(session, bzmBuildLogStream,build);
+            Result result = this.postProcess(session, bzmBuildLog,build);
 
             build.setResult(result);
 
@@ -255,14 +255,14 @@ public class PerformanceBuilder extends Builder {
 
             String status = info.getStatus();
             if (status.equals(TestStatus.Running)) {
-                jenCommonLog.info("Shutting down test");
+                bzmBuildLog.info("Shutting down test");
                 this.api.stopTest(testId);
             } else if (status.equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
-                jenCommonLog.warn("Error while running a test - please try to run the same test on BlazeMeter");
+                bzmBuildLog.warn("Error while running a test - please try to run the same test on BlazeMeter");
             } else if (status.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
-                jenCommonLog.warn("Test not found error");
+                bzmBuildLog.warn("Test not found error");
             }
         }
     }
@@ -283,13 +283,12 @@ public class PerformanceBuilder extends Builder {
     }
 
 
-   private String getTestSession(JSONObject json, PrintStream logger, AbstractBuild<?, ?> build) throws JSONException{
+   private String getTestSession(JSONObject json, StdErrLog bzmBuildLog, AbstractBuild<?, ?> build) throws JSONException{
        String session="";
        if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
            if (json.get("response_code").equals(500) && json.get("error").toString()
                    .startsWith("Test already running")) {
-               bzmBuildLogger.info("Test already running, please stop it first");
-               jenCommonLog.warn("Test already running, please stop it first");
+               bzmBuildLog.warn("Test already running, please stop it first");
                build.setResult(Result.FAILURE);
                return session;
            }
@@ -303,28 +302,27 @@ public class PerformanceBuilder extends Builder {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
            APIFactory apiFactory=APIFactory.getApiFactory();
-           jenCommonLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
-           bzmBuildLogger.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
+           bzmBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
        }
    return session;
    }
 
-    private Result postProcess(String session, PrintStream logger,AbstractBuild<?, ?> build) throws InterruptedException {
+    private Result postProcess(String session, StdErrLog bzmBuildLog,AbstractBuild<?, ?> build) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         JSONObject jo = this.api.getTresholds(session);
         boolean success=false;
         try {
-            jenCommonLog.info("Treshold object = " + jo.toString());
+            bzmBuildLog.info("Treshold object = " + jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
         } catch (JSONException je) {
-            jenCommonLog.warn("Error: Failed to get tresholds: " + je + "\n" + jo.toString());
+            bzmBuildLog.warn("Error: Failed to get tresholds: " + je + "\n" + jo.toString());
         }
         String junitReport = this.api.retrieveJUNITXML(session);
-        jenCommonLog.info("Received Junit report from server.... Saving it to the disc...");
-        Utils.saveReport(session, junitReport, build.getWorkspace());
+        bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
+        Utils.saveReport(session, junitReport, build.getWorkspace(),bzmBuildLog);
 
-        jenCommonLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
+        bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
@@ -336,7 +334,7 @@ public class PerformanceBuilder extends Builder {
 
 
         if (testReport == null || testReport.equals("null")) {
-            jenCommonLog.warn("Requesting aggregate is not available. " +
+            bzmBuildLog.warn("Requesting aggregate is not available. " +
                     "Build won't be validated against local tresholds");
             return result;
         }
@@ -346,18 +344,14 @@ public class PerformanceBuilder extends Builder {
         TestResult testResult = null;
         try {
             testResult = testResultFactory.getTestResult(testReport);
-            bzmBuildLogger.info(testResult.toString());
-            jenCommonLog.info(testResult.toString());
-            bzmBuildLogger.info("Validating local tresholds...\n");
-            jenCommonLog.warn("Validating local tresholds...\n");
-            result=Utils.validateLocalTresholds(testResult,logger,this);
+            bzmBuildLog.info(testResult.toString());
+            bzmBuildLog.info("Validating local tresholds...\n");
+            result=Utils.validateLocalTresholds(testResult,this,bzmBuildLog);
 
         } catch (IOException ioe) {
-            jenCommonLog.warn("Failed to generate TestResult: ", ioe);
-            bzmBuildLogger.info("ERROR: Failed to generate TestResult: " + ioe);
+            bzmBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
-            jenCommonLog.warn("ERROR: Failed to generate TestResult: ", je);
-            bzmBuildLogger.info("ERROR: Failed to generate TestResult: " + je);
+            bzmBuildLog.info("ERROR: Failed to generate TestResult: " + je);
         }finally{
             return result;
         }
