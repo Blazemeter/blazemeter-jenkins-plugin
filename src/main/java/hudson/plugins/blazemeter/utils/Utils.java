@@ -8,6 +8,7 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +17,7 @@ import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
@@ -43,9 +45,9 @@ public class Utils {
                     return "v2";
                 }
             } catch (JSONException je) {
-                javaUtillogger.warn("Received JSONException while auto-detecting version: ",je);
+                javaUtillogger.warn("Received JSONException while auto-detecting version: ", je);
             } catch (NullPointerException npe) {
-                javaUtillogger.warn("Received JSONException while auto-detecting version: ",npe);
+                javaUtillogger.warn("Received JSONException while auto-detecting version: ", npe);
                 return "v3";
             }
         }
@@ -68,9 +70,9 @@ public class Utils {
             api.putTestInfo(testId,result);
 
         }catch(JSONException je){
-            javaUtillogger.warn("Received JSONException while saving testDuration: ",je);
+            javaUtillogger.warn("Received JSONException while saving testDuration: ", je);
         }catch(Exception e){
-            javaUtillogger.warn("Received JSONException while saving testDuration: ",e);
+            javaUtillogger.warn("Received JSONException while saving testDuration: ", e);
         }
     }
 
@@ -87,9 +89,9 @@ public class Utils {
             duration = override.getString("duration");
 
         }catch(JSONException je){
-            javaUtillogger.warn("Received JSONException while requesting testDuration: ",je);
+            javaUtillogger.warn("Received JSONException while requesting testDuration: ", je);
         }catch(Exception e){
-            javaUtillogger.warn("Received Exception while requesting testDuration: ",e);
+            javaUtillogger.warn("Received Exception while requesting testDuration: ", e);
         }
         return duration;
     }
@@ -123,8 +125,8 @@ public class Utils {
         }
     }
 
-    public static void wait_for_finish(BlazemeterApi api,String apiVersion,String testId,PrintStream logger,
-                                       String session, int runDurationSeconds) throws InterruptedException {
+    public static void waitForFinish(BlazemeterApi api, String apiVersion, String testId, AbstractLogger logger,
+                                     String session, int runDurationSeconds) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
@@ -132,12 +134,12 @@ public class Utils {
             TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
-                javaUtillogger.info("TestStatus for session "+(apiVersion.equals("v2") ? testId : session)
-                        +info.getStatus());
-                javaUtillogger.info("BlazeMeter TestStatus for session"+
+                javaUtillogger.info("TestStatus for session " + (apiVersion.equals("v2") ? testId : session)
+                        + info.getStatus());
+                javaUtillogger.info("BlazeMeter TestStatus for session" +
                         (apiVersion.equals("v2") ? testId : session)
-                        +" is not 'Running': finishing build.... ");
-                javaUtillogger.info("Timestamp: "+Calendar.getInstance().getTime());
+                        + " is not 'Running': finishing build.... ");
+                javaUtillogger.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
             }
 
@@ -152,10 +154,10 @@ public class Utils {
 
             if (diffInSec >= runDurationSeconds) {
                 javaUtillogger.info("About to stop Blazemeter test...");
-                javaUtillogger.info("Timestamp: "+Calendar.getInstance().getTime());
+                javaUtillogger.info("Timestamp: " + Calendar.getInstance().getTime());
                 api.stopTest(testId);
                 javaUtillogger.info("BlazeMeter test stopped due to user test duration setup reached");
-                logger.println("BlazeMeter test stopped due to user test duration setup reached");
+                logger.info("BlazeMeter test stopped due to user test duration setup reached");
                 break;
             }
             if (Thread.interrupted()) {
@@ -175,9 +177,9 @@ public class Utils {
             //get created testId;
         testId=jo.getJSONObject("result").getString("id");
         } catch (IOException e) {
-            javaUtillogger.info("Failed to read JSON configuration from file"+newTestPath.getName()+": "+e.getMessage());
+            javaUtillogger.info("Failed to read JSON configuration from file" + newTestPath.getName() + ": " + e.getMessage());
         } catch (JSONException je) {
-            javaUtillogger.info("Failed to read JSON configuration from file"+newTestPath.getName()+": "+je.getMessage());
+            javaUtillogger.info("Failed to read JSON configuration from file" + newTestPath.getName() + ": " + je.getMessage());
         }finally{
             return testId;
         }
@@ -210,11 +212,11 @@ public class Utils {
 
         }catch (FileNotFoundException fnfe)
         {
-            javaUtillogger.info("ERROR: Failed to save XML report to workspace "+ fnfe.getMessage());
+            javaUtillogger.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
         }
         catch (IOException e)
         {
-            javaUtillogger.info("ERROR: Failed to save XML report to workspace "+ e.getMessage());
+            javaUtillogger.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
         }
     }
 
