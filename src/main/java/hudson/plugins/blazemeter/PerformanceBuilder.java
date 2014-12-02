@@ -216,7 +216,7 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=this.getTestSession(json, bzmBuildLog, build);
+             session=this.getTestSession(json, build);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
@@ -283,7 +283,7 @@ public class PerformanceBuilder extends Builder {
     }
 
 
-   private String getTestSession(JSONObject json, StdErrLog bzmBuildLog, AbstractBuild<?, ?> build) throws JSONException{
+   private String getTestSession(JSONObject json, AbstractBuild<?, ?> build) throws JSONException{
        String session="";
        if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
            if (json.get("response_code").equals(500) && json.get("error").toString()
@@ -302,7 +302,8 @@ public class PerformanceBuilder extends Builder {
            JSONObject startJO = (JSONObject) json.get("result");
            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
            APIFactory apiFactory=APIFactory.getApiFactory();
-           bzmBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
+           jenBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
+           jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent()+"/"+Constants.BZM_JEN_LOG);
        }
    return session;
    }
