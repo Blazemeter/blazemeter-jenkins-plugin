@@ -185,8 +185,8 @@ public class PerformanceBuilder extends Builder {
         //update testDuration on server
         this.api = getAPIClient(build);
         if(!this.jsonConfig.isEmpty()){
-            FilePath workspace=build.getWorkspace();
-            this.testId=Utils.createTestFromJSON(this.api,this.jsonConfig,workspace,bzmBuildLog);
+            FilePath jsonConfigPath=new FilePath(build.getWorkspace(),jsonConfig);
+            this.testId=Utils.createTestFromJSON(this.api,jsonConfigPath,bzmBuildLog);
 
         }else{
             Utils.saveTestDuration(this.api, this.testId, testDuration,bzmBuildLog);

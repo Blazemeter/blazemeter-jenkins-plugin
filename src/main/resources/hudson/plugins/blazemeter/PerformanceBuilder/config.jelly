@@ -20,7 +20,7 @@
     </f:entry>
     <f:entry title="${%Path to JSON configuration}:"
              field="jsonConfig"
-             description="${%This path will be used for obtaining JSON configuration}">
+             description="${%This path will be used for obtaining JSON configuration. Should be relative to $WORKSPACE}">
         <f:textbox field="jsonConfig"/>
                    <!--checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)" />-->
     </f:entry>

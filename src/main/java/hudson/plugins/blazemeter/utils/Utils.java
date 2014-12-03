@@ -164,19 +164,18 @@ public class Utils {
         }
     }
 
-    public static String createTestFromJSON(BlazemeterApi api, String jsonConfig, FilePath workspace,StdErrLog bzmBuildLog){
-        FilePath newTestPath=workspace.child(jsonConfig);
+    public static String createTestFromJSON(BlazemeterApi api, FilePath jsonConfigPath,StdErrLog bzmBuildLog){
         String testId=null;
         try {
-            String jsonConfigStr=newTestPath.readToString();
+            String jsonConfigStr=jsonConfigPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
             JSONObject jo=api.createYahooTest(configNode);
             //get created testId;
         testId=jo.getJSONObject("result").getString("id");
         } catch (IOException e) {
-            bzmBuildLog.info("Failed to read JSON configuration from file" + newTestPath.getName() + ": " + e.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
         } catch (JSONException je) {
-            bzmBuildLog.info("Failed to read JSON configuration from file" + newTestPath.getName() + ": " + je.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
         }finally{
             return testId;
         }
