@@ -74,7 +74,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi bzm = apiFactory.getAPI(apiSecret);
             try {
                 HashMap<String, String> testList = bzm.getTestList();
-                items.add("Create new test using JSON configuration", "createTestFromJSON");
+                items.add(Constants.CREATE_YAHOO_TEST, Constants.CREATE_YAHOO_TEST_NOTE);
+                items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
                     items.add("Invalid API key ", "-1");

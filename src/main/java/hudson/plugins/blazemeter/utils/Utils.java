@@ -164,12 +164,15 @@ public class Utils {
         }
     }
 
-    public static String createTestFromJSON(BlazemeterApi api, FilePath jsonConfigPath,StdErrLog bzmBuildLog){
+    public static String setUpTestFromJSON(BlazemeterApi api, FilePath jsonConfigPath, StdErrLog bzmBuildLog, boolean createNew){
         String testId=null;
         try {
             String jsonConfigStr=jsonConfigPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
-            JSONObject jo=api.createYahooTest(configNode);
+            JSONObject jo=null;
+            if(createNew){
+                 jo=api.createYahooTest(configNode);
+            }
             //get created testId;
         testId=jo.getJSONObject("result").getString("id");
         } catch (IOException e) {

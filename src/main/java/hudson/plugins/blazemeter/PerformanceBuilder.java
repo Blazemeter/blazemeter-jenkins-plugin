@@ -62,6 +62,8 @@ public class PerformanceBuilder extends Builder {
 
     private int responseTimeUnstableThreshold = 0;
 
+    private String testName="";
+
     private BlazemeterApi api = null;
     /**
      * @deprecated as of 1.3. for compatibility
@@ -84,7 +86,9 @@ public class PerformanceBuilder extends Builder {
                               String errorFailedThreshold,
                               String errorUnstableThreshold,
                               String responseTimeFailedThreshold,
-                              String responseTimeUnstableThreshold) {
+                              String responseTimeUnstableThreshold,
+                              String testName
+    ) {
         this.errorFailedThreshold = Integer.valueOf(errorFailedThreshold.isEmpty()
                 ?"-1":errorFailedThreshold);
         this.errorUnstableThreshold = Integer.valueOf(errorUnstableThreshold.isEmpty()
@@ -101,6 +105,7 @@ public class PerformanceBuilder extends Builder {
                 ?"-1":responseTimeUnstableThreshold);
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
+        this.testName=testName;
         this.api = apiFactory.getAPI(apiKey);
         this.testDuration=testDuration;
     }
@@ -182,15 +187,17 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
         this.api.setLogger(bzmBuildLog);
 
-        //update testDuration on server
         this.api = getAPIClient(build);
+
         if(!this.jsonConfig.isEmpty()){
             FilePath jsonConfigPath=new FilePath(build.getWorkspace(),jsonConfig);
-            this.testId=Utils.createTestFromJSON(this.api,jsonConfigPath,bzmBuildLog);
+            this.testId=Utils.setUpTestFromJSON(this.api, jsonConfigPath, bzmBuildLog,true);
 
         }else{
+            //update testDuration on server
             Utils.saveTestDuration(this.api, this.testId, testDuration,bzmBuildLog);
         }
+
         this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
                 testDuration : Utils.requestTestDuration(this.api, this.testId,bzmBuildLog);
         bzmBuildLog.info("Expected test duration=" + testDuration);
