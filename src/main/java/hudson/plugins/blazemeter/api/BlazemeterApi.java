@@ -1,8 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.entities.TestInfo;
-import hudson.plugins.blazemeter.utils.Constants;
-import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +55,8 @@ public interface BlazemeterApi {
     public JSONObject putTestInfo(String testId, JSONObject data);
 
     public JSONObject createYahooTest(JSONObject data);
+
+    public JSONObject createTest(JSONObject data,String testName);
 
     public String retrieveJUNITXML(String sessionId);
 

@@ -306,4 +306,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public void setLogger(StdErrLog logger) {
         this.logger = logger;
     }
+
+    @Override
+    public JSONObject createTest(JSONObject data,String testName) {
+        return not_implemented;
+    }
 }

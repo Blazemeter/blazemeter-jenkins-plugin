@@ -53,7 +53,7 @@ public class Utils {
     }
 
 
-    public static void saveTestDuration(BlazemeterApi api, String testId, String updDuration, StdErrLog bzmBuildLog) {
+    public static void updateTest(BlazemeterApi api, String testId, String updDuration, StdErrLog bzmBuildLog) {
         try {
             JSONObject jo = api.getTestInfo(testId);
             JSONObject result = jo.getJSONObject("result");
@@ -165,9 +165,14 @@ public class Utils {
         }
     }
 
-    private static String createTest(BlazemeterApi api, JSONObject configNode, String testId) throws JSONException {
+    private static String createTest(BlazemeterApi api, JSONObject configNode,
+                                     String testId,String testName) throws JSONException {
         if(testId.equals(Constants.CREATE_YAHOO_TEST_NOTE)){
             JSONObject jo = api.createYahooTest(configNode);
+            testId = jo.getJSONObject("result").getString("id");
+        }
+        if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
+            JSONObject jo = api.createTest(configNode,testName);
             testId = jo.getJSONObject("result").getString("id");
         }
         return testId;
@@ -178,17 +183,18 @@ public class Utils {
         FilePath jsonConfigPath = new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
         StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
         String testId = builder.getTestId();
+        String testName = builder.getTestName();
         try {
             String jsonConfigStr = jsonConfigPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
             if (testId.contains("create")) {
-                testId=createTest(api,configNode,testId);
+                testId=createTest(api,configNode,testId,testName);
             } else {
                 /*
                 1.Update testDuration;
                 2.Push jsonConfig to server;
                 */
-                saveTestDuration(api, builder.getTestId(), builder.getTestDuration(), bzmBuildLog);
+                updateTest(api, builder.getTestId(), builder.getTestDuration(), bzmBuildLog);
             }
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
@@ -198,15 +204,9 @@ public class Utils {
         } catch (JSONException je) {
             bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
         } finally {
+            uploadDataFolderFiles(builder.getDataFolder(),builder.getMainJMX(),testId, api,bzmBuildLog);
             return testId;
         }
-        /*
-        1.Create test if needed;
-        2.Update test if needed;
-        3.Set up test duration;
-        4.Upload necessary files to server;
-         */
-
     }
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {

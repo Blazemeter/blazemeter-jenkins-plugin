@@ -197,7 +197,6 @@ public class PerformanceBuilder extends Builder {
 
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
 
-        Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api,bzmBuildLog);
 
         org.json.JSONObject json;
         int countStartRequests = 0;
