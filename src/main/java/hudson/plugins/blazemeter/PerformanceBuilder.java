@@ -65,6 +65,8 @@ public class PerformanceBuilder extends Builder {
     private String testName="";
 
     private BlazemeterApi api = null;
+
+    private AbstractBuild<?, ?> build=null;
     /**
      * @deprecated as of 1.3. for compatibility
      */
@@ -178,6 +180,7 @@ public class PerformanceBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
+        this.build=build;
         jenBuildLog.setStdErrStream(listener.getLogger());
         File bzmLogFile = new File(build.getLogFile().getParentFile()+"/"+Constants.BZM_JEN_LOG);
         if(!bzmLogFile.exists()){
@@ -188,21 +191,11 @@ public class PerformanceBuilder extends Builder {
         this.api.setLogger(bzmBuildLog);
 
         this.api = getAPIClient(build);
+        this.testId=Utils.prepareTestRun(this);
 
-        if(!this.jsonConfig.isEmpty()){
-            FilePath jsonConfigPath=new FilePath(build.getWorkspace(),jsonConfig);
-            this.testId=Utils.setUpTestFromJSON(this.api, jsonConfigPath, bzmBuildLog,true);
+        bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
-        }else{
-            //update testDuration on server
-            Utils.saveTestDuration(this.api, this.testId, testDuration,bzmBuildLog);
-        }
-
-        this.testDuration = (testDuration != null && !testDuration.isEmpty()) ?
-                testDuration : Utils.requestTestDuration(this.api, this.testId,bzmBuildLog);
-        bzmBuildLog.info("Expected test duration=" + testDuration);
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
-
 
         Utils.uploadDataFolderFiles(this.dataFolder,this.mainJMX,testId, this.api,bzmBuildLog);
 
@@ -273,6 +266,7 @@ public class PerformanceBuilder extends Builder {
             }
         }
     }
+
     private BlazemeterApi getAPIClient(AbstractBuild<?, ?> build) {
         String apiKeyId = getDescriptor().getApiKey();
         String apiKey = null;
@@ -445,6 +439,26 @@ public class PerformanceBuilder extends Builder {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getJsonConfig() {
+        return jsonConfig;
+    }
+
+    public AbstractBuild<?, ?> getBuild() {
+        return build;
+    }
+
+    public static StdErrLog getBzmBuildLog() {
+        return bzmBuildLog;
+    }
+
+    public BlazemeterApi getApi() {
+        return api;
+    }
+
+    public String getTestName() {
+        return testName;
     }
 
     @Override

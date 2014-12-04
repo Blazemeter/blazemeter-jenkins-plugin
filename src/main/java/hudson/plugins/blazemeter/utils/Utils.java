@@ -23,22 +23,23 @@ import java.util.Properties;
  */
 public class Utils {
 
-    private Utils(){}
+    private Utils() {
+    }
 
-    public static String autoDetectApiVersion(String apiVersion, String apiKey, AbstractLogger logger){
-        BlazemeterApi api=null;
+    public static String autoDetectApiVersion(String apiVersion, String apiKey, AbstractLogger logger) {
+        BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        String detectedApiVersion = !apiVersion.equals("autoDetect")?apiVersion:"";
-        if(apiVersion.equals("autoDetect")){
+        String detectedApiVersion = !apiVersion.equals("autoDetect") ? apiVersion : "";
+        if (apiVersion.equals("autoDetect")) {
             apiFactory.setVersion(APIFactory.ApiVersion.v3);
-            api=apiFactory.getApiFactory().getAPI(apiKey);
-            boolean isV3=false;
+            api = apiFactory.getApiFactory().getAPI(apiKey);
+            boolean isV3 = false;
             try {
-                isV3=api.getUser().getJSONObject("features").getBoolean("v3");
-                if(isV3){
+                isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
+                if (isV3) {
 
                     return "v3";
-                }else{
+                } else {
                     return "v2";
                 }
             } catch (JSONException je) {
@@ -52,9 +53,9 @@ public class Utils {
     }
 
 
-    public static void saveTestDuration(BlazemeterApi api, String testId, String updDuration,StdErrLog bzmBuildLog){
-        try{
-            JSONObject jo =api.getTestInfo(testId);
+    public static void saveTestDuration(BlazemeterApi api, String testId, String updDuration, StdErrLog bzmBuildLog) {
+        try {
+            JSONObject jo = api.getTestInfo(testId);
             JSONObject result = jo.getJSONObject("result");
             JSONObject configuration = result.getJSONObject("configuration");
             JSONObject plugins = configuration.getJSONObject("plugins");
@@ -63,19 +64,19 @@ public class Utils {
             JSONObject override = options.getJSONObject("override");
             override.put("duration", updDuration);
             override.put("threads", JSONObject.NULL);
-            configuration.put("serversCount",JSONObject.NULL);
-            api.putTestInfo(testId,result);
+            configuration.put("serversCount", JSONObject.NULL);
+            api.putTestInfo(testId, result);
 
-        }catch(JSONException je){
+        } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
-        }catch(Exception e){
+        } catch (Exception e) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", e);
         }
     }
 
-    public static String requestTestDuration(BlazemeterApi api, String testId,StdErrLog bzmBuildLog){
-        String duration=null;
-        try{
+    public static String requestTestDuration(BlazemeterApi api, String testId, StdErrLog bzmBuildLog) {
+        String duration = null;
+        try {
             JSONObject jo = api.getTestInfo(testId);
             JSONObject result = jo.getJSONObject("result");
             JSONObject configuration = result.getJSONObject("configuration");
@@ -85,16 +86,16 @@ public class Utils {
             JSONObject override = options.getJSONObject("override");
             duration = override.getString("duration");
 
-        }catch(JSONException je){
+        } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while requesting testDuration: ", je);
-        }catch(Exception e){
+        } catch (Exception e) {
             bzmBuildLog.warn("Received Exception while requesting testDuration: ", e);
         }
         return duration;
     }
 
-    public static void uploadDataFolderFiles(String dataFolder, String mainJMX,String testId,
-                                             BlazemeterApi bmAPI,StdErrLog bzmBuildLog) {
+    public static void uploadDataFolderFiles(String dataFolder, String mainJMX, String testId,
+                                             BlazemeterApi bmAPI, StdErrLog bzmBuildLog) {
 
         if (dataFolder == null || dataFolder.isEmpty())
             return;
@@ -116,7 +117,7 @@ public class Utils {
                     if (fileName.endsWith(mainJMX))
                         bmAPI.uploadJmx(testId, file);
                     else
-                        uploadFile(testId, bmAPI, file,bzmBuildLog);
+                        uploadFile(testId, bmAPI, file, bzmBuildLog);
                 }
             }
         }
@@ -145,7 +146,7 @@ public class Utils {
             long now = Calendar.getInstance().getTime().getTime();
             long diffInSec = (now - start.getTime()) / 1000;
             if (now - lastPrint > 10000) { //print every 10 sec.
-                bzmBuildLog.info("BlazeMeter test# "+testId+", session # "+session+" running from " + start + " - for " + diffInSec + " seconds");
+                bzmBuildLog.info("BlazeMeter test# " + testId + ", session # " + session + " running from " + start + " - for " + diffInSec + " seconds");
                 lastPrint = now;
             }
 
@@ -164,27 +165,51 @@ public class Utils {
         }
     }
 
-    public static String setUpTestFromJSON(BlazemeterApi api, FilePath jsonConfigPath, StdErrLog bzmBuildLog, boolean createNew){
-        String testId=null;
+    private static String createTest(BlazemeterApi api, JSONObject configNode, String testId) throws JSONException {
+        if(testId.equals(Constants.CREATE_YAHOO_TEST_NOTE)){
+            JSONObject jo = api.createYahooTest(configNode);
+            testId = jo.getJSONObject("result").getString("id");
+        }
+        return testId;
+    }
+
+    public static String prepareTestRun(PerformanceBuilder builder) {
+        BlazemeterApi api = builder.getApi();
+        FilePath jsonConfigPath = new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
+        StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
+        String testId = builder.getTestId();
         try {
-            String jsonConfigStr=jsonConfigPath.readToString();
+            String jsonConfigStr = jsonConfigPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
-            JSONObject jo=null;
-            if(createNew){
-                 jo=api.createYahooTest(configNode);
+            if (testId.contains("create")) {
+                testId=createTest(api,configNode,testId);
+            } else {
+                /*
+                1.Update testDuration;
+                2.Push jsonConfig to server;
+                */
+                saveTestDuration(api, builder.getTestId(), builder.getTestDuration(), bzmBuildLog);
             }
-            //get created testId;
-        testId=jo.getJSONObject("result").getString("id");
+            String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
+                    builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
+            builder.setTestDuration(testDuration);
         } catch (IOException e) {
             bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
         } catch (JSONException je) {
             bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
-        }finally{
+        } finally {
             return testId;
         }
+        /*
+        1.Create test if needed;
+        2.Update test if needed;
+        3.Set up test duration;
+        4.Upload necessary files to server;
+         */
+
     }
 
-    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file,StdErrLog bzmBuildLog) {
+    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
         String fileName = file.getName();
         org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
         try {
@@ -198,82 +223,79 @@ public class Utils {
 
     public static void saveReport(String filename,
                                   String report,
-                                  FilePath filePath,StdErrLog bzmBuildLog) {
-        File reportFile=new File(filePath.getParent()
-                +"/"+filePath.getName()+"/"+filename+".xml");
+                                  FilePath filePath, StdErrLog bzmBuildLog) {
+        File reportFile = new File(filePath.getParent()
+                + "/" + filePath.getName() + "/" + filename + ".xml");
         try {
-            if(!reportFile.exists()){
+            if (!reportFile.exists()) {
                 reportFile.createNewFile();
             }
             BufferedWriter out = new BufferedWriter(new FileWriter(reportFile));
             out.write(report);
             out.close();
 
-        }catch (FileNotFoundException fnfe)
-        {
+        } catch (FileNotFoundException fnfe) {
             bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
         }
     }
 
 
     public static Result validateLocalTresholds(TestResult testResult,
-                                              PerformanceBuilder builder,
-                                              StdErrLog bzmBuildLog){
-        int responseTimeUnstable=builder.getResponseTimeUnstableThreshold();
-        int responseTimeFailed=builder.getResponseTimeFailedThreshold();
-        int errorUnstable=builder.getErrorUnstableThreshold();
-        int errorFailed=builder.getErrorFailedThreshold();
+                                                PerformanceBuilder builder,
+                                                StdErrLog bzmBuildLog) {
+        int responseTimeUnstable = builder.getResponseTimeUnstableThreshold();
+        int responseTimeFailed = builder.getResponseTimeFailedThreshold();
+        int errorUnstable = builder.getErrorUnstableThreshold();
+        int errorFailed = builder.getErrorFailedThreshold();
 
 
-        Result result=Result.SUCCESS;
-        if(responseTimeUnstable>=0&testResult.getAverage()>responseTimeUnstable&
-                testResult.getAverage()<responseTimeFailed){
+        Result result = Result.SUCCESS;
+        if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable &
+                testResult.getAverage() < responseTimeFailed) {
             bzmBuildLog.info("Validating reponseTimeUnstable...\n");
             bzmBuildLog.info("Average response time is higher than responseTimeUnstable treshold\n");
             bzmBuildLog.info("Marking build as unstable");
-            result=Result.UNSTABLE;
+            result = Result.UNSTABLE;
         }
 
-        if(errorUnstable>=0&testResult.getErrorPercentage()>errorUnstable&
-                testResult.getAverage()<errorFailed){
+        if (errorUnstable >= 0 & testResult.getErrorPercentage() > errorUnstable &
+                testResult.getAverage() < errorFailed) {
             bzmBuildLog.info("Validating errorPercentageUnstable...\n");
             bzmBuildLog.info("Error percentage is higher than errorPercentageUnstable treshold\n");
             bzmBuildLog.info("Marking build as unstable");
-            result=Result.UNSTABLE;
+            result = Result.UNSTABLE;
         }
 
 
-        if(responseTimeFailed>=0&testResult.getAverage()>=responseTimeFailed){
+        if (responseTimeFailed >= 0 & testResult.getAverage() >= responseTimeFailed) {
             bzmBuildLog.info("Validating reponseTimeFailed...\n");
             bzmBuildLog.info("Average response time is higher than responseTimeFailure treshold\n");
             bzmBuildLog.info("Marking build as failed");
-            result=Result.FAILURE;
+            result = Result.FAILURE;
         }
 
-        if(errorFailed>=0&testResult.getAverage()>=errorFailed){
+        if (errorFailed >= 0 & testResult.getAverage() >= errorFailed) {
             bzmBuildLog.info("Validating errorPercentageUnstable...\n");
             bzmBuildLog.info("Error percentage is higher than errorPercentageUnstable treshold\n");
             bzmBuildLog.info("Marking build as failed");
-            result=Result.FAILURE;
+            result = Result.FAILURE;
         }
 
-        if(errorUnstable<0){
+        if (errorUnstable < 0) {
             bzmBuildLog.info("ErrorUnstable percentage validation was skipped: value was not set in configuration");
         }
 
-        if(errorFailed<0){
+        if (errorFailed < 0) {
             bzmBuildLog.info("ErrorFailed percentage validation was skipped: value was not set in configuration");
         }
 
-        if(responseTimeUnstable<0){
+        if (responseTimeUnstable < 0) {
             bzmBuildLog.info("ResponseTimeUnstable validation was skipped: value was not set in configuration");
         }
 
-        if(responseTimeFailed<0){
+        if (responseTimeFailed < 0) {
             bzmBuildLog.info("ResponseTimeFailed validation was skipped: value was not set in configuration");
         }
         return result;
