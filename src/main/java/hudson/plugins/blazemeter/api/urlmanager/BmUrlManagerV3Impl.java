@@ -51,30 +51,12 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
 
     @Override
     public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
-        String scriptUpload=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-            testId = URLEncoder.encode(testId, "UTF-8");
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return scriptUpload;
+    return Constants.NOT_IMPLEMENTED;
     }
 
     @Override
     public String fileUpload(String appKey, String userKey, String testId, String fileName) {
-        String fileUpload=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-            testId = URLEncoder.encode(testId, "UTF-8");
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return fileUpload;
+        return Constants.NOT_IMPLEMENTED;
     }
 
     @Override
