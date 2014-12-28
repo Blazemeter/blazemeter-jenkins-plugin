@@ -53,20 +53,28 @@ public class Utils {
     }
 
 
-    public static void updateTest(BlazemeterApi api, String testId, String updDuration, StdErrLog bzmBuildLog) {
+    public static void updateTest(BlazemeterApi api,
+                                  String testId,
+                                  String updDuration,
+                                  JSONObject configNode,
+                                  StdErrLog bzmBuildLog) {
         try {
-            JSONObject jo = api.getTestInfo(testId);
-            JSONObject result = jo.getJSONObject("result");
-            JSONObject configuration = result.getJSONObject("configuration");
-            JSONObject plugins = configuration.getJSONObject("plugins");
-            String type = configuration.getString("type");
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject("override");
-            override.put("duration", updDuration);
-            override.put("threads", JSONObject.NULL);
-            configuration.put("serversCount", JSONObject.NULL);
+            JSONObject result = null;
+            if (configNode != null) {
+                result=configNode;
+            } else if (updDuration != null && !updDuration.isEmpty()) {
+                JSONObject jo = api.getTestInfo(testId);
+                result = jo.getJSONObject("result");
+                JSONObject configuration = result.getJSONObject("configuration");
+                JSONObject plugins = configuration.getJSONObject("plugins");
+                String type = configuration.getString("type");
+                JSONObject options = plugins.getJSONObject(type);
+                JSONObject override = options.getJSONObject("override");
+                override.put("duration", updDuration);
+                override.put("threads", JSONObject.NULL);
+                configuration.put("serversCount", JSONObject.NULL);
+            }
             api.putTestInfo(testId, result);
-
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
         } catch (Exception e) {
@@ -190,11 +198,7 @@ public class Utils {
             if (testId.contains("create")) {
                 testId=createTest(api,configNode,testId,testName);
             } else {
-                /*
-                1.Update testDuration;
-                2.Push jsonConfig to server;
-                */
-                updateTest(api, builder.getTestId(), builder.getTestDuration(), bzmBuildLog);
+                updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
             }
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);

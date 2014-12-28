@@ -18,7 +18,7 @@
         <f:select>
         </f:select>
     </f:entry>
-    <f:entry title="${%Test settings}:" description="${%Define path to JSON with test configuration. Set up test name for new test}">
+    <f:entry title="${%Test settings}:" description="${%Define path to JSON with test configuration}">
         <table width="500px">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@
                         ${%Path to JSON configuration:}
                     </td>
                     <td>
-                        ${%Test name/for BZM test/:}
+                        ${%Test name/only for new BZM test/:}
                     </td>
 
                 </tr>
