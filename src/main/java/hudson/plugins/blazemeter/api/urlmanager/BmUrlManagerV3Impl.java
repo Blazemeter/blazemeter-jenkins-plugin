@@ -188,5 +188,20 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
 
         return retrieveJUNITXML;
     }
+
+    @Override
+    public String createTest(String appKey, String userKey) {
+        String createTest=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        createTest=SERVER_URL+"/api/latest/tests?api_key="
+                +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return createTest;
+    }
 }
 
