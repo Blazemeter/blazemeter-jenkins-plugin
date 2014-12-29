@@ -180,6 +180,7 @@ public class Utils {
             testId = jo.getJSONObject("result").getString("id");
         }
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
+            configNode.put("name",testName);
             JSONObject jo = api.createTest(configNode,testName);
             testId = jo.getJSONObject("result").getString("id");
         }
