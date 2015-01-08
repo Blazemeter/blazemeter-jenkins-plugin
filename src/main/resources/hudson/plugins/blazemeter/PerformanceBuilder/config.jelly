@@ -3,7 +3,7 @@
 
     <f:entry title="Provided by BlazeMeter">
         <a href="http://www.blazemeter.com" target="_blank">
-            <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" alt="100%"/>
+            <img src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/BlazeMeter.png" style="width: 50%; height: 50%"/>
         </a>
     </f:entry>
 
