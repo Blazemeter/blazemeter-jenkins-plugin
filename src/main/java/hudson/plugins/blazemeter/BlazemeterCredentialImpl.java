@@ -69,7 +69,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
             if (testCount < 0) {
                 return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
             } else if (testCount == 0) {
-                return FormValidation.errorWithMarkup("User Key Invalid Or No Available Tests");
+                return FormValidation.warningWithMarkup("User Key Invalid Or No Available Tests");
             } else {
                 return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
 

@@ -27,7 +27,7 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL = "";
+    private String blazeMeterURL;
     private String name = "My BlazeMeter Account";
     private String apiKey;
 
@@ -199,6 +199,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.apiKey = apiKey;
     }
 
+    public String getBlazeMeterURL() {
+        return blazeMeterURL;
+    }
 
+    public void setBlazeMeterURL(String blazeMeterURL) {
+        this.blazeMeterURL = blazeMeterURL;
+    }
 }
 
