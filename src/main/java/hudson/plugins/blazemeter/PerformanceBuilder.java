@@ -192,7 +192,10 @@ public class PerformanceBuilder extends Builder {
 
         this.api = getAPIClient(build);
         this.testId=Utils.prepareTestRun(this);
-
+        if(this.testId.isEmpty()){
+            jenBuildLog.warn("Failed to start test on server: check JSON configuration");
+            return false;
+        }
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
         int runDurationSeconds = Integer.parseInt(testDuration) * 60;
@@ -450,6 +453,10 @@ public class PerformanceBuilder extends Builder {
 
     public static StdErrLog getBzmBuildLog() {
         return bzmBuildLog;
+    }
+
+    public static StdErrLog getJenBuildLog() {
+        return jenBuildLog;
     }
 
     public BlazemeterApi getApi() {

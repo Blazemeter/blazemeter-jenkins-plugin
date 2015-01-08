@@ -53,11 +53,12 @@ public class Utils {
     }
 
 
-    public static void updateTest(BlazemeterApi api,
+    public static JSONObject updateTest(BlazemeterApi api,
                                   String testId,
                                   String updDuration,
                                   JSONObject configNode,
                                   StdErrLog bzmBuildLog) {
+        JSONObject updateResult=null;
         try {
             JSONObject result = null;
             if (configNode != null) {
@@ -74,12 +75,14 @@ public class Utils {
                 override.put("threads", JSONObject.NULL);
                 configuration.put("serversCount", JSONObject.NULL);
             }
-            api.putTestInfo(testId, result);
+            updateResult=api.putTestInfo(testId, result);
+
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
         } catch (Exception e) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", e);
         }
+        return updateResult;
     }
 
     public static String requestTestDuration(BlazemeterApi api, String testId, StdErrLog bzmBuildLog) {
@@ -191,6 +194,7 @@ public class Utils {
         BlazemeterApi api = builder.getApi();
         FilePath jsonConfigPath = new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
         StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
+        StdErrLog jenBuildLog = PerformanceBuilder.getJenBuildLog();
         String testId = builder.getTestId();
         String testName = builder.getTestName();
         try {
@@ -199,7 +203,18 @@ public class Utils {
             if (testId.contains("create")) {
                 testId=createTest(api,configNode,testId,testName);
             } else {
-                updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
+                JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
+                if(updateResult.has("error")){
+                    jenBuildLog.debug("Failed to update test with JSON configuration");
+                    jenBuildLog.debug("Error:"+updateResult.getString("error"));
+                    testId="";
+                }else{
+                    jenBuildLog.info("Test was updated on server");
+                    JSONObject test = updateResult.getJSONObject("test");
+                    jenBuildLog.info("Test id="+test.getString("id"));
+                    jenBuildLog.info("Test name="+test.getString("name"));
+                    testId=test.getString("id");
+                }
             }
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
