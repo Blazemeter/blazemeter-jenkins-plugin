@@ -44,7 +44,7 @@
         </table>
     </f:entry>
 
-    <f:entry title="${%Error percentage threshold}:"
+    <f:entry title="${%Error percentage threshold, %}:"
              description="${%Threshold.Description}">
         <table width="350px">
             <thead>
@@ -78,7 +78,7 @@
 
 
 
-    <f:entry title="${%Response Time threshold}:"
+    <f:entry title="${%Response Time threshold, ms}:"
              description="${%Response.Description}">
         <table width="350px">
             <thead>
@@ -96,7 +96,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="vertical-align:middle">${%Response Time}:</td>
+                    <td style="vertical-align:middle">${%Response Time, ms}:</td>
                     <td>
                         <f:textbox field="responseTimeUnstableThreshold"/>
                     </td>
@@ -109,7 +109,7 @@
             </tbody>
         </table>
     </f:entry>
-    <f:entry title="${%Test Duration}:"
+    <f:entry title="${%Test Duration, min}:"
              field="testDuration"
              description="${%TestDuration}">
         <f:textbox field="testDuration"
