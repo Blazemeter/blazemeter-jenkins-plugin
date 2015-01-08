@@ -67,7 +67,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
             BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey);
             int testCount = bzm.getTestCount();
             if (testCount < 0) {
-                return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
+                return FormValidation.warningWithMarkup("Error while checking test list on server. Check that BlazeMeterUrl is correct");
             } else if (testCount == 0) {
                 return FormValidation.warningWithMarkup("User Key Invalid Or No Available Tests");
             } else {
