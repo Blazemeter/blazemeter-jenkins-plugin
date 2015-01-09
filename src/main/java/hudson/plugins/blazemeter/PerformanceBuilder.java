@@ -193,7 +193,7 @@ public class PerformanceBuilder extends Builder {
         this.api = getAPIClient(build);
         this.testId=Utils.prepareTestRun(this);
         if(this.testId.isEmpty()){
-            jenBuildLog.warn("Failed to start test on server: check JSON configuration");
+            jenBuildLog.warn("Failed to start test on server: check JSON configuration or url format");
             return false;
         }
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
@@ -247,7 +247,8 @@ public class PerformanceBuilder extends Builder {
 
             return true;
         } catch (Exception e){
-            jenCommonLog.warn("Test execution was interrupted: ", e);
+            jenCommonLog.warn("Test execution was interrupted or network connection is broken: ", e);
+            jenBuildLog.warn("Test execution was interrupted or network connection is broken: ", e);
             return true;
 
         }

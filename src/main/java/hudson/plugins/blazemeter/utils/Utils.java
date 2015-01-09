@@ -177,7 +177,7 @@ public class Utils {
     }
 
     private static String createTest(BlazemeterApi api, JSONObject configNode,
-                                     String testId,String testName) throws JSONException {
+                                     String testId,String testName,StdErrLog jenBuildLog) throws JSONException {
         if(testId.equals(Constants.CREATE_YAHOO_TEST_NOTE)){
             JSONObject jo = api.createYahooTest(configNode);
             testId = jo.getJSONObject("result").getString("id");
@@ -185,7 +185,12 @@ public class Utils {
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
             configNode.put("name",testName);
             JSONObject jo = api.createTest(configNode,testName);
-            testId = jo.getJSONObject("result").getString("id");
+            if(jo.has("error")){
+                jenBuildLog.warn("Failed to create test: "+jo.getString("error"));
+                testId="";
+            }else{
+                testId = jo.getJSONObject("result").getString("id");
+            }
         }
         return testId;
     }
@@ -201,7 +206,7 @@ public class Utils {
             String jsonConfigStr = jsonConfigPath.readToString();
             JSONObject configNode = new JSONObject(jsonConfigStr);
             if (testId.contains("create")) {
-                testId=createTest(api,configNode,testId,testName);
+                testId=createTest(api,configNode,testId,testName,jenBuildLog);
             } else {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
                 if(updateResult.has("error")){

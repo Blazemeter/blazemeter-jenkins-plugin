@@ -198,7 +198,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        createTest=SERVER_URL+"/api/latest/tests?api_key="
+        createTest=SERVER_URL+"/api/latest/tests/custom?api_key="
                 +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return createTest;
