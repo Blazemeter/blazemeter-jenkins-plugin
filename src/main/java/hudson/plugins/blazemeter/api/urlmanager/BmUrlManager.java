@@ -35,6 +35,8 @@ public interface BmUrlManager {
 
     public String getTestInfo(String appKey, String userKey, String testId);
 
+    public String putTestInfo(String appKey, String userKey, String testId);
+
     public String createYahooTest(String appKey, String userKey);
 
     public String createTest(String appKey, String userKey);

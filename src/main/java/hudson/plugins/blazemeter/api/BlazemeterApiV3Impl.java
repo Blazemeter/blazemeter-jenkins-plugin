@@ -262,13 +262,13 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject putTestInfo(String testId, JSONObject data){
+    public JSONObject updateTestInfo(String testId, JSONObject data){
         if (apiKey == null || apiKey.trim().isEmpty()) {
             logger.warn("ERROR: User apiKey is empty");
             return null;
         }
-        String url = this.urlManager.getTestInfo(APP_KEY, apiKey,testId);
-        JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.PUT);
+        String url = this.urlManager.putTestInfo(APP_KEY, apiKey, testId);
+        JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
     }
 

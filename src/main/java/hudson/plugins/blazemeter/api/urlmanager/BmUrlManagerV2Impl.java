@@ -155,5 +155,10 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     public String createTest(String appKey, String userKey) {
         return Constants.NOT_IMPLEMENTED;
     }
+
+    @Override
+    public String putTestInfo(String appKey, String userKey, String testId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
 }
 

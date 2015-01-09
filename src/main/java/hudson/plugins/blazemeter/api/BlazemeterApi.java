@@ -52,7 +52,7 @@ public interface BlazemeterApi {
 
     public JSONObject getTestInfo(String testId);
 
-    public JSONObject putTestInfo(String testId, JSONObject data);
+    public JSONObject updateTestInfo(String testId, JSONObject data);
 
     public JSONObject createYahooTest(JSONObject data);
 

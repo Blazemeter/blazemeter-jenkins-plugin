@@ -74,7 +74,7 @@ public class Utils {
                 override.put("threads", JSONObject.NULL);
                 configuration.put("serversCount", JSONObject.NULL);
             }
-            updateResult=api.putTestInfo(testId, result);
+            updateResult=api.updateTestInfo(testId, result);
 
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
@@ -209,8 +209,8 @@ public class Utils {
             } else {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
                 if(updateResult.has("error")){
-                    jenBuildLog.debug("Failed to update test with JSON configuration");
-                    jenBuildLog.debug("Error:"+updateResult.getString("error"));
+                    jenBuildLog.warn("Failed to update test with JSON configuration");
+                    jenBuildLog.warn("Error:"+updateResult.getString("error"));
                     testId="";
                 }else{
                     jenBuildLog.info("Test was updated on server");

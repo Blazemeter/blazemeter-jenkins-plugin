@@ -283,7 +283,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject putTestInfo(String testId, JSONObject data) {
+    public JSONObject updateTestInfo(String testId, JSONObject data) {
         return not_implemented;
     }
 
