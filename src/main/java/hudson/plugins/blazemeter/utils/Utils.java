@@ -139,7 +139,7 @@ public class Utils {
         Date start = null;
         long lastPrint = 0;
         while (true) {
-            Thread.sleep(5000);
+            Thread.sleep(15000);
             TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
