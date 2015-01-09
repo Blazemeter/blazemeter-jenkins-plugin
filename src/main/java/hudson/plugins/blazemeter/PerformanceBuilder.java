@@ -78,8 +78,7 @@ public class PerformanceBuilder extends Builder {
     private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
-    public PerformanceBuilder(String apiKey,
-                              String testDuration,
+    public PerformanceBuilder(String testDuration,
                               String mainJMX,
                               String dataFolder,
                               String testId,
@@ -96,8 +95,9 @@ public class PerformanceBuilder extends Builder {
         this.errorUnstableThreshold = Integer.valueOf(errorUnstableThreshold.isEmpty()
                 ?"-1":errorUnstableThreshold);
         this.testId = testId;
+        String apiKey=getDescriptor().getCredentials("Global").get(0).getApiKey();
         this.apiVersion = apiVersion.equals("autoDetect")?
-                Utils.autoDetectApiVersion(apiVersion, apiKey,jenCommonLog):apiVersion;
+                Utils.autoDetectApiVersion(apiVersion,apiKey,jenCommonLog):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;

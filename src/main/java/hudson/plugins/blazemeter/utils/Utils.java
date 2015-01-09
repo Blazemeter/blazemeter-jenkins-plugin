@@ -37,7 +37,6 @@ public class Utils {
             try {
                 isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
                 if (isV3) {
-
                     return "v3";
                 } else {
                     return "v2";
