@@ -1,7 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -40,8 +40,8 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     BlazemeterApiV2Impl(String apiKey) {
         this.apiKey = apiKey;
-        urlManager = URLFactory.getURLFactory().
-                getURLManager(URLFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        urlManager = UrlManagerFactory.getURLFactory().
+                getURLManager(UrlManagerFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
         not_implemented=new JSONObject();
         try {
             not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);

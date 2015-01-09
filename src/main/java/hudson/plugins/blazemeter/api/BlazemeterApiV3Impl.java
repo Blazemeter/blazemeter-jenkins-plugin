@@ -1,7 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.URLFactory;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -41,8 +41,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     BlazemeterApiV3Impl(String apiKey) {
         this.apiKey = apiKey;
-        urlManager = URLFactory.getURLFactory().
-                getURLManager(URLFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        urlManager = UrlManagerFactory.getURLFactory().
+                getURLManager(UrlManagerFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         try {
             bzmhc = new BZMHTTPClient();
             bzmhc.configureProxy();
