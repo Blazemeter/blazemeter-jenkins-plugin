@@ -1,3 +1,5 @@
+package hudson.plugins.blazemeter;
+
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV2Impl;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
