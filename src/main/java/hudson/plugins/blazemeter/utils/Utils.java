@@ -184,7 +184,7 @@ public class Utils {
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
             configNode.put("name",testName);
             JSONObject jo = api.createTest(configNode,testName);
-            if(jo.has("error")){
+            if(jo.has("error")&&!jo.getString("error").equals("null")){
                 jenBuildLog.warn("Failed to create test: "+jo.getString("error"));
                 testId="";
             }else{
@@ -206,7 +206,9 @@ public class Utils {
             JSONObject configNode = new JSONObject(jsonConfigStr);
             if (testId.contains("create")) {
                 testId=createTest(api,configNode,testId,testName,jenBuildLog);
-            } else {
+            }
+
+            if(configNode!=null) {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
                 if(updateResult.has("error")){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
@@ -220,6 +222,7 @@ public class Utils {
                     testId=test.getString("id");
                 }
             }
+
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
             builder.setTestDuration(testDuration);

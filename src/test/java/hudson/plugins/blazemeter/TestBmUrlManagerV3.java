@@ -118,7 +118,7 @@ public class TestBmUrlManagerV3 {
     @Test
     public void putTestInfo(){
         String expPutTestInfo=bmUrlManager.getServerUrl()+"/api/latest/tests/"+testId+
-                "/custom?custom_test_type=http&api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+                "/custom?custom_test_type=yahoo&api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actPutTestInfo=bmUrlManager.putTestInfo(appKey, userKey, testId);
         Assert.assertEquals(expPutTestInfo,actPutTestInfo);
     }
@@ -133,7 +133,7 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void createTest(){
-        String expCreateTest=bmUrlManager.getServerUrl()+"/api/latest/tests/custom?custom_test_type=jmeter&api_key="
+        String expCreateTest=bmUrlManager.getServerUrl()+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actCreateTest=bmUrlManager.createTest(appKey, userKey);
         Assert.assertEquals(expCreateTest,actCreateTest);
