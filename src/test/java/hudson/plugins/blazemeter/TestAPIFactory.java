@@ -19,12 +19,6 @@ public class TestAPIFactory {
     private String userKey1 = "1234567890";
     private String userKey2 = "0987654321";
 
-    @Test
-    public void testDefaultVersion() {
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        blazemeterApi = apiFactory.getAPI(userKey1);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-    }
 
     @Test
     public void testMixVersion() {

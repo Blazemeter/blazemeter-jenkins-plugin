@@ -315,4 +315,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return apiKey;
     }
 
+
+    public void setBzmhc(BzmHttpWrapper bzmhc) {
+        this.bzmhc = bzmhc;
+    }
 }
