@@ -5,6 +5,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,8 +62,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      */
     @Override
     public synchronized void uploadJmx(String testId, File file) {
-
-        if (!validate(apiKey, testId)) return;
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return;
 
         String url = this.urlManager.scriptUpload(APP_KEY, apiKey, testId, file.getName());
         JSONObject json = this.bzmhc.getJsonForFileUpload(url, file);
@@ -85,8 +85,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public synchronized JSONObject uploadBinaryFile(String testId, File file) {
-
-        if (!validate(apiKey, testId)) return null;
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.fileUpload(APP_KEY, apiKey, testId, file.getName());
 
@@ -98,7 +97,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public TestInfo getTestRunStatus(String testId) {
         TestInfo ti = new TestInfo();
 
-        if (!validate(apiKey, testId)) {
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId))
+        {
             ti.setStatus(TestStatus.NotFound);
             return ti;
         }
@@ -127,8 +127,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public synchronized JSONObject startTest(String testId) {
-
-        if (!validate(apiKey, testId)) return null;
+    if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
@@ -168,7 +167,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      */
     @Override
     public JSONObject stopTest(String testId) {
-        if (!validate(apiKey, testId)) return null;
+    if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
         return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
@@ -181,7 +180,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
      */
     @Override
     public JSONObject testReport(String reportId) {
-        if (!validate(apiKey, reportId)) return null;
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, apiKey, reportId);
         JSONObject summary = null;
@@ -252,10 +251,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public JSONObject getTestInfo(String testId){
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
+
         String url = this.urlManager.getTestInfo(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
@@ -263,10 +260,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public JSONObject updateTestInfo(String testId, JSONObject data){
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
+
         String url = this.urlManager.putTestInfo(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
@@ -274,10 +269,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public JSONObject createYahooTest(JSONObject data){
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)) return null;
         String url = this.urlManager.createYahooTest(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
@@ -285,10 +277,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public JSONObject getTresholds(String sessionId){
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.getTresholds(APP_KEY, apiKey, sessionId);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
@@ -303,26 +292,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return this.urlManager.getServerUrl();
     }
 
-
-    private boolean validate(String apiKey, String testId) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: startTest apiKey is empty");
-            return false;
-        }
-
-        if (testId == null || testId.trim().isEmpty()) {
-            logger.warn("ERROR: testId is empty");
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String retrieveJUNITXML(String sessionId) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, sessionId);
         String xmlJunit = this.bzmhc.getString(url, null, BZMHTTPClient.Method.GET);
 
@@ -341,12 +313,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public JSONObject createTest(JSONObject data,String testName) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testName)) return null;
         String url = this.urlManager.createTest(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getJson(url, data, BZMHTTPClient.Method.POST);
         return jo;
     }
+
+    @Override
+    public String getApiKey() {
+        return apiKey;
+    }
+
 }

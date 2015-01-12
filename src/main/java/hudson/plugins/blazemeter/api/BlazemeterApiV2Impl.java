@@ -311,4 +311,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public JSONObject createTest(JSONObject data,String testName) {
         return not_implemented;
     }
+
+    @Override
+    public String getApiKey() {
+        return apiKey;
+    }
 }
