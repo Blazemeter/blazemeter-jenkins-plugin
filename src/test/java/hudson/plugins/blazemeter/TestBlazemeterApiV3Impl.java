@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by dzmitrykashlach on 12/01/15.
  */
-public class TestBlazemeterApi3Impl {
+public class TestBlazemeterApiV3Impl {
     BlazemeterApiV3Impl blazemeterApiV3 =null;
 
     @Before
