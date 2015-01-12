@@ -65,4 +65,6 @@ public interface BlazemeterApi {
     public void setLogger(StdErrLog logger);
 
     public String getApiKey();
+
+    public String getBlazeMeterURL();
 }

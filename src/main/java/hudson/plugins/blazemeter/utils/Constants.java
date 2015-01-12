@@ -5,6 +5,7 @@ package hudson.plugins.blazemeter.utils;
  */
 public interface Constants {
     public static final String DEFAULT_BLAZEMETER_URL="https://a.blazemeter.com";
+    public final String QA_BLAZEMETER_URL="http://qa.blazemeter.com";
     public static String NOT_IMPLEMENTED="This call is not implemented for V2. Please, select API V3";
     public static String BZM_JEN="BZM-JEN";
     public static String BUILD_JEN="BUILD-JEN";

@@ -4,6 +4,7 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.utils.Constants;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -26,7 +27,34 @@ public class TestAPIFactory {
     }
 
     @Test
-    public void testV3() {
+    public void testMixVersion() {
+        APIFactory apiFactory = APIFactory.getApiFactory();
+        apiFactory.setVersion(APIFactory.ApiVersion.v3);
+        blazemeterApi = apiFactory.getAPI(userKey1);
+        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
+        apiFactory.setVersion(APIFactory.ApiVersion.v2);
+        blazemeterApi = apiFactory.getAPI(userKey1);
+        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
+        apiFactory.setVersion(APIFactory.ApiVersion.v3);
+        blazemeterApi = apiFactory.getAPI(userKey1);
+        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
+
+    }
+
+    @Test
+    public void testMixUrl() {
+        APIFactory apiFactory = APIFactory.getApiFactory();
+        apiFactory.setVersion(APIFactory.ApiVersion.v3);
+        apiFactory.setBlazeMeterUrl(Constants.QA_BLAZEMETER_URL);
+        blazemeterApi = apiFactory.getAPI(userKey1);
+        Assert.assertEquals(blazemeterApi.getBlazeMeterURL(), Constants.QA_BLAZEMETER_URL);
+        apiFactory.setBlazeMeterUrl(Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApi = apiFactory.getAPI(userKey1);
+        Assert.assertEquals(blazemeterApi.getBlazeMeterURL(), Constants.DEFAULT_BLAZEMETER_URL);
+    }
+
+    @Test
+    public void testMixVersionUserKey() {
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.v3);
         blazemeterApi = apiFactory.getAPI(userKey1);
@@ -39,11 +67,6 @@ public class TestAPIFactory {
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
         Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
 
-    }
-
-    @Test
-    public void testV2() {
-        APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.v2);
         blazemeterApi = apiFactory.getAPI(userKey1);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
@@ -56,4 +79,5 @@ public class TestAPIFactory {
         Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
 
     }
+
 }

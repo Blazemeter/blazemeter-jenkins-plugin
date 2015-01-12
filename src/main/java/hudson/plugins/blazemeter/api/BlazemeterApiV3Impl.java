@@ -135,11 +135,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("Error: GetTests apiKey is empty");
-            return 0;
-        }
-
+        if(StringUtils.isBlank(apiKey)) return 0;
         String url = this.urlManager.getTests(APP_KEY, apiKey);
 
         try {
@@ -197,10 +193,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public HashMap<String, String> getTestList() throws IOException, MessagingException {
 
         LinkedHashMap<String, String> testListOrdered = null;
-
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: getTests apiKey is empty");
-        } else {
+        if(StringUtils.isBlank(apiKey)){ return null;}
+         else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
             logger.info("Getting testList with URL=" + url);
             JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
@@ -232,18 +226,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             } catch (Exception e) {
                 logger.warn("Error while populating test list, ", e);
             }
-        }
 
+    }
         return testListOrdered;
     }
 
-
     @Override
     public JSONObject getUser() {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("ERROR: User apiKey is empty");
-            return null;
-        }
+        if(StringUtils.isBlank(apiKey)) return null;
         String url = this.urlManager.getUser(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
         return jo;
@@ -288,7 +278,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         this.urlManager.setServerUrl(blazeMeterURL);
     }
 
-    String getBlazeMeterURL() {
+    @Override
+    public String getBlazeMeterURL() {
         return this.urlManager.getServerUrl();
     }
 
