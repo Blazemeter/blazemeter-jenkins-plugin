@@ -25,18 +25,22 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 
-public class BZMHTTPClient {
+public class BzmHttpWrapper {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
     public enum Method {GET, POST, PUT}
 
     private transient DefaultHttpClient httpClient = null;
 
-    public BZMHTTPClient() {
+    public BzmHttpWrapper() {
         this.httpClient = new DefaultHttpClient();
         this.logger.setDebugEnabled(false);
     }
 
+    public BzmHttpWrapper(DefaultHttpClient httpClient) {
+        this.httpClient = httpClient;
+        this.logger.setDebugEnabled(false);
+    }
 
     HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
 
@@ -183,5 +187,13 @@ public class BZMHTTPClient {
                 httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
             }
         }
+    }
+
+    public DefaultHttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(DefaultHttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 }

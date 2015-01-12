@@ -37,7 +37,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public static JSONObject not_implemented;
     private final String apiKey;
     BmUrlManager urlManager;
-    private BZMHTTPClient bzmhc = null;
+    private BzmHttpWrapper bzmhc = null;
 
     BlazemeterApiV2Impl(String apiKey) {
         this.apiKey = apiKey;
@@ -46,7 +46,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         not_implemented=new JSONObject();
         try {
             not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);
-            bzmhc = new BZMHTTPClient();
+            bzmhc = new BzmHttpWrapper();
             bzmhc.configureProxy();
         } catch (JSONException je) {
             logger.warn("Error NOT_IMPLEMENTED Object: ", je);
@@ -114,7 +114,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
         try {
             String url = this.urlManager.testStatus(APP_KEY, apiKey, testId);
-            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+            JSONObject jo = this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.POST);
 
             if ("Test not found".equals(jo.get("error"))) {
                 ti.setStatus(TestStatus.NotFound);
@@ -137,7 +137,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         }
 
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
-        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+        return this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.POST);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         String url = this.urlManager.getTests(APP_KEY, apiKey);
 
         try {
-            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+            JSONObject jo = this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.POST);
             if (jo == null) {
                 return -1;
             } else {
@@ -178,7 +178,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         }
 
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
-        return this.bzmhc.getJson(url, null, BZMHTTPClient.Method.POST);
+        return this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.POST);
     }
 
     /**
@@ -192,7 +192,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             return null;
         }
         String url = this.urlManager.testReport(APP_KEY, apiKey, reportId);
-        JSONObject response = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        JSONObject response = this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.GET);
         JSONObject aggregate = null;
         try {
             aggregate = response.getJSONObject("report").getJSONObject("aggregate");
@@ -213,7 +213,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
             logger.warn("Getting testLists via URL=" + url);
-            JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+            JSONObject jo = this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.GET);
             try {
                 String r = jo.get("response_code").toString();
                 if (r.equals("200")) {
@@ -252,7 +252,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public JSONObject getUser() {
         if(StringUtils.isBlank(apiKey)) return null;
         String url = this.urlManager.getUser(APP_KEY, apiKey);
-        JSONObject jo = this.bzmhc.getJson(url, null, BZMHTTPClient.Method.GET);
+        JSONObject jo = this.bzmhc.getJson(url, null, BzmHttpWrapper.Method.GET);
         return jo;
         }
 
