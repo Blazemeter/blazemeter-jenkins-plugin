@@ -42,7 +42,7 @@ public class BzmHttpWrapper {
         this.logger.setDebugEnabled(false);
     }
 
-    HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
+    public HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
 
         if(logger.isDebugEnabled())
             logger.debug("Requesting : " + url);
