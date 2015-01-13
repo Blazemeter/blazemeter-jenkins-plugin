@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
+import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
@@ -67,4 +68,6 @@ public interface BlazemeterApi {
     public String getApiKey();
 
     public String getBlazeMeterURL();
+
+    public BmUrlManager getUrlManager();
 }

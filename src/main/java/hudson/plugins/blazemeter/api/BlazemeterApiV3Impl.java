@@ -316,7 +316,11 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
 
-    public void setBzmhc(BzmHttpWrapper bzmhc) {
+    public void setBzmHttpWr(BzmHttpWrapper bzmhc) {
         this.bzmhc = bzmhc;
+    }
+
+    public BmUrlManager getUrlManager() {
+        return urlManager;
     }
 }

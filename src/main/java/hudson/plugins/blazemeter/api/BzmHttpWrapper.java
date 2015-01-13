@@ -138,7 +138,7 @@ public class BzmHttpWrapper {
         return jo;
     }
 
-    JSONObject getJson(String url, JSONObject data, Method method) {
+    public JSONObject getJson(String url, JSONObject data, Method method) {
         JSONObject jo = null;
         try {
             HttpResponse response = getResponse(url, data, method);

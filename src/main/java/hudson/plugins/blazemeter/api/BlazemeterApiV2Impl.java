@@ -309,4 +309,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public String getApiKey() {
         return apiKey;
     }
+
+    @Override
+    public BmUrlManager getUrlManager() {
+        return null;
+    }
 }
