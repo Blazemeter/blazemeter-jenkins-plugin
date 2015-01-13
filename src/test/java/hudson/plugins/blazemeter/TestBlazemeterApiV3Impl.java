@@ -20,8 +20,11 @@ import java.util.logging.Logger;
  */
 public class TestBlazemeterApiV3Impl {
     private Logger log = LogManager.getLogManager().getLogger("TEST");
-    BlazemeterApiV3Impl blazemeterApiV3 =null;
+    private BlazemeterApiV3Impl blazemeterApiV3 =null;
     private BzmHttpWrapper bzmHttpWrapper= Mockito.mock(BzmHttpWrapper.class);
+    private String userKey="1234567890";
+    private String appKey="jnk100x987c06f4e10c4";
+    private String testId="12345";
 
     @Test
     public void createTest_null(){
@@ -126,12 +129,12 @@ public class TestBlazemeterApiV3Impl {
 
     @Test
     public void getTestsList(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getApiFactory().getAPI("1234567890");
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getApiFactory().getAPI(userKey);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTests("jnk100x987c06f4e10c4","1234567890");
+        String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
         try {
             blazemeterApiV3.getTestList();
-            Mockito.verify(bzmHttpWrapper).getJson(url, null, BzmHttpWrapper.Method.GET);
+            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         } catch (IOException e) {
             log.info(e.getMessage());
         } catch (MessagingException e) {
@@ -139,4 +142,33 @@ public class TestBlazemeterApiV3Impl {
         }
     }
 
+    @Test
+    public void getTestsCount(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getApiFactory().getAPI(userKey);
+        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
+        String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
+        try {
+            blazemeterApiV3.getTestCount();
+            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        } catch (ServletException se) {
+            log.info(se.getMessage());
+        } catch (JSONException je) {
+            log.info(je.getMessage());
+        }
+    }
+
+    @Test
+    public void getTestRunStatus(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getApiFactory().getAPI(userKey);
+        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
+        String url = blazemeterApiV3.getUrlManager().getTestInfo(appKey, userKey, testId);
+        try {
+            blazemeterApiV3.getTestInfo(testId);
+            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+       } 
+    }
 }

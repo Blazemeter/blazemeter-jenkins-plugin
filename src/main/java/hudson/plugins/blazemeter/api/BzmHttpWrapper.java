@@ -3,6 +3,7 @@ package hudson.plugins.blazemeter.api;
 import hudson.ProxyConfiguration;
 import hudson.model.Hudson;
 import hudson.plugins.blazemeter.utils.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -17,7 +18,6 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,9 +42,9 @@ public class BzmHttpWrapper {
         this.logger.setDebugEnabled(false);
     }
 
-    public HttpResponse getResponse(String url, JSONObject data, Method method) throws IOException {
-
-        if(logger.isDebugEnabled())
+    public HttpResponse getHttpResponse(String url, JSONObject data, Method method) throws IOException {
+        if (StringUtils.isBlank(url)) return null;
+        if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url);
         HttpResponse response = null;
         HttpRequestBase request = null;
@@ -84,7 +84,7 @@ public class BzmHttpWrapper {
         return response;
     }
 
-    HttpResponse getResponseForFileUpload(String url, File file) throws IOException {
+    public HttpResponse getFileUploadResponse(String url, File file) throws IOException {
         if(logger.isDebugEnabled())
             logger.debug("Requesting : " + url);
         HttpResponse response = null;
@@ -96,6 +96,8 @@ public class BzmHttpWrapper {
 
             if (file != null) {
                 postRequest.setEntity(new FileEntity(file, "text/plain; charset=\"UTF-8\""));
+            }else{
+                return null;
             }
 
             response = this.httpClient.execute(postRequest);
@@ -118,10 +120,10 @@ public class BzmHttpWrapper {
         return response;
     }
 
-    JSONObject getJsonForFileUpload(String url, File file) {
+    public JSONObject getFileUploadJsonResponse(String url, File file) {
         JSONObject jo = null;
         try {
-            HttpResponse response = getResponseForFileUpload(url, file);
+            HttpResponse response = getFileUploadResponse(url, file);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
                 if(logger.isDebugEnabled())
@@ -138,10 +140,10 @@ public class BzmHttpWrapper {
         return jo;
     }
 
-    public JSONObject getJson(String url, JSONObject data, Method method) {
+    public JSONObject getResponseAsJson(String url, JSONObject data, Method method) {
         JSONObject jo = null;
         try {
-            HttpResponse response = getResponse(url, data, method);
+            HttpResponse response = getHttpResponse(url, data, method);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
                 if(logger.isDebugEnabled())
@@ -158,10 +160,10 @@ public class BzmHttpWrapper {
         return jo;
     }
 
-    String getString(String url, JSONObject data, Method method){
+    public String getResponseAsString(String url, JSONObject data, Method method){
         String  str = null;
         try {
-            HttpResponse response = getResponse(url, data, method);
+            HttpResponse response = getHttpResponse(url, data, method);
             if (response != null) {
                 str = EntityUtils.toString(response.getEntity());
                 if(logger.isDebugEnabled())
