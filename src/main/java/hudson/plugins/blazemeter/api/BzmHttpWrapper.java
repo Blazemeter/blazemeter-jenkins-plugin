@@ -84,7 +84,7 @@ public class BzmHttpWrapper {
         return response;
     }
 
-    public HttpResponse getFileUploadResponse(String url, File file) throws IOException {
+    public HttpResponse getFileUploadHttpResponse(String url, File file) throws IOException {
         if(logger.isDebugEnabled())
             logger.debug("Requesting : " + url);
         HttpResponse response = null;
@@ -123,7 +123,7 @@ public class BzmHttpWrapper {
     public JSONObject getFileUploadJsonResponse(String url, File file) {
         JSONObject jo = null;
         try {
-            HttpResponse response = getFileUploadResponse(url, file);
+            HttpResponse response = getFileUploadHttpResponse(url, file);
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
                 if(logger.isDebugEnabled())
