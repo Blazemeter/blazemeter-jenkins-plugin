@@ -228,8 +228,10 @@ public class Utils {
             builder.setTestDuration(testDuration);
         } catch (IOException e) {
             bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
         } catch (JSONException je) {
             bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
         } finally {
             uploadDataFolderFiles(builder.getDataFolder(),builder.getMainJMX(),testId, api,bzmBuildLog);
             return testId;
