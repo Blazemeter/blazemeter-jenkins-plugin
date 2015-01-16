@@ -45,11 +45,6 @@ public class TestBlazemeterApiV3Impl {
         Assert.assertEquals(blazemeterApiV3.getTresholds(null), null);
     }
 
-    @Test
-    public void createYahooTest_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getApiFactory().getAPI(null);
-        Assert.assertEquals(blazemeterApiV3.createYahooTest(null), null);
-    }
 
     @Test
     public void updateTestInfo_null(){

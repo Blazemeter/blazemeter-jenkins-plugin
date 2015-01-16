@@ -120,13 +120,6 @@ public class TestBmUrlManagerV2 {
     }
 
     @Test
-    public void createYahooTest(){
-        String expCreateYahooTest=Constants.NOT_IMPLEMENTED;
-        String actCreateYahooTest=bmUrlManager.createYahooTest(appKey, userKey);
-        Assert.assertEquals(expCreateYahooTest,actCreateYahooTest);
-    }
-
-    @Test
     public void createTest(){
         String expCreateTest=Constants.NOT_IMPLEMENTED;
         String actCreateTest=bmUrlManager.createTest(appKey, userKey);

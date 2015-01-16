@@ -43,11 +43,6 @@ public class TestBlazemeterApiV2Impl {
     }
 
     @Test
-    public void createYahooTest(){
-        Assert.assertEquals(blazemeterApiV2.createYahooTest(null), BlazemeterApiV2Impl.not_implemented);
-    }
-
-    @Test
     public void updateTestInfo(){
         Assert.assertEquals(blazemeterApiV2.updateTestInfo(null, null), BlazemeterApiV2Impl.not_implemented);
     }

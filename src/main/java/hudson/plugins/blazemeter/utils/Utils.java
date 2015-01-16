@@ -178,7 +178,7 @@ public class Utils {
     private static String createTest(BlazemeterApi api, JSONObject configNode,
                                      String testId,String testName,StdErrLog jenBuildLog) throws JSONException {
         if(testId.equals(Constants.CREATE_YAHOO_TEST_NOTE)){
-            JSONObject jo = api.createYahooTest(configNode);
+            JSONObject jo = api.createTest(configNode,testName);
             testId = jo.getJSONObject("result").getString("id");
         }
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){

@@ -260,9 +260,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject createYahooTest(JSONObject data){
-        if(StringUtils.isBlank(apiKey)) return null;
-        String url = this.urlManager.createYahooTest(APP_KEY, apiKey);
+    public JSONObject createTest(JSONObject data,String testName) {
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testName)) return null;
+        String url = this.urlManager.createTest(APP_KEY, apiKey);
         JSONObject jo = this.bzmhc.getResponseAsJson(url, data, BzmHttpWrapper.Method.POST);
         return jo;
       }
@@ -302,14 +302,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public void setLogger(StdErrLog logger) {
         this.logger = logger;
-    }
-
-    @Override
-    public JSONObject createTest(JSONObject data,String testName) {
-        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testName)) return null;
-        String url = this.urlManager.createTest(APP_KEY, apiKey);
-        JSONObject jo = this.bzmhc.getResponseAsJson(url, data, BzmHttpWrapper.Method.POST);
-        return jo;
     }
 
     @Override

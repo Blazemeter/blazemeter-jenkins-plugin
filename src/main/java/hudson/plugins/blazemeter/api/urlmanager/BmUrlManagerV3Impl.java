@@ -137,18 +137,18 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String createYahooTest(String appKey, String userKey){
-        String createYahooTest=null;
+    public String createTest(String appKey, String userKey) {
+        String createTest=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        createYahooTest=SERVER_URL+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
+        createTest=SERVER_URL+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
                 +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
-        return createYahooTest;
+        return createTest;
     }
 
     @Override
@@ -189,20 +189,6 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return retrieveJUNITXML;
     }
 
-    @Override
-    public String createTest(String appKey, String userKey) {
-        String createTest=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        createTest=SERVER_URL+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
-
-        return createTest;
-    }
 
 
     @Override

@@ -281,11 +281,6 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject createYahooTest(JSONObject data) {
-        return not_implemented;
-    }
-
-    @Override
     public String retrieveJUNITXML(String sessionId) {
         return Constants.NOT_IMPLEMENTED;
     }

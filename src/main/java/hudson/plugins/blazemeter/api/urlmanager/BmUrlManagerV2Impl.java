@@ -142,11 +142,6 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String createYahooTest(String appKey, String userKey) {
-        return Constants.NOT_IMPLEMENTED;
-    }
-
-    @Override
     public String retrieveJUNITXML(String appKey, String userKey, String sessionId) {
         return Constants.NOT_IMPLEMENTED;
     }

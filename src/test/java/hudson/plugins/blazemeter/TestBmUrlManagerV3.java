@@ -123,14 +123,6 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void createYahooTest(){
-        String expCreateYahooTest=bmUrlManager.getServerUrl()+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actCreateYahooTest=bmUrlManager.createYahooTest(appKey, userKey);
-        Assert.assertEquals(expCreateYahooTest,actCreateYahooTest);
-    }
-
-    @Test
     public void createTest(){
         String expCreateTest=bmUrlManager.getServerUrl()+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;

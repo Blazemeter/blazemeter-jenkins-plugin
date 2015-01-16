@@ -55,8 +55,6 @@ public interface BlazemeterApi {
 
     public JSONObject updateTestInfo(String testId, JSONObject data);
 
-    public JSONObject createYahooTest(JSONObject data);
-
     public JSONObject createTest(JSONObject data,String testName);
 
     public String retrieveJUNITXML(String sessionId);
