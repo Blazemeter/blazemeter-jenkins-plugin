@@ -36,7 +36,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         load();
-        APIFactory.getApiFactory().setBlazeMeterUrl(!blazeMeterURL.isEmpty()?blazeMeterURL:
+        APIFactory.getApiFactory().setBlazeMeterUrl(blazeMeterURL!=null&&!blazeMeterURL.isEmpty()?blazeMeterURL:
                 Constants.DEFAULT_BLAZEMETER_URL);
 
     }
