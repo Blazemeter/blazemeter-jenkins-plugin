@@ -54,13 +54,13 @@ public class PerformanceBuilder extends Builder {
 
     private String jsonConfig = "";
 
-    private int errorFailedThreshold = 0;
+    private String errorFailedThreshold = "";
 
-    private int errorUnstableThreshold = 0;
+    private String errorUnstableThreshold = "";
 
-    private int responseTimeFailedThreshold = 0;
+    private String responseTimeFailedThreshold = "";
 
-    private int responseTimeUnstableThreshold = 0;
+    private String responseTimeUnstableThreshold = "";
 
     private BlazemeterApi api = null;
 
@@ -87,10 +87,8 @@ public class PerformanceBuilder extends Builder {
                               String responseTimeFailedThreshold,
                               String responseTimeUnstableThreshold
     ) {
-        this.errorFailedThreshold = Integer.valueOf(errorFailedThreshold.isEmpty()
-                ?"-1":errorFailedThreshold);
-        this.errorUnstableThreshold = Integer.valueOf(errorUnstableThreshold.isEmpty()
-                ?"-1":errorUnstableThreshold);
+        this.errorFailedThreshold = errorFailedThreshold;
+        this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         String apiKey=getDescriptor().getCredentials("Global").get(0).getApiKey();
         this.apiVersion = apiVersion.equals("autoDetect")?
@@ -98,10 +96,8 @@ public class PerformanceBuilder extends Builder {
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;
-        this.responseTimeFailedThreshold = Integer.valueOf(responseTimeFailedThreshold.isEmpty()
-                ?"-1":responseTimeFailedThreshold);
-        this.responseTimeUnstableThreshold = Integer.valueOf(responseTimeUnstableThreshold.isEmpty()
-                ?"-1":responseTimeUnstableThreshold);
+        this.responseTimeFailedThreshold = responseTimeFailedThreshold;
+        this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api = apiFactory.getAPI(apiKey);
@@ -359,19 +355,19 @@ public class PerformanceBuilder extends Builder {
     }
 
 
-    public int getResponseTimeFailedThreshold() {
+    public String getResponseTimeFailedThreshold() {
         return responseTimeFailedThreshold;
     }
 
-    public void setResponseTimeFailedThreshold(int responseTimeFailedThreshold) {
+    public void setResponseTimeFailedThreshold(String responseTimeFailedThreshold) {
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
     }
 
-    public int getResponseTimeUnstableThreshold() {
+    public String getResponseTimeUnstableThreshold() {
         return responseTimeUnstableThreshold;
     }
 
-    public void setResponseTimeUnstableThreshold(int responseTimeUnstableThreshold) {
+    public void setResponseTimeUnstableThreshold(String responseTimeUnstableThreshold) {
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
     }
 
@@ -407,21 +403,20 @@ public class PerformanceBuilder extends Builder {
         this.dataFolder = dataFolder;
     }
 
-    public int getErrorFailedThreshold() {
+    public String getErrorFailedThreshold() {
         return errorFailedThreshold;
     }
 
-    public void setErrorFailedThreshold(int errorFailedThreshold) {
-        this.errorFailedThreshold = Math.max(0, Math.min(errorFailedThreshold, 100));
+    public void setErrorFailedThreshold(String errorFailedThreshold) {
+        this.errorFailedThreshold = errorFailedThreshold;
     }
 
-    public int getErrorUnstableThreshold() {
+    public String getErrorUnstableThreshold() {
         return errorUnstableThreshold;
     }
 
-    public void setErrorUnstableThreshold(int errorUnstableThreshold) {
-        this.errorUnstableThreshold = Math.max(0, Math.min(errorUnstableThreshold,
-                100));
+    public void setErrorUnstableThreshold(String errorUnstableThreshold) {
+        this.errorUnstableThreshold = errorUnstableThreshold;
     }
 
     public String getTestId() {

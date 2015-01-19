@@ -268,11 +268,15 @@ public class Utils {
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,
                                                 StdErrLog bzmBuildLog) {
-        int responseTimeUnstable = builder.getResponseTimeUnstableThreshold();
-        int responseTimeFailed = builder.getResponseTimeFailedThreshold();
-        int errorUnstable = builder.getErrorUnstableThreshold();
-        int errorFailed = builder.getErrorFailedThreshold();
+        int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
+                ?"-1":builder.getResponseTimeUnstableThreshold());
 
+        int responseTimeFailed = Integer.valueOf(builder.getResponseTimeFailedThreshold().isEmpty()
+                ?"-1":builder.getResponseTimeFailedThreshold());
+        int errorUnstable = Integer.valueOf(builder.getErrorUnstableThreshold().isEmpty()
+                ?"-1":builder.getErrorUnstableThreshold());
+        int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
+                ?"-1":builder.getErrorFailedThreshold());
 
         Result result = Result.SUCCESS;
         if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable &
