@@ -62,8 +62,6 @@ public class PerformanceBuilder extends Builder {
 
     private int responseTimeUnstableThreshold = 0;
 
-    private String testName="";
-
     private BlazemeterApi api = null;
 
     private AbstractBuild<?, ?> build=null;
@@ -87,8 +85,7 @@ public class PerformanceBuilder extends Builder {
                               String errorFailedThreshold,
                               String errorUnstableThreshold,
                               String responseTimeFailedThreshold,
-                              String responseTimeUnstableThreshold,
-                              String testName
+                              String responseTimeUnstableThreshold
     ) {
         this.errorFailedThreshold = Integer.valueOf(errorFailedThreshold.isEmpty()
                 ?"-1":errorFailedThreshold);
@@ -107,7 +104,6 @@ public class PerformanceBuilder extends Builder {
                 ?"-1":responseTimeUnstableThreshold);
         APIFactory apiFactory = APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
-        this.testName=testName;
         this.api = apiFactory.getAPI(apiKey);
         this.testDuration=testDuration;
     }
@@ -462,10 +458,6 @@ public class PerformanceBuilder extends Builder {
 
     public BlazemeterApi getApi() {
         return api;
-    }
-
-    public String getTestName() {
-        return testName;
     }
 
     @Override

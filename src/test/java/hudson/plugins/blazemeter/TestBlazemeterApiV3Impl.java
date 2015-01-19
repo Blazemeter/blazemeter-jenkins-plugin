@@ -31,7 +31,7 @@ public class TestBlazemeterApiV3Impl {
         APIFactory apiFactory=APIFactory.getApiFactory();
         apiFactory.setVersion(APIFactory.ApiVersion.v3);
         blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
-        Assert.assertEquals(blazemeterApiV3.createTest(null, null), null);
+        Assert.assertEquals(blazemeterApiV3.createTest(null), null);
     }
 
     @Test

@@ -2,7 +2,6 @@ package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
@@ -28,7 +27,7 @@ public class TestBlazemeterApiV2Impl {
 
     @Test
     public void createTest(){
-        Assert.assertEquals(blazemeterApiV2.createTest(null, null), BlazemeterApiV2Impl.not_implemented);
+        Assert.assertEquals(blazemeterApiV2.createTest(null), BlazemeterApiV2Impl.not_implemented);
     }
 
     @Test
