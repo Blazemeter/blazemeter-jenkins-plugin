@@ -200,6 +200,7 @@ public class Utils {
             JSONObject configNode = new JSONObject(jsonConfigStr);
             if (testId.contains("create")) {
                 testId=createTest(api,configNode,testId,jenBuildLog);
+                builder.setTestId(testId);
             }
 
             if(configNode!=null) {
