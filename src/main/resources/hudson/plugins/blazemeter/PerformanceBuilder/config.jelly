@@ -50,7 +50,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="vertical-align:middle">${%Threshold}:</td>
+                    <!--<td style="vertical-align:middle">${%Threshold}:</td>-->
+                    <td style="vertical-align:middle"/>
                     <td>
                         <f:textbox field="errorUnstableThreshold"/>
                     </td>
@@ -84,7 +85,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="vertical-align:middle">${%Response Time, ms}:</td>
+                    <!--<td style="vertical-align:middle">${%Response Time, ms}:</td>-->
+                    <td style="vertical-align:middle"/>
                     <td>
                         <f:textbox field="responseTimeUnstableThreshold"/>
                     </td>
