@@ -54,11 +54,11 @@
                     <td>
                         <f:textbox field="errorUnstableThreshold"/>
                     </td>
-                    <td>%</td>
+                    <td>  </td>
                     <td>
                         <f:textbox field="errorFailedThreshold"/>
                     </td>
-                    <td>%</td>
+                    <td>  </td>
                 </tr>
             </tbody>
         </table>
@@ -88,11 +88,11 @@
                     <td>
                         <f:textbox field="responseTimeUnstableThreshold"/>
                     </td>
-                    <td>ms</td>
+                    <td>  </td>
                     <td>
                         <f:textbox field="responseTimeFailedThreshold"/>
                     </td>
-                    <td>ms</td>
+                    <td>  </td>
                 </tr>
             </tbody>
         </table>
