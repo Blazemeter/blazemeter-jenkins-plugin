@@ -29,16 +29,14 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void createTest_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.createTest(null), null);
     }
 
     @Test
     public void retrieveJUNITXML_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.retrieveJUNITXML(null), null);
     }
 
@@ -46,8 +44,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTresholds_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.getTresholds(null), null);
     }
 
@@ -55,24 +52,21 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void updateTestInfo_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.updateTestInfo(null, null), null);
     }
 
     @Test
     public void getTestInfo_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.getTestInfo(null), null);
     }
 
     @Test
     public void getUser_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.getUser(), null);
     }
  
@@ -80,8 +74,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestList_null(){
         try {
             APIFactory apiFactory=APIFactory.getApiFactory();
-            apiFactory.setVersion(APIFactory.ApiVersion.v3);
-            blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+            blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
             Assert.assertEquals(blazemeterApiV3.getTestList(), null);
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,8 +87,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestCount_zero(){
         try {
             APIFactory apiFactory=APIFactory.getApiFactory();
-            apiFactory.setVersion(APIFactory.ApiVersion.v3);
-            blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+            blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
             Assert.assertEquals(blazemeterApiV3.getTestCount(), 0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,24 +102,21 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void testReport_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.testReport(null), null);
     }
 
    @Test
     public void stopTest_null(){
        APIFactory apiFactory=APIFactory.getApiFactory();
-       apiFactory.setVersion(APIFactory.ApiVersion.v3);
-       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
        Assert.assertEquals(blazemeterApiV3.stopTest(null), null);
     }
 
    @Test
     public void startTest_null(){
        APIFactory apiFactory=APIFactory.getApiFactory();
-       apiFactory.setVersion(APIFactory.ApiVersion.v3);
-       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
        Assert.assertEquals(blazemeterApiV3.startTest(null), null);
     }
 
@@ -135,24 +124,21 @@ public class TestBlazemeterApiV3Impl {
    @Test
     public void getTestRunStatus_notFound(){
        APIFactory apiFactory=APIFactory.getApiFactory();
-       apiFactory.setVersion(APIFactory.ApiVersion.v3);
-       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+       blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
        Assert.assertEquals(blazemeterApiV3.getTestRunStatus(null).getStatus(), TestStatus.NotFound);
     }
 
     @Test
     public void uploadBinaryFile_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
         Assert.assertEquals(blazemeterApiV3.uploadBinaryFile(null, null), null);
     }
 
     @Test
     public void getTestsList(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
         String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
         try {
@@ -168,8 +154,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestsCount(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
         String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
         try {
@@ -187,8 +172,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestRunStatus(){
         APIFactory apiFactory=APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.v3);
-        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey);
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
         String url = blazemeterApiV3.getUrlManager().getTestInfo(appKey, userKey, testId);
         try {

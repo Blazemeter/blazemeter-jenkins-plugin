@@ -10,7 +10,6 @@ public class APIFactory {
     public static APIFactory apiFactory = null;
 
     private String blazeMeterUrl= Constants.DEFAULT_BLAZEMETER_URL;
-    private ApiVersion version =null;
 
     private APIFactory() {
     }
@@ -23,15 +22,11 @@ public class APIFactory {
     }
 
     /*TODO
-    1. Remove version field & getter/setter;
-    2. Remove blazeMeterUrl field & getter/setter;
-    3. Pass version/url as arguments to getAPI();
+    1. Remove blazeMeterUrl field & getter/setter;
+    2. Pass version/url as arguments to getAPI();
     */
 
-    public BlazemeterApi getAPI(String apiKey) {
-        if(version==null){
-            version=ApiVersion.v3;
-        }
+    public BlazemeterApi getAPI(String apiKey,ApiVersion version) {
         BlazemeterApi api=null;
         switch (version) {
             case v2:
@@ -46,13 +41,6 @@ public class APIFactory {
         return api;
     }
 
-    public ApiVersion getVersion() {
-        return version;
-    }
-
-    public void setVersion(ApiVersion version) {
-        this.version = version;
-    }
 
     public String getBlazeMeterUrl() {
         return blazeMeterUrl;

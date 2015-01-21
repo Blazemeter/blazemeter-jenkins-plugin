@@ -92,15 +92,14 @@ public class PerformanceBuilder extends Builder {
         this.testId = testId;
         String apiKey=getDescriptor().getCredentials("Global").get(0).getApiKey();
         this.apiVersion = apiVersion.equals("autoDetect")?
-                Utils.autoDetectApiVersion(apiVersion,apiKey,jenCommonLog):apiVersion;
+                Utils.autoDetectApiVersion(apiKey,jenCommonLog):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        apiFactory.setVersion(APIFactory.ApiVersion.valueOf(this.apiVersion));
-        this.api = apiFactory.getAPI(apiKey);
+        this.api = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.testDuration=testDuration;
     }
 
@@ -281,7 +280,7 @@ public class PerformanceBuilder extends Builder {
 
         // ideally, at this point we'd look up the credential based on the API key to find the secret
         // but there are no secrets, so no need to!
-        return APIFactory.getApiFactory().getAPI(apiKey);
+        return APIFactory.getApiFactory().getAPI(apiKey,APIFactory.ApiVersion.valueOf(this.apiVersion));
     }
 
 

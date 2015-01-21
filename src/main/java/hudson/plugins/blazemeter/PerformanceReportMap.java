@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.ChartUtil;
 import hudson.util.ChartUtil.NumberOnlyBuildLabel;
@@ -310,9 +309,4 @@ public class PerformanceReportMap implements ModelObject {
         public void addAll(Collection<PerformanceReport> parse);
     }
 
-
-    public String getAPIVersion(){
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        return apiFactory.getVersion().name();
-    }
 }

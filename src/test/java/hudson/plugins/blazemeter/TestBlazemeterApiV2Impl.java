@@ -21,8 +21,7 @@ public class TestBlazemeterApiV2Impl {
 
     @Before
     public void setUp(){
-    APIFactory.getApiFactory().setVersion(APIFactory.ApiVersion.v2);
-    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getApiFactory().getAPI(null);
+    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getApiFactory().getAPI(null,APIFactory.ApiVersion.v2);
     }
 
     @Test
