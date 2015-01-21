@@ -26,6 +26,10 @@ public class Utils {
     private Utils() {
     }
 
+
+    /* TODO
+    1. Remove apiVersion from arguments
+     */
     public static String autoDetectApiVersion(String apiVersion, String apiKey, AbstractLogger logger) {
         BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
