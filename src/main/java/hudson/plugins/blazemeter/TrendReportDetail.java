@@ -12,6 +12,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.jfree.data.category.CategoryDataset;
 
 /**
+ * TODO
+ * 1. Not sure, if this class is really needed.
+ * 2. If not, git rid of it.
  * Configures the trend graph of this plug-in.
  */
 public class TrendReportDetail implements ModelObject,

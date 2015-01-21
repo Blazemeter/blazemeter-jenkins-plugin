@@ -4,7 +4,10 @@ import hudson.DescriptorExtensionList;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 
-/**
+/*** TODO
+ * 1. Not sure, if this class is really needed.
+ * 2. If not, git rid of it.
+
  * @author Kohsuke Kawaguchi
  */
 public abstract class PerformanceReportParserDescriptor extends

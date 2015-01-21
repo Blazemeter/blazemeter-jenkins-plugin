@@ -7,7 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-/**
+/**TODO
+ * 1. Not sure, if this class is really needed.
+ * 2. If not, git rid of it.
  * A report about a particular tested URI.
  * <p/>
  * This object belongs under {@link PerformanceReport}.

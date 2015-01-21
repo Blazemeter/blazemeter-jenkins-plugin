@@ -262,6 +262,12 @@ public class PerformanceBuilder extends Builder {
         }
     }
 
+
+    /** TODO
+     * 1. Get rid of this method, it's legacy code
+     * 2. Make Utils.getAPIKey() from CredentialsProvider;
+     */
+
     private BlazemeterApi getAPIClient(AbstractBuild<?, ?> build) {
         String apiKeyId = getDescriptor().getApiKey();
         String apiKey = null;
@@ -279,6 +285,17 @@ public class PerformanceBuilder extends Builder {
     }
 
 
+    /**
+     * TODO
+     * 1. Split this method into two parts depending on
+     * API version and place code to appropriate BlazeMeterAPIImpl
+     * 2. Remove this method, it's legacy
+     *
+     * @param json
+     * @param build
+     * @return
+     * @throws JSONException
+     */
    private String getTestSession(JSONObject json, AbstractBuild<?, ?> build) throws JSONException{
        String session="";
        if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
@@ -304,6 +321,12 @@ public class PerformanceBuilder extends Builder {
    return session;
    }
 
+    /*
+    TODO
+    1. Split into several small logical methods.
+    2. Move these parts to Utils
+    3. Remove this method: it's legacy
+     */
     private Result postProcess(String session, StdErrLog bzmBuildLog,AbstractBuild<?, ?> build) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success

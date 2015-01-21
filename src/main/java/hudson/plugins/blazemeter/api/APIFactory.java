@@ -15,13 +15,18 @@ public class APIFactory {
     private APIFactory() {
     }
 
-
     public static APIFactory getApiFactory() {
         if (apiFactory == null) {
             apiFactory = new APIFactory();
         }
         return apiFactory;
     }
+
+    /*TODO
+    1. Remove version field & getter/setter;
+    2. Remove blazeMeterUrl field & getter/setter;
+    3. Pass version/url as arguments to getAPI();
+    */
 
     public BlazemeterApi getAPI(String apiKey) {
         if(version==null){
