@@ -208,10 +208,10 @@ public class Utils {
                     testId="";
                 }else{
                     jenBuildLog.info("Test was updated on server");
-                    JSONObject test = updateResult.getJSONObject("test");
-                    jenBuildLog.info("Test id="+test.getString("id"));
-                    jenBuildLog.info("Test name="+test.getString("name"));
-                    testId=test.getString("id");
+                    JSONObject result = updateResult.getJSONObject("result");
+                    jenBuildLog.info("Test id="+result.getString("id"));
+                    jenBuildLog.info("Test name="+result.getString("name"));
+                    testId=result.getString("id");
                 }
             }
 
@@ -219,11 +219,11 @@ public class Utils {
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
             builder.setTestDuration(testDuration);
         } catch (IOException e) {
-            bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + e.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + e.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + e.getMessage());
         } catch (JSONException je) {
-            bzmBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file" + jsonConfigPath.getName() + ": " + je.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
         } finally {
             uploadDataFolderFiles(builder.getDataFolder(),builder.getMainJMX(),testId, api,bzmBuildLog);
             return testId;
