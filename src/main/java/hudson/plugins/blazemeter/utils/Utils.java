@@ -8,12 +8,16 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -262,8 +266,29 @@ public class Utils {
         }
     }
 
-    public static void getJTL(BlazemeterApi api,String session){
+    public static void getJTL(BlazemeterApi api,String session,FilePath filePath){
        JSONObject jo=api.retrieveJTLZIP(session);
+       String dataUrl=null;
+        try {
+            JSONArray data=jo.getJSONObject("result").getJSONArray("data");
+            for(int i=0;i<data.length();i++){
+                String title=data.getJSONObject(i).getString("title");
+                if(title.equals("Zip")){
+                  dataUrl=data.getJSONObject(i).getString("dataUrl");
+                    break;
+                }
+            }
+            File jtlZip=new File(filePath.getParent()
+                    + "/" + filePath.getName() + "/" + session + ".zip");
+            URL url=new URL(dataUrl);
+            FileUtils.copyURLToFile(url, jtlZip);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
