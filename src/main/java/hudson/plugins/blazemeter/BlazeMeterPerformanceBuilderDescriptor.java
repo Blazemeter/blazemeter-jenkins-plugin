@@ -71,7 +71,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add("No API Key", "-1");
         } else {
             APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi bzm = apiFactory.getAPI(apiSecret);
+            BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
             try {
                 HashMap<String, String> testList = bzm.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
@@ -136,7 +136,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey);
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey, APIFactory.ApiVersion.v3);
         int testCount = bzm.getTestCount();
         if (testCount < 0) {
             return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");

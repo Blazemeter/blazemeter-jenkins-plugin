@@ -26,24 +26,18 @@ public class Utils {
     private Utils() {
     }
 
-
-    /* TODO
-    1. Remove apiVersion from arguments
-     */
-    public static String autoDetectApiVersion(String apiVersion, String apiKey, AbstractLogger logger) {
+    public static String autoDetectApiVersion(String apiKey, AbstractLogger logger) {
         BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        String detectedApiVersion = !apiVersion.equals("autoDetect") ? apiVersion : "";
-        if (apiVersion.equals("autoDetect")) {
-            apiFactory.setVersion(APIFactory.ApiVersion.v3);
-            api = apiFactory.getApiFactory().getAPI(apiKey);
+        String detectedApiVersion = null;
+            api = apiFactory.getApiFactory().getAPI(apiKey,APIFactory.ApiVersion.v3);
             boolean isV3 = false;
             try {
                 isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
                 if (isV3) {
-                    return "v3";
+                    detectedApiVersion="v3";
                 } else {
-                    return "v2";
+                    detectedApiVersion="v2";
                 }
             } catch (JSONException je) {
                 logger.warn("Received JSONException while auto-detecting version: ", je);
@@ -51,7 +45,6 @@ public class Utils {
                 logger.warn("Received JSONException while auto-detecting version: ", npe);
                 return "v3";
             }
-        }
         return detectedApiVersion;
     }
 
