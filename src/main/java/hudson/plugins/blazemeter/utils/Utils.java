@@ -209,7 +209,7 @@ public class Utils {
 
             if(configNode!=null) {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
-                if(updateResult.has("error")){
+                if(updateResult.has("error")&&!updateResult.get("error").equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
                     jenBuildLog.warn("Error:"+updateResult.getString("error"));
                     testId="";
