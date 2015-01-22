@@ -21,6 +21,8 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
@@ -266,7 +268,7 @@ public class Utils {
         }
     }
 
-    public static void getJTL(BlazemeterApi api,String session,FilePath filePath){
+    public static void getJTL(BlazemeterApi api,String session,FilePath filePath, StdErrLog jenBuildLog){
        JSONObject jo=api.retrieveJTLZIP(session);
        String dataUrl=null;
         try {
@@ -283,14 +285,28 @@ public class Utils {
             URL url=new URL(dataUrl);
             FileUtils.copyURLToFile(url, jtlZip);
         } catch (JSONException e) {
-            e.printStackTrace();
+            jenBuildLog.warn("Failed to get url to JTLZIP: ",e);
         } catch (MalformedURLException e) {
+            jenBuildLog.warn("Failed to create URL to JTLZIP: ",e);
+        } catch (IOException e) {
+            jenBuildLog.warn("Failed to save JTLZIP: ",e);
+        }
+    }
+/*
+
+    public static void unzip(File file){
+        try {
+            ZipFile zipFile = new ZipFile(file.getCanonicalPath());
+
+            zipFile.extractAll(destination);
+        } catch (ZipException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    }
+*/
 
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,
