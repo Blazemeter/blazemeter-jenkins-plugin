@@ -340,6 +340,7 @@ public class PerformanceBuilder extends Builder {
         String junitReport = this.api.retrieveJUNITXML(session);
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
         Utils.saveReport(session, junitReport, build.getWorkspace(),bzmBuildLog);
+        Utils.getJTL(this.api,session);
 
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 

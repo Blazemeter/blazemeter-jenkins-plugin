@@ -262,6 +262,10 @@ public class Utils {
         }
     }
 
+    public static void getJTL(BlazemeterApi api,String session){
+       JSONObject jo=api.retrieveJTLZIP(session);
+    }
+
 
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,

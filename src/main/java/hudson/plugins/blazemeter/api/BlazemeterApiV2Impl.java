@@ -309,4 +309,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public BmUrlManager getUrlManager() {
         return null;
     }
+
+    @Override
+    public JSONObject retrieveJTLZIP(String sessionId) {
+        return null;
+    }
 }

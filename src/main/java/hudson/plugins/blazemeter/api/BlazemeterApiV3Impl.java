@@ -295,6 +295,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
+    public JSONObject retrieveJTLZIP(String sessionId) {
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
+        String url = this.urlManager.retrieveJTLZIP(APP_KEY, apiKey, sessionId);
+        JSONObject jtlzip = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        return jtlzip;
+    }
+
+    @Override
     public StdErrLog getLogger() {
         return logger;
     }

@@ -59,6 +59,8 @@ public interface BlazemeterApi {
 
     public String retrieveJUNITXML(String sessionId);
 
+    public JSONObject retrieveJTLZIP(String sessionId);
+
     public StdErrLog getLogger();
 
     public void setLogger(StdErrLog logger);
