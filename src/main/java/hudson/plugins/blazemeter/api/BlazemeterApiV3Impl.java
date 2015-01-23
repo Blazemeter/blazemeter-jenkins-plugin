@@ -214,7 +214,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                         try {
                             if (en != null) {
                                 id = en.getString("id");
-                                name = en.getString("name").replaceAll("&", "&amp;");
+                                name = en.has("name")?en.getString("name").replaceAll("&", "&amp;"):"";
                                 testListOrdered.put(name, id);
 
                             }

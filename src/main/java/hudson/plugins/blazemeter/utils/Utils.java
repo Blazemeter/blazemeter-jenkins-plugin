@@ -11,6 +11,7 @@ import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -195,19 +196,23 @@ public class Utils {
 
     public static String prepareTestRun(PerformanceBuilder builder) {
         BlazemeterApi api = builder.getApi();
-        FilePath jsonConfigPath = new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
+        FilePath jsonConfigPath = null;
         StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
         StdErrLog jenBuildLog = PerformanceBuilder.getJenBuildLog();
         String testId = builder.getTestId();
         try {
-            String jsonConfigStr = jsonConfigPath.readToString();
-            JSONObject configNode = new JSONObject(jsonConfigStr);
-            if (testId.contains("create")) {
+            JSONObject configNode=null;
+            if(!StringUtils.isBlank(builder.getJsonConfig())){
+                jsonConfigPath=new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
+                configNode = new JSONObject(jsonConfigPath.readToString());
+            }
+
+            if (testId.contains("create")&&configNode!=null) {
                 testId=createTest(api,configNode,testId,jenBuildLog);
                 builder.setTestId(testId);
             }
 
-            if(configNode!=null) {
+            if(configNode!=null|!builder.getTestDuration().isEmpty()) {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
                 if(updateResult.has("error")&&!updateResult.get("error").equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
@@ -217,7 +222,7 @@ public class Utils {
                     jenBuildLog.info("Test was updated on server");
                     JSONObject result = updateResult.getJSONObject("result");
                     jenBuildLog.info("Test id="+result.getString("id"));
-                    jenBuildLog.info("Test name="+result.getString("name"));
+                    jenBuildLog.info("Test name="+(result.has("name")?result.getString("name"):""));
                     testId=result.getString("id");
                 }
             }
