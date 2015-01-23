@@ -3,7 +3,6 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
-import hudson.model.Job;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -99,18 +98,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Set<String> apiKeys = new HashSet<String>();
 
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        if (item instanceof Job) {
-            List<BlazemeterCredential> global = CredentialsProvider
-                    .lookupCredentials(BlazemeterCredential.class, Jenkins.getInstance(), ACL.SYSTEM);
-            if (!global.isEmpty() && !StringUtils.isEmpty(getApiKey())) {
-                items.add("Default API Key", "");
-            }
-        }
         for (BlazemeterCredential c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
-                items.add(StringUtils.defaultIfEmpty(c.getDescription(), id), id);
+                items.add(StringUtils.defaultIfEmpty(c.getDescription(), id)+"->"+c.getId(), id);
                 apiKeys.add(id);
             }
         }
