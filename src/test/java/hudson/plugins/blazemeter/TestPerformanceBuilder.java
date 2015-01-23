@@ -18,10 +18,10 @@ public class TestPerformanceBuilder {
     @Test
     public void first() throws Exception {
         FreeStyleProject project = j.createFreeStyleProject();
-//        PerformanceBuilder pbBefore=new PerformanceBuilder("60","","","123","v3",
-//                                                                      "","","","","");
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","","","123","v3",
+                                                                      "","","","","");
 //        j.jenkins
-//        project.getBuildersList().add(pbBefore);
+        project.getBuildersList().add(pbBefore);
 //        j.submit(j.createWebClient().getPage(project,"configure").getForms().get(0));
 //        PerformanceBuilder pbAfter=project.getBuildersList().get(PerformanceBuilder.class);
 

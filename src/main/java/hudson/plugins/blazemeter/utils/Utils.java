@@ -2,6 +2,8 @@ package hudson.plugins.blazemeter.utils;
 
 import hudson.FilePath;
 import hudson.model.Result;
+import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
+import hudson.plugins.blazemeter.BlazemeterCredential;
 import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
@@ -20,10 +22,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -268,6 +269,19 @@ public class Utils {
         } catch (IOException e) {
             bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
         }
+    }
+
+    public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
+                                           String id){
+        String userKey=null;
+        List<BlazemeterCredential> credentialList=descriptor.getCredentials("Global");
+        for(BlazemeterCredential c:credentialList){
+            if(c.getId().equals(id)){
+                userKey=c.getApiKey();
+                break;
+            }
+        }
+        return userKey;
     }
 
     public static void getJTL(BlazemeterApi api,String session,FilePath filePath, StdErrLog jenBuildLog){

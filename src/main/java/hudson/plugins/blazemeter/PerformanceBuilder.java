@@ -42,6 +42,8 @@ public class PerformanceBuilder extends Builder {
     private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
     private static StdErrLog jenBuildLog =new StdErrLog(Constants.BUILD_JEN);
 
+    private String apiKey = "";
+
     private String testId = "";
 
     private String apiVersion = "v3";
@@ -76,7 +78,8 @@ public class PerformanceBuilder extends Builder {
     private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
-    public PerformanceBuilder(String testDuration,
+    public PerformanceBuilder(String apiKey,
+                              String testDuration,
                               String mainJMX,
                               String dataFolder,
                               String testId,
@@ -87,12 +90,12 @@ public class PerformanceBuilder extends Builder {
                               String responseTimeFailedThreshold,
                               String responseTimeUnstableThreshold
     ) {
+        this.apiKey=Utils.selectUserKeyOnId(DESCRIPTOR,apiKey);
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
-        String apiKey=getDescriptor().getCredentials("Global").get(0).getApiKey();
         this.apiVersion = apiVersion.equals("autoDetect")?
-                Utils.autoDetectApiVersion(apiKey,jenCommonLog):apiVersion;
+                Utils.autoDetectApiVersion(this.apiKey,jenCommonLog):apiVersion;
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
         this.jsonConfig = jsonConfig;
@@ -339,8 +342,8 @@ public class PerformanceBuilder extends Builder {
         }
         String junitReport = this.api.retrieveJUNITXML(session);
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        Utils.saveReport(session, junitReport, build.getWorkspace(),bzmBuildLog);
-        Utils.getJTL(this.api,session,build.getWorkspace(),jenBuildLog);
+        Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog);
+        Utils.getJTL(this.api, session, build.getWorkspace(), jenBuildLog);
 
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 
