@@ -20,18 +20,16 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
  */
 public class Utils {
-
+    private final static int BUFFER_SIZE = 2048;
+    private final static String ZIP_EXTENSION = ".zip";
     private Utils() {
     }
 
@@ -300,7 +298,7 @@ public class Utils {
                     + "/" + filePath.getName() + "/" + session + ".zip");
             URL url=new URL(dataUrl);
             FileUtils.copyURLToFile(url, jtlZip);
-            unzip(jtlZip.getAbsolutePath(),jtlZip.getParent(),jenBuildLog);
+            unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
         } catch (JSONException e) {
             jenBuildLog.warn("Failed to get url to JTLZIP: ", e);
         } catch (MalformedURLException e) {
@@ -310,42 +308,67 @@ public class Utils {
         }
     }
 
-    public static void unzip(String zipFilePath, String destDir,StdErrLog logger) {
-        File dir = new File(destDir);
-        // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
-        FileInputStream fis;
-        //buffer for read and write data to file
-        byte[] buffer = new byte[1024];
+    public static void unzip(String srcZipFileName,
+                             String destDirectoryName, StdErrLog logger) {
         try {
-            fis = new FileInputStream(zipFilePath);
-            ZipInputStream zis = new ZipInputStream(fis);
-            ZipEntry ze = zis.getNextEntry();
-            while(ze != null){
-                String fileName = ze.getName();
-                File newFile = new File(destDir + File.separator + fileName);
-                logger.info("Unzipping to "+newFile.getAbsolutePath());
-                //create directories for sub directories in zip
-                new File(newFile.getParent()).mkdirs();
-                FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-                //close this ZipEntry
-                zis.closeEntry();
-                ze = zis.getNextEntry();
-            }
-            //close last ZipEntry
-            zis.closeEntry();
-            zis.close();
-            fis.close();
-        } catch (IOException e) {
-            logger.warn("Failed to unzip file: ",e );
-        }
+            BufferedInputStream bufIS = null;
+            // create the destination directory structure (if needed)
+            File destDirectory = new File(destDirectoryName);
+            destDirectory.mkdirs();
 
+            // open archive for reading
+            File file = new File(srcZipFileName);
+            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+
+            //for every zip archive entry do
+            Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
+            while (zipFileEntries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+                logger.info("\tExtracting entry: " + entry);
+
+                //create destination file
+                File destFile = new File(destDirectory, entry.getName());
+
+                //create parent directories if needed
+                File parentDestFile = destFile.getParentFile();
+                parentDestFile.mkdirs();
+
+                if (!entry.isDirectory()) {
+                    bufIS = new BufferedInputStream(
+                            zipFile.getInputStream(entry));
+                    int currentByte;
+
+                    // buffer for writing file
+                    byte data[] = new byte[BUFFER_SIZE];
+
+                    // write the current file to disk
+                    FileOutputStream fOS = new FileOutputStream(destFile);
+                    BufferedOutputStream bufOS = new BufferedOutputStream(fOS, BUFFER_SIZE);
+
+                    while ((currentByte = bufIS.read(data, 0, BUFFER_SIZE)) != -1) {
+                        bufOS.write(data, 0, currentByte);
+                    }
+
+                    // close BufferedOutputStream
+                    bufOS.flush();
+                    bufOS.close();
+
+                    // recursively unzip files
+                    if (entry.getName().toLowerCase().endsWith(ZIP_EXTENSION)) {
+                        String zipFilePath = destDirectory.getPath() + File.separatorChar + entry.getName();
+
+                        unzip(zipFilePath, zipFilePath.substring(0,
+                                zipFilePath.length() - ZIP_EXTENSION.length()), logger);
+                    }
+                }
+            }
+            bufIS.close();
+        } catch (Exception e) {
+            logger.warn("Failed to unzip file: ",e);
+            e.printStackTrace();
+        }
     }
+
 
 
     public static Result validateLocalTresholds(TestResult testResult,
