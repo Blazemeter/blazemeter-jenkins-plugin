@@ -50,9 +50,15 @@ public class PerformanceBuilder extends Builder {
 
     private String testDuration = "";
 
+/*  TODO
+    This calls are not implemented in v.2.0
+    Therefor they will be hidden from GUI
+    Should be implemented in v.2.1
+
     private String mainJMX = "";
 
     private String dataFolder = "";
+*/
 
     private String jsonConfig = "";
 
@@ -96,8 +102,14 @@ public class PerformanceBuilder extends Builder {
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
                 Utils.autoDetectApiVersion(this.apiKey,jenCommonLog):apiVersion;
+    /*  TODO
+    This calls are not implemented in v.2.0
+    Therefor they will be hidden from GUI
+    Should be implemented in v.2.1
+
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
+    */
         this.jsonConfig = jsonConfig;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
@@ -413,6 +425,11 @@ public class PerformanceBuilder extends Builder {
         this.apiVersion = apiVersion;
     }
 
+    /* TODO
+    This calls are not implemented in v.2.0
+    Therefor they will be hidden from GUI
+    Should be implemented in v.2.1
+
     public String getMainJMX() {
         return mainJMX;
     }
@@ -428,7 +445,7 @@ public class PerformanceBuilder extends Builder {
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
     }
-
+*/
     public String getErrorFailedThreshold() {
         return errorFailedThreshold;
     }

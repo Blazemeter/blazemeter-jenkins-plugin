@@ -243,7 +243,12 @@ public class Utils {
             bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
             jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
         } finally {
+/*          TODO
+            These calls are not implemented for APIv3
+            Should be fixed in v.2.1
+
             uploadDataFolderFiles(builder.getDataFolder(),builder.getMainJMX(),testId, api,bzmBuildLog);
+*/
             return testId;
         }
     }

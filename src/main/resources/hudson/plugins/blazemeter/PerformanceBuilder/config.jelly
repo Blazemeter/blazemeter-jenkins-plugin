@@ -107,23 +107,30 @@
     </f:entry>
 
     <f:advanced>
-        <f:entry title="${%Data folder}:"
+
+        <!--<f:entry title="${%Data folder}:"
                  description="${%Data folder to be uploaded}">
             <table width="350px">
                 <thead>
                     <tr>
                         <td/>
+                        &lt;!&ndash;
+                        TODO
+                        Should be implemented in v.2.1 for API v3
                         <td colspan="1">
                             Data folder
-                        </td>
+                        </td>&ndash;&gt;
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td/>
+                        &lt;!&ndash;
+                        TODO
+                        Should be implemented in v.2.1 for API v3
                         <td colspan="1">
                             <f:textbox field="dataFolder"/>
-                        </td>
+                        </td>&ndash;&gt;
                     </tr>
                 </tbody>
             </table>
@@ -150,6 +157,8 @@
                 </tbody>
             </table>
         </f:entry>
+        -->
+
         <f:entry name="apiVersionSelector" title="Select API version">
             <select name="apiVersion" field="instance.apiVersion">
                 <option value="autoDetect">Auto Detect</option>
