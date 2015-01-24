@@ -207,10 +207,16 @@ public class Utils {
                 configNode = new JSONObject(jsonConfigPath.readToString());
             }
 
-            if (testId.contains("create")&&configNode!=null) {
-                testId=createTest(api,configNode,testId,jenBuildLog);
-                builder.setTestId(testId);
+            if (testId.contains("create")) {
+                if (configNode != null) {
+                    testId = createTest(api, configNode, testId, jenBuildLog);
+                    builder.setTestId(testId);
+                } else {
+                    testId="";
+                    return testId;
+                }
             }
+
 
             if(configNode!=null|!builder.getTestDuration().isEmpty()) {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
