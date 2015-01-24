@@ -42,7 +42,7 @@ public class TestBlazemeterApiV2Impl {
 
     @Test
     public void updateTestInfo(){
-        Assert.assertEquals(blazemeterApiV2.updateTestInfo(null, null), BlazemeterApiV2Impl.not_implemented);
+        Assert.assertEquals(blazemeterApiV2.postJsonConfig(null, null), BlazemeterApiV2Impl.not_implemented);
     }
 
     @Test

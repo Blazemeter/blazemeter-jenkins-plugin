@@ -115,7 +115,7 @@ public class TestBmUrlManagerV2 {
     @Test
     public void putTestInfo(){
         String expPutTestInfo=Constants.NOT_IMPLEMENTED;
-        String actPutTestInfo=bmUrlManager.putTestInfo(appKey, userKey, testId);
+        String actPutTestInfo=bmUrlManager.postJsonConfig(appKey, userKey, testId);
         Assert.assertEquals(expPutTestInfo,actPutTestInfo);
     }
 

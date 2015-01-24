@@ -115,10 +115,10 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void putTestInfo(){
+    public void postJsonConfig(){
         String expPutTestInfo=bmUrlManager.getServerUrl()+"/api/latest/tests/"+testId+
                 "/custom?custom_test_type=yahoo&api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actPutTestInfo=bmUrlManager.putTestInfo(appKey, userKey, testId);
+        String actPutTestInfo=bmUrlManager.postJsonConfig(appKey, userKey, testId);
         Assert.assertEquals(expPutTestInfo,actPutTestInfo);
     }
 

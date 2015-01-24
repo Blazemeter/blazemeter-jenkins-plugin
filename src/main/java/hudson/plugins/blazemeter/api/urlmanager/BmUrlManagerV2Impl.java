@@ -152,7 +152,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String putTestInfo(String appKey, String userKey, String testId) {
+    public String postJsonConfig(String appKey, String userKey, String testId) {
         return Constants.NOT_IMPLEMENTED;
     }
 

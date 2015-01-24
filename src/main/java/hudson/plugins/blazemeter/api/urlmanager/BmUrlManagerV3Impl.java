@@ -192,7 +192,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
 
 
     @Override
-    public String putTestInfo(String appKey, String userKey, String testId) {
+    public String postJsonConfig(String appKey, String userKey, String testId) {
         String getTestInfo=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");

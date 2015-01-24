@@ -79,7 +79,7 @@ public class Utils {
                 override.put("threads", JSONObject.NULL);
                 configuration.put("serversCount", JSONObject.NULL);
             }
-            updateResult=api.updateTestInfo(testId, result);
+            updateResult=api.putTestInfo(testId, result);
 
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);

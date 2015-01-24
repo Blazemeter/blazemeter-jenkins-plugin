@@ -251,10 +251,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject updateTestInfo(String testId, JSONObject data){
+    public JSONObject postJsonConfig(String testId, JSONObject data){
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
-        String url = this.urlManager.putTestInfo(APP_KEY, apiKey, testId);
+        String url = this.urlManager.postJsonConfig(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getResponseAsJson(url, data, BzmHttpWrapper.Method.POST);
         return jo;
     }
@@ -324,5 +324,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     public BmUrlManager getUrlManager() {
         return urlManager;
+    }
+
+
+    @Override
+    public JSONObject putTestInfo(String testId, JSONObject data) {
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
+
+        String url = this.urlManager.getTestInfo(APP_KEY, apiKey,testId);
+        JSONObject jo = this.bzmhc.getResponseAsJson(url, data, BzmHttpWrapper.Method.PUT);
+        return jo;
     }
 }

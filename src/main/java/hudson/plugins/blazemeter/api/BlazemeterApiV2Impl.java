@@ -276,7 +276,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject updateTestInfo(String testId, JSONObject data) {
+    public JSONObject postJsonConfig(String testId, JSONObject data) {
         return not_implemented;
     }
 
@@ -312,6 +312,11 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     @Override
     public JSONObject retrieveJTLZIP(String sessionId) {
+        return null;
+    }
+
+    @Override
+    public JSONObject putTestInfo(String testId, JSONObject data) {
         return null;
     }
 }

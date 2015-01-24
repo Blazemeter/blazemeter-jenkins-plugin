@@ -53,13 +53,15 @@ public interface BlazemeterApi {
 
     public JSONObject getTestInfo(String testId);
 
-    public JSONObject updateTestInfo(String testId, JSONObject data);
+    public JSONObject postJsonConfig(String testId, JSONObject data);
 
     public JSONObject createTest(JSONObject data);
 
     public String retrieveJUNITXML(String sessionId);
 
     public JSONObject retrieveJTLZIP(String sessionId);
+
+    public JSONObject putTestInfo(String testId, JSONObject data);
 
     public StdErrLog getLogger();
 

@@ -34,7 +34,7 @@ public interface BmUrlManager {
 
     public String getTestInfo(String appKey, String userKey, String testId);
 
-    public String putTestInfo(String appKey, String userKey, String testId);
+    public String postJsonConfig(String appKey, String userKey, String testId);
 
     public String createTest(String appKey, String userKey);
 

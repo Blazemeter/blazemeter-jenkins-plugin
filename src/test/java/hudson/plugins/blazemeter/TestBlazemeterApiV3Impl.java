@@ -53,7 +53,7 @@ public class TestBlazemeterApiV3Impl {
     public void updateTestInfo_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
         blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
-        Assert.assertEquals(blazemeterApiV3.updateTestInfo(null, null), null);
+        Assert.assertEquals(blazemeterApiV3.postJsonConfig(null, null), null);
     }
 
     @Test
@@ -181,5 +181,19 @@ public class TestBlazemeterApiV3Impl {
         } catch (Exception e) {
             log.info(e.getMessage());
        } 
+    }
+
+    @Test
+    public void putTestInfo(){
+        APIFactory apiFactory=APIFactory.getApiFactory();
+        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
+        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
+        String url = blazemeterApiV3.getUrlManager().getTestInfo(appKey, userKey, testId);
+        try {
+            blazemeterApiV3.putTestInfo(testId,null);
+            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.PUT);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
     }
 }
