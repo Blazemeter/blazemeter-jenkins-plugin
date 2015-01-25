@@ -174,6 +174,8 @@ public class Utils {
 
     private static String createTest(BlazemeterApi api, JSONObject configNode,
                                      String testId,StdErrLog jenBuildLog) throws JSONException {
+        try{
+
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
             JSONObject jo = api.createTest(configNode);
             if(jo.has("error")&&!jo.getString("error").equals("null")){
@@ -183,6 +185,10 @@ public class Utils {
                 testId = jo.getJSONObject("result").getString("id");
             }
         }
+        }catch (Exception e){
+            jenBuildLog.warn("Unable to create test: check user-key and server-url");
+        }
+
         return testId;
     }
 
@@ -230,10 +236,10 @@ public class Utils {
             builder.setTestDuration(testDuration);
         } catch (IOException e) {
             bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + e.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + e.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": check if filename/filepath are valid");
         } catch (JSONException je) {
             bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
+            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": check if filename/filepath are valid");
         } finally {
 /*          TODO
             These calls are not implemented for APIv3
@@ -259,7 +265,9 @@ public class Utils {
 
     public static void saveReport(String filename,
                                   String report,
-                                  FilePath filePath, StdErrLog bzmBuildLog) {
+                                  FilePath filePath,
+                                  StdErrLog bzmBuildLog,
+                                  StdErrLog jenBuildLog) {
         File reportFile = new File(filePath.getParent()
                 + "/" + filePath.getName() + "/" + filename + ".xml");
         try {
@@ -272,8 +280,10 @@ public class Utils {
 
         } catch (FileNotFoundException fnfe) {
             bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
+            jenBuildLog.info("Unable to save XML report to workspace - check that test is finished on server or turn to support ");
         } catch (IOException e) {
             bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
+            jenBuildLog.info("Unable to save XML report to workspace - check that test is finished on server or turn to support ");
         }
     }
 
@@ -322,7 +332,7 @@ public class Utils {
     }
 
     public static void unzip(String srcZipFileName,
-                             String destDirectoryName, StdErrLog logger) {
+                             String destDirectoryName, StdErrLog jenBuildLog) {
         try {
             BufferedInputStream bufIS = null;
             // create the destination directory structure (if needed)
@@ -337,7 +347,7 @@ public class Utils {
             Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
             while (zipFileEntries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                logger.info("\tExtracting entry: " + entry);
+                jenBuildLog.info("\tExtracting entry: " + entry);
 
                 //create destination file
                 File destFile = new File(destDirectory, entry.getName());
@@ -371,14 +381,13 @@ public class Utils {
                         String zipFilePath = destDirectory.getPath() + File.separatorChar + entry.getName();
 
                         unzip(zipFilePath, zipFilePath.substring(0,
-                                zipFilePath.length() - ZIP_EXTENSION.length()), logger);
+                                zipFilePath.length() - ZIP_EXTENSION.length()), jenBuildLog);
                     }
                 }
             }
             bufIS.close();
         } catch (Exception e) {
-            logger.warn("Failed to unzip file: ",e);
-            e.printStackTrace();
+            jenBuildLog.warn("Failed to unzip report: check that it is downloaded");
         }
     }
 
@@ -387,6 +396,9 @@ public class Utils {
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,
                                                 StdErrLog bzmBuildLog) {
+        Result result = Result.SUCCESS;
+        try{
+
         int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
                 ?"-1":builder.getResponseTimeUnstableThreshold());
 
@@ -397,7 +409,6 @@ public class Utils {
         int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
                 ?"-1":builder.getErrorFailedThreshold());
 
-        Result result = Result.SUCCESS;
         if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable &
                 testResult.getAverage() < responseTimeFailed) {
             bzmBuildLog.info("Validating reponseTimeUnstable...\n");
@@ -444,6 +455,10 @@ public class Utils {
         if (responseTimeFailed < 0) {
             bzmBuildLog.info("ResponseTimeFailed validation was skipped: value was not set in configuration");
         }
+        }catch (Exception e){
+            bzmBuildLog.info("Error occured while validating local tresholds. Check that test was finished correctly or turn to customer support");
+        }
+
         return result;
     }
 

@@ -196,10 +196,10 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
         this.api.setLogger(bzmBuildLog);
 
-        this.api = getAPIClient(build);
+        this.api = getAPIClient();
         this.testId=Utils.prepareTestRun(this);
         if(this.testId.isEmpty()){
-            jenBuildLog.warn("Failed to start test on server: check JSON configuration or url format");
+            jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
             return false;
         }
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
@@ -227,6 +227,7 @@ public class PerformanceBuilder extends Builder {
                 return false;
             }
         } catch (JSONException e) {
+            jenBuildLog.warn("Unable to start test: check userKey, testId, server url.");
             bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);
             return false;
         }
@@ -251,7 +252,7 @@ public class PerformanceBuilder extends Builder {
             return true;
         } catch (Exception e){
             jenCommonLog.warn("Test execution was interrupted or network connection is broken: ", e);
-            jenBuildLog.warn("Test execution was interrupted or network connection is broken: ", e);
+            jenBuildLog.warn("Test execution was interrupted or network connection is broken: check test state on server");
             return true;
 
         }
@@ -279,16 +280,7 @@ public class PerformanceBuilder extends Builder {
      * 2. Make Utils.getAPIKey() from CredentialsProvider;
      */
 
-    private BlazemeterApi getAPIClient(AbstractBuild<?, ?> build) {
-        String apiKeyId = getDescriptor().getApiKey();
-        String apiKey = null;
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, build.getProject(), ACL.SYSTEM)) {
-            if (StringUtils.equals(apiKeyId, c.getId())) {
-             apiKey = c.getApiKey();
-                break;
-            }
-        }
+    private BlazemeterApi getAPIClient() {
 
         // ideally, at this point we'd look up the credential based on the API key to find the secret
         // but there are no secrets, so no need to!
@@ -309,7 +301,8 @@ public class PerformanceBuilder extends Builder {
      */
    private String getTestSession(JSONObject json, AbstractBuild<?, ?> build) throws JSONException{
        String session="";
-       if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
+       try {
+           if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get("response_code").equals(200)) {
            if (json.get("response_code").equals(500) && json.get("error").toString()
                    .startsWith("Test already running")) {
                bzmBuildLog.warn("Test already running, please stop it first");
@@ -319,15 +312,21 @@ public class PerformanceBuilder extends Builder {
 
        }
        // get sessionId add to interface
-       if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
+           if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
            session = json.get("session_id").toString();
 
        } else {
-           JSONObject startJO = (JSONObject) json.get("result");
-           session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-           APIFactory apiFactory=APIFactory.getApiFactory();
-           jenBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
-           jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent()+"/"+Constants.BZM_JEN_LOG);
+
+               JSONObject startJO = (JSONObject) json.get("result");
+               session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
+               APIFactory apiFactory = APIFactory.getApiFactory();
+               jenBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "/app/#report/" + session + "/loadreport");
+               jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+           }
+
+       }catch (Exception e) {
+           jenBuildLog.info("Failed to get session_id. Check that blazemeter server URL and userKey are correct");
+           bzmBuildLog.info("Failed to get session_id. Check that blazemeter server URL and userKey are correct",e);
        }
    return session;
    }
@@ -341,17 +340,21 @@ public class PerformanceBuilder extends Builder {
     private Result postProcess(String session, AbstractBuild<?, ?> build) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
-        JSONObject jo = this.api.getTresholds(session);
+        String junitReport="";
+        JSONObject jo = null;
         boolean success=false;
         try {
+            jo=this.api.getTresholds(session);
             bzmBuildLog.info("Treshold object = " + jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
+            junitReport = this.api.retrieveJUNITXML(session);
         } catch (JSONException je) {
             bzmBuildLog.warn("Error: Failed to get tresholds: " + je + "\n" + jo.toString());
+        } catch (Exception e) {
+            bzmBuildLog.warn("Error: Failed to get tresholds: check that test is ended correctly or turn to customer support ");
         }
-        String junitReport = this.api.retrieveJUNITXML(session);
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog);
+        Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog,jenBuildLog);
         Utils.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
 
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
@@ -362,7 +365,13 @@ public class PerformanceBuilder extends Builder {
         }
 
         //get testGetArchive information
-        JSONObject testReport = this.api.testReport(session);
+        JSONObject testReport=null;
+        try{
+
+        testReport = this.api.testReport(session);
+        }catch (Exception e){
+           bzmBuildLog.info("Failed to get test report from server.");
+        }
 
 
         if (testReport == null || testReport.equals("null")) {
@@ -381,8 +390,10 @@ public class PerformanceBuilder extends Builder {
             result=Utils.validateLocalTresholds(testResult,this,bzmBuildLog);
 
         } catch (IOException ioe) {
+            jenBuildLog.info("Failed to get test result. Try to check server for it");
             bzmBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
+            jenBuildLog.info("Failed to get test result. Try to check server for it");
             bzmBuildLog.info("ERROR: Failed to generate TestResult: " + je);
         }finally{
             return result;
