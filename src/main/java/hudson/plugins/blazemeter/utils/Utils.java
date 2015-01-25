@@ -67,6 +67,7 @@ public class Utils {
             JSONObject result = null;
             if (configNode != null) {
                 result=configNode;
+                updateResult=api.postJsonConfig(testId, result);
             } else if (updDuration != null && !updDuration.isEmpty()) {
                 JSONObject jo = api.getTestInfo(testId);
                 result = jo.getJSONObject("result");
@@ -78,8 +79,8 @@ public class Utils {
                 override.put("duration", updDuration);
                 override.put("threads", JSONObject.NULL);
                 configuration.put("serversCount", JSONObject.NULL);
+                updateResult=api.putTestInfo(testId, result);
             }
-            updateResult=api.putTestInfo(testId, result);
 
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
@@ -223,12 +224,8 @@ public class Utils {
                     jenBuildLog.warn("Error:"+updateResult.getString("error"));
                     testId="";
                 }else{
-                    jenBuildLog.info("Test was updated on server");
-                    JSONObject result = updateResult.getJSONObject("result");
-                    jenBuildLog.info("Test id="+result.getString("id"));
-                    jenBuildLog.info("Test name="+(result.has("name")?result.getString("name"):""));
-                    testId=result.getString("id");
-                }
+                    jenBuildLog.info("Test "+testId+" was started on server");
+                    }
             }
 
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
