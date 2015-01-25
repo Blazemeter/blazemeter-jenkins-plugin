@@ -204,9 +204,6 @@ public class PerformanceBuilder extends Builder {
         }
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
-        int runDurationSeconds = Integer.parseInt(testDuration) * 60;
-
-
         org.json.JSONObject json;
         int countStartRequests = 0;
         do {
@@ -243,11 +240,11 @@ public class PerformanceBuilder extends Builder {
 
         try {
             Utils.waitForFinish(this.api, this.apiVersion, this.testId,
-                    bzmBuildLog, session, runDurationSeconds);
+                    bzmBuildLog, session);
 
             bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = this.postProcess(session, bzmBuildLog,build);
+            Result result = this.postProcess(session, build);
 
             build.setResult(result);
 
@@ -341,7 +338,7 @@ public class PerformanceBuilder extends Builder {
     2. Move these parts to Utils
     3. Remove this method: it's legacy
      */
-    private Result postProcess(String session, StdErrLog bzmBuildLog,AbstractBuild<?, ?> build) throws InterruptedException {
+    private Result postProcess(String session, AbstractBuild<?, ?> build) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         JSONObject jo = this.api.getTresholds(session);
@@ -355,7 +352,7 @@ public class PerformanceBuilder extends Builder {
         String junitReport = this.api.retrieveJUNITXML(session);
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
         Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog);
-        Utils.getJTL(this.api, session, build.getWorkspace(), jenBuildLog);
+        Utils.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
 
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 

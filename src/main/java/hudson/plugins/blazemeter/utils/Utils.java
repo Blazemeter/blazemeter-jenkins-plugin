@@ -139,7 +139,7 @@ public class Utils {
     }
 
     public static void waitForFinish(BlazemeterApi api, String apiVersion, String testId, AbstractLogger bzmBuildLog,
-                                     String session, int runDurationSeconds) throws InterruptedException {
+                                     String session) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
@@ -165,14 +165,6 @@ public class Utils {
                 lastPrint = now;
             }
 
-            if (diffInSec >= runDurationSeconds) {
-                bzmBuildLog.info("About to stop Blazemeter test...");
-                bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
-                api.stopTest(testId);
-                bzmBuildLog.info("BlazeMeter test stopped due to user test duration setup reached");
-                bzmBuildLog.info("BlazeMeter test stopped due to user test duration setup reached");
-                break;
-            }
             if (Thread.interrupted()) {
                 bzmBuildLog.info("Test was interrupted: throwing Interrupted Exception");
                 throw new InterruptedException();
@@ -298,7 +290,9 @@ public class Utils {
         return userKey;
     }
 
-    public static void getJTL(BlazemeterApi api,String session,FilePath filePath, StdErrLog jenBuildLog){
+    public static void getJTL(BlazemeterApi api,String session,FilePath filePath,
+                              StdErrLog jenBuildLog,
+                              StdErrLog bzmBuildLog){
        JSONObject jo=api.retrieveJTLZIP(session);
        String dataUrl=null;
         try {
@@ -316,11 +310,14 @@ public class Utils {
             FileUtils.copyURLToFile(url, jtlZip);
             unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
         } catch (JSONException e) {
-            jenBuildLog.warn("Failed to get url to JTLZIP: ", e);
+            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get url to JTLZIP: ");
         } catch (MalformedURLException e) {
-            jenBuildLog.warn("Failed to create URL to JTLZIP: ", e);
+            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get url to JTLZIP: ");
         } catch (IOException e) {
-            jenBuildLog.warn("Failed to save JTLZIP: ",e);
+            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get url to JTLZIP: ");
         }
     }
 
