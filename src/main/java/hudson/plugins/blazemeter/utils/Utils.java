@@ -288,10 +288,14 @@ public class Utils {
                                            String id){
         String userKey=null;
         List<BlazemeterCredential> credentialList=descriptor.getCredentials("Global");
-        for(BlazemeterCredential c:credentialList){
-            if(c.getId().equals(id)){
-                userKey=c.getApiKey();
-                break;
+        if(credentialList.size()==1){
+            userKey=credentialList.get(0).getApiKey();
+        }else{
+            for(BlazemeterCredential c:credentialList){
+                if(c.getId().equals(id)){
+                    userKey=c.getApiKey();
+                    break;
+                }
             }
         }
         return userKey;
