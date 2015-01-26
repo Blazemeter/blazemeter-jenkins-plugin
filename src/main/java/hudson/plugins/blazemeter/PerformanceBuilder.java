@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -15,10 +14,8 @@ import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
-import hudson.security.ACL;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -26,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -349,9 +347,11 @@ public class PerformanceBuilder extends Builder {
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
             junitReport = this.api.retrieveJUNITXML(session);
         } catch (JSONException je) {
-            bzmBuildLog.warn("Error: Failed to get tresholds: " + je + "\n" + jo.toString());
+            bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
+            success=true;
         } catch (Exception e) {
-            bzmBuildLog.warn("Error: Failed to get tresholds: check that test is ended correctly or turn to customer support ");
+            bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
+            success=true;
         }
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
         Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog,jenBuildLog);
@@ -518,5 +518,10 @@ public class PerformanceBuilder extends Builder {
     @SuppressWarnings({"UnusedDeclaration"})
     public static final class DescriptorImpl
             extends BlazeMeterPerformanceBuilderDescriptor {
+
+        @Override
+        public boolean configure(StaplerRequest req, net.sf.json.JSONObject formData) throws FormException {
+            return super.configure(req, formData);
+        }
     }
 }

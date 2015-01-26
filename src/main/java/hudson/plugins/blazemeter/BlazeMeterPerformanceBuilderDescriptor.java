@@ -29,6 +29,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String blazeMeterURL;
     private String name = "My BlazeMeter Account";
     private String apiKey;
+    private String testId;
 
 
 
@@ -51,11 +52,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey,
+                                          @QueryParameter String testId
+                                          ) throws FormValidation {
         if (StringUtils.isBlank(apiKey)) {
             apiKey = getApiKey();
         }
-
+        this.apiKey=apiKey;
+//        this.testId=testId;
         String apiSecret = null;
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredential c : CredentialsProvider
@@ -83,7 +87,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     Set set = testList.entrySet();
                     for (Object test : set) {
                         Map.Entry me = (Map.Entry) test;
-                        items.add(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue()));
+/*
+                        items.add(new ListBoxModel.Option(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue()),
+                                this.testId.contains(testId)));
+*/
+                        items.add(new ListBoxModel.Option(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue())));
+
                     }
                 }
             } catch (Exception e) {
@@ -102,7 +111,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
-                items.add(StringUtils.defaultIfEmpty(c.getDescription(), id)+"->"+c.getId(), id);
+                items.add(new ListBoxModel.Option(c.getDescription(),
+                        c.getId(),
+                        c.getId().contains(apiKey)));
                 apiKeys.add(id);
             }
         }
@@ -196,6 +207,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public void setBlazeMeterURL(String blazeMeterURL) {
         this.blazeMeterURL = blazeMeterURL;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
     }
 }
 

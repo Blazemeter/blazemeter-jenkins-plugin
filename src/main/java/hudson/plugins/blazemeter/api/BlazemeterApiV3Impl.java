@@ -128,7 +128,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public synchronized JSONObject startTest(String testId) {
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
-
+        logger.info("Calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
     }
