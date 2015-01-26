@@ -317,18 +317,20 @@ public class Utils {
             }
             File jtlZip=new File(filePath.getParent()
                     + "/" + filePath.getName() + "/" + session + ".zip");
-            URL url=new URL(dataUrl);
+            URL url=new URL(dataUrl+"?api_key="+api.getApiKey());
+
             FileUtils.copyURLToFile(url, jtlZip);
+            jenBuildLog.info("Downloading JTLZIP from "+url+"to "+jtlZip.getCanonicalPath());
             unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
         } catch (JSONException e) {
-            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get url to JTLZIP: ");
+            bzmBuildLog.warn("Unable to get  JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get  JTLZIP: ");
         } catch (MalformedURLException e) {
-            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get url to JTLZIP: ");
+            bzmBuildLog.warn("Unable to get  JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get  JTLZIP: ");
         } catch (IOException e) {
-            bzmBuildLog.warn("Unable to get url to JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get url to JTLZIP: ");
+            bzmBuildLog.warn("Unable to get JTLZIP: ", e);
+            jenBuildLog.warn("Unable to get JTLZIP: ");
         }
     }
 
