@@ -6,7 +6,7 @@
                 <p>Can't access the report.</p>
             </j:if>
             <j:if test="${it.session != null}">
-                <iframe width="1040" height="1200" src="${it.blazeMeterURL}/app/#report/${it.session}/loadreport">
+                <iframe width="1040" height="1200" src="${it.blazeMeterURL}/app/#reports/${it.session}/loadreport">
                     <p>Your browser does not support iframes.</p>
                 </iframe>
             </j:if>
