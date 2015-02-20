@@ -430,7 +430,7 @@ public class Utils {
             result = Result.FAILURE;
         }
 
-        if (errorFailed >= 0 & testResult.getAverage() >= errorFailed) {
+        if (errorFailed >= 0 & testResult.getErrorPercentage() >= errorFailed) {
             bzmBuildLog.info("Validating errorPercentageUnstable...\n");
             bzmBuildLog.info("Error percentage is higher than errorPercentageUnstable treshold\n");
             bzmBuildLog.info("Marking build as failed");
