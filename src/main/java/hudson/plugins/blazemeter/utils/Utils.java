@@ -193,6 +193,30 @@ public class Utils {
         return testId;
     }
 
+    public static String getReportUrl(BlazemeterApi api, String sessionId,
+                                      StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
+        JSONObject jo=null;
+        String publicToken="";
+        String reportUrl=null;
+        try {
+            jo = api.generatePublicToken(sessionId);
+            if(jo.get("error").equals(JSONObject.NULL)){
+                JSONObject result=jo.getJSONObject("result");
+                publicToken=result.getString("publicToken");
+                reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"app/?public-token="+publicToken+"#reports/"+sessionId+"/summary";
+            }else{
+                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get("error").toString());
+                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get("error").toString());
+                reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"app/#reports/"+sessionId+"/summary";
+            }
+        } catch (Exception e){
+          jenBuildLog.warn("Problems with generating public-token for report URL");
+          bzmBuildLog.warn("Problems with generating public-token for report URL",e);
+        }finally {
+                return reportUrl;
+        }
+    }
+
     public static String prepareTestRun(PerformanceBuilder builder) {
         BlazemeterApi api = builder.getApi();
         FilePath jsonConfigPath = null;

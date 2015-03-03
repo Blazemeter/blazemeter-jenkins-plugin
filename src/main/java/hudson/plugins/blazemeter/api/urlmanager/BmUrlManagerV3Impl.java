@@ -220,5 +220,19 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         return retrieveJTLZIP;
     }
 
+    @Override
+    public String generatePublicToken(String appKey, String userKey, String sessionId) {
+        String generatePublicToken=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        generatePublicToken=SERVER_URL+"/api/latest/sessions/"+sessionId+
+                "/publicToken?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return generatePublicToken;
+    }
 }
 

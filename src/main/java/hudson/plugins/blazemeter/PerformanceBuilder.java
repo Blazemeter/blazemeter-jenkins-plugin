@@ -318,7 +318,8 @@ public class PerformanceBuilder extends Builder {
                JSONObject startJO = (JSONObject) json.get("result");
                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
                APIFactory apiFactory = APIFactory.getApiFactory();
-               jenBuildLog.info("Blazemeter test report will be available at " + apiFactory.getBlazeMeterUrl() + "app/#reports/" + session + "/loadreport");
+               String reportUrl=Utils.getReportUrl(this.api, session, jenBuildLog, bzmBuildLog);
+               jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
                jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
            }
 

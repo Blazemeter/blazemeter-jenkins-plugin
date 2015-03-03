@@ -319,4 +319,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public JSONObject putTestInfo(String testId, JSONObject data) {
         return null;
     }
+
+    @Override
+    public JSONObject generatePublicToken(String sessionId) {
+        return not_implemented;
+    }
 }

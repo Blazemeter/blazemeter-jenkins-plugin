@@ -41,5 +41,7 @@ public interface BmUrlManager {
     public String retrieveJUNITXML(String appKey, String userKey, String sessionId);
 
     public String retrieveJTLZIP(String appKey, String userKey, String sessionId);
+
+    public String generatePublicToken(String appKey, String userKey, String sessionId);
 }
 

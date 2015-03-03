@@ -161,5 +161,10 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     public String retrieveJTLZIP(String appKey, String userKey, String sessionId) {
         return Constants.NOT_IMPLEMENTED;
     }
+
+    @Override
+    public String generatePublicToken(String appKey, String userKey, String sessionId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
 }
 

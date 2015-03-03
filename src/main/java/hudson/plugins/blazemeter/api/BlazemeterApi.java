@@ -67,6 +67,8 @@ public interface BlazemeterApi {
 
     public void setLogger(StdErrLog logger);
 
+    public JSONObject generatePublicToken(String sessionId);
+
     public String getApiKey();
 
     public String getBlazeMeterURL();
