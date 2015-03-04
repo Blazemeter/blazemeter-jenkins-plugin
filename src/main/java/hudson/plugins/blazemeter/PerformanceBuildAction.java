@@ -15,25 +15,13 @@ import java.lang.ref.WeakReference;
 public class PerformanceBuildAction implements Action, StaplerProxy {
     private final AbstractBuild<?, ?> build;
 
-    /**
-     * Configured parsers used to parse reports in this build.
-     * For compatibility reasons, this can be null.
-     */
-//    private final List<PerformanceReportParser> parsers;
-
-//    private transient final PrintStream hudsonConsoleWriter;
-
     private transient WeakReference<PerformanceReportMap> performanceReportMap;
 
     private static final Logger logger = Logger.getLogger(PerformanceBuildAction.class.getName());
-    private String session;
-    private String blazeMeterURL;
     private String reportUrl;
 
     public PerformanceBuildAction(AbstractBuild<?, ?> pBuild) {
         build = pBuild;
-//        hudsonConsoleWriter = logger;
-//        this.parsers = parsers;
     }
 
 
@@ -76,27 +64,6 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
         this.performanceReportMap = new WeakReference<PerformanceReportMap>(
                 reportMap);
         return reportMap;
-    }
-
-    public void setPerformanceReportMap(
-            WeakReference<PerformanceReportMap> performanceReportMap) {
-        this.performanceReportMap = performanceReportMap;
-    }
-
-    public String getSession() {
-        return session;
-    }
-
-    public void setSession(String session) {
-        this.session = session;
-    }
-
-    public String getBlazeMeterURL() {
-        return blazeMeterURL;
-    }
-
-    public void setBlazeMeterURL(String blazeMeterURL) {
-        this.blazeMeterURL = blazeMeterURL;
     }
 
     public String getReportUrl() {
