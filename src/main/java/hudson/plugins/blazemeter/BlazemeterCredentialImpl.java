@@ -6,7 +6,7 @@ import hudson.Extension;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.Utils;
+import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -69,7 +69,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
 
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
-            String apiVersion= Utils.autoDetectApiVersion(userKey,jenCommonLog);
+            String apiVersion= BzmServiceManager.autoDetectApiVersion(userKey, jenCommonLog);
             BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, APIFactory.ApiVersion.valueOf(apiVersion));
             int testCount = bzm.getTestCount();
             if (testCount < 0) {

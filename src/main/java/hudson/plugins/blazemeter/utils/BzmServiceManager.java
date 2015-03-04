@@ -28,10 +28,10 @@ import java.util.zip.ZipFile;
 /**
  * Created by dzmitrykashlach on 18/11/14.
  */
-public class Utils {
+public class BzmServiceManager {
     private final static int BUFFER_SIZE = 2048;
     private final static String ZIP_EXTENSION = ".zip";
-    private Utils() {
+    private BzmServiceManager() {
     }
 
     public static String autoDetectApiVersion(String apiKey, AbstractLogger logger) {
@@ -256,12 +256,17 @@ public class Utils {
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
             builder.setTestDuration(testDuration);
         } catch (IOException e) {
-            bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + e.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": check if filename/filepath are valid");
+            jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
         } catch (JSONException je) {
-            bzmBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": " + je.getMessage());
-            jenBuildLog.info("Failed to read JSON configuration from file " + jsonConfigPath.getName() + ": check if filename/filepath are valid");
-        } finally {
+            jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
+            bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
+        } catch (Exception e){
+            jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
+            bzmBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
+        }
+
+        finally {
 /*          TODO
             These calls are not implemented for APIv3
             Should be fixed in v.2.1
@@ -486,7 +491,7 @@ public class Utils {
     public static String getVersion() {
         Properties props = new Properties();
         try {
-            props.load(Utils.class.getResourceAsStream("version.properties"));
+            props.load(BzmServiceManager.class.getResourceAsStream("version.properties"));
         } catch (IOException ex) {
             props.setProperty("version", "N/A");
         }

@@ -1,7 +1,6 @@
 package hudson.plugins.blazemeter;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
@@ -13,7 +12,7 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.Utils;
+import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -31,8 +30,6 @@ import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
@@ -93,12 +90,12 @@ public class PerformanceBuilder extends Builder {
                               String responseTimeFailedThreshold,
                               String responseTimeUnstableThreshold
     ) {
-        this.apiKey=Utils.selectUserKeyOnId(DESCRIPTOR,apiKey);
+        this.apiKey= BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, apiKey);
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
-                Utils.autoDetectApiVersion(this.apiKey,jenCommonLog):apiVersion;
+                BzmServiceManager.autoDetectApiVersion(this.apiKey, jenCommonLog):apiVersion;
     /*  TODO
     This calls are not implemented in v.2.0
     Therefor they will be hidden from GUI
@@ -137,7 +134,7 @@ public class PerformanceBuilder extends Builder {
         this.api.setLogger(bzmBuildLog);
 
         this.api = getAPIClient();
-        this.testId=Utils.prepareTestRun(this);
+        this.testId= BzmServiceManager.prepareTestRun(this);
         if(this.testId.isEmpty()){
             jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
             return false;
@@ -175,7 +172,7 @@ public class PerformanceBuilder extends Builder {
         // add the report to the build object.
 
         try {
-            Utils.waitForFinish(this.api, this.apiVersion, this.testId,
+            BzmServiceManager.waitForFinish(this.api, this.apiVersion, this.testId,
                     bzmBuildLog, session);
 
             bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
@@ -254,7 +251,7 @@ public class PerformanceBuilder extends Builder {
 
                JSONObject startJO = (JSONObject) json.get("result");
                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-               String reportUrl=Utils.getReportUrl(this.api, session, jenBuildLog, bzmBuildLog);
+               String reportUrl= BzmServiceManager.getReportUrl(this.api, session, jenBuildLog, bzmBuildLog);
                jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
                jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
 
@@ -264,8 +261,8 @@ public class PerformanceBuilder extends Builder {
            }
 
        }catch (Exception e) {
-           jenBuildLog.info("Failed to get session_id. Check that blazemeter server URL and userKey are correct");
-           bzmBuildLog.info("Failed to get session_id. Check that blazemeter server URL and userKey are correct",e);
+           jenBuildLog.info("Failed to get session_id: "+e.getMessage());
+           bzmBuildLog.info("Failed to get session_id. ",e);
        }
    return session;
    }
@@ -295,8 +292,8 @@ public class PerformanceBuilder extends Builder {
             success=true;
         }
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        Utils.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog,jenBuildLog);
-        Utils.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
+        BzmServiceManager.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
+        BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
 
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 
@@ -328,7 +325,7 @@ public class PerformanceBuilder extends Builder {
             testResult = testResultFactory.getTestResult(testReport);
             bzmBuildLog.info(testResult.toString());
             bzmBuildLog.info("Validating local tresholds...\n");
-            result=Utils.validateLocalTresholds(testResult,this,bzmBuildLog);
+            result= BzmServiceManager.validateLocalTresholds(testResult, this, bzmBuildLog);
 
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
