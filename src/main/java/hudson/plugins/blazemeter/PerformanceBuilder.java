@@ -79,7 +79,6 @@ public class PerformanceBuilder extends Builder {
     /**
      * Configured report parsers.
      */
-    private List<PerformanceReportParser> parsers = null;
 
     @DataBoundConstructor
     public PerformanceBuilder(String apiKey,
@@ -121,65 +120,8 @@ public class PerformanceBuilder extends Builder {
         return BuildStepMonitor.BUILD;
     }
 
-    public List<PerformanceReportParser> getParsers() {
-        return parsers;
-    }
 
-    /**
-     * <p>
-     * Delete the date suffix appended to the Performance result files by the
-     * Maven Performance plugin
-     * </p>
-     *
-     * @param performanceReportWorkspaceName self explanatory.
-     * @return the name of the PerformanceReport in the Build
-     */
-    public static String getPerformanceReportBuildFileName(
-            String performanceReportWorkspaceName) {
-        String result = performanceReportWorkspaceName;
-        if (performanceReportWorkspaceName != null) {
-            Pattern p = Pattern.compile("-[0-9]*\\.xml");
-            Matcher matcher = p.matcher(performanceReportWorkspaceName);
-            if (matcher.find()) {
-                result = matcher.replaceAll(".xml");
-            }
-        }
-        return result;
-    }
 
-    /**
-     * look for blazemeter reports based in the configured parameter includes.
-     * 'includes' is - an Ant-style pattern - a list of files and folders
-     * separated by the characters ;:,
-     */
-    protected static List<FilePath> locatePerformanceReports(FilePath workspace,
-                                                             String includes) throws IOException, InterruptedException {
-
-        // First use ant-style pattern
-        try {
-            FilePath[] ret = workspace.list(includes);
-            if (ret.length > 0) {
-                return Arrays.asList(ret);
-            }
-        } catch (IOException e) {
-            // Do nothing.
-        }
-
-        // If it fails, do a legacy search
-        ArrayList<FilePath> files = new ArrayList<FilePath>();
-        String parts[] = includes.split("\\s*[;:,]+\\s*");
-        for (String path : parts) {
-            FilePath src = workspace.child(path);
-            if (src.exists()) {
-                if (src.isDirectory()) {
-                    files.addAll(Arrays.asList(src.list("**/*")));
-                } else {
-                    files.add(src);
-                }
-            }
-        }
-        return files;
-    }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
@@ -231,11 +173,6 @@ public class PerformanceBuilder extends Builder {
         }
 
         // add the report to the build object.
-        PerformanceBuildAction a = new PerformanceBuildAction(build, bzmBuildLogStream, parsers);
-        a.setSession(session);
-        APIFactory apiFactory=APIFactory.getApiFactory();
-        a.setBlazeMeterURL(apiFactory.getBlazeMeterUrl());
-        build.addAction(a);
 
         try {
             Utils.waitForFinish(this.api, this.apiVersion, this.testId,
@@ -317,10 +254,13 @@ public class PerformanceBuilder extends Builder {
 
                JSONObject startJO = (JSONObject) json.get("result");
                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-               APIFactory apiFactory = APIFactory.getApiFactory();
                String reportUrl=Utils.getReportUrl(this.api, session, jenBuildLog, bzmBuildLog);
                jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
                jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+
+               PerformanceBuildAction a = new PerformanceBuildAction(build);
+               a.setReportUrl(reportUrl);
+               build.addAction(a);
            }
 
        }catch (Exception e) {
