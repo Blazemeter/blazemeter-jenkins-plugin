@@ -335,6 +335,7 @@ public class BzmServiceManager {
                               StdErrLog bzmBuildLog){
        JSONObject jo=api.retrieveJTLZIP(session);
        String dataUrl=null;
+        URL url=null;
         try {
             JSONArray data=jo.getJSONObject("result").getJSONArray("data");
             for(int i=0;i<data.length();i++){
@@ -346,20 +347,20 @@ public class BzmServiceManager {
             }
             File jtlZip=new File(filePath.getParent()
                     + "/" + filePath.getName() + "/" + session + ".zip");
-            URL url=new URL(dataUrl+"?api_key="+api.getApiKey());
+            url=new URL(dataUrl+"?api_key="+api.getApiKey());
 
             FileUtils.copyURLToFile(url, jtlZip);
             jenBuildLog.info("Downloading JTLZIP from "+url+"to "+jtlZip.getCanonicalPath());
             unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
         } catch (JSONException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get  JTLZIP: ");
+            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
+            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
         } catch (MalformedURLException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get  JTLZIP: ");
+            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
+            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
         } catch (IOException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP: ", e);
-            jenBuildLog.warn("Unable to get JTLZIP: ");
+            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
         }
     }
 
