@@ -418,75 +418,69 @@ public class BzmServiceManager {
     }
 
 
-
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,
-                                                StdErrLog bzmBuildLog) {
+                                                StdErrLog jenBuildLog) {
         Result result = Result.SUCCESS;
-        try{
+        try {
+            int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
+                    ? "-1" : builder.getResponseTimeUnstableThreshold());
+            int responseTimeFailed = Integer.valueOf(builder.getResponseTimeFailedThreshold().isEmpty()
+                    ? "-1" : builder.getResponseTimeFailedThreshold());
+            int errorUnstable = Integer.valueOf(builder.getErrorUnstableThreshold().isEmpty()
+                    ? "-1" : builder.getErrorUnstableThreshold());
+            int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
+                    ? "-1" : builder.getErrorFailedThreshold());
 
-        int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
-                ?"-1":builder.getResponseTimeUnstableThreshold());
+            if (errorUnstable < 0) {
+                jenBuildLog.info("ErrorUnstable percentage validation will be skipped: value was not set in configuration");
+            }
+            if (errorFailed < 0) {
+                jenBuildLog.info("ErrorFailed percentage validation will be skipped: value was not set in configuration");
+            }
+            if (responseTimeUnstable < 0) {
+                jenBuildLog.info("ResponseTimeUnstable validation will be skipped: value was not set in configuration");
+            }
+            if (responseTimeFailed < 0) {
+                jenBuildLog.info("ResponseTimeFailed validation will be skipped: value was not set in configuration");
+            }
 
-        int responseTimeFailed = Integer.valueOf(builder.getResponseTimeFailedThreshold().isEmpty()
-                ?"-1":builder.getResponseTimeFailedThreshold());
-        int errorUnstable = Integer.valueOf(builder.getErrorUnstableThreshold().isEmpty()
-                ?"-1":builder.getErrorUnstableThreshold());
-        int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
-                ?"-1":builder.getErrorFailedThreshold());
+            if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable) {
+                jenBuildLog.info("Validating reponseTimeUnstable...\n");
+                jenBuildLog.info("Average response time is higher than RESPONSE_TIME_UNSTABLE treshold\n");
+                jenBuildLog.info("Marking build as unstable");
+                result = Result.UNSTABLE;
+            }
 
-        if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable &
-                testResult.getAverage() < responseTimeFailed) {
-            bzmBuildLog.info("Validating reponseTimeUnstable...\n");
-            bzmBuildLog.info("Average response time is higher than responseTimeUnstable treshold\n");
-            bzmBuildLog.info("Marking build as unstable");
-            result = Result.UNSTABLE;
+            if (errorUnstable >= 0 & testResult.getErrorPercentage() > errorUnstable) {
+                jenBuildLog.info("Validating errorPercentageUnstable...\n");
+                jenBuildLog.info("Error percentage is higher than ERROR_PERCENTAGE_UNSTABLE treshold\n");
+                jenBuildLog.info("Marking build as unstable");
+                result = Result.UNSTABLE;
+            }
+
+            if (responseTimeFailed >= 0 & testResult.getAverage() >= responseTimeFailed) {
+                jenBuildLog.info("Validating reponseTimeFailed...\n");
+                jenBuildLog.info("Average response time is higher than RESPONSE_TIME_FAILED treshold\n");
+                jenBuildLog.info("Marking build as failed");
+                result = Result.FAILURE;
+                return result;
+            }
+
+            if (errorFailed >= 0 & testResult.getErrorPercentage() >= errorFailed) {
+                jenBuildLog.info("Validating errorPercentageUnstable...\n");
+                jenBuildLog.info("Error percentage is higher than ERROR_PERCENTAGE_FAILED treshold\n");
+                jenBuildLog.info("Marking build as failed");
+                result = Result.FAILURE;
+                return result;
+            }
+
+        } catch (Exception e) {
+            jenBuildLog.info("Error occured while validating local tresholds. Check that test was finished correctly or turn to customer support");
+        } finally {
+            return result;
         }
-
-        if (errorUnstable >= 0 & testResult.getErrorPercentage() > errorUnstable &
-                testResult.getAverage() < errorFailed) {
-            bzmBuildLog.info("Validating errorPercentageUnstable...\n");
-            bzmBuildLog.info("Error percentage is higher than errorPercentageUnstable treshold\n");
-            bzmBuildLog.info("Marking build as unstable");
-            result = Result.UNSTABLE;
-        }
-
-
-        if (responseTimeFailed >= 0 & testResult.getAverage() >= responseTimeFailed) {
-            bzmBuildLog.info("Validating reponseTimeFailed...\n");
-            bzmBuildLog.info("Average response time is higher than responseTimeFailure treshold\n");
-            bzmBuildLog.info("Marking build as failed");
-            result = Result.FAILURE;
-        }
-
-        if (errorFailed >= 0 & testResult.getErrorPercentage() >= errorFailed) {
-            bzmBuildLog.info("Validating errorPercentageUnstable...\n");
-            bzmBuildLog.info("Error percentage is higher than errorPercentageUnstable treshold\n");
-            bzmBuildLog.info("Marking build as failed");
-            result = Result.FAILURE;
-        }
-
-        if (errorUnstable < 0) {
-            bzmBuildLog.info("ErrorUnstable percentage validation was skipped: value was not set in configuration");
-        }
-
-        if (errorFailed < 0) {
-            bzmBuildLog.info("ErrorFailed percentage validation was skipped: value was not set in configuration");
-        }
-
-        if (responseTimeUnstable < 0) {
-            bzmBuildLog.info("ResponseTimeUnstable validation was skipped: value was not set in configuration");
-        }
-
-        if (responseTimeFailed < 0) {
-            bzmBuildLog.info("ResponseTimeFailed validation was skipped: value was not set in configuration");
-        }
-        }catch (Exception e){
-            bzmBuildLog.info("Error occured while validating local tresholds. Check that test was finished correctly or turn to customer support");
-        }
-
-        return result;
-    }
+}
 
     public static String getVersion() {
         Properties props = new Properties();

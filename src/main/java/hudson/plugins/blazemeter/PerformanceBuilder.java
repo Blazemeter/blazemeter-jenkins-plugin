@@ -325,7 +325,7 @@ public class PerformanceBuilder extends Builder {
             testResult = testResultFactory.getTestResult(testReport);
             bzmBuildLog.info(testResult.toString());
             bzmBuildLog.info("Validating local tresholds...\n");
-            result= BzmServiceManager.validateLocalTresholds(testResult, this, bzmBuildLog);
+            result= BzmServiceManager.validateLocalTresholds(testResult, this, jenBuildLog);
 
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
