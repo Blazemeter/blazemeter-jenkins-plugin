@@ -258,12 +258,15 @@ public class BzmServiceManager {
         } catch (IOException e) {
             jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
             bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
+            testId="";
         } catch (JSONException je) {
             jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
             bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
+            testId="";
         } catch (Exception e){
             jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
             bzmBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
+            testId="";
         }
 
         finally {
