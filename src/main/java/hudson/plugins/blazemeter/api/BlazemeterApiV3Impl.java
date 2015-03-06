@@ -321,6 +321,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
 
+    @Override
     public void setBzmHttpWr(BzmHttpWrapper bzmhc) {
         this.bzmhc = bzmhc;
     }
@@ -348,5 +349,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
 
         return jo;
+    }
+
+    @Override
+    public BzmHttpWrapper getBzmHttpWr() {
+        return this.bzmhc;
     }
 }

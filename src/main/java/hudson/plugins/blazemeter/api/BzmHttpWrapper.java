@@ -37,11 +37,6 @@ public class BzmHttpWrapper {
         this.logger.setDebugEnabled(false);
     }
 
-    public BzmHttpWrapper(DefaultHttpClient httpClient) {
-        this.httpClient = httpClient;
-        this.logger.setDebugEnabled(false);
-    }
-
     public HttpResponse getHttpResponse(String url, JSONObject data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
@@ -147,7 +142,7 @@ public class BzmHttpWrapper {
             if (response != null) {
                 String output = EntityUtils.toString(response.getEntity());
                 if(logger.isDebugEnabled())
-                    logger.debug(output);
+                    logger.debug("Received JSON object: "+output);
                 jo = new JSONObject(output);
             }
         } catch (IOException e) {
@@ -197,5 +192,13 @@ public class BzmHttpWrapper {
 
     public void setHttpClient(DefaultHttpClient httpClient) {
         this.httpClient = httpClient;
+    }
+
+    public StdErrLog getLogger() {
+        return logger;
+    }
+
+    public void setLogger(StdErrLog logger) {
+        this.logger = logger;
     }
 }

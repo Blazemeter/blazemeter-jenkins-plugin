@@ -131,9 +131,16 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api.setLogger(bzmBuildLog);
-
         this.api = getAPIClient();
+        this.api.setLogger(bzmBuildLog);
+        bzmBuildLog.setDebugEnabled(true);
+        this.api.getBzmHttpWr().setLogger(bzmBuildLog);
+        this.api.getBzmHttpWr().setLogger(bzmBuildLog);
+        /*
+        TODO
+        1. Get BzmHttpClient
+        2. Set logger
+         */
         this.testId= BzmServiceManager.prepareTestRun(this);
         if(this.testId.isEmpty()){
             jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");

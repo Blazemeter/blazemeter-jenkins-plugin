@@ -324,4 +324,14 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public JSONObject generatePublicToken(String sessionId) {
         return not_implemented;
     }
+
+    @Override
+    public void setBzmHttpWr(BzmHttpWrapper bzmhc) {
+        this.bzmhc=bzmhc;
+    }
+
+    @Override
+    public BzmHttpWrapper getBzmHttpWr() {
+        return null;
+    }
 }

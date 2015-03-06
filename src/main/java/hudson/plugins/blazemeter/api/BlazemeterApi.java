@@ -63,6 +63,10 @@ public interface BlazemeterApi {
 
     public JSONObject putTestInfo(String testId, JSONObject data);
 
+    public void setBzmHttpWr(BzmHttpWrapper bzmhc);
+
+    public BzmHttpWrapper getBzmHttpWr();
+
     public StdErrLog getLogger();
 
     public void setLogger(StdErrLog logger);
