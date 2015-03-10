@@ -450,30 +450,30 @@ public class BzmServiceManager {
             }
 
             if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable) {
-                jenBuildLog.info("Validating reponseTimeUnstable...\n");
-                jenBuildLog.info("Average response time is higher than RESPONSE_TIME_UNSTABLE treshold\n");
+                jenBuildLog.info("Validating responseTimeUnstable...\n");
+                jenBuildLog.info("Actual average_response_time="+testResult.getAverage()+" is higher than RESPONSE_TIME_UNSTABLE_treshold="+responseTimeUnstable+"\n");
                 jenBuildLog.info("Marking build as unstable");
                 result = Result.UNSTABLE;
             }
 
             if (errorUnstable >= 0 & testResult.getErrorPercentage() > errorUnstable) {
                 jenBuildLog.info("Validating errorPercentageUnstable...\n");
-                jenBuildLog.info("Error percentage is higher than ERROR_PERCENTAGE_UNSTABLE treshold\n");
+                jenBuildLog.info("Actual error_percentage="+testResult.getErrorPercentage()+" is higher than ERROR_PERCENTAGE_UNSTABLE_treshold="+errorUnstable+"\n");
                 jenBuildLog.info("Marking build as unstable");
                 result = Result.UNSTABLE;
             }
 
             if (responseTimeFailed >= 0 & testResult.getAverage() >= responseTimeFailed) {
-                jenBuildLog.info("Validating reponseTimeFailed...\n");
-                jenBuildLog.info("Average response time is higher than RESPONSE_TIME_FAILED treshold\n");
+                jenBuildLog.info("Validating responseTimeFailed...\n");
+                jenBuildLog.info("Actual average_response_time="+testResult.getAverage()+" is higher than RESPONSE_TIME_FAILED treshold="+responseTimeFailed+"\n");
                 jenBuildLog.info("Marking build as failed");
                 result = Result.FAILURE;
                 return result;
             }
 
             if (errorFailed >= 0 & testResult.getErrorPercentage() >= errorFailed) {
-                jenBuildLog.info("Validating errorPercentageUnstable...\n");
-                jenBuildLog.info("Error percentage is higher than ERROR_PERCENTAGE_FAILED treshold\n");
+                jenBuildLog.info("Validating errorPercentageFailed...\n");
+                jenBuildLog.info("Actual error_percentage="+testResult.getErrorPercentage()+" is higher than ERROR_PERCENTAGE_FAILED treshold="+errorFailed+"\n");
                 jenBuildLog.info("Marking build as failed");
                 result = Result.FAILURE;
                 return result;
