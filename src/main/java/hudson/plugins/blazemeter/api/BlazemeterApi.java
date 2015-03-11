@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -10,7 +11,6 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * User: Vitali
@@ -45,7 +45,7 @@ public interface BlazemeterApi {
 
     public JSONObject testReport(String reportId);
 
-    public HashMap<String, String> getTestList() throws IOException, MessagingException;
+    public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException;
 
     public JSONObject getUser();
 

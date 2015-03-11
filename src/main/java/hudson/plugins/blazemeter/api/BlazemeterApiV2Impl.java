@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
@@ -15,8 +16,6 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * User: Vitali
@@ -204,9 +203,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public HashMap<String, String> getTestList() throws IOException, MessagingException {
+    public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException {
 
-        LinkedHashMap<String, String> testListOrdered = null;
+        LinkedHashMultimap<String, String> testListOrdered = null;
 
         if (StringUtils.isBlank(apiKey)) {
             return null;
@@ -218,7 +217,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                 String r = jo.get("response_code").toString();
                 if (r.equals("200")) {
                     JSONArray arr = (JSONArray) jo.get("tests");
-                    testListOrdered = new LinkedHashMap<String, String>(arr.length());
+                    testListOrdered = LinkedHashMultimap.create(arr.length(),arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject en = null;
                         try {

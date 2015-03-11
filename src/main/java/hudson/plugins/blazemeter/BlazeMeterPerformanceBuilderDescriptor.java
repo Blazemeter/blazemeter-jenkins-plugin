@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.APIFactory;
@@ -76,7 +77,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             APIFactory apiFactory=APIFactory.getApiFactory();
             BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
             try {
-                HashMap<String, String> testList = bzm.getTestList();
+                LinkedHashMultimap<String, String> testList = bzm.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
@@ -84,15 +85,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 } else if (testList.isEmpty()){
                     items.add("No tests", "-1");
                 } else {
-                    Set set = testList.entrySet();
+                    Set set = testList.entries();
                     for (Object test : set) {
                         Map.Entry me = (Map.Entry) test;
-/*
-                        items.add(new ListBoxModel.Option(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue()),
-                                this.testId.contains(testId)));
-*/
                         items.add(new ListBoxModel.Option(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue())));
-
                     }
                 }
             } catch (Exception e) {
