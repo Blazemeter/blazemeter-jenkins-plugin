@@ -285,12 +285,15 @@ public class PerformanceBuilder extends Builder {
         //get tresholds from server and check if test is success
         String junitReport="";
         JSONObject jo = null;
-        boolean success=false;
+        boolean success=true;
+
+        /*FIXME
+        Move to BzmServiceManager as separate method.
+        Temporarily commmented until implementing server tresholds check-box on UI
         try {
             jo=this.api.getTresholds(session);
             bzmBuildLog.info("Treshold object = " + jo.toString());
             success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
-            junitReport = this.api.retrieveJUNITXML(session);
         } catch (JSONException je) {
             bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
             success=true;
@@ -298,16 +301,23 @@ public class PerformanceBuilder extends Builder {
             bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
             success=true;
         }
-        bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        BzmServiceManager.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
-        BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
-
         bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
 
         Result result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
             return result;
         }
+        */
+        Result result = success?Result.SUCCESS:Result.FAILURE;
+        try{
+            junitReport = this.api.retrieveJUNITXML(session);
+
+        }catch (Exception e){
+            jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
+        }
+        bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
+        BzmServiceManager.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
+        BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
 
         //get testGetArchive information
         JSONObject testReport=null;
