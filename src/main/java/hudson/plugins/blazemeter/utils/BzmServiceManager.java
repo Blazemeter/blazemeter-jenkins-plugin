@@ -316,6 +316,30 @@ public class BzmServiceManager {
         }
     }
 
+    public static Result validateServerTresholds(BlazemeterApi api,String session,StdErrLog jenBuildLog){
+        Result result;
+        JSONObject jo;
+        boolean success;
+        try {
+            jo=api.getTresholds(session);
+            jenBuildLog.info("Treshold object = " + jo.toString());
+            success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
+        } catch (JSONException je) {
+            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
+            success=true;
+        } catch (Exception e) {
+            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
+            success=true;
+        }
+        jenBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
+
+        result = success?Result.SUCCESS:Result.FAILURE;
+        if(result.equals(Result.FAILURE)){
+            return result;
+        }
+        return result;
+    }
+
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
                                            String id){
         String userKey=null;
@@ -425,7 +449,7 @@ public class BzmServiceManager {
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,
                                                 StdErrLog jenBuildLog) {
-        Result result = Result.SUCCESS;
+        Result result=null;
         try {
             int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
                     ? "-1" : builder.getResponseTimeUnstableThreshold());

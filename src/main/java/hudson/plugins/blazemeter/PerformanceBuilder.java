@@ -73,6 +73,7 @@ public class PerformanceBuilder extends Builder {
      */
     private transient String filename;
 
+    private boolean useServerTresholds;
     /**
      * Configured report parsers.
      */
@@ -85,6 +86,7 @@ public class PerformanceBuilder extends Builder {
                               String testId,
                               String apiVersion,
                               String jsonConfig,
+                              boolean useServerTresholds,
                               String errorFailedThreshold,
                               String errorUnstableThreshold,
                               String responseTimeFailedThreshold,
@@ -105,6 +107,7 @@ public class PerformanceBuilder extends Builder {
         this.dataFolder = dataFolder;
     */
         this.jsonConfig = jsonConfig;
+        this.useServerTresholds=useServerTresholds;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
@@ -284,41 +287,19 @@ public class PerformanceBuilder extends Builder {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         String junitReport="";
-        JSONObject jo = null;
-        boolean success=true;
-
-        /*FIXME
-        Move to BzmServiceManager as separate method.
-        Temporarily commmented until implementing server tresholds check-box on UI
-        try {
-            jo=this.api.getTresholds(session);
-            bzmBuildLog.info("Treshold object = " + jo.toString());
-            success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
-        } catch (JSONException je) {
-            bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
-        } catch (Exception e) {
-            bzmBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
-        }
-        bzmBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
-
-        Result result = success?Result.SUCCESS:Result.FAILURE;
-        if(result.equals(Result.FAILURE)){
-            return result;
-        }
-        */
-        Result result = success?Result.SUCCESS:Result.FAILURE;
+        Result result = Result.SUCCESS;
         try{
             junitReport = this.api.retrieveJUNITXML(session);
-
         }catch (Exception e){
             jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
         }
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
         BzmServiceManager.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
         BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
-
+        if(this.useServerTresholds){
+         jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
+         result= BzmServiceManager.validateServerTresholds(this.api,session,jenBuildLog);
+        }
         //get testGetArchive information
         JSONObject testReport=null;
         try{
@@ -338,12 +319,12 @@ public class PerformanceBuilder extends Builder {
         TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
         testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
         TestResult testResult = null;
+        Result localTresholdsResult=null;
         try {
             testResult = testResultFactory.getTestResult(testReport);
             bzmBuildLog.info(testResult.toString());
             bzmBuildLog.info("Validating local tresholds...\n");
-            result= BzmServiceManager.validateLocalTresholds(testResult, this, jenBuildLog);
-
+            localTresholdsResult= BzmServiceManager.validateLocalTresholds(testResult, this, jenBuildLog);
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             bzmBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
@@ -351,7 +332,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             bzmBuildLog.info("ERROR: Failed to generate TestResult: " + je);
         }finally{
-            return result;
+            return localTresholdsResult!=null?localTresholdsResult:result;
         }
     }
 
@@ -459,6 +440,15 @@ public class PerformanceBuilder extends Builder {
 
     public BlazemeterApi getApi() {
         return api;
+    }
+
+
+    public boolean isUseServerTresholds() {
+        return useServerTresholds;
+    }
+
+    public void setUseServerTresholds(boolean useServerTresholds) {
+        this.useServerTresholds = useServerTresholds;
     }
 
     @Override

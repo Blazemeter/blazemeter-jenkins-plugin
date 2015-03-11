@@ -19,7 +19,7 @@ public class TestPerformanceBuilder {
     public void first() throws Exception {
         FreeStyleProject project = j.createFreeStyleProject();
         PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","","","123","v3",
-                                                                      "","","","","");
+                                                                      "",false,"","","","");
 //        j.jenkins
         project.getBuildersList().add(pbBefore);
 //        j.submit(j.createWebClient().getPage(project,"configure").getForms().get(0));
