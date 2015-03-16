@@ -14,4 +14,7 @@ public interface Constants {
     public static String CREATE_YAHOO_TEST_NOTE="createYahooTestFromJSON";
     public static String CREATE_BZM_TEST="Create BZM test using JSON configuration";
     public static String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
+    public static String BM_TRESHOLDS="bm-thresholds.xml";
+    public static String BM_KPIS="bm-kpis.jtl";
+    public static String BM_ARTEFACTS="bm-artefacts.zip";
 }

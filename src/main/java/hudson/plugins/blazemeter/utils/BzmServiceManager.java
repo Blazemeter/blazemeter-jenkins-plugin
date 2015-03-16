@@ -298,7 +298,7 @@ public class BzmServiceManager {
                                   StdErrLog bzmBuildLog,
                                   StdErrLog jenBuildLog) {
         File reportFile = new File(filePath.getParent()
-                + "/" + filePath.getName() + "/" + filename + ".xml");
+                + "/" + filePath.getName() + "/" + filename);
         try {
             if (!reportFile.exists()) {
                 reportFile.createNewFile();
@@ -373,12 +373,17 @@ public class BzmServiceManager {
                 }
             }
             File jtlZip=new File(filePath.getParent()
-                    + "/" + filePath.getName() + "/" + session + ".zip");
+                    + "/" + filePath.getName() + "/" + Constants.BM_ARTEFACTS + ".zip");
             url=new URL(dataUrl+"?api_key="+api.getApiKey());
 
             FileUtils.copyURLToFile(url, jtlZip);
             jenBuildLog.info("Downloading JTLZIP from "+url+"to "+jtlZip.getCanonicalPath());
             unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
+            FilePath sample_jtl=new FilePath(filePath,"sample.jtl");
+            FilePath bm_kpis_jtl=new FilePath(filePath,Constants.BM_KPIS);
+            if(sample_jtl.exists()){
+                sample_jtl.renameTo(bm_kpis_jtl);
+            }
         } catch (JSONException e) {
             bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
             jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
@@ -386,6 +391,9 @@ public class BzmServiceManager {
             bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
             jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
         } catch (IOException e) {
+            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
+        } catch (InterruptedException e) {
             bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
             jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
         }

@@ -294,7 +294,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
         }
         bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        BzmServiceManager.saveReport(session, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
+        BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
         BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
         if(this.useServerTresholds){
          jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
