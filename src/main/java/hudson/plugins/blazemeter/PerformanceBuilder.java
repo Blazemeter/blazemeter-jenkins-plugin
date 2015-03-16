@@ -206,12 +206,12 @@ public class PerformanceBuilder extends Builder {
             if (status.equals(TestStatus.Running)) {
                 bzmBuildLog.info("Shutting down test");
                 this.api.stopTest(testId);
-            } else if (status.equals(TestStatus.Error)) {
-                build.setResult(Result.FAILURE);
-                bzmBuildLog.warn("Error while running a test - please try to run the same test on BlazeMeter");
             } else if (status.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
                 bzmBuildLog.warn("Test not found error");
+            } else if (status.equals(TestStatus.Error)) {
+                build.setResult(Result.FAILURE);
+                jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }
         }
     }

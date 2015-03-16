@@ -111,10 +111,16 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             } else {
                 ti.setId(result.getString("testId"));
                 ti.setName(result.getString("name"));
-                if (!result.getString("status").equals("ENDED")) {
+                if (!result.has("ended")||result.getString("ended").equals(JSONObject.NULL)||result.getString("ended").isEmpty()) {
                     ti.setStatus(TestStatus.Running);
                 } else {
-                    ti.setStatus(TestStatus.NotRunning);
+                    logger.info("Test is not running. Quiting job...");
+                     if(result.has("errors")&&!result.get("errors").equals(JSONObject.NULL)){
+                         logger.debug("Error received from server: "+result.get("errors").toString());
+                         ti.setStatus(TestStatus.Error);
+                     }else {
+                        ti.setStatus(TestStatus.NotRunning);
+                    }
                 }
             }
         } catch (Exception e) {

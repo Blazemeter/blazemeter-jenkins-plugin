@@ -373,7 +373,7 @@ public class BzmServiceManager {
                 }
             }
             File jtlZip=new File(filePath.getParent()
-                    + "/" + filePath.getName() + "/" + Constants.BM_ARTEFACTS + ".zip");
+                    + "/" + filePath.getName() + "/" + Constants.BM_ARTEFACTS);
             url=new URL(dataUrl+"?api_key="+api.getApiKey());
 
             FileUtils.copyURLToFile(url, jtlZip);
