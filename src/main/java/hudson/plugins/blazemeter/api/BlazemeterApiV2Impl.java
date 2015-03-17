@@ -6,6 +6,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JsonConstants;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -72,8 +73,8 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
         String url = this.urlManager.scriptUpload(APP_KEY, apiKey, testId, file.getName());
         JSONObject json = this.bzmhc.getFileUploadJsonResponse(url, file);
         try {
-            if (!json.get("response_code").equals(200)) {
-                logger.warn("Could not upload file " + file.getName() + " " + json.get("error").toString());
+            if (!json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
+                logger.warn("Could not upload file " + file.getName() + " " + json.get(JsonConstants.ERROR).toString());
             }
         } catch (JSONException e) {
             logger.warn("Could not upload file " + file.getName() + " ", e);
@@ -115,12 +116,12 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             String url = this.urlManager.testStatus(APP_KEY, apiKey, testId);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
 
-            if ("Test not found".equals(jo.get("error"))) {
+            if ("Test not found".equals(jo.get(JsonConstants.ERROR))) {
                 ti.setStatus(TestStatus.NotFound);
             } else {
-                ti.setId(jo.getString("test_id"));
+                ti.setId(jo.getString(JsonConstants.TEST_ID));
                 ti.setName(jo.getString("test_name"));
-                ti.setStatus(jo.getString("status"));
+                ti.setStatus(jo.getString(JsonConstants.STATUS));
             }
         } catch (Exception e) {
             logger.warn("ERROR getting status " + e);
@@ -152,7 +153,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             if (jo == null) {
                 return -1;
             } else {
-                String r = jo.get("response_code").toString();
+                String r = jo.get(JsonConstants.RESPONSE_CODE).toString();
                 if (!r.equals("200")) {
                     return 0;
                 }
@@ -214,7 +215,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             logger.warn("Getting testLists via URL=" + url);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
             try {
-                String r = jo.get("response_code").toString();
+                String r = jo.get(JsonConstants.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
                     JSONArray arr = (JSONArray) jo.get("tests");
                     testListOrdered = LinkedHashMultimap.create(arr.length(),arr.length());
@@ -229,7 +230,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
                         String name;
                         try {
                             if (en != null) {
-                                id = en.getString("test_id");
+                                id = en.getString(JsonConstants.TEST_ID);
                                 name = en.getString("test_name").replaceAll("&", "&amp;");
                                 testListOrdered.put(name, id);
 

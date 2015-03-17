@@ -70,13 +70,13 @@ public class BzmServiceManager {
                 updateResult=api.postJsonConfig(testId, result);
             } else if (updDuration != null && !updDuration.isEmpty()) {
                 JSONObject jo = api.getTestInfo(testId);
-                result = jo.getJSONObject("result");
-                JSONObject configuration = result.getJSONObject("configuration");
-                JSONObject plugins = configuration.getJSONObject("plugins");
-                String type = configuration.getString("type");
+                result = jo.getJSONObject(JsonConstants.RESULT);
+                JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
+                JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
+                String type = configuration.getString(JsonConstants.TYPE);
                 JSONObject options = plugins.getJSONObject(type);
-                JSONObject override = options.getJSONObject("override");
-                override.put("duration", updDuration);
+                JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
+                override.put(JsonConstants.DURATION, updDuration);
                 override.put("threads", JSONObject.NULL);
                 configuration.put("serversCount", JSONObject.NULL);
                 updateResult=api.putTestInfo(testId, result);
@@ -94,13 +94,13 @@ public class BzmServiceManager {
         String duration = null;
         try {
             JSONObject jo = api.getTestInfo(testId);
-            JSONObject result = jo.getJSONObject("result");
-            JSONObject configuration = result.getJSONObject("configuration");
-            JSONObject plugins = configuration.getJSONObject("plugins");
-            String type = configuration.getString("type");
+            JSONObject result = jo.getJSONObject(JsonConstants.RESULT);
+            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
+            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
+            String type = configuration.getString(JsonConstants.TYPE);
             JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject("override");
-            duration = override.getString("duration");
+            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
+            duration = override.getString(JsonConstants.DURATION);
 
         } catch (JSONException je) {
             bzmBuildLog.warn("Received JSONException while requesting testDuration: ", je);
@@ -179,11 +179,11 @@ public class BzmServiceManager {
 
         if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
             JSONObject jo = api.createTest(configNode);
-            if(jo.has("error")&&!jo.getString("error").equals("null")){
-                jenBuildLog.warn("Failed to create test: "+jo.getString("error"));
+            if(jo.has(JsonConstants.ERROR)&&!jo.getString(JsonConstants.ERROR).equals("null")){
+                jenBuildLog.warn("Failed to create test: "+jo.getString(JsonConstants.ERROR));
                 testId="";
             }else{
-                testId = jo.getJSONObject("result").getString("id");
+                testId = jo.getJSONObject(JsonConstants.RESULT).getString(JsonConstants.ID);
             }
         }
         }catch (Exception e){
@@ -200,13 +200,13 @@ public class BzmServiceManager {
         String reportUrl=null;
         try {
             jo = api.generatePublicToken(sessionId);
-            if(jo.get("error").equals(JSONObject.NULL)){
-                JSONObject result=jo.getJSONObject("result");
+            if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
+                JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
                 reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"/app/?public-token="+publicToken+"#reports/"+sessionId+"/summary";
             }else{
-                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get("error").toString());
-                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get("error").toString());
+                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
+                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"/app/#reports/"+sessionId+"/summary";
             }
         } catch (Exception e){
@@ -243,9 +243,9 @@ public class BzmServiceManager {
 
             if(configNode!=null|!builder.getTestDuration().isEmpty()) {
                 JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
-                if(updateResult.has("error")&&!updateResult.get("error").equals(null)){
+                if(updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
-                    jenBuildLog.warn("Error:"+updateResult.getString("error"));
+                    jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
                     testId="";
                 }else{
                     jenBuildLog.info("Test "+testId+" was started on server");
@@ -284,8 +284,8 @@ public class BzmServiceManager {
         String fileName = file.getName();
         org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
         try {
-            if (!json.get("response_code").equals(200)) {
-                bzmBuildLog.info("Could not upload file " + fileName + " " + json.get("error").toString());
+            if (!json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
+                bzmBuildLog.info("Could not upload file " + fileName + " " + json.get(JsonConstants.ERROR).toString());
             }
         } catch (JSONException e) {
             bzmBuildLog.info("Could not upload file " + fileName + " " + e.getMessage());
@@ -323,7 +323,7 @@ public class BzmServiceManager {
         try {
             jo=api.getTresholds(session);
             jenBuildLog.info("Treshold object = " + jo.toString());
-            success=jo.getJSONObject("result").getJSONObject("data").getBoolean("success");
+            success=jo.getJSONObject(JsonConstants.RESULT).getJSONObject(JsonConstants.DATA).getBoolean("success");
         } catch (JSONException je) {
             jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
             success=true;
@@ -364,11 +364,11 @@ public class BzmServiceManager {
        String dataUrl=null;
         URL url=null;
         try {
-            JSONArray data=jo.getJSONObject("result").getJSONArray("data");
+            JSONArray data=jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
             for(int i=0;i<data.length();i++){
                 String title=data.getJSONObject(i).getString("title");
                 if(title.equals("Zip")){
-                  dataUrl=data.getJSONObject(i).getString("dataUrl");
+                  dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
                     break;
                 }
             }
@@ -523,8 +523,8 @@ public class BzmServiceManager {
         try {
             props.load(BzmServiceManager.class.getResourceAsStream("version.properties"));
         } catch (IOException ex) {
-            props.setProperty("version", "N/A");
+            props.setProperty(Constants.VERSION, "N/A");
         }
-        return props.getProperty("version");
+        return props.getProperty(Constants.VERSION);
     }
 }
