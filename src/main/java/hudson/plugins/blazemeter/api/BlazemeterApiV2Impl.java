@@ -121,7 +121,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
             } else {
                 ti.setId(jo.getString(JsonConstants.TEST_ID));
                 ti.setName(jo.getString("test_name"));
-                ti.setStatus(jo.getString(JsonConstants.STATUS));
+                ti.setStatus(TestStatus.valueOf(jo.getString(JsonConstants.STATUS)));
             }
         } catch (Exception e) {
             logger.warn("ERROR getting status " + e);

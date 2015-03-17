@@ -13,12 +13,12 @@ package hudson.plugins.blazemeter.entities;
 public class TestInfo {
     private String id;
     private String name;
-    private String status;
+    private TestStatus status;
 
     public TestInfo() {
     }
 
-    public TestInfo(String id, String name, String status) {
+    public TestInfo(String id, String name, TestStatus status) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -40,11 +40,11 @@ public class TestInfo {
         this.name = name;
     }
 
-    public String getStatus() {
+    public TestStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TestStatus status) {
         this.status = status;
     }
 

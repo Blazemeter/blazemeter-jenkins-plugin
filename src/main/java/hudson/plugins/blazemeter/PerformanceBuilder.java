@@ -203,7 +203,7 @@ public class PerformanceBuilder extends Builder {
         finally {
             TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
 
-            String status = info.getStatus();
+            TestStatus status = info.getStatus();
             if (status.equals(TestStatus.Running)) {
                 bzmBuildLog.info("Shutting down test");
                 this.api.stopTest(testId);
