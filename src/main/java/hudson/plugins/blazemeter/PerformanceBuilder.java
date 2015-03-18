@@ -36,7 +36,7 @@ public class PerformanceBuilder extends Builder {
     DateFormat df = new SimpleDateFormat("dd/MM/yy");
     private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
     private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
-    private static StdErrLog jenBuildLog =new StdErrLog(Constants.BUILD_JEN);
+    private StdErrLog jenBuildLog;
 
     private String apiKey = "";
 
@@ -128,6 +128,7 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         this.build=build;
+        jenBuildLog=new StdErrLog(Constants.BUILD_JEN);
         jenBuildLog.setStdErrStream(listener.getLogger());
         File bzmLogFile = new File(build.getLogFile().getParentFile()+"/"+Constants.BZM_JEN_LOG);
         if(!bzmLogFile.exists()){
@@ -435,7 +436,7 @@ public class PerformanceBuilder extends Builder {
         return bzmBuildLog;
     }
 
-    public static StdErrLog getJenBuildLog() {
+    public StdErrLog getJenBuildLog() {
         return jenBuildLog;
     }
 

@@ -221,7 +221,7 @@ public class BzmServiceManager {
         BlazemeterApi api = builder.getApi();
         FilePath jsonConfigPath = null;
         StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
-        StdErrLog jenBuildLog = PerformanceBuilder.getJenBuildLog();
+        StdErrLog jenBuildLog = builder.getJenBuildLog();
         String testId = builder.getTestId();
         try {
             JSONObject configNode=null;
