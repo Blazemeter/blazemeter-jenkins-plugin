@@ -56,6 +56,8 @@ public class PerformanceBuilder extends Builder {
     private String dataFolder = "";
 */
 
+    private String location = "";
+
     private String jsonConfig = "";
 
     private String errorFailedThreshold = "";
@@ -86,6 +88,7 @@ public class PerformanceBuilder extends Builder {
                               String dataFolder,
                               String testId,
                               String apiVersion,
+                              String location,
                               String jsonConfig,
                               boolean useServerTresholds,
                               String errorFailedThreshold,
@@ -107,6 +110,7 @@ public class PerformanceBuilder extends Builder {
         this.mainJMX = mainJMX;
         this.dataFolder = dataFolder;
     */
+        this.location = location;
         this.jsonConfig = jsonConfig;
         this.useServerTresholds=useServerTresholds;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
@@ -444,6 +448,9 @@ public class PerformanceBuilder extends Builder {
         return api;
     }
 
+    public String getLocation() {
+        return location;
+    }
 
     public boolean isUseServerTresholds() {
         return useServerTresholds;

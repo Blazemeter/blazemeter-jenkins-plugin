@@ -56,36 +56,89 @@ public class BzmServiceManager {
         return detectedApiVersion;
     }
 
+    public static JSONObject updateLocation(BlazemeterApi api,String testId,JSONObject configNode,StdErrLog bzmBuildLog){
+        JSONObject updateResult=null;
+        try {
+            if (configNode != null) {
+                updateResult=api.postJsonConfig(testId, configNode);
+            }
+        }catch (Exception e) {
+            bzmBuildLog.warn("Received JSONException while saving testDuration: ", e);
+        }
+        return updateResult;
+    }
 
-    public static JSONObject updateTest(BlazemeterApi api,
-                                  String testId,
-                                  String updDuration,
-                                  JSONObject configNode,
-                                  StdErrLog bzmBuildLog) {
+    public static JSONObject updateTestConfiguration(BlazemeterApi api,
+                                                     String testId,
+                                                     String testDuration,
+                                                     String location,
+                                                     JSONObject configNode,
+                                                     StdErrLog bzmBuildLog) {
         JSONObject updateResult=null;
         try {
             JSONObject result = null;
             if (configNode != null) {
                 result=configNode;
-                updateResult=api.postJsonConfig(testId, result);
-            } else if (updDuration != null && !updDuration.isEmpty()) {
-                JSONObject jo = api.getTestInfo(testId);
-                result = jo.getJSONObject(JsonConstants.RESULT);
-                JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
-                JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
-                String type = configuration.getString(JsonConstants.TYPE);
-                JSONObject options = plugins.getJSONObject(type);
-                JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
-                override.put(JsonConstants.DURATION, updDuration);
-                override.put("threads", JSONObject.NULL);
-                configuration.put("serversCount", JSONObject.NULL);
-                updateResult=api.putTestInfo(testId, result);
+                updateResult = api.postJsonConfig(testId, result);
+            } else {
+                if (testDuration != null && !testDuration.isEmpty()) {
+                    updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
+                }
+                if (location != null && !location.isEmpty()) {
+                    updateResult = updateLocation(api, testId, location, bzmBuildLog);
+                }
             }
+        }catch (Exception e) {
+            bzmBuildLog.warn("Received JSONException while updating test: ", e);
+        }
+        return updateResult;
+    }
 
+
+    public static JSONObject updateTestDuration(BlazemeterApi api,
+                                          String testId,
+                                          String testDuration,
+                                          StdErrLog bzmBuildLog){
+        JSONObject result;
+        JSONObject updateResult=null;
+        try {
+            JSONObject jo = api.getTestInfo(testId);
+            result = jo.getJSONObject(JsonConstants.RESULT);
+            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
+            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
+            String type = configuration.getString(JsonConstants.TYPE);
+            JSONObject options = plugins.getJSONObject(type);
+            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
+            override.put(JsonConstants.DURATION, testDuration);
+            override.put("threads", JSONObject.NULL);
+            configuration.put("serversCount", JSONObject.NULL);
+            updateResult = api.putTestInfo(testId, result);
         } catch (JSONException je) {
-            bzmBuildLog.warn("Received JSONException while saving testDuration: ", je);
+            bzmBuildLog.warn("Received JSONException while updating test duration: ", je);
         } catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while saving testDuration: ", e);
+            bzmBuildLog.warn("Received JSONException while updating test duration: ", e);
+        }
+        return updateResult;
+    }
+
+
+
+    public static JSONObject updateLocation(BlazemeterApi api,
+                                                String testId,
+                                                String location,
+                                                StdErrLog bzmBuildLog){
+        JSONObject result;
+        JSONObject updateResult=null;
+        try {
+            JSONObject jo = api.getTestInfo(testId);
+            result = jo.getJSONObject(JsonConstants.RESULT);
+            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
+            configuration.put(JsonConstants.LOCATION, location);
+            updateResult = api.putTestInfo(testId, result);
+        } catch (JSONException je) {
+            bzmBuildLog.warn("Received JSONException while updating test duration: ", je);
+        } catch (Exception e) {
+            bzmBuildLog.warn("Received JSONException while updating test duration: ", e);
         }
         return updateResult;
     }
@@ -241,8 +294,9 @@ public class BzmServiceManager {
             }
 
 
-            if(configNode!=null|!builder.getTestDuration().isEmpty()) {
-                JSONObject updateResult=updateTest(api,testId,builder.getTestDuration(), configNode, bzmBuildLog);
+                JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),
+                        builder.getLocation(),
+                        configNode, bzmBuildLog);
                 if(updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
                     jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
@@ -250,7 +304,6 @@ public class BzmServiceManager {
                 }else{
                     jenBuildLog.info("Test "+testId+" was started on server");
                     }
-            }
 
             String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
                     builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);

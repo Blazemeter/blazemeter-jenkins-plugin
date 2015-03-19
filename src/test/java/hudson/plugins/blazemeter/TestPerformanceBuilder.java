@@ -18,7 +18,7 @@ public class TestPerformanceBuilder {
     @Test
     public void first() throws Exception {
         FreeStyleProject project = j.createFreeStyleProject();
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","","","123","v3",
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","","","123","v3","",
                                                                       "",false,"","","","");
 //        j.jenkins
         project.getBuildersList().add(pbBefore);

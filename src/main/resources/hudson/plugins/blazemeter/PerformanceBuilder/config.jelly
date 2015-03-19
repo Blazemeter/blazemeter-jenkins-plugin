@@ -13,6 +13,8 @@
         <f:select>
         </f:select>
     </f:entry>
+
+
     <f:entry title="${%Test settings}:" description="${%Define path to JSON with test configuration}">
         <table width="500px">
             <thead>
@@ -31,6 +33,18 @@
             </tbody>
         </table>
     </f:entry>
+    <f:entry title="${%Test Duration, min}:"
+             field="testDuration"
+             description="${%TestDuration}">
+        <f:textbox field="testDuration"
+                   checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
+    </f:entry>
+    <f:entry title="${%Location}:" field="location" description="${%Define location}">
+        <f:textbox field="location"/>
+    </f:entry>
+
+
+
     <f:entry title="Use server tresholds:" description="If checked, server tresholds will be used" field="useServerTresholds">
         <f:checkbox/>
     </f:entry>
@@ -101,13 +115,6 @@
             </tbody>
         </table>
     </f:entry>
-    <f:entry title="${%Test Duration, min}:"
-             field="testDuration"
-             description="${%TestDuration}">
-        <f:textbox field="testDuration"
-                   checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
-    </f:entry>
-
     <f:advanced>
 
         <!--<f:entry title="${%Data folder}:"
