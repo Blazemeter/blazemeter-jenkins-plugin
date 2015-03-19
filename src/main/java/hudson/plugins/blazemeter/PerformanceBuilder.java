@@ -452,6 +452,10 @@ public class PerformanceBuilder extends Builder {
         return location;
     }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public boolean isUseServerTresholds() {
         return useServerTresholds;
     }

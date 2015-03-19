@@ -84,9 +84,9 @@ public class BzmServiceManager {
                 if (testDuration != null && !testDuration.isEmpty()) {
                     updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
                 }
-                if (location != null && !location.isEmpty()) {
-                    updateResult = updateLocation(api, testId, location, bzmBuildLog);
-                }
+            }
+            if (location != null && !location.isEmpty()) {
+                updateResult = updateLocation(api, testId, location, bzmBuildLog);
             }
         }catch (Exception e) {
             bzmBuildLog.warn("Received JSONException while updating test: ", e);

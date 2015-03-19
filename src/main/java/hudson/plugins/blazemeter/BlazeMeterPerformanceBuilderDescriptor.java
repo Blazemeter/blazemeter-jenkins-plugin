@@ -7,12 +7,14 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
@@ -53,14 +55,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey,
-                                          @QueryParameter String testId
-                                          ) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey) throws FormValidation {
         if (StringUtils.isBlank(apiKey)) {
             apiKey = getApiKey();
         }
         this.apiKey=apiKey;
-//        this.testId=testId;
         String apiSecret = null;
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredential c : CredentialsProvider
@@ -97,6 +96,50 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
         return items;
     }
+
+    // Used by config.jelly to display the test list.
+    public ListBoxModel doFillLocationItems(@QueryParameter String apiKey) throws FormValidation {
+        if (StringUtils.isBlank(apiKey)) {
+            apiKey = getApiKey();
+        }
+        this.apiKey=apiKey;
+        String apiSecret = null;
+        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+        for (BlazemeterCredential c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+            if (StringUtils.equals(apiKey, c.getId())) {
+                apiSecret = c.getApiKey();
+                break;
+            }
+        }
+        ListBoxModel items = new ListBoxModel();
+        if (apiSecret == null) {
+            items.add("No API Key", "-1");
+        } else {
+            APIFactory apiFactory=APIFactory.getApiFactory();
+            BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
+            try{
+                LinkedHashMap<String, String> locationList = new LinkedHashMap<String,String>();
+                JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
+                Iterator<JSONObject> locations=jo.getJSONArray("locations").iterator();
+                while(locations.hasNext()){
+                    JSONObject location=locations.next();
+                    locationList.put(location.getString("id"),location.getString("title"));
+                }
+                Set set = locationList.entrySet();
+                for (Object test : set) {
+                    Map.Entry me = (Map.Entry) test;
+                    items.add(new ListBoxModel.Option(String.valueOf(me.getKey()),String.valueOf(me.getKey()),false));
+                }
+
+            } catch (Exception e) {
+                throw FormValidation.error(e.getMessage(), e);
+            }
+        }
+        return items;
+    }
+
+
 
     public ListBoxModel doFillApiKeyItems() {
         ListBoxModel items = new ListBoxModel();
