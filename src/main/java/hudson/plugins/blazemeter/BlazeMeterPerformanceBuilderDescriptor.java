@@ -75,7 +75,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
             try {
                 LinkedHashMultimap<String, String> testList = bzm.getTestList();
-                items.add(Constants.USE_TEST_LOCATION, Constants.CREATE_BZM_TEST_NOTE);
+                items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
                     items.add("Invalid API key ", "-1");
