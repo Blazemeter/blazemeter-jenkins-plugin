@@ -7,14 +7,12 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
@@ -77,7 +75,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
             try {
                 LinkedHashMultimap<String, String> testList = bzm.getTestList();
-                items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
+                items.add(Constants.USE_TEST_LOCATION, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
                     items.add("Invalid API key ", "-1");
@@ -120,6 +118,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
             try{
                 LinkedHashMap<String, String> locationList = new LinkedHashMap<String,String>();
+                items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
                 JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
                 Iterator<JSONObject> locations=jo.getJSONArray("locations").iterator();
                 while(locations.hasNext()){
@@ -129,7 +128,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 Set set = locationList.entrySet();
                 for (Object test : set) {
                     Map.Entry me = (Map.Entry) test;
-                    items.add(new ListBoxModel.Option(String.valueOf(me.getKey()),String.valueOf(me.getKey()),false));
+                    items.add(new ListBoxModel.Option(String.valueOf(me.getValue()),String.valueOf(me.getKey()),false));
                 }
 
             } catch (Exception e) {

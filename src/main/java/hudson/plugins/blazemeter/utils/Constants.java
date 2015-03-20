@@ -13,6 +13,7 @@ public interface Constants {
     public final static String CREATE_YAHOO_TEST="Create YAHOO test using JSON configuration";
     public final static String CREATE_YAHOO_TEST_NOTE="createYahooTestFromJSON";
     public final static String CREATE_BZM_TEST="Create BZM test using JSON configuration";
+    public final static String USE_TEST_LOCATION = "Use Location specified in test/JSON";
     public final static String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
     public final static String BM_TRESHOLDS="bm-thresholds.xml";
     public final static String BM_KPIS="bm-kpis.jtl";

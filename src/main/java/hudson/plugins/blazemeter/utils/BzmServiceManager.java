@@ -85,7 +85,7 @@ public class BzmServiceManager {
                     updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
                 }
             }
-            if (location != null && !location.isEmpty()) {
+            if (location != null && !location.isEmpty() && !location.equals(Constants.USE_TEST_LOCATION)) {
                 updateResult = updateLocation(api, testId, location, bzmBuildLog);
             }
         }catch (Exception e) {
