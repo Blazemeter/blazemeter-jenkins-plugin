@@ -143,26 +143,6 @@ public class BzmServiceManager {
         return updateResult;
     }
 
-    public static String requestTestDuration(BlazemeterApi api, String testId, StdErrLog bzmBuildLog) {
-        String duration = null;
-        try {
-            JSONObject jo = api.getTestInfo(testId);
-            JSONObject result = jo.getJSONObject(JsonConstants.RESULT);
-            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
-            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
-            String type = configuration.getString(JsonConstants.TYPE);
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
-            duration = override.getString(JsonConstants.DURATION);
-
-        } catch (JSONException je) {
-            bzmBuildLog.warn("Received JSONException while requesting testDuration: ", je);
-        } catch (Exception e) {
-            bzmBuildLog.warn("Received Exception while requesting testDuration: ", e);
-        }
-        return duration;
-    }
-
     public static void uploadDataFolderFiles(String dataFolder, String mainJMX, String testId,
                                              BlazemeterApi bmAPI, StdErrLog bzmBuildLog) {
 
@@ -304,10 +284,6 @@ public class BzmServiceManager {
                 }else{
                     jenBuildLog.info("Test "+testId+" was started on server");
                     }
-
-            String testDuration = (builder.getTestDuration() != null && !builder.getTestDuration().isEmpty()) ?
-                    builder.getTestDuration() : requestTestDuration(api, builder.getTestId(), bzmBuildLog);
-            builder.setTestDuration(testDuration);
         } catch (IOException e) {
             jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
             bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
