@@ -193,7 +193,7 @@ public class PerformanceBuilder extends Builder {
 
             bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = this.postProcess(session, build);
+            Result result = BzmServiceManager.postProcess(this,session);
 
             build.setResult(result);
 
@@ -206,12 +206,16 @@ public class PerformanceBuilder extends Builder {
         }
 
         finally {
-            TestInfo info = this.api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
+            TestInfo info = this.api.getTestInfo(apiVersion.equals("v2") ? testId : session);
 
             TestStatus status = info.getStatus();
             if (status.equals(TestStatus.Running)) {
                 bzmBuildLog.info("Shutting down test");
-                this.api.stopTest(testId);
+                boolean terminate=BzmServiceManager.stopTestSession(this.api, testId, session, jenBuildLog);
+                if(!terminate){
+                    Result stopTestResult=BzmServiceManager.postProcess(this, session);
+                    build.setResult(stopTestResult);
+                }
             } else if (status.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
                 bzmBuildLog.warn("Test not found error");
@@ -282,65 +286,6 @@ public class PerformanceBuilder extends Builder {
        }
    return session;
    }
-
-    /*
-    TODO
-    1. Split into several small logical methods.
-    2. Move these parts to Utils
-    3. Remove this method: it's legacy
-     */
-    private Result postProcess(String session, AbstractBuild<?, ?> build) throws InterruptedException {
-        Thread.sleep(10000); // Wait for the report to generate.
-        //get tresholds from server and check if test is success
-        String junitReport="";
-        Result result = Result.SUCCESS;
-        try{
-            junitReport = this.api.retrieveJUNITXML(session);
-        }catch (Exception e){
-            jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
-        }
-        bzmBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, build.getWorkspace(), bzmBuildLog, jenBuildLog);
-        BzmServiceManager.getJTL(this.api, session, build.getWorkspace(), jenBuildLog, bzmBuildLog);
-        if(this.useServerTresholds){
-         jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
-         result= BzmServiceManager.validateServerTresholds(this.api,session,jenBuildLog);
-        }
-        //get testGetArchive information
-        JSONObject testReport=null;
-        try{
-
-        testReport = this.api.testReport(session);
-        }catch (Exception e){
-           bzmBuildLog.info("Failed to get test report from server.");
-        }
-
-
-        if (testReport == null || testReport.equals("null")) {
-            bzmBuildLog.warn("Requesting aggregate is not available. " +
-                    "Build won't be validated against local tresholds");
-            return result;
-        }
-
-        TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
-        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(apiVersion));
-        TestResult testResult = null;
-        Result localTresholdsResult=null;
-        try {
-            testResult = testResultFactory.getTestResult(testReport);
-            bzmBuildLog.info(testResult.toString());
-            bzmBuildLog.info("Validating local tresholds...\n");
-            localTresholdsResult= BzmServiceManager.validateLocalTresholds(testResult, this, jenBuildLog);
-        } catch (IOException ioe) {
-            jenBuildLog.info("Failed to get test result. Try to check server for it");
-            bzmBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
-        } catch (JSONException je) {
-            jenBuildLog.info("Failed to get test result. Try to check server for it");
-            bzmBuildLog.info("ERROR: Failed to generate TestResult: " + je);
-        }finally{
-            return localTresholdsResult!=null?localTresholdsResult:result;
-        }
-    }
 
 
     public String getResponseTimeFailedThreshold() {

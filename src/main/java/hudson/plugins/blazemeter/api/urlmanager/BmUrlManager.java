@@ -14,7 +14,7 @@ public interface BmUrlManager {
 
     public void setServerUrl(String serverUrl);
 
-    public String testStatus(String appKey, String userKey, String testId);
+    public String testSessionStatus(String appKey, String userKey, String testId);
 
     public String getTests(String appKey, String userKey);
 
@@ -26,13 +26,15 @@ public interface BmUrlManager {
 
     public String testStop(String appKey, String userKey, String testId);
 
+    public String testTerminate(String appKey, String userKey, String testId);
+
     public String testReport(String appKey, String userKey, String reportId);
 
     public String getUser(String appKey, String userKey);
 
     public String getTresholds(String appKey, String userKey, String sessionId);
 
-    public String getTestInfo(String appKey, String userKey, String testId);
+    public String getTestConfig(String appKey, String userKey, String testId);
 
     public String postJsonConfig(String appKey, String userKey, String testId);
 

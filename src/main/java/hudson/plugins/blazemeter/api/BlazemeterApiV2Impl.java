@@ -104,16 +104,16 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
 
     @Override
-    public TestInfo getTestRunStatus(String testId) {
+    public TestInfo getTestInfo(String id) {
         TestInfo ti = new TestInfo();
 
-        if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) {
+        if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(id)) {
             ti.setStatus(TestStatus.NotFound);
             return ti;
         }
 
         try {
-            String url = this.urlManager.testStatus(APP_KEY, apiKey, testId);
+            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
 
             if ("Test not found".equals(jo.get(JsonConstants.ERROR))) {
@@ -271,7 +271,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject getTestInfo(String testId) {
+    public JSONObject getTestConfig(String testId) {
         return not_implemented;
     }
 
@@ -333,5 +333,15 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public BzmHttpWrapper getBzmHttpWr() {
         return null;
+    }
+
+    @Override
+    public int getTestSessionStatusCode(String id) {
+        return -1;
+    }
+
+    @Override
+    public JSONObject terminateTest(String testId) {
+        return not_implemented;
     }
 }

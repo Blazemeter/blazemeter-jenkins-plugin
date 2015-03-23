@@ -10,6 +10,7 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -102,7 +103,7 @@ public class BzmServiceManager {
         JSONObject result;
         JSONObject updateResult=null;
         try {
-            JSONObject jo = api.getTestInfo(testId);
+            JSONObject jo = api.getTestConfig(testId);
             result = jo.getJSONObject(JsonConstants.RESULT);
             JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
             JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
@@ -130,7 +131,7 @@ public class BzmServiceManager {
         JSONObject result;
         JSONObject updateResult=null;
         try {
-            JSONObject jo = api.getTestInfo(testId);
+            JSONObject jo = api.getTestConfig(testId);
             result = jo.getJSONObject(JsonConstants.RESULT);
             JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
             configuration.put(JsonConstants.LOCATION, location);
@@ -178,7 +179,7 @@ public class BzmServiceManager {
         long lastPrint = 0;
         while (true) {
             Thread.sleep(15000);
-            TestInfo info = api.getTestRunStatus(apiVersion.equals("v2") ? testId : session);
+            TestInfo info = api.getTestInfo(apiVersion.equals("v2") ? testId : session);
 
             if (!info.getStatus().equals(TestStatus.Running)) {
                 bzmBuildLog.info("TestStatus for session " + (apiVersion.equals("v2") ? testId : session)
@@ -277,7 +278,7 @@ public class BzmServiceManager {
                 JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),
                         builder.getLocation(),
                         configNode, bzmBuildLog);
-                if(updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
+                if(updateResult!=null&&updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
                     jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
                     testId="";
@@ -324,7 +325,6 @@ public class BzmServiceManager {
     public static void saveReport(String filename,
                                   String report,
                                   FilePath filePath,
-                                  StdErrLog bzmBuildLog,
                                   StdErrLog jenBuildLog) {
         File reportFile = new File(filePath.getParent()
                 + "/" + filePath.getName() + "/" + filename);
@@ -337,11 +337,9 @@ public class BzmServiceManager {
             out.close();
 
         } catch (FileNotFoundException fnfe) {
-            bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
-            jenBuildLog.info("Unable to save XML report to workspace - check that test is finished on server or turn to support ");
+            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
         } catch (IOException e) {
-            bzmBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
-            jenBuildLog.info("Unable to save XML report to workspace - check that test is finished on server or turn to support ");
+            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
         }
     }
 
@@ -482,6 +480,82 @@ public class BzmServiceManager {
         }
     }
 
+    public static Result postProcess(PerformanceBuilder builder,String session) throws InterruptedException {
+        Thread.sleep(10000); // Wait for the report to generate.
+        //get tresholds from server and check if test is success
+        BlazemeterApi api=builder.getApi();
+        StdErrLog jenBuildLog=builder.getJenBuildLog();
+        String junitReport="";
+        Result result = Result.SUCCESS;
+        try{
+            junitReport = api.retrieveJUNITXML(session);
+        }catch (Exception e){
+            jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
+        }
+        jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
+        BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
+        Thread.sleep(30000);
+        BzmServiceManager.getJTL(api, session, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
+        if(builder.isUseServerTresholds()){
+            jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
+            result= BzmServiceManager.validateServerTresholds(api,session,jenBuildLog);
+        }
+        //get testGetArchive information
+        JSONObject testReport=null;
+        try{
+
+            testReport = api.testReport(session);
+        }catch (Exception e){
+            jenBuildLog.info("Failed to get test report from server.");
+        }
+
+
+        if (testReport == null || testReport.equals("null")) {
+            jenBuildLog.warn("Requesting aggregate is not available. " +
+                    "Build won't be validated against local tresholds");
+            return result;
+        }
+
+        TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
+        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(builder.getApiVersion()));
+        TestResult testResult = null;
+        Result localTresholdsResult=null;
+        try {
+            testResult = testResultFactory.getTestResult(testReport);
+            jenBuildLog.info(testResult.toString());
+            jenBuildLog.info("Validating local tresholds...\n");
+            localTresholdsResult= validateLocalTresholds(testResult, builder, jenBuildLog);
+        } catch (IOException ioe) {
+            jenBuildLog.info("Failed to get test result. Try to check server for it");
+            jenBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
+        } catch (JSONException je) {
+            jenBuildLog.info("Failed to get test result. Try to check server for it");
+            jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
+        }finally{
+            return localTresholdsResult!=null?localTresholdsResult:result;
+        }
+    }
+
+
+    public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, StdErrLog jenBuildLog) {
+        boolean terminate=false;
+        try {
+
+            int statusCode = api.getTestSessionStatusCode(sessionId);
+            if (statusCode < 100) {
+                api.terminateTest(testId);
+                terminate=true;
+            }
+            if (statusCode >= 100) {
+                api.stopTest(testId);
+                terminate=false;
+            }
+        } catch (Exception e) {
+            jenBuildLog.warn("Error while trying to stop test with testId=" + testId + ", " + e.getMessage());
+        }finally {
+            return terminate;
+        }
+    }
 
     public static Result validateLocalTresholds(TestResult testResult,
                                                 PerformanceBuilder builder,

@@ -40,14 +40,13 @@ public class TestResultV3Impl extends TestResult {
 
     @Override
     public String toString() {
-        return "######### AggregateTestResult ####################" +
-               "\nhits=" + hits +
-               "\nerrors percentage=" + errorPercentage+
-               "\naverage=" + average +
-               "\naverage=" + average +
-               "\nmin=" + min +
-               "\nmax=" + max+"\n"+
-               "#################################################";
+        return "AggregateTestResult ->" +
+               " hits=" + hits +
+               ", errors percentage=" + errorPercentage+
+               ", average=" + average +
+               ", average=" + average +
+               ", min=" + min +
+               ", max=" + max;
     }
 
     public double getStd() {

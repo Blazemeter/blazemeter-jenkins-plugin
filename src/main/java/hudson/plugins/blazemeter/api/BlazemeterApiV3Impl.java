@@ -94,17 +94,38 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
 
     @Override
-    public TestInfo getTestRunStatus(String testId) {
+    public int getTestSessionStatusCode(String id) {
+        int statusCode=0;
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(id))
+        {
+            return statusCode;
+        }
+        try {
+            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
+            JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+            JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
+            statusCode=result.getInt("statusCode");
+        } catch (Exception e) {
+            logger.warn("Error getting status ", e);
+        }finally {
+            {
+                return statusCode;
+            }
+        }
+    }
+
+    @Override
+    public TestInfo getTestInfo(String id) {
         TestInfo ti = new TestInfo();
 
-        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId))
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(id))
         {
             ti.setStatus(TestStatus.NotFound);
             return ti;
         }
 
         try {
-            String url = this.urlManager.testStatus(APP_KEY, apiKey, testId);
+            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.get(JsonConstants.DATA_URL) == null) {
@@ -174,6 +195,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
         return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
     }
+
+    @Override
+    public JSONObject terminateTest(String testId) {
+        if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
+
+        String url = this.urlManager.testTerminate(APP_KEY, apiKey, testId);
+        return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+    }
+
 
     /**
      * @param reportId - report Id same as Session Id, can be obtained from start stop status.
@@ -248,10 +278,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject getTestInfo(String testId){
+    public JSONObject getTestConfig(String testId){
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
-        String url = this.urlManager.getTestInfo(APP_KEY, apiKey, testId);
+        String url = this.urlManager.getTestConfig(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         return jo;
     }
@@ -341,7 +371,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public JSONObject putTestInfo(String testId, JSONObject data) {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
-        String url = this.urlManager.getTestInfo(APP_KEY, apiKey,testId);
+        String url = this.urlManager.getTestConfig(APP_KEY, apiKey, testId);
         JSONObject jo = this.bzmhc.getResponseAsJson(url, data, BzmHttpWrapper.Method.PUT);
         return jo;
     }

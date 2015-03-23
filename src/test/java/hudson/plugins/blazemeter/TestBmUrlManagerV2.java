@@ -37,7 +37,7 @@ public class TestBmUrlManagerV2 {
     public void testStatus(){
         String expTestGetStatus=bmUrlManager.getServerUrl()+"api/rest/blazemeter/testGetStatus.json/?app_key="
                 +appKey+"&user_key="+userKey+"&test_id="+testId+"&"+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actTestGetStatus=bmUrlManager.testStatus(appKey, userKey, testId);
+        String actTestGetStatus=bmUrlManager.testSessionStatus(appKey, userKey, testId);
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }
 
@@ -108,7 +108,7 @@ public class TestBmUrlManagerV2 {
     @Test
     public void getTestInfo(){
         String expGetTestInfo=Constants.NOT_IMPLEMENTED;
-        String actGetTestInfo=bmUrlManager.getTestInfo(appKey, userKey, testId);
+        String actGetTestInfo=bmUrlManager.getTestConfig(appKey, userKey, testId);
         Assert.assertEquals(expGetTestInfo,actGetTestInfo);
     }
 

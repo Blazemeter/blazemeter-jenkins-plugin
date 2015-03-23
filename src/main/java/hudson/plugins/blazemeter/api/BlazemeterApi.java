@@ -35,13 +35,17 @@ public interface BlazemeterApi {
 
     public JSONObject uploadBinaryFile(String testId, File file);
 
-    public TestInfo getTestRunStatus(String testId);
+    public TestInfo getTestInfo(String id);
+
+    public int getTestSessionStatusCode(String id);
 
     public JSONObject startTest(String testId);
 
     public int getTestCount() throws JSONException, IOException, ServletException;
 
     public JSONObject stopTest(String testId);
+
+    public JSONObject terminateTest(String testId);
 
     public JSONObject testReport(String reportId);
 
@@ -51,7 +55,7 @@ public interface BlazemeterApi {
 
     public JSONObject getTresholds(String sessionId);
 
-    public JSONObject getTestInfo(String testId);
+    public JSONObject getTestConfig(String testId);
 
     public JSONObject postJsonConfig(String testId, JSONObject data);
 

@@ -60,7 +60,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestInfo_null(){
         APIFactory apiFactory=APIFactory.getApiFactory();
         blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
-        Assert.assertEquals(blazemeterApiV3.getTestInfo(null), null);
+        Assert.assertEquals(blazemeterApiV3.getTestConfig(null), null);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestRunStatus_notFound(){
        APIFactory apiFactory=APIFactory.getApiFactory();
        blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(null,APIFactory.ApiVersion.v3);
-       Assert.assertEquals(blazemeterApiV3.getTestRunStatus(null).getStatus(), TestStatus.NotFound);
+       Assert.assertEquals(blazemeterApiV3.getTestInfo(null).getStatus(), TestStatus.NotFound);
     }
 
     @Test
@@ -174,9 +174,9 @@ public class TestBlazemeterApiV3Impl {
         APIFactory apiFactory=APIFactory.getApiFactory();
         blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTestInfo(appKey, userKey, testId);
+        String url = blazemeterApiV3.getUrlManager().getTestConfig(appKey, userKey, testId);
         try {
-            blazemeterApiV3.getTestInfo(testId);
+            blazemeterApiV3.getTestConfig(testId);
             Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -188,7 +188,7 @@ public class TestBlazemeterApiV3Impl {
         APIFactory apiFactory=APIFactory.getApiFactory();
         blazemeterApiV3=(BlazemeterApiV3Impl)apiFactory.getAPI(userKey,APIFactory.ApiVersion.v3);
         blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTestInfo(appKey, userKey, testId);
+        String url = blazemeterApiV3.getUrlManager().getTestConfig(appKey, userKey, testId);
         try {
             blazemeterApiV3.putTestInfo(testId,null);
             Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.PUT);
