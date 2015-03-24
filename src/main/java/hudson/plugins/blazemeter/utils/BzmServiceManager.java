@@ -283,7 +283,7 @@ public class BzmServiceManager {
                     jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
                     testId="";
                 }else{
-                    jenBuildLog.info("Test "+testId+" was started on server");
+                    jenBuildLog.info("Test " + testId + " was started on server");
                     }
         } catch (IOException e) {
             jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
@@ -499,6 +499,8 @@ public class BzmServiceManager {
         if(builder.isUseServerTresholds()){
             jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
             result= BzmServiceManager.validateServerTresholds(api,session,jenBuildLog);
+        }else{
+            jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
         }
         //get testGetArchive information
         JSONObject testReport=null;
@@ -523,7 +525,8 @@ public class BzmServiceManager {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             jenBuildLog.info(testResult.toString());
-            if (!builder.isUseServerTresholds()) {
+            if (!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS))) {
+                jenBuildLog.info("UseServerTresholds flag was set to FALSE or server tresholds validation was SUCCESS.");
                 jenBuildLog.info("Validating local tresholds...\n");
                 localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
             }
