@@ -523,8 +523,10 @@ public class BzmServiceManager {
         try {
             testResult = testResultFactory.getTestResult(testReport);
             jenBuildLog.info(testResult.toString());
-            jenBuildLog.info("Validating local tresholds...\n");
-            localTresholdsResult= validateLocalTresholds(testResult, builder, jenBuildLog);
+            if (!builder.isUseServerTresholds()) {
+                jenBuildLog.info("Validating local tresholds...\n");
+                localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
+            }
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);

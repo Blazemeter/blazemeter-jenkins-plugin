@@ -27,7 +27,7 @@
         <f:textbox field="testDuration"
                    checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
     </f:entry>
-<f:entry title="Use server tresholds:" description="If checked, server tresholds will be used" field="useServerTresholds">
+<f:entry title="Use server tresholds:" description="If checked, server tresholds will be used. LocalTresholds will be skipped" field="useServerTresholds">
         <f:checkbox/>
     </f:entry>
     <f:entry title="${%Error percentage threshold, %}:"
