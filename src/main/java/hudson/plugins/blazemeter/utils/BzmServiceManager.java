@@ -1,9 +1,11 @@
 package hudson.plugins.blazemeter.utils;
 
 import hudson.FilePath;
+import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
 import hudson.plugins.blazemeter.BlazemeterCredential;
+import hudson.plugins.blazemeter.PerformanceBuildAction;
 import hudson.plugins.blazemeter.PerformanceBuilder;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
@@ -321,6 +323,55 @@ public class BzmServiceManager {
             bzmBuildLog.info("Could not upload file " + fileName + " " + e.getMessage());
         }
     }
+
+    /**
+     * TODO
+     * 1. Split this method into two parts depending on
+     * API version and place code to appropriate BlazeMeterAPIImpl
+     * 2. Remove this method, it's legacy
+     *
+     * @param json
+     * @param build
+     * @return
+     * @throws JSONException
+     */
+    public static String getSessionId(JSONObject json, AbstractBuild<?, ?> build,
+                                APIFactory.ApiVersion apiVersion,BlazemeterApi api,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
+        String session="";
+        try {
+            if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
+                if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
+                        .startsWith("Test already running")) {
+                    bzmBuildLog.warn("Test already running, please stop it first");
+                    build.setResult(Result.FAILURE);
+                    return session;
+                }
+
+            }
+            // get sessionId add to interface
+            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
+                session = json.get("session_id").toString();
+
+            } else {
+
+                JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
+                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
+                String reportUrl= getReportUrl(api, session, jenBuildLog, bzmBuildLog);
+                jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
+                jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+
+                PerformanceBuildAction a = new PerformanceBuildAction(build);
+                a.setReportUrl(reportUrl);
+                build.addAction(a);
+            }
+
+        }catch (Exception e) {
+            jenBuildLog.info("Failed to get session_id: "+e.getMessage());
+            bzmBuildLog.info("Failed to get session_id. ",e);
+        }
+        return session;
+    }
+
 
     public static void saveReport(String filename,
                                   String report,

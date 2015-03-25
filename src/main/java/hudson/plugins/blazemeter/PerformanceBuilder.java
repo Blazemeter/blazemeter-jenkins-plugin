@@ -9,19 +9,14 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.testresult.TestResult;
-import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
-import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -140,7 +135,7 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = getAPIClient();
+        this.api = APIFactory.getApiFactory().getAPI(apiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api.setLogger(bzmBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
@@ -174,7 +169,8 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=this.getTestSession(json, build);
+             session=BzmServiceManager.getSessionId(json, build,APIFactory.ApiVersion.valueOf(this.apiVersion),
+                     this.api,bzmBuildLog,jenBuildLog);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
@@ -226,66 +222,6 @@ public class PerformanceBuilder extends Builder {
         }
     }
 
-
-    /** TODO
-     * 1. Get rid of this method, it's legacy code
-     * 2. Make Utils.getAPIKey() from CredentialsProvider;
-     */
-
-    private BlazemeterApi getAPIClient() {
-
-        // ideally, at this point we'd look up the credential based on the API key to find the secret
-        // but there are no secrets, so no need to!
-        return APIFactory.getApiFactory().getAPI(apiKey,APIFactory.ApiVersion.valueOf(this.apiVersion));
-    }
-
-
-    /**
-     * TODO
-     * 1. Split this method into two parts depending on
-     * API version and place code to appropriate BlazeMeterAPIImpl
-     * 2. Remove this method, it's legacy
-     *
-     * @param json
-     * @param build
-     * @return
-     * @throws JSONException
-     */
-   private String getTestSession(JSONObject json, AbstractBuild<?, ?> build) throws JSONException{
-       String session="";
-       try {
-           if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
-           if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
-                   .startsWith("Test already running")) {
-               bzmBuildLog.warn("Test already running, please stop it first");
-               build.setResult(Result.FAILURE);
-               return session;
-           }
-
-       }
-       // get sessionId add to interface
-           if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
-           session = json.get("session_id").toString();
-
-       } else {
-
-               JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
-               session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-               String reportUrl= BzmServiceManager.getReportUrl(this.api, session, jenBuildLog, bzmBuildLog);
-               jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-               jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
-
-               PerformanceBuildAction a = new PerformanceBuildAction(build);
-               a.setReportUrl(reportUrl);
-               build.addAction(a);
-           }
-
-       }catch (Exception e) {
-           jenBuildLog.info("Failed to get session_id: "+e.getMessage());
-           bzmBuildLog.info("Failed to get session_id. ",e);
-       }
-   return session;
-   }
 
 
     public String getResponseTimeFailedThreshold() {
