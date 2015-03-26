@@ -207,11 +207,8 @@ public class PerformanceBuilder extends Builder {
             TestStatus status = info.getStatus();
             if (status.equals(TestStatus.Running)) {
                 bzmBuildLog.info("Shutting down test");
-                boolean terminate=BzmServiceManager.stopTestSession(this.api, testId, session, jenBuildLog);
-                if(!terminate){
-                    Result stopTestResult=BzmServiceManager.postProcess(this, session);
-                    build.setResult(stopTestResult);
-                }
+                BzmServiceManager.stopTestSession(this.api, testId, session, jenBuildLog);
+                build.setResult(Result.ABORTED);
             } else if (status.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
                 bzmBuildLog.warn("Test not found error");
