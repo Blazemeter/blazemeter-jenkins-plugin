@@ -33,7 +33,7 @@ public class PerformanceBuilder extends Builder {
     private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
     private StdErrLog jenBuildLog;
 
-    private String apiKey = "";
+    private String jobApiKey = "";
 
     private String testId = "";
 
@@ -77,7 +77,7 @@ public class PerformanceBuilder extends Builder {
      */
 
     @DataBoundConstructor
-    public PerformanceBuilder(String apiKey,
+    public PerformanceBuilder(String jobApiKey,
                               String testDuration,
                               String mainJMX,
                               String dataFolder,
@@ -91,12 +91,12 @@ public class PerformanceBuilder extends Builder {
                               String responseTimeFailedThreshold,
                               String responseTimeUnstableThreshold
     ) {
-        this.apiKey= BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, apiKey);
+        this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.errorFailedThreshold = errorFailedThreshold;
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
-                BzmServiceManager.autoDetectApiVersion(this.apiKey, jenCommonLog):apiVersion;
+                BzmServiceManager.autoDetectApiVersion(this.jobApiKey, jenCommonLog):apiVersion;
     /*  TODO
     This calls are not implemented in v.2.0
     Therefor they will be hidden from GUI
@@ -111,7 +111,7 @@ public class PerformanceBuilder extends Builder {
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        this.api = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
+        this.api = apiFactory.getAPI(jobApiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.testDuration=testDuration;
     }
 
@@ -135,7 +135,7 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = APIFactory.getApiFactory().getAPI(apiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
+        this.api = APIFactory.getApiFactory().getAPI(jobApiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
         this.api.setLogger(bzmBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
@@ -253,27 +253,36 @@ public class PerformanceBuilder extends Builder {
         this.apiVersion = apiVersion;
     }
 
+
+    public String getJobApiKey() {
+        return jobApiKey;
+    }
+
+    public void setJobApiKey(String jobApiKey) {
+        this.jobApiKey = jobApiKey;
+    }
+
     /* TODO
-    This calls are not implemented in v.2.0
-    Therefor they will be hidden from GUI
-    Should be implemented in v.2.1
+        This calls are not implemented in v.2.0
+        Therefor they will be hidden from GUI
+        Should be implemented in v.2.1
 
-    public String getMainJMX() {
-        return mainJMX;
-    }
+        public String getMainJMX() {
+            return mainJMX;
+        }
 
-    public void setMainJMX(String mainJMX) {
-        this.mainJMX = mainJMX;
-    }
+        public void setMainJMX(String mainJMX) {
+            this.mainJMX = mainJMX;
+        }
 
-    public String getDataFolder() {
-        return dataFolder;
-    }
+        public String getDataFolder() {
+            return dataFolder;
+        }
 
-    public void setDataFolder(String dataFolder) {
-        this.dataFolder = dataFolder;
-    }
-*/
+        public void setDataFolder(String dataFolder) {
+            this.dataFolder = dataFolder;
+        }
+    */
     public String getErrorFailedThreshold() {
         return errorFailedThreshold;
     }

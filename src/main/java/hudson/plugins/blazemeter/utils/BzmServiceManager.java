@@ -52,11 +52,13 @@ public class BzmServiceManager {
                 }
             } catch (JSONException je) {
                 logger.warn("Received JSONException while auto-detecting version: ", je);
+                detectedApiVersion="v3";
             } catch (NullPointerException npe) {
-                logger.warn("Received JSONException while auto-detecting version: ", npe);
-                return "v3";
+                logger.warn("Received NullPointerException while auto-detecting version: ", npe);
+                detectedApiVersion="v3";
+            }finally {
+                return detectedApiVersion;
             }
-        return detectedApiVersion;
     }
 
     public static JSONObject updateLocation(BlazemeterApi api,String testId,JSONObject configNode,StdErrLog bzmBuildLog){

@@ -4,8 +4,8 @@
 
     <j:set var="keys" value="${descriptor.getCredentials(it)}"/>
     <j:if test="${keys.size() &gt; 1}">
-        <f:entry title="${%API Key:}" field="apiKey">
-            <f:select style="width:32em;"/>
+        <f:entry title="${%API Key:}">
+            <f:select style="width:32em;" field="jobApiKey"/>
         </f:entry>
     </j:if>
 

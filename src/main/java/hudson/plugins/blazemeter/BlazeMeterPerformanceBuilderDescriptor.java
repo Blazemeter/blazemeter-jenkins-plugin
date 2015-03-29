@@ -30,8 +30,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String blazeMeterURL;
     private String name = "My BlazeMeter Account";
     private String apiKey;
-    private String testId;
-
 
 
     public BlazeMeterPerformanceBuilderDescriptor() {
@@ -138,7 +136,15 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return items;
     }
 
-
+    public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
+        ListBoxModel items = doFillApiKeyItems();
+        Iterator<ListBoxModel.Option> iterator=items.iterator();
+        while(iterator.hasNext()){
+            ListBoxModel.Option option=iterator.next();
+            option.selected=jobApiKey.substring(jobApiKey.length()-4).equals(option.value.substring(option.value.length()-4))?true:false;
+        }
+        return items;
+    }
 
     public ListBoxModel doFillApiKeyItems() {
         ListBoxModel items = new ListBoxModel();
@@ -247,12 +253,5 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.blazeMeterURL = blazeMeterURL;
     }
 
-    public String getTestId() {
-        return testId;
-    }
-
-    public void setTestId(String testId) {
-        this.testId = testId;
-    }
 }
 
