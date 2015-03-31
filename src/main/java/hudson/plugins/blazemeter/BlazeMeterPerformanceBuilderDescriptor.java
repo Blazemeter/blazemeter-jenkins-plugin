@@ -141,7 +141,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Iterator<ListBoxModel.Option> iterator=items.iterator();
         while(iterator.hasNext()){
             ListBoxModel.Option option=iterator.next();
-            option.selected=jobApiKey.substring(jobApiKey.length()-4).equals(option.value.substring(option.value.length()-4))?true:false;
+            try{
+                option.selected=jobApiKey.substring(jobApiKey.length()-4).equals(option.value.substring(option.value.length()-4))?true:false;
+            }catch (Exception e){
+                option.selected=false;
+            }
         }
         return items;
     }
