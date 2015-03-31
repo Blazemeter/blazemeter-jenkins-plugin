@@ -96,7 +96,7 @@ public class PerformanceBuilder extends Builder {
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
-                BzmServiceManager.autoDetectApiVersion(this.jobApiKey, jenCommonLog):apiVersion;
+                BzmServiceManager.autoDetectApiVersion(this.jobApiKey):apiVersion;
     /*  TODO
     This calls are not implemented in v.2.0
     Therefor they will be hidden from GUI
@@ -150,6 +150,13 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
             return false;
         }
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey);
+        if(userEmail.isEmpty()){
+            jenBuildLog.warn("Invalid user key. UserKey="+this.jobApiKey+", serverUrl="+APIFactory.getApiFactory().getBlazeMeterUrl());
+            return false;
+        }
+        jenBuildLog.warn("User key ="+jobApiKey+" is valid with "+APIFactory.getApiFactory().getBlazeMeterUrl());
+        jenBuildLog.warn("User's e-mail="+userEmail);
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
         org.json.JSONObject json;

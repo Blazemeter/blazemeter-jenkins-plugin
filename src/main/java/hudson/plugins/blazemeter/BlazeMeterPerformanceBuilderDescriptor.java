@@ -6,6 +6,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -187,15 +188,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(apiKey, APIFactory.ApiVersion.v3);
-        int testCount = bzm.getTestCount();
-        if (testCount < 0) {
-            return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
-        } else if (testCount == 0) {
-            return FormValidation.errorWithMarkup("User Key Invalid Or No Available Tests");
-        } else {
-            return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
-        }
+        return BzmServiceManager.validateUserKey(userKey);
     }
 
     public FormValidation doCheckTestDuration(@QueryParameter String value) throws IOException, ServletException {

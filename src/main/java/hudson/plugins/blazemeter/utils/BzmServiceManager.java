@@ -13,6 +13,7 @@ import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.testresult.TestResultFactory;
+import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -37,7 +38,7 @@ public class BzmServiceManager {
     private BzmServiceManager() {
     }
 
-    public static String autoDetectApiVersion(String apiKey, AbstractLogger logger) {
+    public static String autoDetectApiVersion(String apiKey) {
         BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
         String detectedApiVersion = null;
@@ -51,10 +52,8 @@ public class BzmServiceManager {
                     detectedApiVersion="v2";
                 }
             } catch (JSONException je) {
-                logger.warn("Received JSONException while auto-detecting version: ", je);
                 detectedApiVersion="v3";
             } catch (NullPointerException npe) {
-                logger.warn("Received NullPointerException while auto-detecting version: ", npe);
                 detectedApiVersion="v3";
             }finally {
                 return detectedApiVersion;
@@ -299,7 +298,7 @@ public class BzmServiceManager {
             testId="";
         } catch (Exception e){
             jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
-            bzmBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
+            bzmBuildLog.info("Unknown error while preparing test for execution: " + e.getMessage());
             testId="";
         }
 
@@ -687,5 +686,33 @@ public class BzmServiceManager {
             props.setProperty(Constants.VERSION, "N/A");
         }
         return props.getProperty(Constants.VERSION);
+    }
+
+    public static FormValidation validateUserKey(String userKey){
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, APIFactory.ApiVersion.v3);
+        try{
+        net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
+        if (user.has("error")) {
+            return FormValidation.errorWithMarkup("Invalid user key. Error - "+user.get("error").toString());
+        } else {
+            return FormValidation.ok("User Key Valid. Email - "+user.getString("mail"));
+        }
+        }catch (Exception e){
+            return FormValidation.errorWithMarkup("Invalid user key. Unknown error");
+        }
+    }
+
+    public static String getUserEmail(String userKey){
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, APIFactory.ApiVersion.v3);
+        try{
+            net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
+            if (user.has("mail")) {
+                return user.getString("mail");
+            } else {
+                return "";
+            }
+        }catch (Exception e){
+            return "";
+        }
     }
 }
