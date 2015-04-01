@@ -229,15 +229,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
-        if(StringUtils.isBlank(apiKey)){ return null;}
-         else {
+        if(StringUtils.isBlank(apiKey)) {
+            return null;
+        } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
             logger.info("Getting testList with URL=" + url);
             try {
                 JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
-                JSONArray result = (JSONArray) jo.get(JsonConstants.RESULT);
+                JSONArray result = null;
+                if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
+                    result = (JSONArray) jo.get(JsonConstants.RESULT);
+                }
                 if (result != null && result.length() > 0) {
-                    testListOrdered = LinkedHashMultimap.create(result.length(),result.length());
+                    testListOrdered = LinkedHashMultimap.create(result.length(), result.length());
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject en = null;
                         try {
@@ -250,7 +254,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                         try {
                             if (en != null) {
                                 id = en.getString(JsonConstants.ID);
-                                name = en.has(JsonConstants.NAME)?en.getString(JsonConstants.NAME).replaceAll("&", "&amp;"):"";
+                                name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
                                 testListOrdered.put(name, id);
 
                             }
@@ -261,12 +265,13 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                 }
             } catch (NullPointerException npe) {
                 logger.warn("Error while receiving answer from server - check connection ", npe);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 logger.warn("Error while populating test list, ", e);
+            } finally {
+                return testListOrdered;
             }
 
     }
-        return testListOrdered;
     }
 
     @Override

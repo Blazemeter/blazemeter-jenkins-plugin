@@ -30,7 +30,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private String blazeMeterURL;
     private String name = "My BlazeMeter Account";
-    private String apiKey;
 
 
     public BlazeMeterPerformanceBuilderDescriptor() {
@@ -52,26 +51,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter String apiKey) throws FormValidation {
-        if (StringUtils.isBlank(apiKey)) {
-            apiKey = getApiKey();
-        }
-        this.apiKey=apiKey;
-        String apiSecret = null;
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
-            if (StringUtils.equals(apiKey, c.getId())) {
-                apiSecret = c.getApiKey();
-                break;
-            }
+    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
+        if(apiKey.contains("...")){
+            apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
         }
         ListBoxModel items = new ListBoxModel();
-        if (apiSecret == null) {
+        if (apiKey == null) {
             items.add("No API Key", "-1");
         } else {
             APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
+            BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
             try {
                 LinkedHashMultimap<String, String> testList = bzm.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
@@ -95,63 +84,44 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillLocationItems(@QueryParameter String apiKey) throws FormValidation {
-        if (StringUtils.isBlank(apiKey)) {
-            apiKey = getApiKey();
-        }
-        this.apiKey=apiKey;
-        String apiSecret = null;
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
-            if (StringUtils.equals(apiKey, c.getId())) {
-                apiSecret = c.getApiKey();
-                break;
-            }
+    public ListBoxModel doFillLocationItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
+        if(apiKey.contains("...")){
+            apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
         }
         ListBoxModel items = new ListBoxModel();
-        if (apiSecret == null) {
+        if (apiKey == null) {
             items.add("No API Key", "-1");
-        } else {
-            APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi bzm = apiFactory.getAPI(apiSecret, APIFactory.ApiVersion.v3);
-            try{
-                LinkedHashMap<String, String> locationList = new LinkedHashMap<String,String>();
-                items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
-                JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
-                Iterator<JSONObject> locations=jo.getJSONArray("locations").iterator();
-                while(locations.hasNext()){
-                    JSONObject location=locations.next();
-                    locationList.put(location.getString("id"),location.getString("title"));
-                }
-                Set set = locationList.entrySet();
-                for (Object test : set) {
-                    Map.Entry me = (Map.Entry) test;
-                    items.add(new ListBoxModel.Option(String.valueOf(me.getValue()),String.valueOf(me.getKey()),false));
-                }
-
-            } catch (Exception e) {
-                throw FormValidation.error(e.getMessage(), e);
-            }
+            return items;
         }
-        return items;
+        APIFactory apiFactory = APIFactory.getApiFactory();
+        BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
+        try {
+            LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
+            items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
+            JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
+            if (!jo.has("locations")) {
+                items.add("Invalid API key ", "-1");
+                return items;
+            }
+            Iterator<JSONObject> locations = jo.getJSONArray("locations").iterator();
+            while (locations.hasNext()) {
+                JSONObject location = locations.next();
+                locationList.put(location.getString("id"), location.getString("title"));
+            }
+            Set set = locationList.entrySet();
+            for (Object test : set) {
+                Map.Entry me = (Map.Entry) test;
+                items.add(new ListBoxModel.Option(String.valueOf(me.getValue()), String.valueOf(me.getKey()), false));
+            }
+
+        } catch (Exception e) {
+            throw FormValidation.error(e.getMessage(), e);
+        } finally {
+            return items;
+        }
     }
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
-        ListBoxModel items = doFillApiKeyItems();
-        Iterator<ListBoxModel.Option> iterator=items.iterator();
-        while(iterator.hasNext()){
-            ListBoxModel.Option option=iterator.next();
-            try{
-                option.selected=jobApiKey.substring(jobApiKey.length()-4).equals(option.value.substring(option.value.length()-4))?true:false;
-            }catch (Exception e){
-                option.selected=false;
-            }
-        }
-        return items;
-    }
-
-    public ListBoxModel doFillApiKeyItems() {
         ListBoxModel items = new ListBoxModel();
         Set<String> apiKeys = new HashSet<String>();
 
@@ -162,8 +132,17 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if (!apiKeys.contains(id)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
                         c.getId(),
-                        c.getId().contains(apiKey)));
+                        false));
                 apiKeys.add(id);
+            }
+        }
+        Iterator<ListBoxModel.Option> iterator=items.iterator();
+        while(iterator.hasNext()){
+            ListBoxModel.Option option=iterator.next();
+            try{
+                option.selected=jobApiKey.substring(jobApiKey.length()-4).equals(option.value.substring(option.value.length()-4))?true:false;
+            }catch (Exception e){
+                option.selected=false;
             }
         }
         return items;
@@ -203,7 +182,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-        apiKey = formData.optString("apiKey");
         blazeMeterURL = formData.optString("blazeMeterURL");
         APIFactory.getApiFactory().setBlazeMeterUrl(!blazeMeterURL.isEmpty()?blazeMeterURL:
                 Constants.DEFAULT_BLAZEMETER_URL);
@@ -218,28 +196,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getApiKey() {
-        List<BlazemeterCredential> credentials = CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, Jenkins.getInstance(), ACL.SYSTEM);
-        if (StringUtils.isBlank(apiKey) && !credentials.isEmpty()) {
-            return credentials.get(0).getId();
-        }
-        if (credentials.size() == 1) {
-            return credentials.get(0).getId();
-        }
-        for (BlazemeterCredential c: credentials) {
-            if (StringUtils.equals(c.getId(), apiKey)) {
-                return apiKey;
-            }
-        }
-        // API key is not valid any more
-        return "";
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
     }
 
     public String getBlazeMeterURL() {
