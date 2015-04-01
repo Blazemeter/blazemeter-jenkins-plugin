@@ -436,6 +436,23 @@ public class BzmServiceManager {
         return userKey;
     }
 
+    public static String selectUserKeyId(BlazeMeterPerformanceBuilderDescriptor descriptor,
+                                           String userKey){
+        String userKeyId=null;
+        List<BlazemeterCredential> credentialList=descriptor.getCredentials("Global");
+        if(credentialList.size()==1){
+            userKeyId=credentialList.get(0).getId();
+        }else{
+            for(BlazemeterCredential c:credentialList){
+                if(c.getApiKey().equals(userKey)){
+                    userKeyId=c.getId();
+                    break;
+                }
+            }
+        }
+        return userKeyId;
+    }
+
     public static void getJTL(BlazemeterApi api,String session,FilePath filePath,
                               StdErrLog jenBuildLog,
                               StdErrLog bzmBuildLog){

@@ -140,23 +140,22 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
-        /*
-        TODO
-        1. Get BzmHttpClient
-        2. Set logger
-         */
+
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey);
+        String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
+        if(userEmail.isEmpty()){
+            jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+APIFactory.getApiFactory().getBlazeMeterUrl());
+            return false;
+        }
+        jenBuildLog.warn("User key ="+userKeyId+" is valid with "+APIFactory.getApiFactory().getBlazeMeterUrl());
+        jenBuildLog.warn("User's e-mail="+userEmail);
+
         this.testId= BzmServiceManager.prepareTestRun(this);
         if(this.testId.isEmpty()){
             jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
             return false;
         }
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey);
-        if(userEmail.isEmpty()){
-            jenBuildLog.warn("Invalid user key. UserKey="+this.jobApiKey+", serverUrl="+APIFactory.getApiFactory().getBlazeMeterUrl());
-            return false;
-        }
-        jenBuildLog.warn("User key ="+jobApiKey+" is valid with "+APIFactory.getApiFactory().getBlazeMeterUrl());
-        jenBuildLog.warn("User's e-mail="+userEmail);
+
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
         org.json.JSONObject json;
