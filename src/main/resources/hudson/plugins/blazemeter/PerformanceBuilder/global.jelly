@@ -4,9 +4,11 @@
          xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson"
          xmlns:f="/lib/form">
-    <f:entry title="Server URL"
-             field="blazeMeterURL"
-             description="${%Server URL}">
-        <f:textbox field="blazeMeterURL"/>
-    </f:entry>
+    <f:section title="BlazeMeter Cloud">
+        <f:entry title="Server URL"
+                 field="blazeMeterURL"
+                 description="${%Server URL}">
+            <f:textbox field="blazeMeterURL"/>
+        </f:entry>
+    </f:section>
 </j:jelly>
