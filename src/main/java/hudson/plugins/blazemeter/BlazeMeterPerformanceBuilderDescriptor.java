@@ -51,13 +51,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by config.jelly to display the test list.
     public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
-        if(apiKey.contains(Constants.CREDENTIALS_KEY)){
-            apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
-        }
         ListBoxModel items = new ListBoxModel();
         if (apiKey == null) {
             items.add(Constants.NO_API_KEY, "-1");
         } else {
+            if(apiKey.contains(Constants.CREDENTIALS_KEY)){
+                apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
+            }
             APIFactory apiFactory=APIFactory.getApiFactory();
             BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
             try {
