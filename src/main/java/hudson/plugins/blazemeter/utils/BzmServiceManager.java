@@ -652,15 +652,27 @@ public class BzmServiceManager {
 
             if (errorUnstable < 0) {
                 jenBuildLog.info("ErrorUnstable percentage validation will be skipped: value was not set in configuration");
+            }else{
+                jenBuildLog.info("ErrorUnstable percentage value="+errorUnstable+". It will be compared with errorPercentage="+testResult.getErrorPercentage());
             }
+
             if (errorFailed < 0) {
                 jenBuildLog.info("ErrorFailed percentage validation will be skipped: value was not set in configuration");
+            }else{
+                jenBuildLog.info("ErrorFailed percentage value="+errorFailed+". It will be compared with errorPercentage="+testResult.getErrorPercentage());
             }
+
             if (responseTimeUnstable < 0) {
                 jenBuildLog.info("ResponseTimeUnstable validation will be skipped: value was not set in configuration");
+            }else{
+                jenBuildLog.info("ResponseTimeUnstable value="+responseTimeUnstable+". It will be compared with averageResponseTime="+testResult.getAverage());
             }
+
+
             if (responseTimeFailed < 0) {
                 jenBuildLog.info("ResponseTimeFailed validation will be skipped: value was not set in configuration");
+            }else{
+                jenBuildLog.info("ResponseTimeFailed value="+responseTimeFailed+". It will be compared with averageResponseTime="+testResult.getAverage());
             }
 
             if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable) {
