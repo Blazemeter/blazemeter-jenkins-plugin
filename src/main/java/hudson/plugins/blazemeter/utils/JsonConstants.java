@@ -19,4 +19,5 @@ public interface JsonConstants {
     public static final String TYPE="type";
     public static final String ID="id";
     public static final String LOCATION="location";
+    public static final String LOCATIONS="locations";
 }

@@ -8,14 +8,13 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
@@ -52,12 +51,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by config.jelly to display the test list.
     public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
-        if(apiKey.contains("...")){
+        if(apiKey.contains(Constants.CREDENTIALS_KEY)){
             apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
         }
         ListBoxModel items = new ListBoxModel();
         if (apiKey == null) {
-            items.add("No API Key", "-1");
+            items.add(Constants.NO_API_KEY, "-1");
         } else {
             APIFactory apiFactory=APIFactory.getApiFactory();
             BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
@@ -85,12 +84,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by config.jelly to display the test list.
     public ListBoxModel doFillLocationItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
-        if(apiKey.contains("...")){
+        if(apiKey.contains(Constants.CREDENTIALS_KEY)){
             apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
         }
         ListBoxModel items = new ListBoxModel();
         if (apiKey == null) {
-            items.add("No API Key", "-1");
+            items.add(Constants.NO_API_KEY, Constants.MINUS_ONE);
             return items;
         }
         APIFactory apiFactory = APIFactory.getApiFactory();
@@ -99,11 +98,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
             items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
             JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
-            if (!jo.has("locations")) {
-                items.add("Invalid API key ", "-1");
+            if (!jo.has(JsonConstants.LOCATIONS)) {
+                items.add("Invalid API key ", Constants.MINUS_ONE);
                 return items;
             }
-            Iterator<JSONObject> locations = jo.getJSONArray("locations").iterator();
+            Iterator<JSONObject> locations = jo.getJSONArray(JsonConstants.LOCATIONS).iterator();
             while (locations.hasNext()) {
                 JSONObject location = locations.next();
                 locationList.put(location.getString("id"), location.getString("title"));

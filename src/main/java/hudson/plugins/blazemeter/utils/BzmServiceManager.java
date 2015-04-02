@@ -470,10 +470,15 @@ public class BzmServiceManager {
             }
             File jtlZip=new File(filePath.getParent()
                     + "/" + filePath.getName() + "/" + Constants.BM_ARTEFACTS);
-            url=new URL(dataUrl+"?api_key="+api.getApiKey());
+
+            if(!dataUrl.contains("amazonaws")){
+                url=new URL(dataUrl+"?api_key="+api.getApiKey());
+            }else{
+                url=new URL(dataUrl);
+            }
 
             FileUtils.copyURLToFile(url, jtlZip);
-            jenBuildLog.info("Downloading JTLZIP from "+url+"to "+jtlZip.getCanonicalPath());
+            jenBuildLog.info("Downloading JTLZIP from " + url + "to " + jtlZip.getCanonicalPath());
             unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
             FilePath sample_jtl=new FilePath(filePath,"sample.jtl");
             FilePath bm_kpis_jtl=new FilePath(filePath,Constants.BM_KPIS);
@@ -637,13 +642,13 @@ public class BzmServiceManager {
         Result result=null;
         try {
             int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
-                    ? "-1" : builder.getResponseTimeUnstableThreshold());
+                    ? Constants.MINUS_ONE : builder.getResponseTimeUnstableThreshold());
             int responseTimeFailed = Integer.valueOf(builder.getResponseTimeFailedThreshold().isEmpty()
-                    ? "-1" : builder.getResponseTimeFailedThreshold());
+                    ? Constants.MINUS_ONE : builder.getResponseTimeFailedThreshold());
             int errorUnstable = Integer.valueOf(builder.getErrorUnstableThreshold().isEmpty()
-                    ? "-1" : builder.getErrorUnstableThreshold());
+                    ? Constants.MINUS_ONE : builder.getErrorUnstableThreshold());
             int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
-                    ? "-1" : builder.getErrorFailedThreshold());
+                    ? Constants.MINUS_ONE : builder.getErrorFailedThreshold());
 
             if (errorUnstable < 0) {
                 jenBuildLog.info("ErrorUnstable percentage validation will be skipped: value was not set in configuration");
