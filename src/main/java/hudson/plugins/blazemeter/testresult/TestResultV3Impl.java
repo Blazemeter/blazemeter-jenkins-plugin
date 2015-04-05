@@ -40,10 +40,14 @@ public class TestResultV3Impl extends TestResult {
 
     @Override
     public String toString() {
+        String hits=String.valueOf(this.hits);
+        String errorPercentage=String.valueOf(this.errorPercentage);
+        String average=String.valueOf(this.average);
+        String min=String.valueOf(this.min);
+        String max=String.valueOf(this.max);
         return "AggregateTestResult ->" +
                " hits=" + hits +
-               ", errors percentage=" + errorPercentage+
-               ", average=" + average +
+               ", errors percentage=" + errorPercentage +
                ", average=" + average +
                ", min=" + min +
                ", max=" + max;

@@ -592,13 +592,10 @@ public class BzmServiceManager {
                     "Build won't be validated against local tresholds");
             return result;
         }
-
-        TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
-        testResultFactory.setVersion(APIFactory.ApiVersion.valueOf(builder.getApiVersion()));
         TestResult testResult = null;
         Result localTresholdsResult=null;
         try {
-            testResult = testResultFactory.getTestResult(testReport);
+            testResult = TestResultFactory.getTestResult(testReport,APIFactory.ApiVersion.valueOf(builder.getApiVersion()));
             jenBuildLog.info(testResult.toString());
             if (!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS))) {
                 jenBuildLog.info("UseServerTresholds flag was set to FALSE or server tresholds validation was SUCCESS.");
