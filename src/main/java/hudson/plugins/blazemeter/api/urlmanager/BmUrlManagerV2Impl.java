@@ -30,7 +30,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&",
+        return String.format("%s/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&",
                 SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
@@ -42,7 +42,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all",
+        return String.format("%s/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all",
                 SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
 
     }
@@ -57,7 +57,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
+        return String.format("%s/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
                 SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
@@ -71,7 +71,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
+        return String.format("%s/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
                 SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
@@ -84,7 +84,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s&",
+        return String.format("%s/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s&",
                 SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
@@ -97,7 +97,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s&",
+        return String.format("%s/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s&",
                 SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
@@ -110,7 +110,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
+        return String.format("%s/api/rest/blazemeter/testGetReport.json/?app_key=%s&user_key=%s&report_id=%s&get_aggregate=true&",
                 SERVER_URL,appKey, userKey, reportId)+ CLIENT_IDENTIFICATION;
     }
 
@@ -122,7 +122,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%sapi/rest/blazemeter/getUserInfo/?app_key=%s&user_key=%s",
+        return String.format("%s/api/rest/blazemeter/getUserInfo/?app_key=%s&user_key=%s",
                 SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
     }
 

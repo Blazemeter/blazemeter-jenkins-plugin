@@ -7,6 +7,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -111,7 +112,7 @@ public class PerformanceBuilder extends Builder {
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         APIFactory apiFactory = APIFactory.getApiFactory();
-        this.api = apiFactory.getAPI(jobApiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
+        this.api = apiFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion));
         this.testDuration=testDuration;
     }
 
@@ -135,7 +136,7 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = APIFactory.getApiFactory().getAPI(jobApiKey, APIFactory.ApiVersion.valueOf(this.apiVersion));
+        this.api = APIFactory.getApiFactory().getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion));
         this.api.setLogger(bzmBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
@@ -150,11 +151,15 @@ public class PerformanceBuilder extends Builder {
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+APIFactory.getApiFactory().getBlazeMeterUrl());
         jenBuildLog.warn("User's e-mail="+userEmail);
 
-        this.testId= BzmServiceManager.prepareTestRun(this);
-        if(this.testId.isEmpty()){
-            jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
-            return false;
+        // implemented only with V3
+        if(this.api instanceof BlazemeterApiV3Impl){
+            this.testId= BzmServiceManager.prepareTestRun(this);
+            if(this.testId.isEmpty()){
+                jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
+                return false;
+            }
         }
+
 
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
 
@@ -175,7 +180,7 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=BzmServiceManager.getSessionId(json, build,APIFactory.ApiVersion.valueOf(this.apiVersion),
+             session=BzmServiceManager.getSessionId(json, build,ApiVersion.valueOf(this.apiVersion),
                      this.api,bzmBuildLog,jenBuildLog);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);

@@ -50,7 +50,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter String apiVersion) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         if (apiKey == null) {
             items.add(Constants.NO_API_KEY, "-1");
@@ -59,9 +59,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
             APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
+            BlazemeterApi api = apiFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion));
             try {
-                LinkedHashMultimap<String, String> testList = bzm.getTestList();
+                LinkedHashMultimap<String, String> testList = api.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
@@ -93,7 +93,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         APIFactory apiFactory = APIFactory.getApiFactory();
-        BlazemeterApi bzm = apiFactory.getAPI(apiKey, APIFactory.ApiVersion.v3);
+        BlazemeterApi bzm = apiFactory.getAPI(apiKey, ApiVersion.v3);
         try {
             LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
             items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
@@ -119,6 +119,18 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
     }
+
+    public ListBoxModel doFillApiVersionItems(@QueryParameter String apiVersion) throws FormValidation {
+        ListBoxModel items = new ListBoxModel();
+        items.add(new ListBoxModel.Option("AutoDetect",ApiVersion.autoDetect.name(),
+                ApiVersion.autoDetect.name().equals(apiVersion)));
+        items.add(new ListBoxModel.Option("V3(force)",ApiVersion.v3.name(),
+                ApiVersion.v3.name().equals(apiVersion)));
+        items.add(new ListBoxModel.Option("V2(deprecated)",ApiVersion.v2.name(),
+                ApiVersion.v2.name().equals(apiVersion)));
+        return items;
+    }
+
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
         ListBoxModel items = new ListBoxModel();

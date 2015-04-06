@@ -332,7 +332,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     @Override
     public BzmHttpWrapper getBzmHttpWr() {
-        return null;
+        return this.bzmhc;
     }
 
     @Override

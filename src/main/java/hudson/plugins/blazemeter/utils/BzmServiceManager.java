@@ -3,10 +3,7 @@ package hudson.plugins.blazemeter.utils;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.BlazeMeterPerformanceBuilderDescriptor;
-import hudson.plugins.blazemeter.BlazemeterCredential;
-import hudson.plugins.blazemeter.PerformanceBuildAction;
-import hudson.plugins.blazemeter.PerformanceBuilder;
+import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
@@ -42,7 +39,7 @@ public class BzmServiceManager {
         BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
         String detectedApiVersion = null;
-            api = apiFactory.getApiFactory().getAPI(apiKey,APIFactory.ApiVersion.v3);
+            api = apiFactory.getApiFactory().getAPI(apiKey,ApiVersion.v3);
             boolean isV3 = false;
             try {
                 isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
@@ -337,10 +334,10 @@ public class BzmServiceManager {
      * @throws JSONException
      */
     public static String getSessionId(JSONObject json, AbstractBuild<?, ?> build,
-                                APIFactory.ApiVersion apiVersion,BlazemeterApi api,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
+                                ApiVersion apiVersion,BlazemeterApi api,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
         String session="";
         try {
-            if (apiVersion.equals(APIFactory.ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
+            if (apiVersion.equals(ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
                 if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
                         .startsWith("Test already running")) {
                     bzmBuildLog.warn("Test already running, please stop it first");
@@ -350,7 +347,7 @@ public class BzmServiceManager {
 
             }
             // get sessionId add to interface
-            if (apiVersion.equals(APIFactory.ApiVersion.v2.name())) {
+            if (apiVersion.equals(ApiVersion.v2)) {
                 session = json.get("session_id").toString();
 
             } else {
@@ -562,25 +559,29 @@ public class BzmServiceManager {
         StdErrLog jenBuildLog=builder.getJenBuildLog();
         String junitReport="";
         Result result = Result.SUCCESS;
-        try{
-            junitReport = api.retrieveJUNITXML(session);
-        }catch (Exception e){
-            jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
+        ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
+
+        if(apiVersion.equals(ApiVersion.v3)){
+            try{
+                junitReport = api.retrieveJUNITXML(session);
+            }catch (Exception e){
+                jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
+            }
+            jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
+            BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
+            Thread.sleep(30000);
+            BzmServiceManager.getJTL(api, session, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
+            if(builder.isUseServerTresholds()){
+                jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
+                result= BzmServiceManager.validateServerTresholds(api,session,jenBuildLog);
+            }else{
+                jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
+            }
         }
-        jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-        BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
-        Thread.sleep(30000);
-        BzmServiceManager.getJTL(api, session, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
-        if(builder.isUseServerTresholds()){
-            jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
-            result= BzmServiceManager.validateServerTresholds(api,session,jenBuildLog);
-        }else{
-            jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
-        }
+
         //get testGetArchive information
         JSONObject testReport=null;
         try{
-
             testReport = api.testReport(session);
         }catch (Exception e){
             jenBuildLog.info("Failed to get test report from server.");
@@ -595,11 +596,15 @@ public class BzmServiceManager {
         TestResult testResult = null;
         Result localTresholdsResult=null;
         try {
-            testResult = TestResultFactory.getTestResult(testReport,APIFactory.ApiVersion.valueOf(builder.getApiVersion()));
+            testResult = TestResultFactory.getTestResult(testReport,ApiVersion.valueOf(builder.getApiVersion()));
             jenBuildLog.info(testResult.toString());
-            if (!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS))) {
+            if (apiVersion.equals(ApiVersion.v3)
+                    &&(!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS)))) {
                 jenBuildLog.info("UseServerTresholds flag was set to FALSE or server tresholds validation was SUCCESS.");
                 jenBuildLog.info("Validating local tresholds...\n");
+                localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
+            }
+            if(apiVersion.equals(ApiVersion.v2)){
                 localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
             }
         } catch (IOException ioe) {
@@ -611,6 +616,7 @@ public class BzmServiceManager {
         }finally{
             return localTresholdsResult!=null?localTresholdsResult:result;
         }
+
     }
 
 
@@ -623,7 +629,7 @@ public class BzmServiceManager {
                 api.terminateTest(testId);
                 terminate=true;
             }
-            if (statusCode >= 100) {
+            if (statusCode >= 100|statusCode ==-1) {
                 api.stopTest(testId);
                 terminate=false;
             }
@@ -721,7 +727,7 @@ public class BzmServiceManager {
     }
 
     public static FormValidation validateUserKey(String userKey){
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, APIFactory.ApiVersion.v3);
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, ApiVersion.v3);
         try{
         net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
         if (user.has("error")) {
@@ -735,7 +741,7 @@ public class BzmServiceManager {
     }
 
     public static String getUserEmail(String userKey){
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, APIFactory.ApiVersion.v3);
+        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, ApiVersion.v3);
         try{
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {

@@ -89,11 +89,11 @@
     </f:entry>
     <f:advanced>
     <f:entry title="Select API version">
-            <select name="apiVersion" field="instance.apiVersion">
+            <f:select style="width:16em;" field="apiVersion">
                 <option value="autoDetect">Auto Detect</option>
                 <option value="v3">V3(force)</option>
                 <option value="v2">V2(deprecated)</option>
-            </select>
+            </f:select>
         </f:entry>
     </f:advanced>
 </j:jelly>

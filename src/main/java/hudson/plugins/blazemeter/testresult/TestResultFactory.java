@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.testresult;
 
+import hudson.plugins.blazemeter.ApiVersion;
 import hudson.plugins.blazemeter.api.APIFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,9 +15,9 @@ public class TestResultFactory {
     private TestResultFactory() {
     }
 
-    public static TestResult getTestResult(JSONObject json,APIFactory.ApiVersion version) throws IOException, JSONException{
+    public static TestResult getTestResult(JSONObject json,ApiVersion version) throws IOException, JSONException{
         if(version==null){
-            version= APIFactory.ApiVersion.v3;
+            version= ApiVersion.v3;
         }
         TestResult result=null;
         try{
