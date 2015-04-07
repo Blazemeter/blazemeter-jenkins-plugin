@@ -83,8 +83,8 @@ public class TestBmUrlManagerV2 {
 
     @Test
     public void testReport(){
-        String expTestReport=bmUrlManager.getServerUrl()+"/api/rest/blazemeter/testGetReport.json/?app_key="
-                +appKey+"&user_key="+userKey+"&report_id="+reportId+"&get_aggregate=true&"+BmUrlManager.CLIENT_IDENTIFICATION;
+        String expTestReport=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+reportId+"/reports/main/summary?api_key="
+                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actTestReport=bmUrlManager.testReport(appKey, userKey, reportId);
         Assert.assertEquals(expTestReport,actTestReport);
     }

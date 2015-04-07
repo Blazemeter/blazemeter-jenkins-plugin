@@ -9,7 +9,6 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
-import hudson.plugins.blazemeter.testresult.TestResultFactory;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -349,19 +348,18 @@ public class BzmServiceManager {
             // get sessionId add to interface
             if (apiVersion.equals(ApiVersion.v2)) {
                 session = json.get("session_id").toString();
-
             } else {
-
                 JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
                 session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-                String reportUrl= getReportUrl(api, session, jenBuildLog, bzmBuildLog);
-                jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-                jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
-
-                PerformanceBuildAction a = new PerformanceBuildAction(build);
-                a.setReportUrl(reportUrl);
-                build.addAction(a);
             }
+            String reportUrl= getReportUrl(api, session, jenBuildLog, bzmBuildLog);
+            jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
+            jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+
+            PerformanceBuildAction a = new PerformanceBuildAction(build);
+            a.setReportUrl(reportUrl);
+            build.addAction(a);
+
 
         }catch (Exception e) {
             jenBuildLog.info("Failed to get session_id: "+e.getMessage());
@@ -596,7 +594,7 @@ public class BzmServiceManager {
         TestResult testResult = null;
         Result localTresholdsResult=null;
         try {
-            testResult = TestResultFactory.getTestResult(testReport,ApiVersion.valueOf(builder.getApiVersion()));
+            testResult = new TestResult(testReport);
             jenBuildLog.info(testResult.toString());
             if (apiVersion.equals(ApiVersion.v3)
                     &&(!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS)))) {
