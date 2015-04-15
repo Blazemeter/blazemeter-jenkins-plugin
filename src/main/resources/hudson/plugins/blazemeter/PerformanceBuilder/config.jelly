@@ -1,0 +1,99 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+    <f:entry title="${%API Key:}">
+        <f:select style="width:32em;" field="jobApiKey"/>
+    </f:entry>
+    <f:entry title="${%BlazeMeter Test}:" field="testId">
+        <f:select>
+        </f:select>
+    </f:entry>
+    <f:entry title="${%Location}:" field="location">
+        <f:select>
+        </f:select>
+    </f:entry>
+
+    <f:entry title="${%Path to JSON configuration}:" description="${%Define path to JSON with test configuration}" field="jsonConfig">
+        <f:textbox field="jsonConfig"></f:textbox>
+    </f:entry>
+    <f:entry title="${%Test Duration, min}:"
+             field="testDuration"
+             description="${%TestDuration}">
+        <f:textbox field="testDuration"
+                   checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
+    </f:entry>
+<f:entry title="Use server tresholds:" description="If checked, server tresholds will be used. LocalTresholds will be skipped" field="useServerTresholds">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry title="${%Error percentage threshold, %}:"
+             description="${%Threshold.Description}">
+        <table width="350px">
+            <thead>
+                <tr>
+                    <td/>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/yellow.gif" alt="100%"/>
+                        ${%Unstable}
+                    </td>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/red.gif" alt="100%"/>
+                        ${%Failed}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="vertical-align:middle"/>
+                    <td>
+                        <f:textbox field="errorUnstableThreshold"/>
+                    </td>
+                    <td/>
+                    <td>
+                        <f:textbox field="errorFailedThreshold"/>
+                    </td>
+                    <td/>
+                </tr>
+            </tbody>
+        </table>
+    </f:entry>
+    <f:entry title="${%Response Time threshold, ms}:"
+             description="${%Response.Description}">
+        <table width="350px">
+            <thead>
+                <tr>
+                    <td/>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/yellow.gif" alt="100%"/>
+                        ${%Unstable}
+                    </td>
+                    <td colspan="2">
+                        <img src="${rootURL}/images/16x16/red.gif" alt="100%"/>
+                        ${%Failed}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="vertical-align:middle"/>
+                    <td>
+                        <f:textbox field="responseTimeUnstableThreshold"/>
+                    </td>
+                    <td>  </td>
+                    <td>
+                        <f:textbox field="responseTimeFailedThreshold"/>
+                    </td>
+                    <td>  </td>
+                </tr>
+            </tbody>
+        </table>
+    </f:entry>
+    <f:advanced>
+    <f:entry title="Select API version">
+            <f:select style="width:16em;" field="apiVersion">
+                <option value="autoDetect">Auto Detect</option>
+                <option value="v3">V3(force)</option>
+                <option value="v2">V2(deprecated)</option>
+            </f:select>
+        </f:entry>
+    </f:advanced>
+</j:jelly>

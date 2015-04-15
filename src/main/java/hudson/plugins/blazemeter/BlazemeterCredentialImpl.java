@@ -3,10 +3,12 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
-import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import hudson.util.Secret;
+import org.eclipse.jetty.util.log.AbstractLogger;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -24,13 +26,15 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
      * Ensure consistent serialization.
      */
     private static final long serialVersionUID = 1L;
+    private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
 
-    private final Secret apiKey;
+    //private final Secret apiKey;
+    private final String apiKey;
     private final String description;
 
     @DataBoundConstructor
     public BlazemeterCredentialImpl(String apiKey, String description) {
-        this.apiKey = Secret.fromString(apiKey);
+        this.apiKey = apiKey;
         this.description = description;
     }
 
@@ -38,7 +42,8 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
         return description;
     }
 
-    public Secret getApiKey() {
+
+    public String getApiKey() {
         return apiKey;
     }
 
@@ -60,19 +65,9 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
             return m;
         }
 
-
-
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterApi bzm = new BlazemeterApi();
-            int testCount = bzm.getTestCount(userKey);
-            if (testCount < 0) {
-                return FormValidation.errorWithMarkup("An error as occurred, check proxy settings");
-            } else if (testCount == 0) {
-                return FormValidation.errorWithMarkup("User Key Invalid Or No Available Tests");
-            } else {
-                return FormValidation.ok("User Key Valid. " + testCount + " Available Tests");
-            }
+            return  BzmServiceManager.validateUserKey(userKey);
         }
 
     }

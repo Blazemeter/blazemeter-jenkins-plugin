@@ -1,0 +1,5 @@
+language: java
+jdk:
+  - openjdk7
+install: "mvn clean --batch-mode"
+script: "mvn test --fail-at-end --batch-mode"

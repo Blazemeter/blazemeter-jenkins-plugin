@@ -10,41 +10,21 @@ import java.util.logging.Logger;
 import org.kohsuke.stapler.StaplerProxy;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 public class PerformanceBuildAction implements Action, StaplerProxy {
     private final AbstractBuild<?, ?> build;
 
-    /**
-     * Configured parsers used to parse reports in this build.
-     * For compatibility reasons, this can be null.
-     */
-    private final List<PerformanceReportParser> parsers;
-
-    private transient final PrintStream hudsonConsoleWriter;
-
     private transient WeakReference<PerformanceReportMap> performanceReportMap;
 
     private static final Logger logger = Logger.getLogger(PerformanceBuildAction.class.getName());
-    private String session;
-    private String blazeMeterURL;
+    private String reportUrl;
 
-    public PerformanceBuildAction(AbstractBuild<?, ?> pBuild, PrintStream logger,
-                                  List<PerformanceReportParser> parsers) {
+    public PerformanceBuildAction(AbstractBuild<?, ?> pBuild) {
         build = pBuild;
-        hudsonConsoleWriter = logger;
-        this.parsers = parsers;
     }
 
-    public PerformanceReportParser getParserByDisplayName(String displayName) {
-        if (parsers != null)
-            for (PerformanceReportParser parser : parsers)
-                if (parser.getDescriptor().getDisplayName().equals(displayName))
-                    return parser;
-        return null;
-    }
+
 
     public String getDisplayName() {
         return Messages.BuildAction_DisplayName();
@@ -64,10 +44,6 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
 
     public AbstractBuild<?, ?> getBuild() {
         return build;
-    }
-
-    PrintStream getHudsonConsoleWriter() {
-        return hudsonConsoleWriter;
     }
 
     public PerformanceReportMap getPerformanceReportMap() {
@@ -90,24 +66,11 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
         return reportMap;
     }
 
-    public void setPerformanceReportMap(
-            WeakReference<PerformanceReportMap> performanceReportMap) {
-        this.performanceReportMap = performanceReportMap;
+    public String getReportUrl() {
+        return reportUrl;
     }
 
-    public String getSession() {
-        return session;
-    }
-
-    public void setSession(String session) {
-        this.session = session;
-    }
-
-    public String getBlazeMeterURL() {
-        return blazeMeterURL;
-    }
-
-    public void setBlazeMeterURL(String blazeMeterURL) {
-        this.blazeMeterURL = blazeMeterURL;
+    public void setReportUrl(String reportUrl) {
+        this.reportUrl = reportUrl;
     }
 }

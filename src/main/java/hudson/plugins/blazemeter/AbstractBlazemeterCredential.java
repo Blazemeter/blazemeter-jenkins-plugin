@@ -2,7 +2,7 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.BaseCredentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import hudson.Util;
+import hudson.plugins.blazemeter.utils.Constants;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -19,7 +19,7 @@ public abstract  class AbstractBlazemeterCredential extends BaseCredentials impl
     }
 
     public String getId() {
-        final String apiKey = getApiKey().getPlainText();
-        return StringUtils.left(apiKey,4) + "..." + StringUtils.right(apiKey, 4);
+        final String apiKey = getApiKey();
+        return StringUtils.left(apiKey,4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
     }
 }
