@@ -16,6 +16,14 @@
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
     <inceptionYear>July 2012</inceptionYear>
 
+    <developers>
+        <developer>
+            <id>zmicerkashlach</id>
+            <name>Zmicer Kashlach</name>
+            <email>dzmitry.kashlach@blazemeter.com</email>
+        </developer>
+    </developers>
+
     <organization>
         <name>BlazeMeterInc</name>
         <url>http://www.blazemeter.com</url>
