@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
     private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
-    private TestType testType;
+    private TestType testType=TestType.http;
     BmUrlManagerV3Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
     }

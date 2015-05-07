@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.ApiVersion;
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -44,7 +45,7 @@ public class TestBmUrlManagerV3 {
     public void getTests(){
     String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/web/tests?api_key="+userKey+
             "&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-    String actGetTestsUrl=bmUrlManager.getTests(appKey,userKey);
+    String actGetTestsUrl=bmUrlManager.getTests(appKey, userKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
     }
 
@@ -63,7 +64,7 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void testStart(){
+    public void testStart_tests(){
         String expTestStart=bmUrlManager.getServerUrl()+"/api/latest/tests/"
                 +testId+"/start?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
 
@@ -72,21 +73,63 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void testStop(){
+    public void testStart_collections(){
+        bmUrlManager.setTestType(TestType.multi);
+        String expTestStart=bmUrlManager.getServerUrl()+"/api/latest/collections/"
+                +testId+"/start?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+
+        String actTestStart=bmUrlManager.testStart(appKey, userKey, testId);
+        Assert.assertEquals(expTestStart,actTestStart);
+        bmUrlManager.setTestType(TestType.http);
+
+    }
+
+    @Test
+    public void testStop_tests(){
         String expTestStop=bmUrlManager.getServerUrl()+"/api/latest/tests/"
                 +testId+"/stop?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
 
         String actTestStop=bmUrlManager.testStop(appKey, userKey, testId);
-        Assert.assertEquals(expTestStop,actTestStop);
+        Assert.assertEquals(expTestStop, actTestStop);
     }
 
+    @Test
+    public void testStop_collections(){
+        bmUrlManager.setTestType(TestType.multi);
+        String expTestStop=bmUrlManager.getServerUrl()+"/api/latest/collections/"
+                +testId+"/stop?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+
+        String actTestStop=bmUrlManager.testStop(appKey, userKey, testId);
+        Assert.assertEquals(expTestStop,actTestStop);
+        bmUrlManager.setTestType(TestType.http);
+    }
+
+    @Test
+    public void testTerminate_tests(){
+        String expTestTerminate=bmUrlManager.getServerUrl()+"/api/latest/tests/"
+                +testId+"/terminate?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+
+        String actTestTerminate=bmUrlManager.testTerminate(appKey, userKey, testId);
+        Assert.assertEquals(expTestTerminate, actTestTerminate);
+    }
+
+    @Test
+    public void testTerminate_collections(){
+        bmUrlManager.setTestType(TestType.multi);
+        String expTestTerminate=bmUrlManager.getServerUrl()+"/api/latest/collections/"
+                +testId+"/terminate?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+
+        String actTestTerminate=bmUrlManager.testTerminate(appKey, userKey, testId);
+        Assert.assertEquals(expTestTerminate, actTestTerminate);
+        bmUrlManager.setTestType(TestType.http);
+    }
 
     @Test
     public void testReport(){
         String expTestReport=bmUrlManager.getServerUrl()+"/api/latest/sessions/"
                 +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actTestReport=bmUrlManager.testReport(appKey, userKey, sessionId);
-        Assert.assertEquals(expTestReport,actTestReport);
+        Assert.assertEquals(expTestReport, actTestReport);
 
     }
 
@@ -132,12 +175,32 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void retrieveJUNITXML(){
+    public void retrieveJUNITXML_tests(){
         String expRetrieveJUNITXML=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+sessionId+
                 "/reports/thresholds/data?format=junit&api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actRetrieveJUNITXML=bmUrlManager.retrieveJUNITXML(appKey, userKey, sessionId);
         Assert.assertEquals(expRetrieveJUNITXML,actRetrieveJUNITXML);
+    }
+
+    @Test
+    public void retrieveJUNITXML_sessions(){
+        String expRetrieveJUNITXML=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+sessionId+
+                "/reports/thresholds/data?format=junit&api_key="
+                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actRetrieveJUNITXML=bmUrlManager.retrieveJUNITXML(appKey, userKey, sessionId);
+        Assert.assertEquals(expRetrieveJUNITXML,actRetrieveJUNITXML);
+    }
+
+    @Test
+    public void generatePublicToken_masters(){
+        bmUrlManager.setTestType(TestType.multi);
+        String expGenPublicToken=bmUrlManager.getServerUrl()+"/api/latest/masters/"+sessionId+
+                "/publicToken?api_key="
+                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actGenPublicToken=bmUrlManager.generatePublicToken(appKey, userKey, sessionId);
+        Assert.assertEquals(expGenPublicToken,actGenPublicToken);
+        bmUrlManager.setTestType(TestType.http);
     }
 
 }
