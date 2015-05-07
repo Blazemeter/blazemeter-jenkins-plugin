@@ -222,11 +222,13 @@ public class BzmServiceManager {
         String publicToken="";
         String reportUrl=null;
         try {
+            TestType testType=api.getUrlManager().getTestType();
+            String reportType=(testType!=null&&testType.equals(TestType.multi))?"masters":"reports";
             jo = api.generatePublicToken(sessionId);
             if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
                 JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
-                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#reports/"+sessionId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#"+reportType+"/"+sessionId+"/summary";
             }else{
                 jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
@@ -618,12 +620,12 @@ public class BzmServiceManager {
     }
 
 
+    
     public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, StdErrLog jenBuildLog) {
         boolean terminate=false;
         try {
             TestType testType=api.getUrlManager().getTestType();
             if(testType!=TestType.multi){
-
             int statusCode = api.getTestSessionStatusCode(sessionId);
             if (statusCode < 100&statusCode!=0) {
                 api.terminateTest(testId);

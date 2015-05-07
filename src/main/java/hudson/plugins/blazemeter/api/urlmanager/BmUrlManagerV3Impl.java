@@ -249,7 +249,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        generatePublicToken= serverUrl +"/api/latest/sessions/"+sessionId+
+        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"masters":"sessions";
+        generatePublicToken= serverUrl +"/api/latest/"+type+"/"+sessionId+
                 "/publicToken?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return generatePublicToken;
