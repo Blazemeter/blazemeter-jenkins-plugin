@@ -315,17 +315,6 @@ public class BzmServiceManager {
         }
     }
 
-    /**
-     * TODO
-     * 1. Split this method into two parts depending on
-     * API version and place code to appropriate BlazeMeterAPIImpl
-     * 2. Remove this method, it's legacy
-     *
-     * @param json
-     * @param build
-     * @return
-     * @throws JSONException
-     */
     public static String getSessionId(JSONObject json,
                                 ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
         String session = "";
@@ -551,12 +540,14 @@ public class BzmServiceManager {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
+        TestType testType =api.getUrlManager().getTestType();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
         String junitReport="";
         Result result = Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
 
-        if(apiVersion.equals(ApiVersion.v3)){
+        if(apiVersion.equals(ApiVersion.v3)&!testType.equals(TestType.multi)){
+            jenBuildLog.info("Requesting JUNIT report from server...");
             try{
                 junitReport = api.retrieveJUNITXML(session);
             }catch (Exception e){
@@ -572,6 +563,8 @@ public class BzmServiceManager {
             }else{
                 jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
             }
+        }else{
+            jenBuildLog.info("JUNIT adn JTL report report won't be requested: apiVersion is v2 or multi-test is selected.");
         }
 
         //get testGetArchive information

@@ -122,7 +122,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testAggregateReport= serverUrl +"/api/latest/sessions/"
+        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"masters":"sessions";
+        testAggregateReport= serverUrl +"/api/latest/"+type+"/"
                 +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testAggregateReport;
