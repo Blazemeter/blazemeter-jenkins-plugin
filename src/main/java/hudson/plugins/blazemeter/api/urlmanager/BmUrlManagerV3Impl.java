@@ -110,18 +110,17 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String testReport(String appKey, String userKey, String sessionId) {
+    public String testReport(String appKey, String userKey, String masterId) {
         String testAggregateReport=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
-            sessionId = URLEncoder.encode(sessionId, "UTF-8");
+            masterId = URLEncoder.encode(masterId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"masters":"sessions";
-        testAggregateReport= serverUrl +"/api/latest/"+type+"/"
-                +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        testAggregateReport= serverUrl +"/api/latest/masters/"
+                +masterId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testAggregateReport;
     }

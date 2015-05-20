@@ -106,7 +106,7 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void testReport(){
-        String expTestReport=bmUrlManager.getServerUrl()+"/api/latest/sessions/"
+        String expTestReport=bmUrlManager.getServerUrl()+"/api/latest/masters/"
                 + masterId +"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actTestReport=bmUrlManager.testReport(appKey, userKey, masterId);
         Assert.assertEquals(expTestReport, actTestReport);

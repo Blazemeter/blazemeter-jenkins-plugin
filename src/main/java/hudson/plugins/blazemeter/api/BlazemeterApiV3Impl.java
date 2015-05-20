@@ -129,7 +129,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             if (result.has(JsonConstants.DATA_URL)&&result.get(JsonConstants.DATA_URL) == null) {
                 testStatus=TestStatus.NotFound;
             } else {
-                if (!result.has("ended")||result.getString("ended").equals(JSONObject.NULL)||result.getString("ended").isEmpty()) {
+                if (result.has("status")&&!result.getString("status").equals("ENDED")) {
                     testStatus=TestStatus.Running;
                 } else {
                     logger.info("Test is not running. Quiting job...");
