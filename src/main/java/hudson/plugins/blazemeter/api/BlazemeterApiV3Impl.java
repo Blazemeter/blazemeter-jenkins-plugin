@@ -16,6 +16,8 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: Vitali
@@ -332,7 +334,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject retrieveJTLZIP(String sessionId) {
+    public JSONObject retrieveJtlZip(String sessionId) {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
         logger.info("Trying to get JTLZIP url with the following parameters: APP_KEY="+APP_KEY+" apiKey="
                 +apiKey+" sessionId="+sessionId);
@@ -399,5 +401,25 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         logger.info("Getting testList with URL=" + url);
         JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         return jo;
+    }
+
+    @Override
+    public List<String> getListOfSessionIds(String masterId) {
+        List<String> sessionsIds=new ArrayList<String>();
+        String url = this.urlManager.listOfSessionIds(APP_KEY, apiKey, masterId);
+        JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        try {
+            JSONArray sessions=jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
+            int sessionsLength=sessions.length();
+            for (int i=0;i<sessionsLength;i++) {
+                 sessionsIds.add(sessions.getJSONObject(i).getString(JsonConstants.ID));
+            }
+        } catch (JSONException je) {
+           logger.info("Failed to get list of sessions from JSONObject "+jo,je);
+        } catch (Exception e) {
+            logger.info("Failed to get list of sessions from JSONObject "+jo,e);
+        }finally {
+            return sessionsIds;
+        }
     }
 }

@@ -16,6 +16,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * User: Vitali
@@ -311,7 +312,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject retrieveJTLZIP(String sessionId) {
+    public JSONObject retrieveJtlZip(String sessionId) {
         return null;
     }
 
@@ -355,5 +356,10 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     @Override
     public JSONObject getTestsJSON() {
         return not_implemented;
+    }
+
+    @Override
+    public List<String> getListOfSessionIds(String masterId) {
+        return null;
     }
 }

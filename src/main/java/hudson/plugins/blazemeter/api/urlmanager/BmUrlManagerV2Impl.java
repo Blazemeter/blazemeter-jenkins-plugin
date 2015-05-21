@@ -196,5 +196,10 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     public void setTestType(TestType testType) {
        this.testType=testType;
     }
+
+    @Override
+    public String listOfSessionIds(String appKey, String userKey, String masterId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
 }
 

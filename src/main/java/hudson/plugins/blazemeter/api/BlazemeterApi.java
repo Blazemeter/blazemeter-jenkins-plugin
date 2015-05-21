@@ -11,6 +11,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * User: Vitali
@@ -65,9 +66,11 @@ public interface BlazemeterApi {
 
     String retrieveJUNITXML(String sessionId);
 
-    JSONObject retrieveJTLZIP(String sessionId);
+    JSONObject retrieveJtlZip(String sessionId);
 
     JSONObject putTestInfo(String testId, JSONObject data);
+
+    List<String> getListOfSessionIds(String masterId);
 
     void setBzmHttpWr(BzmHttpWrapper bzmhc);
 

@@ -47,6 +47,8 @@ public interface BmUrlManager {
 
     String generatePublicToken(String appKey, String userKey, String sessionId);
 
+    String listOfSessionIds(String appKey, String userKey, String masterId);
+
     TestType getTestType();
     void setTestType(TestType testType);
 }

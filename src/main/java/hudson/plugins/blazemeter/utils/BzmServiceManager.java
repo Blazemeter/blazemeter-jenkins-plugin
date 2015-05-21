@@ -431,23 +431,24 @@ public class BzmServiceManager {
         return userKeyId;
     }
 
-    public static void getJTL(BlazemeterApi api,String session,FilePath filePath,
-                              StdErrLog jenBuildLog,
-                              StdErrLog bzmBuildLog){
-       JSONObject jo=api.retrieveJTLZIP(session);
-       String dataUrl=null;
+    public static void downloadJtlReport(BlazemeterApi api, String sessionId, FilePath filePath,
+                                          StdErrLog jenBuildLog,
+                                          StdErrLog bzmBuildLog) {
+
+        JSONObject jo=api.retrieveJtlZip(sessionId);
+        String dataUrl=null;
         URL url=null;
         try {
             JSONArray data=jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
             for(int i=0;i<data.length();i++){
                 String title=data.getJSONObject(i).getString("title");
                 if(title.equals("Zip")){
-                  dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
+                    dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
                     break;
                 }
             }
             File jtlZip=new File(filePath.getParent()
-                    + "/" + filePath.getName() + "/" + Constants.BM_ARTEFACTS);
+                    + "/" + filePath.getName() + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
 
             if(!dataUrl.contains("amazonaws")){
                 url=new URL(dataUrl+"?api_key="+api.getApiKey());
@@ -478,6 +479,17 @@ public class BzmServiceManager {
             jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
         }
     }
+
+        public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
+                                          StdErrLog jenBuildLog,
+                                          StdErrLog bzmBuildLog){
+            List<String> sessionsIds=api.getListOfSessionIds(masterId);
+            for(String s:sessionsIds){
+                downloadJtlReport(api, s, filePath, jenBuildLog, bzmBuildLog);
+            }
+    }
+
+
 
     public static void unzip(String srcZipFileName,
                              String destDirectoryName, StdErrLog jenBuildLog) {
@@ -533,7 +545,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder,String session) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder,String masterId) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
@@ -543,20 +555,20 @@ public class BzmServiceManager {
         Result result = Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
 
-        if(apiVersion.equals(ApiVersion.v3)&!testType.equals(TestType.multi)){
+        if(apiVersion.equals(ApiVersion.v3)){
             jenBuildLog.info("Requesting JUNIT report from server...");
             try{
-                junitReport = api.retrieveJUNITXML(session);
+                junitReport = api.retrieveJUNITXML(masterId);
             }catch (Exception e){
                 jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
             }
             jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
             BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
             Thread.sleep(30000);
-            BzmServiceManager.getJTL(api, session, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
+            BzmServiceManager.downloadJtlReports(api, masterId, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
             if(builder.isUseServerTresholds()){
                 jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
-                result= BzmServiceManager.validateServerTresholds(api,session,jenBuildLog);
+                result= BzmServiceManager.validateServerTresholds(api,masterId,jenBuildLog);
             }else{
                 jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
             }
@@ -567,7 +579,7 @@ public class BzmServiceManager {
         //get testGetArchive information
         JSONObject testReport=null;
         try{
-            testReport = api.testReport(session);
+            testReport = api.testReport(masterId);
         }catch (Exception e){
             jenBuildLog.info("Failed to get test report from server.");
         }

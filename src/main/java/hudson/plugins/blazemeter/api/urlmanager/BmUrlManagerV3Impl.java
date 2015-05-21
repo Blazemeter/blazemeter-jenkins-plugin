@@ -262,5 +262,20 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         this.testType=testType;
     }
 
+
+    @Override
+    public String listOfSessionIds(String appKey, String userKey, String masterId) {
+        String listOfSessionIds=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        listOfSessionIds= serverUrl +"/api/latest/masters/"+masterId+
+                "/sessions?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return listOfSessionIds;
+    }
 }
 
