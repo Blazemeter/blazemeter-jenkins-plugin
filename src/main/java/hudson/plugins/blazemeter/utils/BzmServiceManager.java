@@ -565,7 +565,9 @@ public class BzmServiceManager {
             jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
             BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
             Thread.sleep(30000);
-            BzmServiceManager.downloadJtlReports(api, masterId, builder.getBuild().getWorkspace(), jenBuildLog, jenBuildLog);
+            AbstractBuild build=builder.getBuild();
+            FilePath jtlPath=new FilePath(build.getWorkspace().getParent(),"builds/"+build.getId());
+            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
             if(builder.isUseServerTresholds()){
                 jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
                 result= BzmServiceManager.validateServerTresholds(api,masterId,jenBuildLog);
