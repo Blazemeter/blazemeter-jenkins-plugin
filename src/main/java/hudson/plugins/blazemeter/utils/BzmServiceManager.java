@@ -458,8 +458,9 @@ public class BzmServiceManager {
 
             FileUtils.copyURLToFile(url, jtlZip);
             jenBuildLog.info("Downloading JTLZIP from " + url);
-            jenBuildLog.info("Saving ZIP to " + jtlZip.getCanonicalPath());
-            unzip(jtlZip.getAbsolutePath(), jtlZip.getParent(), jenBuildLog);
+            String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
+            jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
+            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), jenBuildLog);
             FilePath sample_jtl=new FilePath(filePath,"sample.jtl");
             FilePath bm_kpis_jtl=new FilePath(filePath,Constants.BM_KPIS);
             if(sample_jtl.exists()){
