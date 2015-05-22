@@ -183,4 +183,12 @@ public class TestBmUrlManagerV3 {
         bmUrlManager.setTestType(TestType.http);
     }
 
+    @Test
+    public void listOfSessions(){
+        String expListOfSessionIds=bmUrlManager.getServerUrl()+"/api/latest/masters/"+ masterId +
+                "/sessions?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actListOfSessionsIds=bmUrlManager.listOfSessionIds(appKey, userKey, masterId);
+        Assert.assertEquals(expListOfSessionIds,actListOfSessionsIds);
+        bmUrlManager.setTestType(TestType.http);
+    }
 }
