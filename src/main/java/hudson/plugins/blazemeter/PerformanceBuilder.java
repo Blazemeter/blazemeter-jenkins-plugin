@@ -97,7 +97,7 @@ public class PerformanceBuilder extends Builder {
         this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
-                BzmServiceManager.autoDetectApiVersion(this.jobApiKey):apiVersion;
+                BzmServiceManager.autoDetectApiVersion(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL()):apiVersion;
     /*  TODO
     This calls are not implemented in v.2.0
     Therefor they will be hidden from GUI
@@ -111,8 +111,7 @@ public class PerformanceBuilder extends Builder {
         this.useServerTresholds=useServerTresholds;
         this.responseTimeFailedThreshold = responseTimeFailedThreshold;
         this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        this.api = apiFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion));
+        this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion),DESCRIPTOR.getBlazeMeterURL());
         this.testDuration=testDuration;
     }
 
@@ -136,19 +135,19 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = APIFactory.getApiFactory().getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion));
+        this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion), DESCRIPTOR.getBlazeMeterURL());
         this.api.setLogger(bzmBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey);
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
-            jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+APIFactory.getApiFactory().getBlazeMeterUrl());
+            jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+DESCRIPTOR.getBlazeMeterURL());
             return false;
         }
-        jenBuildLog.warn("User key ="+userKeyId+" is valid with "+APIFactory.getApiFactory().getBlazeMeterUrl());
+        jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
 
         // implemented only with V3

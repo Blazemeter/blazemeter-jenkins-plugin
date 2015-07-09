@@ -17,7 +17,7 @@ public class TestBmUrlManagerV3 {
     private String sessionId="987654321";
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLFactory().getURLManager(UrlManagerFactory.ApiVersion.v3,
+            UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3,
             Constants.DEFAULT_BLAZEMETER_URL);
 
     @Test

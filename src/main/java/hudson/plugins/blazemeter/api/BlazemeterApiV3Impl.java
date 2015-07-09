@@ -40,10 +40,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BmUrlManager urlManager;
     private BzmHttpWrapper bzmhc = null;
 
-    BlazemeterApiV3Impl(String apiKey) {
+    BlazemeterApiV3Impl(String apiKey,String blazeMeterUrl) {
         this.apiKey = apiKey;
-        urlManager = UrlManagerFactory.getURLFactory().
-                getURLManager(UrlManagerFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        urlManager = UrlManagerFactory.
+                getURLManager(UrlManagerFactory.ApiVersion.v3, blazeMeterUrl);
         try {
             bzmhc = new BzmHttpWrapper();
             bzmhc.configureProxy();

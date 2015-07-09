@@ -29,14 +29,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private String blazeMeterURL;
     private String name = "My BlazeMeter Account";
-
+    private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         load();
-        APIFactory.getApiFactory().setBlazeMeterUrl(blazeMeterURL!=null&&!blazeMeterURL.isEmpty()?blazeMeterURL:
-                Constants.DEFAULT_BLAZEMETER_URL);
+        descriptor=this;
+    }
 
+    public static BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
+        return descriptor;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
             APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi api = apiFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion));
+            BlazemeterApi api = apiFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
@@ -93,7 +95,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         APIFactory apiFactory = APIFactory.getApiFactory();
-        BlazemeterApi bzm = apiFactory.getAPI(apiKey, ApiVersion.v3);
+        BlazemeterApi bzm = apiFactory.getAPI(apiKey, ApiVersion.v3,this.blazeMeterURL);
         try {
             LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
             items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
@@ -178,7 +180,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        return BzmServiceManager.validateUserKey(userKey);
+        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL);
     }
 
     public FormValidation doCheckTestDuration(@QueryParameter String value) throws IOException, ServletException {
@@ -194,8 +196,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         blazeMeterURL = formData.optString("blazeMeterURL");
-        APIFactory.getApiFactory().setBlazeMeterUrl(!blazeMeterURL.isEmpty()?blazeMeterURL:
-                Constants.DEFAULT_BLAZEMETER_URL);
         save();
         return true;
     }

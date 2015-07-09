@@ -19,7 +19,7 @@ public class TestBmUrlManagerV2 {
     private String reportId="1212121212";
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLFactory().getURLManager(UrlManagerFactory.ApiVersion.v2,
+            UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2,
             Constants.DEFAULT_BLAZEMETER_URL);
 
     @Test

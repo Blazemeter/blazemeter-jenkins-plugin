@@ -34,11 +34,11 @@ public class BzmServiceManager {
     private BzmServiceManager() {
     }
 
-    public static String autoDetectApiVersion(String apiKey) {
+    public static String autoDetectApiVersion(String apiKey,String blazeMeterUrl) {
         BlazemeterApi api = null;
         APIFactory apiFactory = APIFactory.getApiFactory();
         String detectedApiVersion = null;
-            api = apiFactory.getApiFactory().getAPI(apiKey,ApiVersion.v3);
+            api = APIFactory.getAPI(apiKey,ApiVersion.v3,blazeMeterUrl);
             boolean isV3 = false;
             try {
                 isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
@@ -236,11 +236,11 @@ public class BzmServiceManager {
             if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
                 JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
-                reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"/app/?public-token="+publicToken+"#reports/"+sessionId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#reports/"+sessionId+"/summary";
             }else{
                 jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                reportUrl=APIFactory.getApiFactory().getBlazeMeterUrl()+"/app/#reports/"+sessionId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/#reports/"+sessionId+"/summary";
             }
         } catch (Exception e){
           jenBuildLog.warn("Problems with generating public-token for report URL");
@@ -724,8 +724,8 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey){
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, ApiVersion.v3);
+    public static FormValidation validateUserKey(String userKey,String blazeMeterUrl){
+        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3,blazeMeterUrl);
         try{
         net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
         if (user.has("error")) {
@@ -738,9 +738,9 @@ public class BzmServiceManager {
         }
     }
 
-    public static String getUserEmail(String userKey){
-        BlazemeterApi bzm = APIFactory.getApiFactory().getAPI(userKey, ApiVersion.v3);
-        try{
+    public static String getUserEmail(String userKey,String blazemeterUrl){
+        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazemeterUrl);
+        try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {
                 return user.getString("mail");

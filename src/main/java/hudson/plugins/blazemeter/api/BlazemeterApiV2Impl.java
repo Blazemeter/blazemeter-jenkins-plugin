@@ -39,10 +39,10 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     BmUrlManager urlManager;
     private BzmHttpWrapper bzmhc = null;
 
-    BlazemeterApiV2Impl(String apiKey) {
+    BlazemeterApiV2Impl(String apiKey,String blazemeterUrl) {
         this.apiKey = apiKey;
-        urlManager = UrlManagerFactory.getURLFactory().
-                getURLManager(UrlManagerFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        urlManager = UrlManagerFactory.
+                getURLManager(UrlManagerFactory.ApiVersion.v2, blazemeterUrl);
         not_implemented=new JSONObject();
         try {
             not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);

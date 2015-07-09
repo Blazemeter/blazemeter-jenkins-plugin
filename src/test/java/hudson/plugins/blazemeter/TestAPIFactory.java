@@ -22,50 +22,12 @@ public class TestAPIFactory {
 
     @Test
     public void testMixVersion() {
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v2);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
 
     }
-
-    @Test
-    public void testMixUrl() {
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        apiFactory.setBlazeMeterUrl(Constants.QA_BLAZEMETER_URL);
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
-        Assert.assertEquals(blazemeterApi.getBlazeMeterURL(), Constants.QA_BLAZEMETER_URL);
-        apiFactory.setBlazeMeterUrl(Constants.DEFAULT_BLAZEMETER_URL);
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
-        Assert.assertEquals(blazemeterApi.getBlazeMeterURL(), Constants.DEFAULT_BLAZEMETER_URL);
-    }
-
-    @Test
-    public void testMixVersionUserKey() {
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
-        blazemeterApi = apiFactory.getAPI(userKey2,ApiVersion.v3);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey2));
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v3);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
-
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v2);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
-        blazemeterApi = apiFactory.getAPI(userKey2,ApiVersion.v2);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey2));
-        blazemeterApi = apiFactory.getAPI(userKey1,ApiVersion.v2);
-        Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
-        Assert.assertTrue(blazemeterApi.getApiKey().equals(userKey1));
-
-    }
-
 }

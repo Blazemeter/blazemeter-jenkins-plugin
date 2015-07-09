@@ -12,25 +12,24 @@ import org.junit.Test;
  * Created by dzmitrykashlach on 9/01/15.
  */
 public class TestUrlManagerFactory {
-    private UrlManagerFactory urlManagerFactory = UrlManagerFactory.getURLFactory();
     private BmUrlManager bmUrlManager=null;
     private String QA_BLAZEMETER_URL="http://qa.blazemeter.com";
 
     @Test
     public void getUrlManager(){
-        bmUrlManager=urlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV2Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
 
-        bmUrlManager=urlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, QA_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, QA_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV2Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(QA_BLAZEMETER_URL));
 
-        bmUrlManager=urlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV3Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
 
-        bmUrlManager=urlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, QA_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, QA_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV3Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(QA_BLAZEMETER_URL));
 

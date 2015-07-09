@@ -8,8 +8,6 @@ public class APIFactory {
 
     public static APIFactory apiFactory = null;
 
-    private String blazeMeterUrl= Constants.DEFAULT_BLAZEMETER_URL;
-
     private APIFactory() {
     }
 
@@ -25,31 +23,23 @@ public class APIFactory {
     2. Pass version/url as arguments to getAPI();
     */
 
-    public BlazemeterApi getAPI(String apiKey,ApiVersion version) {
+    public static BlazemeterApi getAPI(String apiKey,ApiVersion version, String blazeMeterUrl) {
         BlazemeterApi api=null;
         switch (version) {
             case autoDetect:
-                api=new BlazemeterApiV3Impl(apiKey);
-                ((BlazemeterApiV3Impl)api).setBlazeMeterURL(this.blazeMeterUrl);
+                api=new BlazemeterApiV3Impl(apiKey,blazeMeterUrl);
+                ((BlazemeterApiV3Impl)api).setBlazeMeterURL(blazeMeterUrl);
                 break;
             case v2:
-                api=new BlazemeterApiV2Impl(apiKey);
-                ((BlazemeterApiV2Impl)api).setBlazeMeterURL(this.blazeMeterUrl);
+                api=new BlazemeterApiV2Impl(apiKey,blazeMeterUrl);
+                ((BlazemeterApiV2Impl)api).setBlazeMeterURL(blazeMeterUrl);
                 break;
             case v3:
-                api=new BlazemeterApiV3Impl(apiKey);
-                ((BlazemeterApiV3Impl)api).setBlazeMeterURL(this.blazeMeterUrl);
+                api=new BlazemeterApiV3Impl(apiKey,blazeMeterUrl);
+                ((BlazemeterApiV3Impl)api).setBlazeMeterURL(blazeMeterUrl);
                 break;
         }
         return api;
     }
 
-
-    public String getBlazeMeterUrl() {
-        return blazeMeterUrl;
-    }
-
-    public void setBlazeMeterUrl(String blazeMeterUrl) {
-        this.blazeMeterUrl = blazeMeterUrl;
-    }
 }
