@@ -1,0 +1,125 @@
+{
+    "api_version": 2,
+    "error": null,
+    "result": {
+        "id": "r-v3-559f8f82a6229",
+        "name": "FAILED-2",
+        "userId": 1689,
+        "offset": 0,
+        "statusCode": "qwerty",
+        "status": "BOOT_STARTING",
+        "runtime": {
+            "instances": [
+                "i-7f15c8d7"
+            ]
+        },
+        "created": 1436520322,
+        "updated": 1436520324,
+        "masterId": 15101884,
+        "testId": 5039530,
+        "configuration": {
+            "location": "us-east-1",
+            "consoleSize": "defaultMachine",
+            "type": "http",
+            "indexOffset": 0,
+            "serversCount": 0,
+            "delayedStart": false,
+            "dedicatedIpsEnabled": false,
+            "plugins": {
+                "http": {
+                    "pages": [
+                        {
+                            "headers": [
+                                {
+                                    "name": "Host",
+                                    "value": "demo.blazemeter.com"
+                                },
+                                {
+                                    "name": "User-Agent",
+                                    "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                }
+                            ],
+                            "label": "http://demo.blazemeter.com/echo.php?url=1",
+                            "body": "",
+                            "type": "GET",
+                            "url": "http://user_2:p2@demo.blazemeter.com/echo.php?url=1",
+                            "order": 0
+                        },
+                        {
+                            "headers": [
+                                {
+                                    "name": "Accept-Charset",
+                                    "value": "ISO-8859-1"
+                                }
+                            ],
+                            "label": "http://demo.blazemeter.com/echo.php?url=local/",
+                            "body": "",
+                            "type": "GET",
+                            "url": "http://user_1:p2@demo.blazemeter.com/echo.php?url=local/",
+                            "order": 1
+                        },
+                        {
+                            "headers": [],
+                            "label": "http://demo.blazemeter.com/echo.php?name=filename",
+                            "body": "",
+                            "type": "GET",
+                            "url": "http://user_2:p2@demo.blazemeter.com/echo.php?name=filename",
+                            "order": 2
+                        }
+                    ],
+                    "delay": 10,
+                    "settings": {
+                        "managers": {
+                            "CacheManager": {
+                                "enabled": false
+                            },
+                            "CookieManager": {
+                                "enabled": false
+                            },
+                            "HeaderManager": {
+                                "enabled": false
+                            }
+                        }
+                    },
+                    "override": {
+                        "threads": 4,
+                        "duration": 5
+                    }
+                },
+                "thresholds": {
+                    "thresholds": [
+                        {
+                            "op": "ne",
+                            "field": "responseTime.max",
+                            "description": "max_resp_time",
+                            "label": "http://demo.blazemeter.com/echo.php?url=1",
+                            "value": "1",
+                            "stopTestOnViolation": false
+                        }
+                    ],
+                    "ignoreRampup": true,
+                    "slidingWindow": false
+                },
+                "throughputController": {
+                    "throughput": 4,
+                    "loadProfile": {
+                        "duration": 1,
+                        "start": 2,
+                        "end": 20,
+                        "step": 2
+                    }
+                },
+                "globalHeaders": {
+                    "headers": [
+                        {
+                            "name": "X-Custom-Header",
+                            "value": "blazemeter header value"
+                        }
+                    ]
+                }
+            }
+        },
+        "dataUrl": "https://a.blazemeter.com/api/latest/sessions/r-v3-559f8f82a6229/reports",
+        "expiresTimestamp": null
+    }
+}

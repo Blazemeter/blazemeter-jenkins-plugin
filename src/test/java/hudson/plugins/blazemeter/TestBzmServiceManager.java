@@ -27,8 +27,9 @@ public class TestBzmServiceManager {
     @BeforeClass
     public static void setUp()throws IOException{
         MockedAPI.startAPI();
-        MockedAPI.configure_userProfile();
-        MockedAPI.configure_stopTestSession();
+        MockedAPI.userProfile();
+        MockedAPI.stopTestSession();
+        MockedAPI.getSessionStatus();
     }
 
     @AfterClass

@@ -2,14 +2,11 @@ package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
-import hudson.plugins.blazemeter.api.BzmHttpWrapper;
+import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -23,10 +20,23 @@ import java.util.logging.Logger;
 public class TestBlazemeterApiV3Impl {
     private Logger log = LogManager.getLogManager().getLogger("TEST");
     private BlazemeterApiV3Impl blazemeterApiV3 =null;
-    private BzmHttpWrapper bzmHttpWrapper= Mockito.mock(BzmHttpWrapper.class);
     private String userKey="1234567890";
     private String appKey="jnk100x987c06f4e10c4";
     private String testId="12345";
+
+
+    @BeforeClass
+    public static void setUp()throws IOException{
+        MockedAPI.startAPI();
+        MockedAPI.userProfile();
+        MockedAPI.getSessionStatus();
+    }
+
+    @AfterClass
+    public static void tearDown()throws IOException{
+        MockedAPI.stopAPI();
+    }
+
 
     @Test
     public void createTest_null(){
@@ -59,6 +69,49 @@ public class TestBlazemeterApiV3Impl {
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertEquals(blazemeterApiV3.getTestConfig(null), null);
     }
+
+    @Test
+    public void getTestInfo_Running(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
+                TestConstants.mockedApiUrl);
+        TestInfo ti=blazemeterApiV3.getTestInfo(TestConstants.TEST_SESSION_100);
+        Assert.assertEquals(ti.getId(), "5039530");
+        Assert.assertEquals(ti.getName(), "FAILED-2");
+        Assert.assertEquals(ti.getStatus(), TestStatus.Running);
+    }
+
+    @Test
+    public void getTestInfo_NotRunning(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
+                TestConstants.mockedApiUrl);
+        TestInfo ti=blazemeterApiV3.getTestInfo(TestConstants.TEST_SESSION_140);
+        Assert.assertEquals(ti.getId(), "5039532");
+        Assert.assertEquals(ti.getName(), "PASSED-1");
+        Assert.assertEquals(ti.getStatus(), TestStatus.NotRunning);
+    }
+
+
+    @Test
+    public void getTestInfo_Error(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
+                TestConstants.mockedApiUrl);
+        TestInfo ti=blazemeterApiV3.getTestInfo(TestConstants.TEST_SESSION_NOT_FOUND);
+        Assert.assertEquals(ti.getId(), null);
+        Assert.assertEquals(ti.getName(), null);
+        Assert.assertEquals(ti.getStatus(), TestStatus.Error);
+    }
+
+    @Test
+    public void getTestInfo_NotFound(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI("",ApiVersion.v3,
+                TestConstants.mockedApiUrl);
+        TestInfo ti=blazemeterApiV3.getTestInfo("");
+        Assert.assertEquals(ti.getId(), null);
+        Assert.assertEquals(ti.getName(), null);
+        Assert.assertEquals(ti.getStatus(), TestStatus.NotFound);
+    }
+
+
 
     @Test
     public void getUser_null(){
@@ -130,61 +183,63 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestsList(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
-        try {
-            blazemeterApiV3.getTestList();
-            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        } catch (MessagingException e) {
-            log.info(e.getMessage());
-        }
+
     }
 
     @Ignore
     @Test
     public void getTestsCount(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTests(appKey,userKey);
-        try {
-            blazemeterApiV3.getTestCount();
-            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        } catch (ServletException se) {
-            log.info(se.getMessage());
-        } catch (JSONException je) {
-            log.info(je.getMessage());
-        }
+
     }
 
-    @Ignore
     @Test
-    public void getTestRunStatus(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTestConfig(appKey, userKey, testId);
-        try {
-            blazemeterApiV3.getTestConfig(testId);
-            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-       } 
+    public void getTestSessionStatusCode_25(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int status=blazemeterApiV3.getTestSessionStatusCode(TestConstants.TEST_SESSION_25);
+        Assert.assertTrue(status==25);
     }
+
+    @Test
+    public void getTestSessionStatusCode_70(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int status=blazemeterApiV3.getTestSessionStatusCode(TestConstants.TEST_SESSION_70);
+        Assert.assertTrue(status==70);
+    }
+
+    @Test
+    public void getTestSessionStatusCode_140(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int status=blazemeterApiV3.getTestSessionStatusCode(TestConstants.TEST_SESSION_140);
+        Assert.assertTrue(status==140);
+    }
+
+
+    @Test
+    public void getTestSessionStatusCode_100(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int status=blazemeterApiV3.getTestSessionStatusCode(TestConstants.TEST_SESSION_100);
+        Assert.assertTrue(status==100);
+    }
+
+    @Test
+    public void getTestSessionStatusCode_0(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_EXCEPTION,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int status=blazemeterApiV3.getTestSessionStatusCode(TestConstants.TEST_SESSION_0);
+        Assert.assertTrue(status==0);
+    }
+
+
 
     @Ignore
     @Test
     public void putTestInfo(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-        blazemeterApiV3.setBzmHttpWr(bzmHttpWrapper);
-        String url = blazemeterApiV3.getUrlManager().getTestConfig(appKey, userKey, testId);
-        try {
-            blazemeterApiV3.putTestInfo(testId,null);
-            Mockito.verify(bzmHttpWrapper).getResponseAsJson(url, null, BzmHttpWrapper.Method.PUT);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-        }
+
     }
 }

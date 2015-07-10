@@ -25,7 +25,7 @@ public class MockedAPI {
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
 
     }
-    public static void configure_userProfile() throws IOException{
+    public static void userProfile() throws IOException{
 
 
 
@@ -84,7 +84,8 @@ public class MockedAPI {
 
     }
 
-    public static void configure_stopTestSession() throws IOException{
+    public static void getSessionStatus() throws IOException{
+
 
         File jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_25.json");
         String testStatus= FileUtils.readFileToString(jsonFile);
@@ -111,6 +112,22 @@ public class MockedAPI {
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(testStatus));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_0.json");
+        testStatus= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_0)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_EXCEPTION)
                         ),
                 unlimited()
         )
@@ -151,7 +168,28 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/terminateTest.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_not_found.json");
+        testStatus= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_NOT_FOUND)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(testStatus));
+
+
+    }
+
+    public static void stopTestSession() throws IOException{
+
+        File jsonFile = new File(TestConstants.RESOURCES + "/terminateTest.json");
         String terminateTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
@@ -185,7 +223,6 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(stopTest));
 
     }
-
 
 
     public static void stopAPI(){
