@@ -596,14 +596,19 @@ public class BzmServiceManager {
         try {
             testResult = new TestResult(testReport);
             jenBuildLog.info(testResult.toString());
+            String respTimeUTr=builder.getResponseTimeUnstableThreshold();
+            String respTimeFTr=builder.getResponseTimeFailedThreshold();
+            String errUTr=builder.getErrorUnstableThreshold();
+            String errFTr=builder.getErrorFailedThreshold();
+
             if (apiVersion.equals(ApiVersion.v3)
                     &&(!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS)))) {
                 jenBuildLog.info("UseServerTresholds flag was set to FALSE or server tresholds validation was SUCCESS.");
                 jenBuildLog.info("Validating local tresholds...\n");
-                localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
+                localTresholdsResult = validateLocalTresholds(testResult, respTimeUTr,respTimeFTr,errUTr,errFTr, jenBuildLog);
             }
             if(apiVersion.equals(ApiVersion.v2)){
-                localTresholdsResult = validateLocalTresholds(testResult, builder, jenBuildLog);
+                localTresholdsResult = validateLocalTresholds(testResult, respTimeUTr,respTimeFTr,errUTr,errFTr, jenBuildLog);
             }
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
@@ -639,18 +644,21 @@ public class BzmServiceManager {
     }
 
     public static Result validateLocalTresholds(TestResult testResult,
-                                                PerformanceBuilder builder,
+                                                String respTimeUTr,
+                                                String respTimeFTr,
+                                                String errUTr,
+                                                String errFTr,
                                                 StdErrLog jenBuildLog) {
         Result result=null;
         try {
-            int responseTimeUnstable = Integer.valueOf(builder.getResponseTimeUnstableThreshold().isEmpty()
-                    ? Constants.MINUS_ONE : builder.getResponseTimeUnstableThreshold());
-            int responseTimeFailed = Integer.valueOf(builder.getResponseTimeFailedThreshold().isEmpty()
-                    ? Constants.MINUS_ONE : builder.getResponseTimeFailedThreshold());
-            int errorUnstable = Integer.valueOf(builder.getErrorUnstableThreshold().isEmpty()
-                    ? Constants.MINUS_ONE : builder.getErrorUnstableThreshold());
-            int errorFailed = Integer.valueOf(builder.getErrorFailedThreshold().isEmpty()
-                    ? Constants.MINUS_ONE : builder.getErrorFailedThreshold());
+            int responseTimeUnstable = Integer.valueOf(respTimeUTr.isEmpty()
+                    ? Constants.MINUS_ONE : respTimeUTr);
+            int responseTimeFailed = Integer.valueOf(respTimeFTr.isEmpty()
+                    ? Constants.MINUS_ONE : respTimeFTr);
+            int errorUnstable = Integer.valueOf(errUTr.isEmpty()
+                    ? Constants.MINUS_ONE : errUTr);
+            int errorFailed = Integer.valueOf(errFTr.isEmpty()
+                    ? Constants.MINUS_ONE : errFTr);
 
             if (errorUnstable < 0) {
                 jenBuildLog.info("ErrorUnstable percentage validation will be skipped: value was not set in configuration");

@@ -1,15 +1,26 @@
 package hudson.plugins.blazemeter;
 
+import hudson.model.Result;
+import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.FormValidation;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONObject;
 import org.junit.*;
 import org.json.JSONException;
+import org.mockito.Mockito;
+
+import java.io.File;
 import java.io.IOException;
 
 /**
  * Created by zmicer on 8.7.15.
  */
 public class TestBzmServiceManager {
+
+
 
     @BeforeClass
     public static void setUp()throws IOException{
@@ -61,5 +72,50 @@ public class TestBzmServiceManager {
     public void getVersion() throws IOException,JSONException{
         String version=BzmServiceManager.getVersion();
         Assert.assertTrue(version.matches("^(\\d{1,}\\.+\\d{1,2}\\S*)$"));
+    }
+
+    @Test
+    public void validateLocalTr() throws IOException,JSONException{
+        File summaryFile = new File(TestConstants.RESOURCES + "/summary.json");
+        String summaryStr= FileUtils.readFileToString(summaryFile);
+        JSONObject summaryJson=new JSONObject(summaryStr);
+        TestResult testResult=new TestResult(summaryJson);
+        StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
+        Result result= null;
+        result = BzmServiceManager.validateLocalTresholds(testResult, "1", "", "", "", stdErrLog);
+        Assert.assertEquals(result, Result.UNSTABLE);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "", "1", "", "", stdErrLog);
+        Assert.assertEquals(result, Result.FAILURE);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "1", "", stdErrLog);
+        Assert.assertEquals(result,Result.UNSTABLE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","","","1",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"1","2","","",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"1","2","3","4",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","","1","2",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "50", "", "", "", stdErrLog);
+        Assert.assertEquals(result, null);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "", "50", "", "", stdErrLog);
+        Assert.assertEquals(result, null);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "50", "50", "", "", stdErrLog);
+        Assert.assertEquals(result, null);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "60", "", stdErrLog);
+        Assert.assertEquals(result, null);
+        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "", "60", stdErrLog);
+        Assert.assertEquals(result, null);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","","60","60",stdErrLog);
+        Assert.assertEquals(result,null);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"0","","","",stdErrLog);
+        Assert.assertEquals(result,Result.UNSTABLE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","","0","",stdErrLog);
+        Assert.assertEquals(result,Result.UNSTABLE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","0","","",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+        result=BzmServiceManager.validateLocalTresholds(testResult,"","","","0",stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+
     }
 }
