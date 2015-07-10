@@ -13,5 +13,10 @@ public interface TestConstants {
     String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
     int mockedApiPort=1234;
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
-    String mockedApiHost ="127.0.0.1";
+
+    String TEST_ID="testId";
+    String TEST_SESSION_25="testSession-25";
+    String TEST_SESSION_70="testSession-70";
+    String TEST_SESSION_100="testSession-100";
+    String TEST_SESSION_140="testSession-140";
 }

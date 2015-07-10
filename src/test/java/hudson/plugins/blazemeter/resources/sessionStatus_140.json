@@ -1,0 +1,117 @@
+{
+    "api_version": 2,
+    "error": null,
+    "result": {
+        "id": "r-v3-559f65fc7b482",
+        "name": "PASSED-1",
+        "userId": 1689,
+        "offset": 0,
+        "statusCode": 140,
+        "status": "ENDED",
+        "ended": 1436510180,
+        "firstSampleTime": 1436509806,
+        "lastSampleTime": 1436510092,
+        "labels": [
+            {
+                "id": "7f3f77da4e620c6b3703db942e883173",
+                "name": "tut.gy"
+            },
+            {
+                "id": "ALL",
+                "name": "ALL"
+            }
+        ],
+        "runtime": {
+            "instances": [
+                "i-3b0edc93"
+            ]
+        },
+        "created": 1436509692,
+        "updated": 1436510180,
+        "masterId": 15101800,
+        "testId": 5039532,
+        "configuration": {
+            "location": "us-east-1",
+            "consoleSize": "defaultMachine",
+            "type": "http",
+            "indexOffset": 0,
+            "serversCount": 0,
+            "delayedStart": false,
+            "dedicatedIpsEnabled": false,
+            "plugins": {
+                "http": {
+                    "pages": [
+                        {
+                            "headers": [
+                                {
+                                    "name": "Host",
+                                    "value": "demo.blazemeter.com"
+                                },
+                                {
+                                    "name": "User-Agent",
+                                    "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                }
+                            ],
+                            "label": "tut.gy",
+                            "body": "",
+                            "type": "GET",
+                            "url": "http://tut.gy",
+                            "order": 0
+                        }
+                    ],
+                    "delay": 10,
+                    "settings": {
+                        "managers": {
+                            "CacheManager": {
+                                "enabled": false
+                            },
+                            "CookieManager": {
+                                "enabled": false
+                            },
+                            "HeaderManager": {
+                                "enabled": false
+                            }
+                        }
+                    },
+                    "override": {
+                        "threads": 4,
+                        "duration": 5
+                    }
+                },
+                "thresholds": {
+                    "thresholds": [
+                        {
+                            "op": "eq",
+                            "field": "responseTime.max",
+                            "description": "max_resp_time",
+                            "label": "tut.gy",
+                            "value": 10000,
+                            "stopTestOnViolation": false
+                        }
+                    ],
+                    "ignoreRampup": true,
+                    "slidingWindow": false
+                },
+                "throughputController": {
+                    "throughput": 4,
+                    "loadProfile": {
+                        "duration": 1,
+                        "start": 2,
+                        "end": 20,
+                        "step": 2
+                    }
+                },
+                "globalHeaders": {
+                    "headers": [
+                        {
+                            "name": "X-Custom-Header",
+                            "value": "blazemeter header value"
+                        }
+                    ]
+                }
+            }
+        },
+        "dataUrl": "https://a.blazemeter.com/api/latest/sessions/r-v3-559f65fc7b482/reports",
+        "expiresTimestamp": null
+    }
+}

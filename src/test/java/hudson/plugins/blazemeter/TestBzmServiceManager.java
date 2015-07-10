@@ -1,9 +1,10 @@
 package hudson.plugins.blazemeter;
 
 import hudson.model.Result;
+import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
-import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -20,16 +21,19 @@ import java.io.IOException;
  */
 public class TestBzmServiceManager {
 
+    private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
 
 
     @BeforeClass
     public static void setUp()throws IOException{
-        MockedAPIConfigurator.startMockedAPIServer();
+        MockedAPI.startAPI();
+        MockedAPI.configure_userProfile();
+        MockedAPI.configure_stopTestSession();
     }
 
     @AfterClass
     public static void tearDown()throws IOException{
-        MockedAPIConfigurator.stopMockedAPIServer();
+        MockedAPI.stopAPI();
     }
 
     @Test
@@ -80,7 +84,6 @@ public class TestBzmServiceManager {
         String summaryStr= FileUtils.readFileToString(summaryFile);
         JSONObject summaryJson=new JSONObject(summaryStr);
         TestResult testResult=new TestResult(summaryJson);
-        StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
         Result result= null;
         result = BzmServiceManager.validateLocalTresholds(testResult, "1", "", "", "", stdErrLog);
         Assert.assertEquals(result, Result.UNSTABLE);
@@ -117,5 +120,18 @@ public class TestBzmServiceManager {
         result=BzmServiceManager.validateLocalTresholds(testResult,"","","","0",stdErrLog);
         Assert.assertEquals(result,Result.FAILURE);
 
+    }
+
+    @Test
+    public void stopTestSession(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_25, stdErrLog);
+        Assert.assertEquals(terminate, true);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_70, stdErrLog);
+        Assert.assertEquals(terminate, true);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_100, stdErrLog);
+        Assert.assertEquals(terminate, false);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_140, stdErrLog);
+        Assert.assertEquals(terminate, false);
     }
 }
