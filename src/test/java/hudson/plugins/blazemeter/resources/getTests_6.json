@@ -1,0 +1,483 @@
+{
+    "api_version": 2,
+    "error": null,
+    "result": [
+        {
+            "id": 5039530,
+            "name": "FAILED-2",
+            "userId": 1689,
+            "created": 1426081800,
+            "updated": 1435751730,
+            "configuration": {
+                "location": "us-east-1",
+                "consoleSize": "m3.large",
+                "enginesSize": "m3.large",
+                "type": "http",
+                "concurrency": 4,
+                "plugins": {
+                    "http": {
+                        "pages": [
+                            {
+                                "headers": [
+                                    {
+                                        "name": "Host",
+                                        "value": "demo.blazemeter.com"
+                                    },
+                                    {
+                                        "name": "User-Agent",
+                                        "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                    }
+                                ],
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "body": "",
+                                "type": "GET",
+                                "url": "http://user_2:p2@demo.blazemeter.com/echo.php?url=1",
+                                "order": 0
+                            },
+                            {
+                                "headers": [
+                                    {
+                                        "name": "Accept-Charset",
+                                        "value": "ISO-8859-1"
+                                    }
+                                ],
+                                "label": "http://demo.blazemeter.com/echo.php?url=local/",
+                                "body": "",
+                                "type": "GET",
+                                "url": "http://user_1:p2@demo.blazemeter.com/echo.php?url=local/",
+                                "order": 1
+                            },
+                            {
+                                "headers": [],
+                                "label": "http://demo.blazemeter.com/echo.php?name=filename",
+                                "body": "",
+                                "type": "GET",
+                                "url": "http://user_2:p2@demo.blazemeter.com/echo.php?name=filename",
+                                "order": 2
+                            }
+                        ],
+                        "delay": 10,
+                        "settings": {
+                            "managers": {
+                                "CacheManager": {
+                                    "enabled": false
+                                },
+                                "CookieManager": {
+                                    "enabled": false
+                                },
+                                "HeaderManager": {
+                                    "enabled": false
+                                }
+                            }
+                        },
+                        "override": {
+                            "duration": 5
+                        }
+                    },
+                    "thresholds": {
+                        "thresholds": [
+                            {
+                                "op": "ne",
+                                "field": "responseTime.max",
+                                "description": "max_resp_time",
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "value": "1",
+                                "stopTestOnViolation": false
+                            }
+                        ],
+                        "ignoreRampup": true,
+                        "slidingWindow": false
+                    },
+                    "throughputController": {
+                        "throughput": 4,
+                        "loadProfile": {
+                            "duration": 1,
+                            "start": 2,
+                            "end": 20,
+                            "step": 2
+                        }
+                    },
+                    "globalHeaders": {
+                        "headers": [
+                            {
+                                "name": "X-Custom-Header",
+                                "value": "blazemeter header value"
+                            }
+                        ]
+                    }
+                }
+            },
+            "projectId": null
+        },
+        {
+            "id": 5075679,
+            "name": "zmicer-test, build # 179",
+            "userId": 1689,
+            "created": 1434529012,
+            "updated": 1435742492,
+            "configuration": {
+                "location": "eu-west-1",
+                "consoleSize": "m3.large",
+                "enginesSize": "m3.large",
+                "type": "http",
+                "concurrency": 4,
+                "plugins": {
+                    "http": {
+                        "pages": [
+                            {
+                                "headers": [
+                                    {
+                                        "name": "User-Agent",
+                                        "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                    },
+                                    {
+                                        "name": "Host",
+                                        "value": "demo.blazemeter.com"
+                                    }
+                                ],
+                                "includeEmbeddedResources": false,
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "type": "GET",
+                                "body": "",
+                                "url": "http://demo.blazemeter.com/echo.php?url=1"
+                            },
+                            {
+                                "headers": [
+                                    {
+                                        "name": "Accept-Charset",
+                                        "value": "ISO-8859-1"
+                                    }
+                                ],
+                                "includeEmbeddedResources": false,
+                                "label": "http://demo.blazemeter.com/echo.php?url=local/",
+                                "type": "GET",
+                                "body": "",
+                                "url": "http://demo.blazemeter.com/echo.php?url=local/"
+                            },
+                            {
+                                "headers": [],
+                                "includeEmbeddedResources": false,
+                                "label": "http://demo.blazemeter.com/echo.php?name=filename",
+                                "type": "GET",
+                                "body": "",
+                                "url": "http://demo.blazemeter.com/echo.php?name=filename"
+                            }
+                        ],
+                        "delay": 0,
+                        "settings": {
+                            "managers": {
+                                "CacheManager": {
+                                    "enabled": false
+                                },
+                                "CookieManager": {
+                                    "enabled": false
+                                },
+                                "HeaderManager": {
+                                    "enabled": false
+                                }
+                            }
+                        },
+                        "keepAlive": true,
+                        "randomOrder": true,
+                        "clientImplementation": "HttpClient4",
+                        "override": {
+                            "rampup": 0,
+                            "duration": 5
+                        }
+                    },
+                    "thresholds": {
+                        "thresholds": [
+                            {
+                                "op": "gt",
+                                "field": "responseTime.avg",
+                                "description": "avg_resp_time",
+                                "label": null,
+                                "value": 2000,
+                                "stopTestOnViolation": false
+                            },
+                            {
+                                "op": "gt",
+                                "field": "responseTime.max",
+                                "description": "max_resp_time",
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "value": 10000,
+                                "stopTestOnViolation": false
+                            }
+                        ],
+                        "ignoreRampup": true,
+                        "slidingWindow": true
+                    },
+                    "throughputController": {
+                        "throughput": 2,
+                        "loadProfile": {
+                            "duration": 60,
+                            "start": 2,
+                            "end": 20,
+                            "step": 2
+                        }
+                    },
+                    "globalHeaders": {
+                        "headers": [
+                            {
+                                "name": "X-Custom-Header",
+                                "value": "blazemeter header value"
+                            }
+                        ]
+                    }
+                }
+            },
+            "projectId": null
+        },
+        {
+            "id": 5075114,
+            "name": "creating_and_deleting_project.jmx",
+            "userId": 1689,
+            "created": 1434437019,
+            "updated": 1434437019,
+            "configuration": {
+                "location": "us-east-1",
+                "type": "jmeter",
+                "serversCount": 2,
+                "plugins": {
+                    "jmeter": {
+                        "filename": "creating_and_deleting_project.jmx",
+                        "version": "2.13",
+                        "override": {
+                            "threads": 100,
+                            "duration": 100
+                        }
+                    }
+                }
+            },
+            "projectId": null
+        },
+        {
+            "id": 5074760,
+            "name": "test via script #2",
+            "userId": 1689,
+            "created": 1434370811,
+            "updated": 1434371410,
+            "configuration": {
+                "location": "us-east-1",
+                "consoleSize": "m3.large",
+                "enginesSize": "m3.large",
+                "type": "http",
+                "concurrency": 4,
+                "plugins": {
+                    "http": {
+                        "pages": [
+                            {
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "url": "http://demo.blazemeter.com/echo.php?url=1",
+                                "type": "GET",
+                                "body": "",
+                                "headers": [
+                                    {
+                                        "name": "User-Agent",
+                                        "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                    },
+                                    {
+                                        "name": "Host",
+                                        "value": "demo.blazemeter.com"
+                                    }
+                                ],
+                                "includeEmbeddedResources": false
+                            },
+                            {
+                                "label": "http://demo.blazemeter.com/echo.php?url=local/",
+                                "url": "http://demo.blazemeter.com/echo.php?url=local/",
+                                "type": "GET",
+                                "body": "",
+                                "headers": [
+                                    {
+                                        "name": "Accept-Charset",
+                                        "value": "ISO-8859-1"
+                                    }
+                                ],
+                                "includeEmbeddedResources": false
+                            },
+                            {
+                                "label": "http://demo.blazemeter.com/echo.php?name=filename",
+                                "url": "http://demo.blazemeter.com/echo.php?name=filename",
+                                "type": "GET",
+                                "body": "",
+                                "headers": [],
+                                "includeEmbeddedResources": false
+                            }
+                        ],
+                        "delay": 0,
+                        "settings": {
+                            "managers": {
+                                "CacheManager": {
+                                    "enabled": false
+                                },
+                                "CookieManager": {
+                                    "enabled": false
+                                },
+                                "HeaderManager": {
+                                    "enabled": false
+                                }
+                            }
+                        },
+                        "keepAlive": true,
+                        "randomOrder": true,
+                        "clientImplementation": "HttpClient4",
+                        "override": {
+                            "rampup": 0,
+                            "duration": 9
+                        }
+                    },
+                    "thresholds": {
+                        "thresholds": [
+                            {
+                                "label": null,
+                                "field": "responseTime.avg",
+                                "op": "gt",
+                                "value": 2000,
+                                "description": "avg_resp_time",
+                                "stopTestOnViolation": false
+                            },
+                            {
+                                "label": "http://demo.blazemeter.com/echo.php?url=1",
+                                "field": "responseTime.max",
+                                "op": "gt",
+                                "value": 10000,
+                                "description": "max_resp_time",
+                                "stopTestOnViolation": false
+                            }
+                        ],
+                        "ignoreRampup": true,
+                        "slidingWindow": true
+                    },
+                    "throughputController": {
+                        "throughput": 2,
+                        "loadProfile": {
+                            "start": 2,
+                            "end": 20,
+                            "step": 2,
+                            "duration": 60
+                        }
+                    },
+                    "globalHeaders": {
+                        "headers": [
+                            {
+                                "name": "X-Custom-Header",
+                                "value": "blazemeter header value"
+                            }
+                        ]
+                    }
+                }
+            },
+            "projectId": null
+        },
+        {
+            "id": 5072981,
+            "name": "jmeter-plugins.jmx",
+            "userId": 1689,
+            "created": 1433925319,
+            "updated": 1433925319,
+            "configuration": {
+                "location": "us-east-1",
+                "type": "jmeter",
+                "serversCount": 5,
+                "plugins": {
+                    "jmeter": {
+                        "filename": "jmeter-plugins.jmx",
+                        "version": "2.13",
+                        "override": {
+                            "threads": 100,
+                            "duration": 100
+                        }
+                    }
+                }
+            },
+            "projectId": null
+        },
+        {
+            "id": 5039532,
+            "name": "PASSED-1",
+            "userId": 1689,
+            "created": 1426081949,
+            "updated": 1429785304,
+            "configuration": {
+                "location": "us-east-1",
+                "consoleSize": "m3.large",
+                "enginesSize": "m3.large",
+                "type": "http",
+                "concurrency": 4,
+                "plugins": {
+                    "http": {
+                        "pages": [
+                            {
+                                "headers": [
+                                    {
+                                        "name": "Host",
+                                        "value": "demo.blazemeter.com"
+                                    },
+                                    {
+                                        "name": "User-Agent",
+                                        "value": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.116 Safari/537.36"
+                                    }
+                                ],
+                                "label": "tut.gy",
+                                "body": "",
+                                "type": "GET",
+                                "url": "http://tut.gy",
+                                "order": 0
+                            }
+                        ],
+                        "delay": 10,
+                        "settings": {
+                            "managers": {
+                                "CacheManager": {
+                                    "enabled": false
+                                },
+                                "CookieManager": {
+                                    "enabled": false
+                                },
+                                "HeaderManager": {
+                                    "enabled": false
+                                }
+                            }
+                        },
+                        "override": {
+                            "duration": 5
+                        }
+                    },
+                    "thresholds": {
+                        "thresholds": [
+                            {
+                                "op": "eq",
+                                "field": "responseTime.max",
+                                "description": "max_resp_time",
+                                "label": "tut.gy",
+                                "value": 10000,
+                                "stopTestOnViolation": false
+                            }
+                        ],
+                        "ignoreRampup": true,
+                        "slidingWindow": false
+                    },
+                    "throughputController": {
+                        "throughput": 4,
+                        "loadProfile": {
+                            "duration": 1,
+                            "start": 2,
+                            "end": 20,
+                            "step": 2
+                        }
+                    },
+                    "globalHeaders": {
+                        "headers": [
+                            {
+                                "name": "X-Custom-Header",
+                                "value": "blazemeter header value"
+                            }
+                        ]
+                    }
+                }
+            },
+            "projectId": null
+        }
+    ]
+}

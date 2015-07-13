@@ -171,11 +171,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                 return -1;
             } else {
                 JSONArray result = (JSONArray) jo.get(JsonConstants.RESULT);
-                if (result.length() == 0) {
-                    return 0;
-                } else {
-                    return result.length();
-                }
+                return result.length();
             }
         } catch (JSONException e) {
             logger.warn("Error getting response from server: ", e);

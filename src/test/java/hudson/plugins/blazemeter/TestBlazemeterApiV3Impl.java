@@ -1,11 +1,13 @@
 package hudson.plugins.blazemeter;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.*;
 
 import javax.mail.MessagingException;
@@ -30,6 +32,9 @@ public class TestBlazemeterApiV3Impl {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.getSessionStatus();
+        MockedAPI.getTests();
+        MockedAPI.getTestReport();
+        MockedAPI.startTest();
     }
 
     @AfterClass
@@ -120,20 +125,6 @@ public class TestBlazemeterApiV3Impl {
     }
  
     @Test
-    public void getTestList_null(){
-        try {
-            blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-            Assert.assertEquals(blazemeterApiV3.getTestList(), null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void getTestCount_zero(){
         try {
             blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
@@ -179,17 +170,79 @@ public class TestBlazemeterApiV3Impl {
         Assert.assertEquals(blazemeterApiV3.uploadBinaryFile(null, null), null);
     }
 
-    @Ignore
+
     @Test
-    public void getTestsList(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+    public void getTestList_6_10() throws IOException,JSONException,ServletException,MessagingException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        Assert.assertTrue(testList.asMap().size()==6);
+        Assert.assertTrue(testList.size()==10);
 
     }
 
-    @Ignore
     @Test
-    public void getTestsCount(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+    public void getTestList_6_6() throws IOException,JSONException,ServletException,MessagingException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_6_TESTS,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        Assert.assertTrue(testList.asMap().size()==6);
+        Assert.assertTrue(testList.size()==6);
+
+    }
+
+    @Test
+    public void getTestReport(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        JSONObject testReport=blazemeterApiV3.testReport(TestConstants.TEST_SESSION_ID);
+        Assert.assertTrue(testReport.length()==33);
+
+
+    }
+
+    @Test
+    public void getTestList_null() throws IOException,JSONException,ServletException,MessagingException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_EXCEPTION,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        Assert.assertTrue(testList==null);
+
+    }
+
+@Test
+    public void getTestsCount_10() throws IOException,JSONException,ServletException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int count=blazemeterApiV3.getTestCount();
+        Assert.assertTrue(count==10);
+
+    }
+
+    @Test
+    public void getTestsCount_1() throws IOException,JSONException,ServletException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_1_TEST,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int count=blazemeterApiV3.getTestCount();
+        Assert.assertTrue(count==1);
+
+    }
+
+    @Test
+    public void getTestsCount_0() throws IOException,JSONException,ServletException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_0_TESTS,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int count=blazemeterApiV3.getTestCount();
+        Assert.assertTrue(count==0);
+
+    }
+
+@Test
+    public void getTestsCount_null() throws IOException,JSONException,ServletException{
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        int count=blazemeterApiV3.getTestCount();
+        Assert.assertTrue(count == -1);
 
     }
 

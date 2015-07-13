@@ -126,13 +126,13 @@ public class TestBzmServiceManager {
     @Test
     public void stopTestSession(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_25, stdErrLog);
+        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_ID, TestConstants.TEST_SESSION_25, stdErrLog);
         Assert.assertEquals(terminate, true);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_70, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_ID, TestConstants.TEST_SESSION_70, stdErrLog);
         Assert.assertEquals(terminate, true);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_100, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_ID, TestConstants.TEST_SESSION_100, stdErrLog);
         Assert.assertEquals(terminate, false);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_ID, TestConstants.TEST_SESSION_140, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_ID, TestConstants.TEST_SESSION_140, stdErrLog);
         Assert.assertEquals(terminate, false);
     }
 }
