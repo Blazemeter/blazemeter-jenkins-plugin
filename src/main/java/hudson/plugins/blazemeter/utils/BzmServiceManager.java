@@ -56,18 +56,6 @@ public class BzmServiceManager {
             }
     }
 
-    public static JSONObject updateLocation(BlazemeterApi api,String testId,JSONObject configNode,StdErrLog bzmBuildLog){
-        JSONObject updateResult=null;
-        try {
-            if (configNode != null) {
-                updateResult=api.postJsonConfig(testId, configNode);
-            }
-        }catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while saving testDuration: ", e);
-        }
-        return updateResult;
-    }
-
     public static JSONObject updateTestConfiguration(BlazemeterApi api,
                                                      String testId,
                                                      String testDuration,
