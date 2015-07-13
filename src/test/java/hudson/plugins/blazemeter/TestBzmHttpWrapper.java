@@ -1,80 +1,76 @@
 package hudson.plugins.blazemeter;
 
-import java.io.*;
+import com.google.common.collect.LinkedHashMultimap;
+import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.api.BzmHttpWrapper;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Assert;
+import hudson.plugins.blazemeter.entities.TestInfo;
+import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.utils.Constants;
+import org.apache.http.HttpResponse;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.*;
 
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * Created by dzmitrykashlach on 13/01/15.
+ * Created by dzmitrykashlach on 12/01/15.
  */
 public class TestBzmHttpWrapper {
     private Logger log = LogManager.getLogManager().getLogger("TEST");
-    private BzmHttpWrapper bzmHttpWrapper= new BzmHttpWrapper();
-    private DefaultHttpClient httpClient = Mockito.mock(DefaultHttpClient.class);
-    private String url = "http://tut.by";
-    private JSONObject data = null;
-    private BzmHttpWrapper.Method method = BzmHttpWrapper.Method.GET;
-    private File file = new File("TestBzmHttpWrapper.class");
+    private String userKey="1234567890";
+    private String appKey="jnk100x987c06f4e10c4";
+    private String testId="12345";
+    private BzmHttpWrapper bzmHttpWrapper=new BzmHttpWrapper();
 
-    @Test
-    public void getResponseAsJson(){
-        BzmHttpWrapper spyBzmHttpWrapper=Mockito.spy(bzmHttpWrapper);
-        spyBzmHttpWrapper.getResponseAsJson(url, data, method);
-        try {
-            Mockito.verify(spyBzmHttpWrapper).getHttpResponse(url, data, method);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
+    @BeforeClass
+    public static void setUp()throws IOException{
+        MockedAPI.startAPI();
+        MockedAPI.userProfile();
+        MockedAPI.getSessionStatus();
+        MockedAPI.getTests();
+        MockedAPI.getTestReport();
+        MockedAPI.startTest();
+    }
+
+    @AfterClass
+    public static void tearDown()throws IOException{
+        MockedAPI.stopAPI();
     }
 
     @Test
-    public void getResponseAsString(){
-        BzmHttpWrapper spyBzmHttpWrapper=Mockito.spy(bzmHttpWrapper);
-        spyBzmHttpWrapper.getResponseAsString(url, data, method);
-        try {
-            Mockito.verify(spyBzmHttpWrapper).getHttpResponse(url, data, method);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
+    public void getResponseAsJson_25() throws IOException {
+        String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
+        JSONObject response=bzmHttpWrapper.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        Assert.assertTrue(response.length()==25);
     }
 
     @Test
-    public void getFileUploadHttpResponse(){
-        BzmHttpWrapper spyBzmHttpWrapper=Mockito.spy(bzmHttpWrapper);
-        spyBzmHttpWrapper.setHttpClient(httpClient);
-        try {
-            spyBzmHttpWrapper.getFileUploadHttpResponse(url,file );
-            Mockito.verify(spyBzmHttpWrapper,Mockito.never()).getHttpResponse(url, data, method);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
+    public void getResponseAsJson_null() throws IOException {
+        JSONObject response=bzmHttpWrapper.getResponseAsJson(null, null, BzmHttpWrapper.Method.GET);
+        Assert.assertTrue(response==null);
     }
 
-    @Test
-    public void getHttpResponse(){
-        BzmHttpWrapper spyBzmHttpWrapper=Mockito.spy(bzmHttpWrapper);
-        try {
-            Assert.assertEquals(spyBzmHttpWrapper.getHttpResponse(null, data, method),null);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
-    }
 
     @Test
-    public void getFileUploadResponse(){
-        BzmHttpWrapper spyBzmHttpWrapper=Mockito.spy(bzmHttpWrapper);
-        try {
-            Assert.assertEquals(spyBzmHttpWrapper.getFileUploadHttpResponse(url, null), null);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
+    public void getResponseAsString_5438() throws IOException {
+        String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
+        String response=bzmHttpWrapper.getResponseAsString(url, null, BzmHttpWrapper.Method.GET);
+        Assert.assertTrue(response.length()==5438);
     }
+
+
+    @Test
+    public void getResponseAsString_null() throws IOException {
+        String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
+        String response=bzmHttpWrapper.getResponseAsString(null, null, BzmHttpWrapper.Method.GET);
+        Assert.assertTrue(response==null);
+    }
+
+
 }

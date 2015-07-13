@@ -20,11 +20,7 @@ import java.util.logging.Logger;
  * Created by dzmitrykashlach on 12/01/15.
  */
 public class TestBlazemeterApiV3Impl {
-    private Logger log = LogManager.getLogManager().getLogger("TEST");
     private BlazemeterApiV3Impl blazemeterApiV3 =null;
-    private String userKey="1234567890";
-    private String appKey="jnk100x987c06f4e10c4";
-    private String testId="12345";
 
 
     @BeforeClass
@@ -120,10 +116,10 @@ public class TestBlazemeterApiV3Impl {
 
     @Test
     public void getUser_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.getUser(), null);
     }
- 
+
     @Test
     public void getTestCount_zero(){
         try {

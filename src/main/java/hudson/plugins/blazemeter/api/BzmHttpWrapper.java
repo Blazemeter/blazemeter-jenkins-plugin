@@ -171,21 +171,6 @@ public class BzmHttpWrapper {
         return str;
     }
 
-    void configureProxy() {
-        if (Hudson.getInstance() != null && Hudson.getInstance().proxy != null) {
-            ProxyConfiguration proxy = Hudson.getInstance().proxy;
-            // Configure the proxy if necessary
-            if (proxy.name != null && !proxy.name.isEmpty() && proxy.port > 0) {
-                if (proxy.getUserName() != null && !proxy.getUserName().isEmpty()) {
-                    Credentials cred = new UsernamePasswordCredentials(proxy.getUserName(), proxy.getPassword());
-                    httpClient.getCredentialsProvider().setCredentials(new AuthScope(proxy.name, proxy.port), cred);
-                }
-                HttpHost proxyHost = new HttpHost(proxy.name, proxy.port);
-                httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
-            }
-        }
-    }
-
     public DefaultHttpClient getHttpClient() {
         return httpClient;
     }
