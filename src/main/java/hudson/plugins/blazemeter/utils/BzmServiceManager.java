@@ -193,7 +193,7 @@ public class BzmServiceManager {
         }
     }
 
-    private static String createTest(BlazemeterApi api, JSONObject configNode,
+    public static String createTest(BlazemeterApi api, JSONObject configNode,
                                      String testId,StdErrLog jenBuildLog) throws JSONException {
         try{
 

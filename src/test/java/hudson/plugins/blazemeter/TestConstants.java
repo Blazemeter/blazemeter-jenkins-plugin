@@ -27,4 +27,6 @@ public interface TestConstants {
     String TEST_SESSION_140="testSession-140";
     String TEST_SESSION_SUCCESS="testSessionSuccess";
     String TEST_SESSION_FAILURE="testSessionFailure";
- }
+
+    String YAHOO="yahoo";
+}

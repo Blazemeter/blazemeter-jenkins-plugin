@@ -5,6 +5,7 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -33,6 +34,7 @@ public class TestBzmServiceManager {
         MockedAPI.getServerThresholds();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
+        MockedAPI.createTest();
     }
 
     @AfterClass
@@ -184,5 +186,23 @@ public class TestBzmServiceManager {
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String actReportUrl=BzmServiceManager.getReportUrl(api,TestConstants.TEST_SESSION_ID, stdErrLog,stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
+    }
+
+    @Test
+    public void createTest_pos() throws JSONException, IOException {
+        File jsonFile = new File(TestConstants.RESOURCES + "/createTest_body.json");
+        JSONObject createTestBody= new JSONObject(FileUtils.readFileToString(jsonFile));
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        String testId=BzmServiceManager.createTest(api, createTestBody, Constants.CREATE_BZM_TEST_NOTE, stdErrLog);
+        Assert.assertEquals(testId,"5086072");
+    }
+
+    @Test
+    public void createTest_neg() throws JSONException, IOException {
+        File jsonFile = new File(TestConstants.RESOURCES + "/createTest_body.json");
+        JSONObject createTestBody= new JSONObject(FileUtils.readFileToString(jsonFile));
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        String testId=BzmServiceManager.createTest(api, createTestBody, Constants.CREATE_BZM_TEST_NOTE, stdErrLog);
+        Assert.assertEquals(testId,"");
     }
 }
