@@ -36,7 +36,6 @@ public class BzmServiceManager {
 
     public static String autoDetectApiVersion(String apiKey,String blazeMeterUrl) {
         BlazemeterApi api = null;
-        APIFactory apiFactory = APIFactory.getApiFactory();
         String detectedApiVersion = null;
             api = APIFactory.getAPI(apiKey,ApiVersion.v3,blazeMeterUrl);
             boolean isV3 = false;
@@ -230,6 +229,8 @@ public class BzmServiceManager {
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 reportUrl=api.getBlazeMeterURL()+"/app/#reports/"+sessionId+"/summary";
             }
+            jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
+
         } catch (Exception e){
           jenBuildLog.warn("Problems with generating public-token for report URL");
           bzmBuildLog.warn("Problems with generating public-token for report URL",e);
@@ -320,18 +321,16 @@ public class BzmServiceManager {
      * @return
      * @throws JSONException
      */
-    public static String getSessionId(JSONObject json, AbstractBuild<?, ?> build,
-                                ApiVersion apiVersion,BlazemeterApi api,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
+    public static String getSessionId(JSONObject json,
+                                ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
         String session="";
         try {
             if (apiVersion.equals(ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
                 if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
                         .startsWith("Test already running")) {
                     bzmBuildLog.warn("Test already running, please stop it first");
-                    build.setResult(Result.FAILURE);
                     return session;
                 }
-
             }
             // get sessionId add to interface
             if (apiVersion.equals(ApiVersion.v2)) {
@@ -340,15 +339,6 @@ public class BzmServiceManager {
                 JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
                 session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
             }
-            String reportUrl= getReportUrl(api, session, jenBuildLog, bzmBuildLog);
-            jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-            jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
-
-            PerformanceBuildAction a = new PerformanceBuildAction(build);
-            a.setReportUrl(reportUrl);
-            build.addAction(a);
-
-
         }catch (Exception e) {
             jenBuildLog.info("Failed to get session_id: "+e.getMessage());
             bzmBuildLog.info("Failed to get session_id. ",e);

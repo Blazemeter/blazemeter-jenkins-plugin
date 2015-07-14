@@ -60,8 +60,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
-            APIFactory apiFactory=APIFactory.getApiFactory();
-            BlazemeterApi api = apiFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
+            BlazemeterApi api = APIFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestList();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
@@ -94,8 +93,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(Constants.NO_API_KEY, Constants.MINUS_ONE);
             return items;
         }
-        APIFactory apiFactory = APIFactory.getApiFactory();
-        BlazemeterApi bzm = apiFactory.getAPI(apiKey, ApiVersion.v3,this.blazeMeterURL);
+        BlazemeterApi bzm = APIFactory.getAPI(apiKey, ApiVersion.v3,this.blazeMeterURL);
         try {
             LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
             items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);

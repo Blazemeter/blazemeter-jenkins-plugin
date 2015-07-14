@@ -5,17 +5,7 @@ import hudson.plugins.blazemeter.utils.Constants;
 
 public class APIFactory {
 
-
-    public static APIFactory apiFactory = null;
-
     private APIFactory() {
-    }
-
-    public static APIFactory getApiFactory() {
-        if (apiFactory == null) {
-            apiFactory = new APIFactory();
-        }
-        return apiFactory;
     }
 
     /*TODO

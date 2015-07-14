@@ -179,12 +179,17 @@ public class PerformanceBuilder extends Builder {
 
         String session;
         try {
-             session=BzmServiceManager.getSessionId(json, build,ApiVersion.valueOf(this.apiVersion),
-                     this.api,bzmBuildLog,jenBuildLog);
+             session=BzmServiceManager.getSessionId(json, ApiVersion.valueOf(this.apiVersion),bzmBuildLog,jenBuildLog);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
             }
+            jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+            String reportUrl= BzmServiceManager.getReportUrl(api, session, jenBuildLog, bzmBuildLog);
+            PerformanceBuildAction a = new PerformanceBuildAction(build);
+            a.setReportUrl(reportUrl);
+            build.addAction(a);
+
         } catch (JSONException e) {
             jenBuildLog.warn("Unable to start test: check userKey, testId, server url.");
             bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);

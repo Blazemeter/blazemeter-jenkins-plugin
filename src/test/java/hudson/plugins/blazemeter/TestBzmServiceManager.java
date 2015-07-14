@@ -31,6 +31,8 @@ public class TestBzmServiceManager {
         MockedAPI.stopTestSession();
         MockedAPI.getSessionStatus();
         MockedAPI.getServerThresholds();
+        MockedAPI.autoDetectVersion();
+        MockedAPI.getReportUrl();
     }
 
     @AfterClass
@@ -152,5 +154,35 @@ public class TestBzmServiceManager {
         Result result = BzmServiceManager.validateServerTresholds(api, TestConstants.TEST_SESSION_SUCCESS, stdErrLog);
         Assert.assertEquals(result,Result.SUCCESS);
 
+    }
+
+    @Test
+    public void autoDetectApiVersion_v2(){
+        String apiVersion=BzmServiceManager.autoDetectApiVersion(TestConstants.MOCKED_USER_KEY_V2, TestConstants.mockedApiUrl);
+        Assert.assertEquals(apiVersion,"v2");
+    }
+
+
+    @Test
+    public void autoDetectApiVersion_v3(){
+        String apiVersion=BzmServiceManager.autoDetectApiVersion(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Assert.assertEquals(apiVersion,"v3");
+    }
+
+
+    @Test
+    public void getReportUrl_pos(){
+        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#reports/testSessionId/summary";
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        String actReportUrl=BzmServiceManager.getReportUrl(api,TestConstants.TEST_SESSION_ID, stdErrLog,stdErrLog);
+        Assert.assertEquals(expectedReportUrl,actReportUrl);
+    }
+
+    @Test
+    public void getReportUrl_neg(){
+        String expectedReportUrl="http://127.0.0.1:1234/app/#reports/testSessionId/summary";
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        String actReportUrl=BzmServiceManager.getReportUrl(api,TestConstants.TEST_SESSION_ID, stdErrLog,stdErrLog);
+        Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 }

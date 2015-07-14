@@ -167,7 +167,7 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_not_found.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
@@ -365,6 +365,62 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getServerThresholds));
+
+    }
+
+
+    public static void autoDetectVersion()  throws IOException{
+        File jsonFile = new File(TestConstants.RESOURCES + "/autoDetectVersion_v2.json");
+        String autoDetectVersion= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/user")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_V2)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(autoDetectVersion));
+}
+
+    public static void getReportUrl() throws IOException{
+        // https://a.blazemeter.com/api/latest/sessions/r-v3-55a4eaedbb17f/publicToken
+        File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
+        String getReportUrl= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_ID+"/publicToken")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getReportUrl));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
+        getReportUrl= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_ID+"/publicToken")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_INVALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getReportUrl));
+
 
     }
 
