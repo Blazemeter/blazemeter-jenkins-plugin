@@ -30,6 +30,7 @@ public class TestBzmServiceManager {
         MockedAPI.userProfile();
         MockedAPI.stopTestSession();
         MockedAPI.getSessionStatus();
+        MockedAPI.getServerThresholds();
     }
 
     @AfterClass
@@ -134,5 +135,22 @@ public class TestBzmServiceManager {
         Assert.assertEquals(terminate, false);
         terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_ID, TestConstants.TEST_SESSION_140, stdErrLog);
         Assert.assertEquals(terminate, false);
+    }
+
+
+    @Test
+    public void getServerThresholds_failure(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        Result result = BzmServiceManager.validateServerTresholds(api, TestConstants.TEST_SESSION_FAILURE, stdErrLog);
+        Assert.assertEquals(result,Result.FAILURE);
+
+    }
+
+    @Test
+    public void getServerThresholds_success(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        Result result = BzmServiceManager.validateServerTresholds(api, TestConstants.TEST_SESSION_SUCCESS, stdErrLog);
+        Assert.assertEquals(result,Result.SUCCESS);
+
     }
 }

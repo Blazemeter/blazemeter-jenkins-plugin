@@ -18,10 +18,12 @@ public interface TestConstants {
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
 
     String TEST_SESSION_ID ="testSessionId";
+    String TEST_SESSION_NOT_FOUND="testSession-not-found";
     String TEST_SESSION_0="testSession-0";
     String TEST_SESSION_25="testSession-25";
     String TEST_SESSION_70="testSession-70";
     String TEST_SESSION_100="testSession-100";
     String TEST_SESSION_140="testSession-140";
-    String TEST_SESSION_NOT_FOUND="testSession-not-found";
-}
+    String TEST_SESSION_SUCCESS="testSessionSuccess";
+    String TEST_SESSION_FAILURE="testSessionFailure";
+ }

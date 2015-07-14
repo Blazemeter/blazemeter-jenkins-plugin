@@ -332,6 +332,42 @@ public class MockedAPI {
 
     }
 
+    public static void getServerThresholds()  throws IOException{
+        File jsonFile = new File(TestConstants.RESOURCES + "/serverThresholds_negative.json");
+        String getServerThresholds= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_FAILURE +"/reports/thresholds")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getServerThresholds));
+
+
+        jsonFile = new File(TestConstants.RESOURCES + "/serverThresholds_positive.json");
+        getServerThresholds= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_SUCCESS +"/reports/thresholds")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getServerThresholds));
+
+    }
+
 
     public static void stopAPI(){
         mockServer.reset();
