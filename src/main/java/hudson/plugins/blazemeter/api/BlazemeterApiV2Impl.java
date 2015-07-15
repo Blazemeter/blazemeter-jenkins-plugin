@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
+import hudson.model.Result;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.entities.TestInfo;
@@ -130,13 +131,19 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public synchronized JSONObject startTest(String testId) {
+    public synchronized String startTest(String testId) throws JSONException{
         if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) {
             return null;
         }
-
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
-        return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        if (jo.get(JsonConstants.RESPONSE_CODE).equals(500) && jo.get(JsonConstants.ERROR).toString()
+                .startsWith("Test already running")) {
+            return "";
+        }
+
+        String session = jo.get("session_id").toString();
+        return session;
     }
 
     @Override

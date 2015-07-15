@@ -88,7 +88,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStop= serverUrl +"/api/latest/tests/"
+        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"collections":"tests";
+        testStop= serverUrl +"/api/latest/"+type+"/"
                 +testId+"/stop?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testStop;
@@ -104,7 +105,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testTerminate= serverUrl +"/api/latest/tests/"
+        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"collections":"tests";
+        testTerminate= serverUrl +"/api/latest/"+type+"/"
                 +testId+"/terminate?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testTerminate;

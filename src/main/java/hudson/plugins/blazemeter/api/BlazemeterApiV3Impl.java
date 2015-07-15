@@ -127,10 +127,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-            if (result.get(JsonConstants.DATA_URL) == null) {
+            if (result.has(JsonConstants.DATA_URL)&&result.get(JsonConstants.DATA_URL) == null) {
                 ti.setStatus(TestStatus.NotFound);
             } else {
-                ti.setId(result.getString("testId"));
+                if(this.urlManager.getTestType().equals(TestType.multi)){
+                    ti.setId(result.getString("collectionId"));
+                }else{
+                    ti.setId(result.getString("testId"));
+                }
                 ti.setName(result.getString(JsonConstants.NAME));
                 if (!result.has("ended")||result.getString("ended").equals(JSONObject.NULL)||result.getString("ended").isEmpty()) {
                     ti.setStatus(TestStatus.Running);
@@ -152,11 +156,18 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public synchronized JSONObject startTest(String testId) {
+    public synchronized String startTest(String testId) throws JSONException{
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
+        String session;
         logger.info("Calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
-        return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
+        JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
+        JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
+        if(!this.urlManager.getTestType().equals(TestType.multi)){
+           return  ((JSONArray) result.get("sessionsId")).get(0).toString();
+        }else{
+           return  result.getString("id");
+        }
     }
 
     @Override
@@ -186,9 +197,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public JSONObject stopTest(String testId) {
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
-
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
-        return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        JSONObject stopJSON=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        return stopJSON;
     }
 
     @Override
@@ -196,7 +207,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testTerminate(APP_KEY, apiKey, testId);
-        return this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        JSONObject terminateJSON=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        return terminateJSON;
     }
 
 

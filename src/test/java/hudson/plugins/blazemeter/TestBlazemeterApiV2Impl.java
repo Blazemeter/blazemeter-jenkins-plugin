@@ -93,8 +93,12 @@ public class TestBlazemeterApiV2Impl {
 
    @Test
     public void startTest(){
-        Assert.assertEquals(blazemeterApiV2.startTest(null), null);
-    }
+       try {
+           Assert.assertEquals(blazemeterApiV2.startTest(null), null);
+       } catch (JSONException e) {
+           e.printStackTrace();
+       }
+   }
 
 
    @Test

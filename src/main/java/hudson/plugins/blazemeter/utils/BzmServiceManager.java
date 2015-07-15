@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter.utils;
 
-import com.google.common.collect.LinkedHashMultimap;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
@@ -21,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.mail.MessagingException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +39,7 @@ public class BzmServiceManager {
     public static String autoDetectApiVersion(String apiKey,String blazeMeterUrl) {
         BlazemeterApi api = null;
         String detectedApiVersion = null;
-            api = APIFactory.getAPI(apiKey,ApiVersion.v3,blazeMeterUrl);
+            api = APIFactory.getAPI(apiKey, ApiVersion.v3, blazeMeterUrl);
             boolean isV3 = false;
             try {
                 isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
@@ -58,6 +56,7 @@ public class BzmServiceManager {
                 return detectedApiVersion;
             }
     }
+
 
     public static JSONObject updateTestConfiguration(BlazemeterApi api,
                                                      String testId,
@@ -326,8 +325,8 @@ public class BzmServiceManager {
      * @throws JSONException
      */
     public static String getSessionId(JSONObject json,
-                                ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException{
-        String session="";
+                                ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
+        String session = "";
         try {
             if (apiVersion.equals(ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
                 if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
@@ -343,13 +342,27 @@ public class BzmServiceManager {
                 JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
                 session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
             }
-        }catch (Exception e) {
-            jenBuildLog.info("Failed to get session_id: "+e.getMessage());
-            bzmBuildLog.info("Failed to get session_id. ",e);
+        } catch (Exception e) {
+            jenBuildLog.info("Failed to get session_id: " + e.getMessage());
+            bzmBuildLog.info("Failed to get session_id. ", e);
         }
         return session;
     }
 
+    public static void publishReport(BlazemeterApi api, String session,
+                                     AbstractBuild<?, ?> build,
+                                     StdErrLog jenBuildLog,
+                                     StdErrLog bzmBuildLog){
+
+        String reportUrl= getReportUrl(api, session, jenBuildLog,bzmBuildLog);
+        jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
+        jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+
+        PerformanceBuildAction a = new PerformanceBuildAction(build);
+        a.setReportUrl(reportUrl);
+        build.addAction(a);
+
+    }
 
     public static void saveReport(String filename,
                                   String report,
@@ -608,16 +621,23 @@ public class BzmServiceManager {
     public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, StdErrLog jenBuildLog) {
         boolean terminate=false;
         try {
+            TestType testType=api.getUrlManager().getTestType();
+            if(testType!=TestType.multi){
 
             int statusCode = api.getTestSessionStatusCode(sessionId);
-            if (statusCode < 100) {
+            if (statusCode < 100&statusCode!=0) {
                 api.terminateTest(testId);
                 terminate=true;
             }
-            if (statusCode >= 100|statusCode ==-1) {
+            if (statusCode >= 100|statusCode ==-1|statusCode==0) {
                 api.stopTest(testId);
                 terminate=false;
             }
+            }else{
+                api.stopTest(testId);
+                terminate=false;
+            }
+
         } catch (Exception e) {
             jenBuildLog.warn("Error while trying to stop test with testId=" + testId + ", " + e.getMessage());
         }finally {
@@ -715,7 +735,7 @@ public class BzmServiceManager {
     }
 
     public static FormValidation validateUserKey(String userKey,String blazeMeterUrl){
-        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3,blazeMeterUrl);
+        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
         try{
         net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
         if (user.has("error")) {

@@ -39,7 +39,7 @@ public interface BlazemeterApi {
 
     int getTestSessionStatusCode(String id);
 
-    JSONObject startTest(String testId);
+    String startTest(String testId) throws JSONException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 

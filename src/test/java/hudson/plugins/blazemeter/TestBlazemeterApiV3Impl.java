@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -76,6 +77,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestInfo_Running(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
+        blazemeterApiV3.getUrlManager().setTestType(TestType.http);
         TestInfo ti=blazemeterApiV3.getTestInfo(TestConstants.TEST_SESSION_100);
         Assert.assertEquals(ti.getId(), "5039530");
         Assert.assertEquals(ti.getName(), "FAILED-2");
@@ -86,6 +88,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestInfo_NotRunning(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
+        blazemeterApiV3.getUrlManager().setTestType(TestType.http);
         TestInfo ti=blazemeterApiV3.getTestInfo(TestConstants.TEST_SESSION_140);
         Assert.assertEquals(ti.getId(), "5039532");
         Assert.assertEquals(ti.getName(), "PASSED-1");
@@ -149,7 +152,7 @@ public class TestBlazemeterApiV3Impl {
     }
 
    @Test
-    public void startTest_null(){
+    public void startTest_null() throws JSONException{
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
        Assert.assertEquals(blazemeterApiV3.startTest(null), null);
     }

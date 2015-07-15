@@ -159,37 +159,18 @@ public class PerformanceBuilder extends Builder {
 
 
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
+        String session="";
+        TestType testType=BzmServiceManager.getTestType(this.api,testId,jenBuildLog);
+        this.api.getUrlManager().setTestType(testType);
+        bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
+        bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
-        org.json.JSONObject json;
-        int countStartRequests = 0;
-        do {
-            bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
-            bzmBuildLog.info("Attempt# " + (countStartRequests + 1));
-            bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
-            TestType testType=BzmServiceManager.getTestType(this.api,testId,jenBuildLog);
-            this.api.getUrlManager().setTestType(testType);
-            json = this.api.startTest(testId);
-            countStartRequests++;
-            if (json == null && countStartRequests > 5) {
-                bzmBuildLog.info("Could not start BlazeMeter Test with 5 attempts");
-                build.setResult(Result.FAILURE);
-                return false;
-            }
-        } while (json == null);
-
-        String session;
         try {
-             session=BzmServiceManager.getSessionId(json, ApiVersion.valueOf(this.apiVersion),bzmBuildLog,jenBuildLog);
+            session = this.api.startTest(testId);
             if(session.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
             }
-            jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
-            String reportUrl= BzmServiceManager.getReportUrl(api, session, jenBuildLog, bzmBuildLog);
-            PerformanceBuildAction a = new PerformanceBuildAction(build);
-            a.setReportUrl(reportUrl);
-            build.addAction(a);
-
         } catch (JSONException e) {
             jenBuildLog.warn("Unable to start test: check userKey, testId, server url.");
             bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);
@@ -197,6 +178,8 @@ public class PerformanceBuilder extends Builder {
         }
 
         // add the report to the build object.
+
+        BzmServiceManager.publishReport(this.api,session,build,jenBuildLog,bzmBuildLog);
 
         try {
             BzmServiceManager.waitForFinish(this.api, this.apiVersion, this.testId,
