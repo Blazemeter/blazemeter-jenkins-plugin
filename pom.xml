@@ -126,6 +126,20 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.pitest</groupId>
+                    <artifactId>pitest-maven</artifactId>
+                    <version>1.1.5</version>
+                    <configuration>
+                        <targetClasses>
+                            <param>hudson.plugins.blazemeter.*</param>
+                        </targetClasses>
+                        <targetTests>
+                            <param>hudson.plugins.blazemeter.*</param>
+                        </targetTests>
+                    </configuration>
+                </plugin>
+
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>2.5.1</version>
