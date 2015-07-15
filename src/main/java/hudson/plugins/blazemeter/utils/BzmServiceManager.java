@@ -216,23 +216,21 @@ public class BzmServiceManager {
         return testId;
     }
 
-    public static String getReportUrl(BlazemeterApi api, String sessionId,
+    public static String getReportUrl(BlazemeterApi api, String masterId,
                                       StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
         JSONObject jo=null;
         String publicToken="";
         String reportUrl=null;
         try {
-            TestType testType=api.getUrlManager().getTestType();
-            String reportType=(testType!=null&&testType.equals(TestType.multi))?"masters":"reports";
-            jo = api.generatePublicToken(sessionId);
+            jo = api.generatePublicToken(masterId);
             if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
                 JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
-                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#"+reportType+"/"+sessionId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#"+"/"+masterId+"/summary";
             }else{
                 jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                reportUrl=api.getBlazeMeterURL()+"/app/#reports/"+sessionId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/#reports/"+masterId+"/summary";
             }
             jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
 
@@ -340,12 +338,12 @@ public class BzmServiceManager {
         return session;
     }
 
-    public static void publishReport(BlazemeterApi api, String session,
+    public static void publishReport(BlazemeterApi api, String masterId,
                                      AbstractBuild<?, ?> build,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
 
-        String reportUrl= getReportUrl(api, session, jenBuildLog,bzmBuildLog);
+        String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
         jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
         jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
 

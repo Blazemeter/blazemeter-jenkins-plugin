@@ -158,16 +158,11 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public synchronized String startTest(String testId) throws JSONException{
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
-        String session;
         logger.info("Calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
         String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
         JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-        if(!this.urlManager.getTestType().equals(TestType.multi)){
-           return  ((JSONArray) result.get("sessionsId")).get(0).toString();
-        }else{
-           return  result.getString("id");
-        }
+        return  result.getString(JsonConstants.ID);
     }
 
     @Override

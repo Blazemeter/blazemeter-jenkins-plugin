@@ -443,13 +443,13 @@ public class MockedAPI {
 
 
     public static void getReportUrl() throws IOException{
-        // https://a.blazemeter.com/api/latest/sessions/r-v3-55a4eaedbb17f/publicToken
+        String expectedPath="/api/latest/masters/"+TestConstants.TEST_SESSION_ID+"/publicToken";
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
         String getReportUrl= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_ID+"/publicToken")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -465,7 +465,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_ID+"/publicToken")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_INVALID)

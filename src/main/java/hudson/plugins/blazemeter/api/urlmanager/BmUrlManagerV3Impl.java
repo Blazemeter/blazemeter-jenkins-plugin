@@ -242,7 +242,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String generatePublicToken(String appKey, String userKey, String sessionId) {
+    public String generatePublicToken(String appKey, String userKey, String masterId) {
         String generatePublicToken=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -250,8 +250,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"masters":"sessions";
-        generatePublicToken= serverUrl +"/api/latest/"+type+"/"+sessionId+
+        generatePublicToken= serverUrl +"/api/latest/masters/"+masterId+
                 "/publicToken?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return generatePublicToken;

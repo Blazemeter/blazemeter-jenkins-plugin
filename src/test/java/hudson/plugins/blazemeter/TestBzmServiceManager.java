@@ -195,7 +195,7 @@ public class TestBzmServiceManager {
 
     @Test
     public void getReportUrl_pos(){
-        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#reports/testSessionId/summary";
+        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#/testSessionId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_SESSION_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
