@@ -48,7 +48,7 @@ public class TestBzmServiceManager {
     @Test
     public void getUserEmail_positive() throws IOException,JSONException{
         String email=BzmServiceManager.getUserEmail(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(email,"dzmitry.kashlach@blazemeter.com");
+        Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
 
     @Test
@@ -179,7 +179,7 @@ public class TestBzmServiceManager {
     public void getReportUrl_pos(){
         String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#reports/testSessionId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        String actReportUrl=BzmServiceManager.getReportUrl(api,TestConstants.TEST_SESSION_ID, stdErrLog,stdErrLog);
+        String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_SESSION_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
@@ -217,5 +217,32 @@ public class TestBzmServiceManager {
                 getJSONObject(JsonConstants.PLUGINS).getJSONObject(JsonConstants.HTTP).
                 getJSONObject(JsonConstants.OVERRIDE).getString(JsonConstants.DURATION);
         Assert.assertEquals(testDuration,"6");
+    }
+
+    @Test
+    public void getSessionId_v3() throws JSONException, IOException {
+        File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
+        String getSessionId_v3_str=FileUtils.readFileToString(getSessionId_v3);
+        JSONObject getSession_json=new JSONObject(getSessionId_v3_str);
+        String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v3,stdErrLog,stdErrLog);
+        Assert.assertEquals(session,"r-v3-55a6136b314bd");
+    }
+
+    @Test
+    public void getSessionId_v2() throws JSONException, IOException {
+        File getSessionId_v2=new File(TestConstants.RESOURCES+"/getSessionId_v2.json");
+        String getSessionId_v2_str=FileUtils.readFileToString(getSessionId_v2);
+        JSONObject getSession_json=new JSONObject(getSessionId_v2_str);
+        String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v2,stdErrLog,stdErrLog);
+        Assert.assertEquals(session,"r-ec255a6160ec7b39");
+    }
+
+    @Test
+    public void getSessionId_empty() throws JSONException, IOException {
+        File getSessionId_v2=new File(TestConstants.RESOURCES+"/getSessionId_v2_500.json");
+        String getSessionId_v2_str=FileUtils.readFileToString(getSessionId_v2);
+        JSONObject getSession_json=new JSONObject(getSessionId_v2_str);
+        String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v2,stdErrLog,stdErrLog);
+        Assert.assertEquals(session,"");
     }
 }

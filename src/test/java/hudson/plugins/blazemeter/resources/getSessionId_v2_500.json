@@ -1,0 +1,4 @@
+{
+  "response_code": 500,
+  "error": "Test already running, please stop it first"
+}
