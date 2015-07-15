@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.utils.Constants;
 
 import java.io.UnsupportedEncodingException;
@@ -10,15 +11,16 @@ import java.net.URLEncoder;
  */
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
-    private String SERVER_URL = Constants.DEFAULT_BLAZEMETER_URL+"/";
+    private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
+    private TestType testType=TestType.http;
 
     BmUrlManagerV2Impl(String blazeMeterUrl) {
-        SERVER_URL = blazeMeterUrl;
+        this.serverUrl = blazeMeterUrl;
     }
 
     @Override
     public String getServerUrl() {
-        return SERVER_URL;
+        return serverUrl;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/testGetStatus.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
+                serverUrl,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all",
-                SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
+                serverUrl, appKey, userKey)+ CLIENT_IDENTIFICATION;
 
     }
 
@@ -58,7 +60,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/testScriptUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
-                SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
+                serverUrl,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -72,7 +74,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/testArtifactUpload.json/?app_key=%s&user_key=%s&test_id=%s&file_name=%s&",
-                SERVER_URL,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
+                serverUrl,appKey, userKey, testId, fileName)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
+                serverUrl,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -98,7 +100,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/testStop.json/?app_key=%s&user_key=%s&test_id=%s&",
-                SERVER_URL,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
+                serverUrl,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -111,7 +113,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testAggregateReport=SERVER_URL+"/api/latest/sessions/"
+        testAggregateReport= serverUrl +"/api/latest/sessions/"
                 +sessionId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testAggregateReport;
@@ -126,12 +128,12 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return String.format("%s/api/rest/blazemeter/getUserInfo/?app_key=%s&user_key=%s",
-                SERVER_URL, appKey, userKey)+ CLIENT_IDENTIFICATION;
+                serverUrl, appKey, userKey)+ CLIENT_IDENTIFICATION;
     }
 
     @Override
     public void setServerUrl(String serverUrl) {
-        this.SERVER_URL=serverUrl;
+        this.serverUrl =serverUrl;
     }
 
     @Override
@@ -174,7 +176,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        generatePublicToken=SERVER_URL+"/api/latest/sessions/"+sessionId+
+        generatePublicToken= serverUrl +"/api/latest/sessions/"+sessionId+
                 "/publicToken?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return generatePublicToken;
@@ -183,6 +185,16 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     @Override
     public String testTerminate(String appKey, String userKey, String testId) {
         return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public TestType getTestType() {
+        return this.testType;
+    }
+
+    @Override
+    public void setTestType(TestType testType) {
+       this.testType=testType;
     }
 }
 

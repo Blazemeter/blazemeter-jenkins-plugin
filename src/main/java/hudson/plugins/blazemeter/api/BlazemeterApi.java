@@ -29,57 +29,59 @@ import java.io.IOException;
 
 public interface BlazemeterApi {
 
-    public static final String APP_KEY = "jnk100x987c06f4e10c4";
+    String APP_KEY = "jnk100x987c06f4e10c4";
 
-    public void uploadJmx(String testId, File file);
+    void uploadJmx(String testId, File file);
 
-    public JSONObject uploadBinaryFile(String testId, File file);
+    JSONObject uploadBinaryFile(String testId, File file);
 
-    public TestInfo getTestInfo(String id);
+    TestInfo getTestInfo(String id);
 
-    public int getTestSessionStatusCode(String id);
+    int getTestSessionStatusCode(String id);
 
-    public JSONObject startTest(String testId);
+    JSONObject startTest(String testId);
 
-    public int getTestCount() throws JSONException, IOException, ServletException;
+    int getTestCount() throws JSONException, IOException, ServletException;
 
-    public JSONObject stopTest(String testId);
+    JSONObject stopTest(String testId);
 
-    public JSONObject terminateTest(String testId);
+    JSONObject terminateTest(String testId);
 
-    public JSONObject testReport(String reportId);
+    JSONObject testReport(String reportId);
 
-    public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException;
+    LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException;
 
-    public JSONObject getUser();
+    JSONObject getTestsJSON();
 
-    public JSONObject getTresholds(String sessionId);
+    JSONObject getUser();
 
-    public JSONObject getTestConfig(String testId);
+    JSONObject getTresholds(String sessionId);
 
-    public JSONObject postJsonConfig(String testId, JSONObject data);
+    JSONObject getTestConfig(String testId);
 
-    public JSONObject createTest(JSONObject data);
+    JSONObject postJsonConfig(String testId, JSONObject data);
 
-    public String retrieveJUNITXML(String sessionId);
+    JSONObject createTest(JSONObject data);
 
-    public JSONObject retrieveJTLZIP(String sessionId);
+    String retrieveJUNITXML(String sessionId);
 
-    public JSONObject putTestInfo(String testId, JSONObject data);
+    JSONObject retrieveJTLZIP(String sessionId);
 
-    public void setBzmHttpWr(BzmHttpWrapper bzmhc);
+    JSONObject putTestInfo(String testId, JSONObject data);
 
-    public BzmHttpWrapper getBzmHttpWr();
+    void setBzmHttpWr(BzmHttpWrapper bzmhc);
 
-    public StdErrLog getLogger();
+    BzmHttpWrapper getBzmHttpWr();
 
-    public void setLogger(StdErrLog logger);
+    StdErrLog getLogger();
 
-    public JSONObject generatePublicToken(String sessionId);
+    void setLogger(StdErrLog logger);
 
-    public String getApiKey();
+    JSONObject generatePublicToken(String sessionId);
 
-    public String getBlazeMeterURL();
+    String getApiKey();
 
-    public BmUrlManager getUrlManager();
+    String getBlazeMeterURL();
+
+    BmUrlManager getUrlManager();
 }

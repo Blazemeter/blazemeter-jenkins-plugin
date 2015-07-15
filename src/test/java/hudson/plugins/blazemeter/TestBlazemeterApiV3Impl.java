@@ -2,6 +2,7 @@ package hudson.plugins.blazemeter;
 
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
@@ -123,7 +124,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestCount_zero(){
         try {
-            blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+            blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null, ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
             Assert.assertEquals(blazemeterApiV3.getTestCount(), 0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -171,7 +172,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestList_6_10() throws IOException,JSONException,ServletException,MessagingException{
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestsMultiMap();
         Assert.assertTrue(testList.asMap().size()==6);
         Assert.assertTrue(testList.size()==10);
 
@@ -181,7 +182,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestList_6_6() throws IOException,JSONException,ServletException,MessagingException{
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_6_TESTS,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestsMultiMap();
         Assert.assertTrue(testList.asMap().size()==6);
         Assert.assertTrue(testList.size()==6);
 
@@ -201,7 +202,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestList_null() throws IOException,JSONException,ServletException,MessagingException{
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_EXCEPTION,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestList();
+        LinkedHashMultimap<String,String> testList=blazemeterApiV3.getTestsMultiMap();
         Assert.assertTrue(testList==null);
 
     }

@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV2Impl;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
@@ -17,19 +18,19 @@ public class TestUrlManagerFactory {
 
     @Test
     public void getUrlManager(){
-        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV2Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
 
-        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2, QA_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(ApiVersion.v2, QA_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV2Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(QA_BLAZEMETER_URL));
 
-        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV3Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
 
-        bmUrlManager=UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3, QA_BLAZEMETER_URL);
+        bmUrlManager=UrlManagerFactory.getURLManager(ApiVersion.v3, QA_BLAZEMETER_URL);
         Assert.assertTrue(bmUrlManager instanceof BmUrlManagerV3Impl);
         Assert.assertTrue(bmUrlManager.getServerUrl().equals(QA_BLAZEMETER_URL));
 

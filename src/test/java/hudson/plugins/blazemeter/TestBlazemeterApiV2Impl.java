@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -21,7 +22,7 @@ public class TestBlazemeterApiV2Impl {
 
     @Before
     public void setUp(){
-    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getAPI(null,ApiVersion.v2,Constants.DEFAULT_BLAZEMETER_URL);
+    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getAPI(null, ApiVersion.v2,Constants.DEFAULT_BLAZEMETER_URL);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class TestBlazemeterApiV2Impl {
     @Test
     public void getTestList(){
         try {
-            Assert.assertEquals(blazemeterApiV2.getTestList(), null);
+            Assert.assertEquals(blazemeterApiV2.getTestsMultiMap(), null);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MessagingException e) {

@@ -1,13 +1,12 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
 
+import hudson.plugins.blazemeter.api.ApiVersion;
+
 /**
  * Created by dzmitrykashlach on 11/11/14.
  */
 public class UrlManagerFactory {
-    public enum ApiVersion {
-        v3, v2
-    }
 
     private UrlManagerFactory() {
     }

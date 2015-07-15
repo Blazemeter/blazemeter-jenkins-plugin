@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -17,7 +18,7 @@ public class TestBmUrlManagerV3 {
     private String sessionId="987654321";
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v3,
+            UrlManagerFactory.getURLManager(ApiVersion.v3,
             Constants.DEFAULT_BLAZEMETER_URL);
 
     @Test
@@ -41,7 +42,7 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void getTests(){
-    String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/latest/tests?api_key="+userKey+
+    String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/web/tests?api_key="+userKey+
             "&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
     String actGetTestsUrl=bmUrlManager.getTests(appKey,userKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);

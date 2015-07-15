@@ -1,9 +1,6 @@
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV2Impl;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;

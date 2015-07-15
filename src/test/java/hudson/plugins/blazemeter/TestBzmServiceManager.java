@@ -2,7 +2,9 @@ package hudson.plugins.blazemeter;
 
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -38,6 +40,7 @@ public class TestBzmServiceManager {
         MockedAPI.createTest();
         MockedAPI.getTestConfig();
         MockedAPI.putTestInfo();
+        MockedAPI.getTests();
     }
 
     @AfterClass
@@ -224,7 +227,7 @@ public class TestBzmServiceManager {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
         String getSessionId_v3_str=FileUtils.readFileToString(getSessionId_v3);
         JSONObject getSession_json=new JSONObject(getSessionId_v3_str);
-        String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v3,stdErrLog,stdErrLog);
+        String session=BzmServiceManager.getSessionId(getSession_json, ApiVersion.v3,stdErrLog,stdErrLog);
         Assert.assertEquals(session,"r-v3-55a6136b314bd");
     }
 
@@ -244,5 +247,40 @@ public class TestBzmServiceManager {
         JSONObject getSession_json=new JSONObject(getSessionId_v2_str);
         String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v2,stdErrLog,stdErrLog);
         Assert.assertEquals(session,"");
+    }
+
+    @Test
+    public void getTestType_http(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_TEST_TYPE, ApiVersion.v3, TestConstants.mockedApiUrl);
+        TestType testType=BzmServiceManager.getTestType(api, "5086069", stdErrLog);
+        Assert.assertEquals(testType,TestType.http);
+    }
+
+    @Test
+    public void getTestType_multi(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_TEST_TYPE, ApiVersion.v3, TestConstants.mockedApiUrl);
+        TestType testType=BzmServiceManager.getTestType(api, "10000679", stdErrLog);
+        Assert.assertEquals(testType,TestType.multi);
+    }
+
+    @Test
+    public void getTestType_jmeter(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_TEST_TYPE, ApiVersion.v3, TestConstants.mockedApiUrl);
+        TestType testType=BzmServiceManager.getTestType(api, "5075182", stdErrLog);
+        Assert.assertEquals(testType,TestType.jmeter);
+    }
+
+    @Test
+    public void getTestType_followme(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_TEST_TYPE, ApiVersion.v3, TestConstants.mockedApiUrl);
+        TestType testType=BzmServiceManager.getTestType(api, "5039532", stdErrLog);
+        Assert.assertEquals(testType,TestType.followme);
+    }
+
+    @Test
+    public void getTestType_exception(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_EXCEPTION, ApiVersion.v3, TestConstants.mockedApiUrl);
+        TestType testType=BzmServiceManager.getTestType(api, "5039532", stdErrLog);
+        Assert.assertEquals(testType,TestType.http);
     }
 }

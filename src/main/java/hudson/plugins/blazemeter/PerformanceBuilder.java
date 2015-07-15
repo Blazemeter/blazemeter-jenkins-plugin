@@ -5,9 +5,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -168,6 +166,8 @@ public class PerformanceBuilder extends Builder {
             bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
             bzmBuildLog.info("Attempt# " + (countStartRequests + 1));
             bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
+            TestType testType=BzmServiceManager.getTestType(this.api,testId,jenBuildLog);
+            this.api.getUrlManager().setTestType(testType);
             json = this.api.startTest(testId);
             countStartRequests++;
             if (json == null && countStartRequests > 5) {

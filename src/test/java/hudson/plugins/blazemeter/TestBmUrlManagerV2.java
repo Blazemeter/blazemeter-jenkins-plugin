@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -19,7 +20,7 @@ public class TestBmUrlManagerV2 {
     private String reportId="1212121212";
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLManager(UrlManagerFactory.ApiVersion.v2,
+            UrlManagerFactory.getURLManager(ApiVersion.v2,
             Constants.DEFAULT_BLAZEMETER_URL);
 
     @Test

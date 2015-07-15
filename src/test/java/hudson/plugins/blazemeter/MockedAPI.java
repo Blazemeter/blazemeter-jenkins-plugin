@@ -243,13 +243,13 @@ public class MockedAPI {
     }
 
     public static void getTests() throws IOException{
-
+        String expectedPath="/api/web/tests";
         File jsonFile = new File(TestConstants.RESOURCES + "/getTests_10.json");
         String getTests= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -265,7 +265,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_1_TEST)
@@ -282,7 +282,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_0_TESTS)
@@ -298,7 +298,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests")
+                        .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_6_TESTS)
@@ -310,6 +310,23 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(getTests));
 
 
+
+
+        File returnFile=new File(TestConstants.RESOURCES+"/getTestType.json");
+        String returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(expectedPath)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_TEST_TYPE)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
 
     }
 
@@ -412,7 +429,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("PUT")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID)
+                        .withPath("/api/latest/tests/" + TestConstants.TEST_SESSION_ID)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -423,6 +440,7 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(returnStr));
 }
+
 
     public static void getReportUrl() throws IOException{
         // https://a.blazemeter.com/api/latest/sessions/r-v3-55a4eaedbb17f/publicToken

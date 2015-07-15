@@ -42,7 +42,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     BlazemeterApiV2Impl(String apiKey,String blazemeterUrl) {
         this.apiKey = apiKey;
         urlManager = UrlManagerFactory.
-                getURLManager(UrlManagerFactory.ApiVersion.v2, blazemeterUrl);
+                getURLManager(ApiVersion.v2, blazemeterUrl);
         not_implemented=new JSONObject();
         try {
             not_implemented.put(Constants.NOT_IMPLEMENTED,Constants.NOT_IMPLEMENTED);
@@ -202,7 +202,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException {
+    public LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
 
@@ -305,7 +305,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     @Override
     public BmUrlManager getUrlManager() {
-        return null;
+        return this.urlManager;
     }
 
     @Override
@@ -347,6 +347,11 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
     @Override
     public JSONObject terminateTest(String testId) {
+        return not_implemented;
+    }
+
+    @Override
+    public JSONObject getTestsJSON() {
         return not_implemented;
     }
 }

@@ -1,4 +1,4 @@
-package hudson.plugins.blazemeter;
+package hudson.plugins.blazemeter.api;
 
 /**
  * Created by zmicer on 6.4.15.

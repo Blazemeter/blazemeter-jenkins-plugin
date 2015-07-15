@@ -43,7 +43,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BlazemeterApiV3Impl(String apiKey,String blazeMeterUrl) {
         this.apiKey = apiKey;
         urlManager = UrlManagerFactory.
-                getURLManager(UrlManagerFactory.ApiVersion.v3, blazeMeterUrl);
+                getURLManager(ApiVersion.v3, blazeMeterUrl);
         try {
             bzmhc = new BzmHttpWrapper();
         } catch (Exception ex) {
@@ -221,7 +221,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         return summary;
     }
     @Override
-    public LinkedHashMultimap<String, String> getTestList() throws IOException, MessagingException {
+    public LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
         if(StringUtils.isBlank(apiKey)) {
@@ -250,7 +250,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                             if (en != null) {
                                 id = en.getString(JsonConstants.ID);
                                 name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-                                testListOrdered.put(name, id);
+                                String testType=en.has(JsonConstants.TYPE)?en.getString(JsonConstants.TYPE):TestType.http.name();
+                                testListOrdered.put(name+"("+testType+")", id);
 
                             }
                         } catch (JSONException ie) {
@@ -390,5 +391,13 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public BzmHttpWrapper getBzmHttpWr() {
         return this.bzmhc;
+    }
+
+    @Override
+    public JSONObject getTestsJSON() {
+        String url = this.urlManager.getTests(APP_KEY, apiKey);
+        logger.info("Getting testList with URL=" + url);
+        JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        return jo;
     }
 }

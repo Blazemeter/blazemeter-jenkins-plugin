@@ -1,11 +1,14 @@
 package hudson.plugins.blazemeter.utils;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -18,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.mail.MessagingException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -735,6 +739,26 @@ public class BzmServiceManager {
             }
         }catch (Exception e){
             return "";
+        }
+    }
+
+    public static TestType getTestType(BlazemeterApi api, String testId, StdErrLog jenBuildLog){
+        TestType testType=TestType.http;
+        jenBuildLog.debug("Detecting testType....");
+        try{
+            JSONArray result=api.getTestsJSON().getJSONArray(JsonConstants.RESULT);
+            int resultLength=result.length();
+            for (int i=0;i<resultLength;i++){
+                JSONObject jo=result.getJSONObject(i);
+                if(jo.getString(JsonConstants.ID).equals(testId)){
+                    testType=TestType.valueOf(jo.getString(JsonConstants.TYPE));
+                    jenBuildLog.debug("Received testType="+testType.toString()+" for testId="+testId);
+                }
+            }
+        }catch(Exception e){
+            jenBuildLog.debug("Error while detecting type of test:"+e);
+        }finally {
+            return testType;
         }
     }
 }

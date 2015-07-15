@@ -5,6 +5,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.APIFactory;
+import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -62,7 +63,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
             BlazemeterApi api = APIFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
             try {
-                LinkedHashMultimap<String, String> testList = api.getTestList();
+                LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
 
                 if (testList == null){
