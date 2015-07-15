@@ -6,6 +6,7 @@ import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -35,6 +36,8 @@ public class TestBzmServiceManager {
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
         MockedAPI.createTest();
+        MockedAPI.getTestConfig();
+        MockedAPI.putTestInfo();
     }
 
     @AfterClass
@@ -204,5 +207,15 @@ public class TestBzmServiceManager {
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String testId=BzmServiceManager.createTest(api, createTestBody, Constants.CREATE_BZM_TEST_NOTE, stdErrLog);
         Assert.assertEquals(testId,"");
+    }
+
+    @Test
+    public void updateTestDuration() throws JSONException, IOException {
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        JSONObject updateTestDuration=BzmServiceManager.updateTestDuration(api, TestConstants.TEST_SESSION_ID, "6", stdErrLog);
+        String testDuration=updateTestDuration.getJSONObject(JsonConstants.TEST).getJSONObject(JsonConstants.CONFIGURATION).
+                getJSONObject(JsonConstants.PLUGINS).getJSONObject(JsonConstants.HTTP).
+                getJSONObject(JsonConstants.OVERRIDE).getString(JsonConstants.DURATION);
+        Assert.assertEquals(testDuration,"6");
     }
 }

@@ -387,6 +387,43 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(autoDetectVersion));
 }
 
+
+    public static void getTestConfig()  throws IOException{
+        File jsonFile = new File(TestConstants.RESOURCES + "/getTestConfig.json");
+        String getTestConfig= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getTestConfig));
+}
+
+    public static void putTestInfo()  throws IOException{
+        File returnFile=new File(TestConstants.RESOURCES+"/updateTestDurationResult.json");
+        String returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("PUT")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+}
+
     public static void getReportUrl() throws IOException{
         // https://a.blazemeter.com/api/latest/sessions/r-v3-55a4eaedbb17f/publicToken
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
@@ -425,7 +462,6 @@ public class MockedAPI {
     }
 
     public static void createTest() throws IOException{
-        // https://a.blazemeter.com/api/latest/tests/custom?custom_test_type=yahoo
         File jsonFile = new File(TestConstants.RESOURCES + "/createTest.json");
         String createTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
