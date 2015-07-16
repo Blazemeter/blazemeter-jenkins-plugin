@@ -21,5 +21,6 @@ public interface Constants {
     String CREDENTIALS_KEY="...";
     String NO_API_KEY="No API Key";
     String MINUS_ONE="-1";
+    String UNKNOWN_TYPE="unkonwn type";
 
 }

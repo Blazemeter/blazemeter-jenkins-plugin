@@ -1,7 +1,6 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.ApiVersion;
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -64,35 +63,12 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void testStart_tests(){
-        String expTestStart=bmUrlManager.getServerUrl()+"/api/latest/tests/"
-                +testId+"/start?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-
-        String actTestStart=bmUrlManager.testStart(appKey, userKey, testId);
-        Assert.assertEquals(expTestStart,actTestStart);
-    }
-
-    @Test
-    public void testStart_collections(){
-        bmUrlManager.setTestType(TestType.multi);
-        String expTestStart=bmUrlManager.getServerUrl()+"/api/latest/collections/"
-                +testId+"/start?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-
-        String actTestStart=bmUrlManager.testStart(appKey, userKey, testId);
-        Assert.assertEquals(expTestStart,actTestStart);
-        bmUrlManager.setTestType(TestType.http);
-
-    }
-
-    @Test
     public void testStop_masters(){
-        bmUrlManager.setTestType(TestType.multi);
         String expTestStop=bmUrlManager.getServerUrl()+"/api/latest/masters/"
                 +testId+"/stop?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
 
         String actTestStop=bmUrlManager.testStop(appKey, userKey, testId);
         Assert.assertEquals(expTestStop,actTestStop);
-        bmUrlManager.setTestType(TestType.http);
     }
 
     @Test
@@ -174,13 +150,11 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void generatePublicToken_masters(){
-        bmUrlManager.setTestType(TestType.multi);
         String expGenPublicToken=bmUrlManager.getServerUrl()+"/api/latest/masters/"+ masterId +
                 "/publicToken?api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actGenPublicToken=bmUrlManager.generatePublicToken(appKey, userKey, masterId);
         Assert.assertEquals(expGenPublicToken,actGenPublicToken);
-        bmUrlManager.setTestType(TestType.http);
     }
 
     @Test
@@ -189,6 +163,5 @@ public class TestBmUrlManagerV3 {
                 "/sessions?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actListOfSessionsIds=bmUrlManager.listOfSessionIds(appKey, userKey, masterId);
         Assert.assertEquals(expListOfSessionIds,actListOfSessionsIds);
-        bmUrlManager.setTestType(TestType.http);
     }
 }

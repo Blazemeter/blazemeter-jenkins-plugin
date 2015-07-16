@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 
 /**
@@ -49,7 +48,5 @@ public interface BmUrlManager {
 
     String listOfSessionIds(String appKey, String userKey, String masterId);
 
-    TestType getTestType();
-    void setTestType(TestType testType);
 }
 

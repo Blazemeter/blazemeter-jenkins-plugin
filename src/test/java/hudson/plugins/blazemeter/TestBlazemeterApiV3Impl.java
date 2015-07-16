@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
@@ -14,8 +13,6 @@ import org.junit.*;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 /**
  * Created by dzmitrykashlach on 12/01/15.
@@ -77,7 +74,6 @@ public class TestBlazemeterApiV3Impl {
     public void getTestStatus_Running(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
-        blazemeterApiV3.getUrlManager().setTestType(TestType.http);
         TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_SESSION_100);
         Assert.assertEquals(testStatus, TestStatus.Running);
     }
@@ -87,7 +83,6 @@ public class TestBlazemeterApiV3Impl {
     public void getTestInfo_NotRunning(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
-        blazemeterApiV3.getUrlManager().setTestType(TestType.http);
         TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_SESSION_140);
         Assert.assertEquals(testStatus, TestStatus.NotRunning);
     }

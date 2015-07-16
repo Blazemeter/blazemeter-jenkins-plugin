@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.utils.Constants;
 
 import java.io.UnsupportedEncodingException;
@@ -12,7 +11,6 @@ import java.net.URLEncoder;
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
     private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
-    private TestType testType=TestType.http;
     BmUrlManagerV3Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
     }
@@ -70,8 +68,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String type=(this.testType!=null&&this.testType.equals(TestType.multi))?"collections":"tests";
-        testStart= serverUrl +"/api/latest/"+type+"/"
+        testStart= serverUrl +"/api/latest/tests/"
                 +testId+"/start?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testStart;
@@ -250,16 +247,6 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
                 "/publicToken?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return generatePublicToken;
-    }
-
-    @Override
-    public TestType getTestType() {
-        return this.testType;
-    }
-
-    @Override
-    public void setTestType(TestType testType) {
-        this.testType=testType;
     }
 
 

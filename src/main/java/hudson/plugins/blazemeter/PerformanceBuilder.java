@@ -155,8 +155,6 @@ public class PerformanceBuilder extends Builder {
 
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
         String masterId="";
-        TestType testType=BzmServiceManager.getTestType(this.api,testId,jenBuildLog);
-        this.api.getUrlManager().setTestType(testType);
         bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 

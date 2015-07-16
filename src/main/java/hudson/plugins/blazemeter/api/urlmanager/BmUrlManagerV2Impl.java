@@ -1,6 +1,5 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.utils.Constants;
 
 import java.io.UnsupportedEncodingException;
@@ -12,7 +11,6 @@ import java.net.URLEncoder;
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
     private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
-    private TestType testType=TestType.http;
 
     BmUrlManagerV2Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
@@ -185,16 +183,6 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     @Override
     public String testTerminate(String appKey, String userKey, String testId) {
         return Constants.NOT_IMPLEMENTED;
-    }
-
-    @Override
-    public TestType getTestType() {
-        return this.testType;
-    }
-
-    @Override
-    public void setTestType(TestType testType) {
-       this.testType=testType;
     }
 
     @Override

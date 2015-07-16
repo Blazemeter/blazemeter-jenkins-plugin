@@ -7,7 +7,6 @@ import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
@@ -225,11 +224,11 @@ public class BzmServiceManager {
             if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
                 JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
-                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#"+"/"+masterId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
             }else{
                 jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                reportUrl=api.getBlazeMeterURL()+"/app/#reports/"+masterId+"/summary";
+                reportUrl=api.getBlazeMeterURL()+"/app/#masters/"+masterId+"/summary";
             }
             jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
 
@@ -550,7 +549,6 @@ public class BzmServiceManager {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
-        TestType testType =api.getUrlManager().getTestType();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
         String junitReport="";
         Result result = Result.SUCCESS;
@@ -758,26 +756,6 @@ public class BzmServiceManager {
             }
         }catch (Exception e){
             return "";
-        }
-    }
-
-    public static TestType getTestType(BlazemeterApi api, String testId, StdErrLog jenBuildLog){
-        TestType testType=TestType.http;
-        jenBuildLog.debug("Detecting testType....");
-        try{
-            JSONArray result=api.getTestsJSON().getJSONArray(JsonConstants.RESULT);
-            int resultLength=result.length();
-            for (int i=0;i<resultLength;i++){
-                JSONObject jo=result.getJSONObject(i);
-                if(jo.getString(JsonConstants.ID).equals(testId)){
-                    testType=TestType.valueOf(jo.getString(JsonConstants.TYPE));
-                    jenBuildLog.debug("Received testType="+testType.toString()+" for testId="+testId);
-                }
-            }
-        }catch(Exception e){
-            jenBuildLog.debug("Error while detecting type of test:"+e);
-        }finally {
-            return testType;
         }
     }
 }

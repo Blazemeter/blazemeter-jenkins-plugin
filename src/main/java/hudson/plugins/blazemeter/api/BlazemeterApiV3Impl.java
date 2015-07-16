@@ -252,7 +252,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                             if (en != null) {
                                 id = en.getString(JsonConstants.ID);
                                 name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-                                String testType=en.has(JsonConstants.TYPE)?en.getString(JsonConstants.TYPE):TestType.http.name();
+                                String testType=en.has(JsonConstants.TYPE)?en.getString(JsonConstants.TYPE):Constants.UNKNOWN_TYPE;
                                 testListOrdered.put(name+"("+testType+")", id);
 
                             }
