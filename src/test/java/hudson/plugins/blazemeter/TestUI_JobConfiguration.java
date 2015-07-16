@@ -40,7 +40,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_save_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60", Constants.CREATE_BZM_TEST_NOTE,
                                                                       "v3",Constants.USE_TEST_LOCATION,
                                                                       "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -57,7 +57,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_respTimeF_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60", Constants.CREATE_BZM_TEST_NOTE,
                                                                       "v3",Constants.USE_TEST_LOCATION,
                                                                       "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -82,7 +82,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_respTimeUns_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -107,7 +107,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_error_F_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -132,7 +132,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_error_U_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -157,7 +157,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_testD_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -182,7 +182,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_servTresh_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
@@ -208,7 +208,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_jsonConf_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60","mainJmx","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","dataFolder", Constants.CREATE_BZM_TEST_NOTE,
                 "v3",Constants.USE_TEST_LOCATION,
                 "pathToJsonConfiguration",false,"1","2","3","4");
         project.getBuildersList().add(pbBefore);
