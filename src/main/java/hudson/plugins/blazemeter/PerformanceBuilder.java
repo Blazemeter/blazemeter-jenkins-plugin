@@ -77,8 +77,6 @@ public class PerformanceBuilder extends Builder {
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
                               String testDuration,
-                              String mainJMX,
-                              String dataFolder,
                               String testId,
                               String apiVersion,
                               String location,
@@ -100,8 +98,6 @@ public class PerformanceBuilder extends Builder {
     Therefor they will be hidden from GUI
     Should be implemented in v.2.1
 
-        this.mainJMX = mainJMX;
-        this.dataFolder = dataFolder;
     */
         this.location = location;
         this.jsonConfig = jsonConfig;

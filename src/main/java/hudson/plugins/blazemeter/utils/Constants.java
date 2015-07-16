@@ -15,6 +15,7 @@ public interface Constants {
     String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
     String BM_TRESHOLDS="bm-thresholds.xml";
     String BM_KPIS="bm-kpis.jtl";
+    String SAMPLE="sample.jtl";
     String BM_ARTEFACTS="bm-artefacts.zip";
     String VERSION="version";
     String CREDENTIALS_KEY="...";
