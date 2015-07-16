@@ -4,21 +4,21 @@ package hudson.plugins.blazemeter.utils;
  * Created by dzmitrykashlach on 19/11/14.
  */
 public interface Constants {
-    public final  String DEFAULT_BLAZEMETER_URL="https://a.blazemeter.com";
-    public final static String QA_BLAZEMETER_URL="http://qa.blazemeter.com";
-    public final static String NOT_IMPLEMENTED="This call is not implemented for V2. Please, select API V3";
-    public final static String BZM_JEN="BZM-JEN";
-    public final static String BUILD_JEN="BUILD-JEN";
-    public final static String BZM_JEN_LOG="bzm-jen-log";
-    public final static String CREATE_BZM_TEST="Create BZM test using JSON configuration";
-    public final static String USE_TEST_LOCATION = "Use Location specified in test/JSON";
-    public final static String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
-    public final static String BM_TRESHOLDS="bm-thresholds.xml";
-    public final static String BM_KPIS="bm-kpis.jtl";
-    public final static String BM_ARTEFACTS="bm-artefacts.zip";
-    public final static String VERSION="version";
-    public final static String CREDENTIALS_KEY="...";
-    public final static String NO_API_KEY="No API Key";
-    public final static String MINUS_ONE="-1";
+    String DEFAULT_BLAZEMETER_URL="https://a.blazemeter.com";
+    String QA_BLAZEMETER_URL="http://qa.blazemeter.com";
+    String NOT_IMPLEMENTED="This call is not implemented for V2. Please, select API V3";
+    String BZM_JEN="BZM-JEN";
+    String BUILD_JEN="BUILD-JEN";
+    String BZM_JEN_LOG="bzm-jen-log";
+    String CREATE_BZM_TEST="Create BZM test using JSON configuration";
+    String USE_TEST_LOCATION = "Use Location specified in test/JSON";
+    String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
+    String BM_TRESHOLDS="bm-thresholds.xml";
+    String BM_KPIS="bm-kpis.jtl";
+    String BM_ARTEFACTS="bm-artefacts.zip";
+    String VERSION="version";
+    String CREDENTIALS_KEY="...";
+    String NO_API_KEY="No API Key";
+    String MINUS_ONE="-1";
 
 }
