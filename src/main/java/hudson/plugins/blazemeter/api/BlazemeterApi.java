@@ -2,7 +2,7 @@ package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.entities.TestInfo;
+import hudson.plugins.blazemeter.entities.TestStatus;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,9 +35,9 @@ public interface BlazemeterApi {
 
     JSONObject uploadBinaryFile(String testId, File file);
 
-    TestInfo getTestInfo(String id);
+    TestStatus getTestStatus(String id);
 
-    int getTestSessionStatusCode(String id);
+    int getTestMasterStatusCode(String id);
 
     String startTest(String testId) throws JSONException;
 

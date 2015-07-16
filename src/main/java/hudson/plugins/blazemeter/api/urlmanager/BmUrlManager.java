@@ -15,7 +15,7 @@ public interface BmUrlManager {
 
     void setServerUrl(String serverUrl);
 
-    String testSessionStatus(String appKey, String userKey, String testId);
+    String testMasterStatus(String appKey, String userKey, String testId);
 
     String getTests(String appKey, String userKey);
 

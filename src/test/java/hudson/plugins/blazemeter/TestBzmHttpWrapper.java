@@ -1,19 +1,9 @@
 package hudson.plugins.blazemeter;
 
-import com.google.common.collect.LinkedHashMultimap;
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.api.BzmHttpWrapper;
-import hudson.plugins.blazemeter.entities.TestInfo;
-import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.Constants;
-import org.apache.http.HttpResponse;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -67,7 +57,6 @@ public class TestBzmHttpWrapper {
 
     @Test
     public void getResponseAsString_null() throws IOException {
-        String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
         String response=bzmHttpWrapper.getResponseAsString(null, null, BzmHttpWrapper.Method.GET);
         Assert.assertTrue(response==null);
     }

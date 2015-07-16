@@ -1,10 +1,8 @@
 package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
-import hudson.model.Result;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
-import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
@@ -104,30 +102,27 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
 
 
     @Override
-    public TestInfo getTestInfo(String id) {
-        TestInfo ti = new TestInfo();
-
+    public TestStatus getTestStatus(String id) {
+        TestStatus testStatus=null;
         if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(id)) {
-            ti.setStatus(TestStatus.NotFound);
-            return ti;
+            testStatus=TestStatus.NotFound;
+            return testStatus;
         }
 
         try {
-            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
+            String url = this.urlManager.testMasterStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
 
             if ("Test not found".equals(jo.get(JsonConstants.ERROR))) {
-                ti.setStatus(TestStatus.NotFound);
+                testStatus=TestStatus.NotFound;
             } else {
-                ti.setId(jo.getString(JsonConstants.TEST_ID));
-                ti.setName(jo.getString("test_name"));
-                ti.setStatus(TestStatus.valueOf(jo.getString(JsonConstants.STATUS).equals("Not Running")?"NotRunning":jo.getString(JsonConstants.STATUS)));
+                testStatus=TestStatus.valueOf(jo.getString(JsonConstants.STATUS).equals("Not Running")?"NotRunning":jo.getString(JsonConstants.STATUS));
             }
         } catch (Exception e) {
             logger.warn("ERROR getting status " + e);
-            ti.setStatus(TestStatus.Error);
+            testStatus=TestStatus.Error;
         }
-        return ti;
+        return testStatus;
     }
 
     @Override
@@ -348,7 +343,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public int getTestSessionStatusCode(String id) {
+    public int getTestMasterStatusCode(String id) {
         return -1;
     }
 

@@ -24,7 +24,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String testSessionStatus(String appKey, String userKey, String testId) {
+    public String testMasterStatus(String appKey, String userKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");

@@ -6,7 +6,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.*;
-import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
@@ -159,15 +158,15 @@ public class PerformanceBuilder extends Builder {
 
 
         bzmBuildLog.info("Expected test duration=" + this.testDuration);
-        String session="";
+        String masterId="";
         TestType testType=BzmServiceManager.getTestType(this.api,testId,jenBuildLog);
         this.api.getUrlManager().setTestType(testType);
         bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
-            session = this.api.startTest(testId);
-            if(session.isEmpty()){
+            masterId = this.api.startTest(testId);
+            if(masterId.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
             }
@@ -179,15 +178,15 @@ public class PerformanceBuilder extends Builder {
 
         // add the report to the build object.
 
-        BzmServiceManager.publishReport(this.api,session,build,jenBuildLog,bzmBuildLog);
+        BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
 
         try {
             BzmServiceManager.waitForFinish(this.api, this.apiVersion, this.testId,
-                    bzmBuildLog, session);
+                    bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,session);
+            Result result = BzmServiceManager.postProcess(this,masterId);
 
             build.setResult(result);
 
@@ -200,17 +199,16 @@ public class PerformanceBuilder extends Builder {
         }
 
         finally {
-            TestInfo info = this.api.getTestInfo(apiVersion.equals("v2") ? testId : session);
+            TestStatus testStatus = this.api.getTestStatus(apiVersion.equals("v2") ? testId : masterId);
 
-            TestStatus status = info.getStatus();
-            if (status.equals(TestStatus.Running)) {
+            if (testStatus.equals(TestStatus.Running)) {
                 bzmBuildLog.info("Shutting down test");
-                BzmServiceManager.stopTestSession(this.api, testId, session, jenBuildLog);
+                BzmServiceManager.stopTestSession(this.api, masterId, jenBuildLog);
                 build.setResult(Result.ABORTED);
-            } else if (status.equals(TestStatus.NotFound)) {
+            } else if (testStatus.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
                 bzmBuildLog.warn("Test not found error");
-            } else if (status.equals(TestStatus.Error)) {
+            } else if (testStatus.equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }

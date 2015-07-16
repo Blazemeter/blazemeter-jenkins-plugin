@@ -8,7 +8,6 @@ import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
 import hudson.plugins.blazemeter.api.TestType;
-import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
@@ -168,11 +167,11 @@ public class BzmServiceManager {
         long lastPrint = 0;
         while (true) {
             Thread.sleep(15000);
-            TestInfo info = api.getTestInfo(apiVersion.equals("v2") ? testId : session);
+            TestStatus testStatus = api.getTestStatus(apiVersion.equals("v2") ? testId : session);
 
-            if (!info.getStatus().equals(TestStatus.Running)) {
+            if (!testStatus.equals(TestStatus.Running)) {
                 bzmBuildLog.info("TestStatus for session " + (apiVersion.equals("v2") ? testId : session)
-                        + info.getStatus());
+                        + testStatus);
                 bzmBuildLog.info("BlazeMeter TestStatus for session" +
                         (apiVersion.equals("v2") ? testId : session)
                         + " is not 'Running': finishing build.... ");
@@ -611,29 +610,21 @@ public class BzmServiceManager {
     }
 
 
-    
-    public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, StdErrLog jenBuildLog) {
-        boolean terminate=false;
+    public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
+        boolean terminate = false;
         try {
-            TestType testType=api.getUrlManager().getTestType();
-            if(testType!=TestType.multi){
-            int statusCode = api.getTestSessionStatusCode(sessionId);
-            if (statusCode < 100&statusCode!=0) {
-                api.terminateTest(testId);
-                terminate=true;
-            }
-            if (statusCode >= 100|statusCode ==-1|statusCode==0) {
-                api.stopTest(testId);
-                terminate=false;
-            }
-            }else{
-                api.stopTest(testId);
-                terminate=false;
-            }
-
+                int statusCode = api.getTestMasterStatusCode(masterId);
+                if (statusCode < 100 & statusCode != 0) {
+                    api.terminateTest(masterId);
+                    terminate = true;
+                }
+                if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
+                    api.stopTest(masterId);
+                    terminate = false;
+                }
         } catch (Exception e) {
-            jenBuildLog.warn("Error while trying to stop test with testId=" + testId + ", " + e.getMessage());
-        }finally {
+            jenBuildLog.warn("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
+        } finally {
             return terminate;
         }
     }

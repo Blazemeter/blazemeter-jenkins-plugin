@@ -3,7 +3,6 @@ package hudson.plugins.blazemeter.api;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
-import hudson.plugins.blazemeter.entities.TestInfo;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
@@ -93,17 +92,17 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
 
     @Override
-    public int getTestSessionStatusCode(String id) {
+    public int getTestMasterStatusCode(String id) {
         int statusCode=0;
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(id))
         {
             return statusCode;
         }
         try {
-            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
+            String url = this.urlManager.testMasterStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-            statusCode=result.getInt("statusCode");
+            statusCode=result.getInt("progress");
         } catch (Exception e) {
             logger.warn("Error getting status ", e);
         }finally {
@@ -114,45 +113,39 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public TestInfo getTestInfo(String id) {
-        TestInfo ti = new TestInfo();
+    public TestStatus getTestStatus(String id) {
+        TestStatus testStatus = null;
 
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(id))
         {
-            ti.setStatus(TestStatus.NotFound);
-            return ti;
+            testStatus=TestStatus.NotFound;
+            return testStatus;
         }
 
         try {
-            String url = this.urlManager.testSessionStatus(APP_KEY, apiKey, id);
+            String url = this.urlManager.testMasterStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.has(JsonConstants.DATA_URL)&&result.get(JsonConstants.DATA_URL) == null) {
-                ti.setStatus(TestStatus.NotFound);
+                testStatus=TestStatus.NotFound;
             } else {
-                if(this.urlManager.getTestType().equals(TestType.multi)){
-                    ti.setId(result.getString("collectionId"));
-                }else{
-                    ti.setId(result.getString("testId"));
-                }
-                ti.setName(result.getString(JsonConstants.NAME));
                 if (!result.has("ended")||result.getString("ended").equals(JSONObject.NULL)||result.getString("ended").isEmpty()) {
-                    ti.setStatus(TestStatus.Running);
+                    testStatus=TestStatus.Running;
                 } else {
                     logger.info("Test is not running. Quiting job...");
                      if(result.has("errors")&&!result.get("errors").equals(JSONObject.NULL)){
                          logger.debug("Error received from server: "+result.get("errors").toString());
-                         ti.setStatus(TestStatus.Error);
+                         testStatus=TestStatus.Error;
                      }else {
-                        ti.setStatus(TestStatus.NotRunning);
+                        testStatus=TestStatus.NotRunning;
                     }
                 }
             }
         } catch (Exception e) {
             logger.warn("Error getting status ", e);
-            ti.setStatus(TestStatus.Error);
+            testStatus=TestStatus.Error;
         }
-        return ti;
+        return testStatus;
     }
 
     @Override
