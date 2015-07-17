@@ -19,11 +19,11 @@ public class TestAPIFactory {
 
     @Test
     public void testMixVersion() {
-        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, TestConstants.mockedApiUrl);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
-        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v2, Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v2, TestConstants.mockedApiUrl);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV2Impl);
-        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApi = APIFactory.getAPI(userKey1, ApiVersion.v3, TestConstants.mockedApiUrl);
         Assert.assertTrue(blazemeterApi instanceof BlazemeterApiV3Impl);
 
     }

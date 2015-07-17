@@ -10,7 +10,7 @@ import java.net.URLEncoder;
  */
 public class BmUrlManagerV3Impl implements BmUrlManager {
 
-    private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
+    private String serverUrl = "";
     BmUrlManagerV3Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
     }
@@ -70,6 +70,22 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         }
         testStart= serverUrl +"/api/latest/tests/"
                 +testId+"/start?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return testStart;
+    }
+
+    @Override
+    public String collectionStart(String appKey, String userKey, String collectionId) {
+        String testStart=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+            collectionId = URLEncoder.encode(collectionId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        testStart= serverUrl +"/api/latest/collections/"
+                +collectionId+"/start?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testStart;
     }

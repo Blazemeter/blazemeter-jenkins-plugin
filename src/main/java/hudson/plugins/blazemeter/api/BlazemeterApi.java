@@ -40,7 +40,7 @@ public interface BlazemeterApi {
 
     int getTestMasterStatusCode(String id);
 
-    String startTest(String testId) throws JSONException;
+    String startTest(String testId,TestType testType) throws JSONException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 

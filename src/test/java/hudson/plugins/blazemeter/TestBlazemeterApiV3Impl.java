@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
@@ -39,33 +40,33 @@ public class TestBlazemeterApiV3Impl {
 
     @Test
     public void createTest_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3, Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3, TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.createTest(null), null);
     }
 
     @Test
     public void retrieveJUNITXML_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.retrieveJUNITXML(null), null);
     }
 
 
     @Test
     public void getTresholds_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.getTresholds(null), null);
     }
 
 
     @Test
     public void updateTestInfo_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.postJsonConfig(null, null), null);
     }
 
     @Test
     public void getTestInfo_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.getTestConfig(null), null);
     }
 
@@ -115,7 +116,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestCount_zero(){
         try {
-            blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null, ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+            blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null, ApiVersion.v3,TestConstants.mockedApiUrl);
             Assert.assertEquals(blazemeterApiV3.getTestCount(), 0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,32 +130,56 @@ public class TestBlazemeterApiV3Impl {
 
     @Test
     public void testReport_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.testReport(null), null);
     }
 
    @Test
     public void stopTest_null(){
-       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
        Assert.assertEquals(blazemeterApiV3.stopTest(null), null);
     }
 
    @Test
     public void startTest_null() throws JSONException{
-       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
-       Assert.assertEquals(blazemeterApiV3.startTest(null), null);
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,null);
+       Assert.assertEquals(blazemeterApiV3.startTest(null,null), null);
+    }
+
+    @Test
+    public void startTest_http() throws JSONException{
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.http), "15102806");
+    }
+
+    @Test
+    public void startTest_jmeter() throws JSONException{
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.jmeter), "15102806");
+    }
+
+    @Test
+    public void startTest_followme() throws JSONException{
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.followme), "15102806");
+    }
+
+    @Test
+    public void startTest_multi() throws JSONException{
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID,TestType.multi), "15105877");
     }
 
 
    @Test
     public void getTestRunStatus_notFound(){
-       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+       blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
        Assert.assertEquals(blazemeterApiV3.getTestStatus(null), TestStatus.NotFound);
     }
 
     @Test
     public void uploadBinaryFile_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.uploadBinaryFile(null, null), null);
     }
 
@@ -284,7 +309,7 @@ public class TestBlazemeterApiV3Impl {
     @Ignore("Incomplete")
     @Test
     public void putTestInfo(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,Constants.DEFAULT_BLAZEMETER_URL);
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
 
     }
 }

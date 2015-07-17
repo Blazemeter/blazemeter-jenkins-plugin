@@ -127,7 +127,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public synchronized String startTest(String testId) throws JSONException{
+    public synchronized String startTest(String testId,TestType testType) throws JSONException{
         if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) {
             return null;
         }
@@ -362,4 +362,5 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     public List<String> getListOfSessionIds(String masterId) {
         return null;
     }
+
 }

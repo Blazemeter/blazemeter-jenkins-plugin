@@ -12,7 +12,6 @@ import org.junit.Test;
  */
 
 public class TestBmUrlManagerV2 {
-    private String QA_BLAZEMETER_URL="http://qa.blazemeter.com";
     private String userKey="881a84b35e97c4342bf11";
     private String appKey="jnk100x987c06f4e10c4";
     private String testId="123456789";
@@ -21,17 +20,17 @@ public class TestBmUrlManagerV2 {
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
             UrlManagerFactory.getURLManager(ApiVersion.v2,
-            Constants.DEFAULT_BLAZEMETER_URL);
+                    TestConstants.mockedApiUrl);
 
     @Test
     public void getServerUrl(){
-        Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
+        Assert.assertTrue(bmUrlManager.getServerUrl().equals(TestConstants.mockedApiUrl));
     }
 
     @Test
     public void setServerUrl(){
-        bmUrlManager.setServerUrl(QA_BLAZEMETER_URL);
-        Assert.assertTrue(bmUrlManager.getServerUrl().equals(QA_BLAZEMETER_URL));
+        bmUrlManager.setServerUrl(TestConstants.mockedApiUrl);
+        Assert.assertTrue(bmUrlManager.getServerUrl().equals(TestConstants.mockedApiUrl));
     }
 
     @Test

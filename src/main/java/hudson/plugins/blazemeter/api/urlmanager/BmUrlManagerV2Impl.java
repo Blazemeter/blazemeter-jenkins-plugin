@@ -10,7 +10,7 @@ import java.net.URLEncoder;
  */
 public class BmUrlManagerV2Impl implements BmUrlManager {
 
-    private String serverUrl = Constants.DEFAULT_BLAZEMETER_URL+"/";
+    private String serverUrl = "";
 
     BmUrlManagerV2Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
@@ -86,6 +86,11 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
         }
         return String.format("%s/api/rest/blazemeter/testStart.json/?app_key=%s&user_key=%s&test_id=%s&",
                 serverUrl,appKey, userKey, testId)+ CLIENT_IDENTIFICATION;
+    }
+
+    @Override
+    public String collectionStart(String appKey, String userKey, String collectionId) {
+        return Constants.NOT_IMPLEMENTED;
     }
 
     @Override

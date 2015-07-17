@@ -19,17 +19,17 @@ public class TestBmUrlManagerV3 {
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=
             UrlManagerFactory.getURLManager(ApiVersion.v3,
-            Constants.DEFAULT_BLAZEMETER_URL);
+                    TestConstants.mockedApiUrl);
 
     @Test
     public void getServerUrl(){
-        Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.DEFAULT_BLAZEMETER_URL));
+        Assert.assertTrue(bmUrlManager.getServerUrl().equals(TestConstants.mockedApiUrl));
     }
 
     @Test
     public void setServerUrl(){
-        bmUrlManager.setServerUrl(Constants.QA_BLAZEMETER_URL);
-        Assert.assertTrue(bmUrlManager.getServerUrl().equals(Constants.QA_BLAZEMETER_URL));
+        bmUrlManager.setServerUrl(TestConstants.mockedApiUrl);
+        Assert.assertTrue(bmUrlManager.getServerUrl().equals(TestConstants.mockedApiUrl));
     }
 
     @Test

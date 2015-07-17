@@ -240,6 +240,22 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(startTest));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/startCollection.json");
+        String startCollection= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/collections/"+TestConstants.TEST_SESSION_ID +"/start")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(startCollection));
     }
 
     public static void getTests() throws IOException{

@@ -24,6 +24,8 @@ public interface BmUrlManager {
 
     String testStart(String appKey, String userKey, String testId);
 
+    String collectionStart(String appKey, String userKey, String collectionId);
+
     String testStop(String appKey, String userKey, String testId);
 
     String testTerminate(String appKey, String userKey, String testId);

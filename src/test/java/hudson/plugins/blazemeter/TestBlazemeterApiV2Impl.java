@@ -22,7 +22,7 @@ public class TestBlazemeterApiV2Impl {
 
     @Before
     public void setUp(){
-    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getAPI(null, ApiVersion.v2,Constants.DEFAULT_BLAZEMETER_URL);
+    blazemeterApiV2=(BlazemeterApiV2Impl)APIFactory.getAPI(null, ApiVersion.v2,TestConstants.mockedApiUrl);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class TestBlazemeterApiV2Impl {
    @Test
     public void startTest(){
        try {
-           Assert.assertEquals(blazemeterApiV2.startTest(null), null);
+           Assert.assertEquals(blazemeterApiV2.startTest(null,null), null);
        } catch (JSONException e) {
            e.printStackTrace();
        }

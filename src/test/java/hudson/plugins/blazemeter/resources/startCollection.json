@@ -1,0 +1,23 @@
+{
+  "api_version": 2,
+  "error": null,
+  "result": {
+    "id": 15105877,
+    "name": "PASSED-1+FAILED-2",
+    "userId": 1689,
+    "publicToken": null,
+    "ended": null,
+    "lastUpdate": null,
+    "delayedStartReady": null,
+    "created": 1437125742,
+    "updated": 1437125742,
+    "note": null,
+    "testCollectionId": 10000679,
+    "testId": null,
+    "projectId": null,
+    "sessionsId": [
+      "r-v3-55a8cc6e68e4f",
+      "r-v3-55a8cc6e6cdb6"
+    ]
+  }
+}

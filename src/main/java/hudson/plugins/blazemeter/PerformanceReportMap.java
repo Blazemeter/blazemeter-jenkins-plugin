@@ -33,9 +33,6 @@ public class PerformanceReportMap implements ModelObject {
     }
 
     public String getDisplayName() {
-        if ("".equals(Messages.Report_DisplayName())) {
-            return Constants.DEFAULT_BLAZEMETER_URL;
-        }
        return Messages.Report_DisplayName();
     }
 

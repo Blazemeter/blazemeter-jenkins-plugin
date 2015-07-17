@@ -9,6 +9,7 @@ import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -142,7 +143,9 @@ public class PerformanceBuilder extends Builder {
         }
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
-
+        int dotPos=this.testId.indexOf(".");
+        TestType testType= Utils.getTestType(this.testId,dotPos);
+        this.testId=testId.substring(0,dotPos);
         // implemented only with V3
         if(this.api instanceof BlazemeterApiV3Impl){
             this.testId= BzmServiceManager.prepareTestRun(this);
@@ -159,7 +162,7 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
-            masterId = this.api.startTest(testId);
+            masterId = api.startTest(testId,testType);
             if(masterId.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;

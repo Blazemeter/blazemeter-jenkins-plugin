@@ -151,11 +151,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public synchronized String startTest(String testId) throws JSONException{
+    public synchronized String startTest(String testId,TestType testType) throws JSONException{
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
         logger.info("Calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
-        String url = this.urlManager.testStart(APP_KEY, apiKey, testId);
+        String url="";
+        switch (testType){
+            case multi:
+                url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
+                break;
+            default:
+                url = this.urlManager.testStart(APP_KEY, apiKey, testId);
+        }
         JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
+
         JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
         return  result.getString(JsonConstants.ID);
     }
@@ -253,7 +261,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                                 id = en.getString(JsonConstants.ID);
                                 name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
                                 String testType=en.has(JsonConstants.TYPE)?en.getString(JsonConstants.TYPE):Constants.UNKNOWN_TYPE;
-                                testListOrdered.put(name+"("+testType+")", id);
+                                testListOrdered.put(name, id+"."+testType);
 
                             }
                         } catch (JSONException ie) {
