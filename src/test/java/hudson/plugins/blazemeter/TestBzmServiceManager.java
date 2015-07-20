@@ -33,7 +33,7 @@ public class TestBzmServiceManager {
         MockedAPI.userProfile();
         MockedAPI.stopTestSession();
         MockedAPI.getSessionStatus();
-        MockedAPI.getServerThresholds();
+        MockedAPI.getCIStatus();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
         MockedAPI.createTest();
@@ -161,22 +161,6 @@ public class TestBzmServiceManager {
 
 
     @Test
-    public void getServerThresholds_failure(){
-        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result = BzmServiceManager.validateServerTresholds(api, TestConstants.TEST_SESSION_FAILURE, stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-
-    }
-
-    @Test
-    public void getServerThresholds_success(){
-        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result = BzmServiceManager.validateServerTresholds(api, TestConstants.TEST_SESSION_SUCCESS, stdErrLog);
-        Assert.assertEquals(result,Result.SUCCESS);
-
-    }
-
-    @Test
     public void autoDetectApiVersion_v2(){
         String apiVersion=BzmServiceManager.autoDetectApiVersion(TestConstants.MOCKED_USER_KEY_V2, TestConstants.mockedApiUrl);
         Assert.assertEquals(apiVersion,"v2");
@@ -259,5 +243,19 @@ public class TestBzmServiceManager {
         JSONObject getSession_json=new JSONObject(getSessionId_v2_str);
         String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v2,stdErrLog,stdErrLog);
         Assert.assertEquals(session,"");
+    }
+
+    @Test
+    public void getCIStatus_success(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        Result result=BzmServiceManager.validateCIStatus(api,TestConstants.TEST_SESSION_SUCCESS,stdErrLog);
+        Assert.assertEquals(Result.SUCCESS,result);
+    }
+
+    @Test
+    public void getCIStatus_failure(){
+        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
+        Result result=BzmServiceManager.validateCIStatus(api,TestConstants.TEST_SESSION_FAILURE,stdErrLog);
+        Assert.assertEquals(Result.FAILURE,result);
     }
 }

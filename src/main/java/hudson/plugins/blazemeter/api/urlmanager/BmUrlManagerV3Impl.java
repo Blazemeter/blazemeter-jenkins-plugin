@@ -182,7 +182,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String getTresholds(String appKey, String userKey, String sessionId){
+    public String getCIStatus(String appKey, String userKey, String masterId){
         String getTresholds=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -190,7 +190,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        getTresholds= serverUrl +"/api/latest/sessions/"+sessionId+"/reports/thresholds?api_key="
+        getTresholds= serverUrl +"/api/latest/masters/"+masterId+"/ci-status?api_key="
                 +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return getTresholds;

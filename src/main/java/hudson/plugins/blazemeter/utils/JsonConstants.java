@@ -13,6 +13,9 @@ public interface JsonConstants {
     String DURATION="duration";
     String DATA="data";
     String STATUS="status";
+    String SUCCESS="success";
+    String FAILURES="failures";
+    String ERRORS="errors";
     String DATA_URL="dataUrl";
     String NAME="name";
     String TEST_ID="test_id";

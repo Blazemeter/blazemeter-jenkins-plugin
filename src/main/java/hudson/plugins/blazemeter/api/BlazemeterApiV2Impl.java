@@ -267,7 +267,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject getTresholds(String sessionId) {
+    public JSONObject getCIStatus(String sessionId) {
         return not_implemented;
     }
 

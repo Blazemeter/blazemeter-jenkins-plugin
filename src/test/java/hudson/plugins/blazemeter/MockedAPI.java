@@ -365,41 +365,6 @@ public class MockedAPI {
 
     }
 
-    public static void getServerThresholds()  throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/serverThresholds_negative.json");
-        String getServerThresholds= FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-                request()
-                        .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_FAILURE +"/reports/thresholds")
-                        .withHeader("Accept", "application/json")
-                        .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
-                        ),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader("application/json")
-                                .withStatusCode(200).withBody(getServerThresholds));
-
-
-        jsonFile = new File(TestConstants.RESOURCES + "/serverThresholds_positive.json");
-        getServerThresholds= FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-                request()
-                        .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_SUCCESS +"/reports/thresholds")
-                        .withHeader("Accept", "application/json")
-                        .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
-                        ),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader("application/json")
-                                .withStatusCode(200).withBody(getServerThresholds));
-
-    }
 
 
     public static void autoDetectVersion()  throws IOException{
@@ -455,7 +420,43 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(returnStr));
-}
+    }
+
+
+    public static void getCIStatus()  throws IOException{
+        File returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_failure.json");
+        String returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_SESSION_FAILURE+"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_success.json");
+        returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_SESSION_SUCCESS+"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+    }
 
 
     public static void getReportUrl() throws IOException{

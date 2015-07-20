@@ -34,7 +34,7 @@ public interface BmUrlManager {
 
     String getUser(String appKey, String userKey);
 
-    String getTresholds(String appKey, String userKey, String sessionId);
+    String getCIStatus(String appKey, String userKey, String sessionId);
 
     String getTestConfig(String appKey, String userKey, String testId);
 

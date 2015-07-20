@@ -7,7 +7,6 @@ import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
@@ -373,14 +372,18 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result validateServerTresholds(BlazemeterApi api,String session,StdErrLog jenBuildLog){
+    public static Result validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
         Result result;
         JSONObject jo;
         boolean success;
+        JSONArray failures=new JSONArray();
+        JSONArray errors=new JSONArray();
         try {
-            jo=api.getTresholds(session);
+            jo=api.getCIStatus(session);
             jenBuildLog.info("Treshold object = " + jo.toString());
-            success=jo.getJSONObject(JsonConstants.RESULT).getJSONObject(JsonConstants.DATA).getBoolean("success");
+            success=jo.getString(JsonConstants.STATUS).equals(JsonConstants.SUCCESS);
+            failures=jo.getJSONArray(JsonConstants.FAILURES);
+            errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
             jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
             success=true;
@@ -392,6 +395,9 @@ public class BzmServiceManager {
 
         result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
+            jenBuildLog.info("Having problems while CI status validation....");
+            jenBuildLog.info("Errors: "+errors.toString());
+            jenBuildLog.info("Failures: "+failures.toString());
             return result;
         }
         return result;
@@ -570,7 +576,7 @@ public class BzmServiceManager {
             BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
             if(builder.isUseServerTresholds()){
                 jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
-                result= BzmServiceManager.validateServerTresholds(api,masterId,jenBuildLog);
+                result= BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
             }else{
                 jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
             }

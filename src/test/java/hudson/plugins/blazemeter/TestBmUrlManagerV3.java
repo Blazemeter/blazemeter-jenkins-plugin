@@ -99,11 +99,11 @@ public class TestBmUrlManagerV3 {
 
 
     @Test
-    public void getTresholds(){
-        String expGetTresholds=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+ masterId +"/reports/thresholds?api_key="
+    public void getCIStatus(){
+        String expCIStatus=bmUrlManager.getServerUrl()+"/api/latest/masters/"+ masterId +"/ci-status?api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actGetTresholds=bmUrlManager.getTresholds(appKey, userKey, masterId);
-        Assert.assertEquals(expGetTresholds,actGetTresholds);
+        String actCIStatus=bmUrlManager.getCIStatus(appKey, userKey, masterId);
+        Assert.assertEquals(expCIStatus,actCIStatus);
     }
 
     @Test

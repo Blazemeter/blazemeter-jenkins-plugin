@@ -101,7 +101,7 @@ public class TestBmUrlManagerV2 {
     @Test
     public void getTresholds(){
         String expGetTresholds=Constants.NOT_IMPLEMENTED;
-        String actGetTresholds=bmUrlManager.getTresholds(appKey, userKey, sessionId);
+        String actGetTresholds=bmUrlManager.getCIStatus(appKey, userKey, sessionId);
         Assert.assertEquals(expGetTresholds,actGetTresholds);
     }
 

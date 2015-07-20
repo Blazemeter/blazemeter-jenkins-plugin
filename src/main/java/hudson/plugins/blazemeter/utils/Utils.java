@@ -9,7 +9,8 @@ public class Utils {
 
     private Utils(){}
 
-    public static TestType getTestType(String testId,int dotPos){
+    public static TestType getTestType(String testId){
+        int dotPos=testId.indexOf(".");
         TestType testType=null;
         try{
             testType=TestType.valueOf(testId.substring(dotPos+1));
@@ -18,4 +19,12 @@ public class Utils {
         }
         return testType;
     }
+
+    public static String getTestId(String testId){
+        try{
+            return testId.substring(0,testId.indexOf("."));
+        }catch (Exception e){
+            return testId;
+        }
+     }
 }

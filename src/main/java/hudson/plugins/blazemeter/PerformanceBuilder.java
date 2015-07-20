@@ -143,9 +143,8 @@ public class PerformanceBuilder extends Builder {
         }
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
-        int dotPos=this.testId.indexOf(".");
-        TestType testType= Utils.getTestType(this.testId,dotPos);
-        this.testId=testId.substring(0,dotPos);
+        TestType testType= Utils.getTestType(this.testId);
+        this.testId=Utils.getTestId(this.testId);
         // implemented only with V3
         if(this.api instanceof BlazemeterApiV3Impl){
             this.testId= BzmServiceManager.prepareTestRun(this);

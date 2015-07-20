@@ -56,7 +56,7 @@ public interface BlazemeterApi {
 
     JSONObject getUser();
 
-    JSONObject getTresholds(String sessionId);
+    JSONObject getCIStatus(String sessionId) throws JSONException;
 
     JSONObject getTestConfig(String testId);
 

@@ -37,8 +37,8 @@ public class TestBlazemeterApiV2Impl {
 
 
     @Test
-    public void getTresholds(){
-        Assert.assertEquals(blazemeterApiV2.getTresholds(null), BlazemeterApiV2Impl.not_implemented);
+    public void getCIStatus(){
+        Assert.assertEquals(blazemeterApiV2.getCIStatus(null), BlazemeterApiV2Impl.not_implemented);
     }
 
     @Test

@@ -315,10 +315,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
       }
 
     @Override
-    public JSONObject getTresholds(String sessionId){
+    public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
-        String url = this.urlManager.getTresholds(APP_KEY, apiKey, sessionId);
-        JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
+        JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET).getJSONObject(JsonConstants.RESULT);
         return jo;
     }
 

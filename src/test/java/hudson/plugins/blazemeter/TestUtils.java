@@ -17,16 +17,18 @@ public class TestUtils {
 
     @Test
     public void getTestType(){
-        int dotPos=testId_http.indexOf(".");
-        Assert.assertEquals(TestType.http, Utils.getTestType(testId_http,dotPos));
-        dotPos=testId_jmeter.indexOf(".");
-        Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter,dotPos));
-        dotPos=testId_followme.indexOf(".");
-        Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme,dotPos));
-        dotPos=testId_unkown_type.indexOf(".");
-        Assert.assertEquals(TestType.unknown_type, Utils.getTestType(testId_unkown_type,dotPos));
-        dotPos=testId_multi.indexOf(".");
-        Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi,dotPos));
+        Assert.assertEquals(TestType.http, Utils.getTestType(testId_http));
+        Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter));
+        Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme));
+        Assert.assertEquals(TestType.unknown_type, Utils.getTestType(testId_unkown_type));
+        Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi));
+
+    }
+
+    @Test
+    public void getTestId(){
+        Assert.assertEquals("12345", Utils.getTestId("12345.2345"));
+        Assert.assertEquals("123452345", Utils.getTestId("123452345"));
 
     }
 }

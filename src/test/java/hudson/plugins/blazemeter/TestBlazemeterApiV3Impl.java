@@ -6,7 +6,6 @@ import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
@@ -48,13 +47,6 @@ public class TestBlazemeterApiV3Impl {
     public void retrieveJUNITXML_null(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.retrieveJUNITXML(null), null);
-    }
-
-
-    @Test
-    public void getTresholds_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.getTresholds(null), null);
     }
 
 

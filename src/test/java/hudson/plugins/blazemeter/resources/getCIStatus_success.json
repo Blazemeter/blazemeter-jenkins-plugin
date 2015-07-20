@@ -1,0 +1,15 @@
+{
+  "api_version": 2,
+  "error": null,
+  "result": {
+    "masterId": 15105933,
+    "userId": 1689,
+    "name": "PASSED-1+FAILED-2",
+    "created": 1437133519,
+    "ended": null,
+    "progress": 100,
+    "status": "success",
+    "failures": [],
+    "errors": []
+  }
+}

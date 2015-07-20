@@ -140,7 +140,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String getTresholds(String appKey, String userKey, String sessionId) {
+    public String getCIStatus(String appKey, String userKey, String sessionId) {
         return Constants.NOT_IMPLEMENTED;
     }
 
