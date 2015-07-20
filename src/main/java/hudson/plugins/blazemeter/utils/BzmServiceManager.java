@@ -351,10 +351,10 @@ public class BzmServiceManager {
 
     }
 
-    public static void saveReport(String filename,
-                                  String report,
-                                  FilePath filePath,
-                                  StdErrLog jenBuildLog) {
+    public static void saveFile(String filename,
+                                String report,
+                                FilePath filePath,
+                                StdErrLog jenBuildLog) {
         File reportFile = new File(filePath.getParent()
                 + "/" + filePath.getName() + "/" + filename);
         try {
@@ -552,24 +552,32 @@ public class BzmServiceManager {
         }
     }
 
+    public static void retrieveJUNITXMLreports(BlazemeterApi api, String masterId, FilePath workspace, StdErrLog jenBuildLog){
+        List<String> sessionsIds=api.getListOfSessionIds(masterId);
+        for(String s:sessionsIds){
+        String junitReport="";
+
+        jenBuildLog.info("Requesting JUNIT report from server, sessionId="+s);
+        try{
+            junitReport = api.retrieveJUNITXML(s);
+        }catch (Exception e){
+            jenBuildLog.warn("Problems with receiving JUNIT report from server, sessionId="+s+" "+e.getMessage());
+        }
+        jenBuildLog.info("Received Junit report from server.... sessionId="+s+" Saving it to the disc...");
+        saveFile(s+"-"+Constants.BM_TRESHOLDS, junitReport, workspace, jenBuildLog);
+        }
+    }
+
     public static Result postProcess(PerformanceBuilder builder,String masterId) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
-        String junitReport="";
         Result result = Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
-
+        FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3)){
-            jenBuildLog.info("Requesting JUNIT report from server...");
-            try{
-                junitReport = api.retrieveJUNITXML(masterId);
-            }catch (Exception e){
-                jenBuildLog.warn("Problems with receiving JUNIT report from server: "+e.getMessage());
-            }
-            jenBuildLog.info("Received Junit report from server.... Saving it to the disc...");
-            BzmServiceManager.saveReport(Constants.BM_TRESHOLDS, junitReport, builder.getBuild().getWorkspace(), jenBuildLog);
+            retrieveJUNITXMLreports(api,masterId,workspace,jenBuildLog);
             Thread.sleep(30000);
             AbstractBuild build=builder.getBuild();
             FilePath jtlPath=new FilePath(build.getWorkspace().getParent(),"builds/"+build.getId());
