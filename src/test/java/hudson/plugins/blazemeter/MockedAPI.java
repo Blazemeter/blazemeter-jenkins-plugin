@@ -83,15 +83,15 @@ public class MockedAPI {
 
     }
 
-    public static void getSessionStatus() throws IOException{
+    public static void getMasterStatus() throws IOException{
 
 
-        File jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_25.json");
+        File jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_25.json");
         String testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_25)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_25 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -102,12 +102,12 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_70.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_70.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_70)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_70 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -118,12 +118,12 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_0.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_0.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_0)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_0 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_EXCEPTION)
@@ -134,12 +134,12 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_100.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_100)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_100 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -151,12 +151,12 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(testStatus));
 
 
-        jsonFile = new File(TestConstants.RESOURCES + "/sessionStatus_140.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_140)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_140 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -172,7 +172,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_NOT_FOUND)
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_NOT_FOUND +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -193,7 +193,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID +"/terminate")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -210,7 +210,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID +"/stop")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -230,7 +230,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID +"/start")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -246,7 +246,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/collections/"+TestConstants.TEST_SESSION_ID +"/start")
+                        .withPath("/api/latest/collections/"+TestConstants.TEST_MASTER_ID +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -352,7 +352,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/sessions/"+TestConstants.TEST_SESSION_ID +"/reports/main/summary")
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_ID +"/reports/main/summary")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -392,7 +392,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_SESSION_ID)
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -410,7 +410,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("PUT")
-                        .withPath("/api/latest/tests/" + TestConstants.TEST_SESSION_ID)
+                        .withPath("/api/latest/tests/" + TestConstants.TEST_MASTER_ID)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -429,7 +429,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_SESSION_FAILURE+"/ci-status")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_FAILURE +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -445,7 +445,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_SESSION_SUCCESS+"/ci-status")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_SUCCESS +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -460,7 +460,7 @@ public class MockedAPI {
 
 
     public static void getReportUrl() throws IOException{
-        String expectedPath="/api/latest/masters/"+TestConstants.TEST_SESSION_ID+"/publicToken";
+        String expectedPath="/api/latest/masters/"+TestConstants.TEST_MASTER_ID +"/publicToken";
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
         String getReportUrl= FileUtils.readFileToString(jsonFile);
         mockServer.when(

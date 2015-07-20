@@ -32,7 +32,7 @@ public class TestBzmServiceManager {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.stopTestSession();
-        MockedAPI.getSessionStatus();
+        MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
@@ -132,33 +132,18 @@ public class TestBzmServiceManager {
         Assert.assertEquals(result,Result.FAILURE);
 
     }
-    @Ignore("Broken during cherry-pick action")
     @Test
-    public void stopTestSession_http(){
+    public void stopMaster(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_25, stdErrLog);
+        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
         Assert.assertEquals(terminate, true);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_70, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_MASTER_70, stdErrLog);
         Assert.assertEquals(terminate, true);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_100, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_MASTER_100, stdErrLog);
         Assert.assertEquals(terminate, false);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_140, stdErrLog);
+        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_MASTER_140, stdErrLog);
         Assert.assertEquals(terminate, false);
     }
-
-    @Test
-    public void stopTestSession_multi(){
-        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_25, stdErrLog);
-        Assert.assertEquals(terminate, false);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_70, stdErrLog);
-        Assert.assertEquals(terminate, false);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_100, stdErrLog);
-        Assert.assertEquals(terminate, false);
-        terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_SESSION_140, stdErrLog);
-        Assert.assertEquals(terminate, false);
-    }
-
 
     @Test
     public void autoDetectApiVersion_v2(){
@@ -176,17 +161,17 @@ public class TestBzmServiceManager {
 
     @Test
     public void getReportUrl_pos(){
-        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testSessionId/summary";
+        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_SESSION_ID, stdErrLog, stdErrLog);
+        String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
     @Test
     public void getReportUrl_neg(){
-        String expectedReportUrl="http://127.0.0.1:1234/app/#masters/testSessionId/summary";
+        String expectedReportUrl="http://127.0.0.1:1234/app/#masters/testMasterId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        String actReportUrl=BzmServiceManager.getReportUrl(api,TestConstants.TEST_SESSION_ID, stdErrLog,stdErrLog);
+        String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
@@ -211,7 +196,7 @@ public class TestBzmServiceManager {
     @Test
     public void updateTestDuration() throws JSONException, IOException {
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        JSONObject updateTestDuration=BzmServiceManager.updateTestDuration(api, TestConstants.TEST_SESSION_ID, "6", stdErrLog);
+        JSONObject updateTestDuration=BzmServiceManager.updateTestDuration(api, TestConstants.TEST_MASTER_ID, "6", stdErrLog);
         String testDuration=updateTestDuration.getJSONObject(JsonConstants.TEST).getJSONObject(JsonConstants.CONFIGURATION).
                 getJSONObject(JsonConstants.PLUGINS).getJSONObject(JsonConstants.HTTP).
                 getJSONObject(JsonConstants.OVERRIDE).getString(JsonConstants.DURATION);
@@ -223,7 +208,7 @@ public class TestBzmServiceManager {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
         String getSessionId_v3_str=FileUtils.readFileToString(getSessionId_v3);
         JSONObject getSession_json=new JSONObject(getSessionId_v3_str);
-        String session=BzmServiceManager.getSessionId(getSession_json, ApiVersion.v3,stdErrLog,stdErrLog);
+        String session=BzmServiceManager.getSessionId(getSession_json, ApiVersion.v3, stdErrLog, stdErrLog);
         Assert.assertEquals(session,"r-v3-55a6136b314bd");
     }
 
@@ -232,7 +217,7 @@ public class TestBzmServiceManager {
         File getSessionId_v2=new File(TestConstants.RESOURCES+"/getSessionId_v2.json");
         String getSessionId_v2_str=FileUtils.readFileToString(getSessionId_v2);
         JSONObject getSession_json=new JSONObject(getSessionId_v2_str);
-        String session=BzmServiceManager.getSessionId(getSession_json,ApiVersion.v2,stdErrLog,stdErrLog);
+        String session=BzmServiceManager.getSessionId(getSession_json, ApiVersion.v2, stdErrLog, stdErrLog);
         Assert.assertEquals(session,"r-ec255a6160ec7b39");
     }
 
@@ -248,14 +233,14 @@ public class TestBzmServiceManager {
     @Test
     public void getCIStatus_success(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api,TestConstants.TEST_SESSION_SUCCESS,stdErrLog);
+        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog);
         Assert.assertEquals(Result.SUCCESS,result);
     }
 
     @Test
     public void getCIStatus_failure(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api,TestConstants.TEST_SESSION_FAILURE,stdErrLog);
+        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog);
         Assert.assertEquals(Result.FAILURE,result);
     }
 }

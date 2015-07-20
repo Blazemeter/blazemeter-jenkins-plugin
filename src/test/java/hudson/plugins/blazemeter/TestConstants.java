@@ -19,15 +19,15 @@ public interface TestConstants {
     int mockedApiPort=1234;
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
 
-    String TEST_SESSION_ID ="testSessionId";
-    String TEST_SESSION_NOT_FOUND="testSession-not-found";
-    String TEST_SESSION_0="testSession-0";
-    String TEST_SESSION_25="testSession-25";
-    String TEST_SESSION_70="testSession-70";
-    String TEST_SESSION_100="testSession-100";
-    String TEST_SESSION_140="testSession-140";
-    String TEST_SESSION_SUCCESS="testSessionSuccess";
-    String TEST_SESSION_FAILURE="testSessionFailure";
+    String TEST_MASTER_ID ="testMasterId";
+    String TEST_MASTER_NOT_FOUND ="testMaster-not-found";
+    String TEST_MASTER_0 ="testMaster-0";
+    String TEST_MASTER_25 ="testMaster-25";
+    String TEST_MASTER_70 ="testMaster-70";
+    String TEST_MASTER_100 ="testMaster-100";
+    String TEST_MASTER_140 ="testMaster-140";
+    String TEST_MASTER_SUCCESS ="testMasterSuccess";
+    String TEST_MASTER_FAILURE ="testMasterFailure";
 
     String YAHOO="yahoo";
 }

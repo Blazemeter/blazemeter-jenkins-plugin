@@ -1,0 +1,118 @@
+{
+    "api_version": 2,
+    "error": null,
+    "result": {
+        "progress": 100,
+        "status": "DATA_RECIEVED",
+        "jmeterLogSummary": [
+            {
+                "count": 3,
+                "message": "kg.apc.jmeter.timers.VariableThroughputTimer: No free threads left in worker pool, made ##/##.0 samples",
+                "level": "WARN"
+            }
+        ],
+        "jmeterLogTypeSummary": [
+            {
+                "count": 69,
+                "type": "INFO"
+            },
+            {
+                "count": 3,
+                "type": "WARN"
+            }
+        ],
+        "sessions": [
+            {
+                "id": "r-v3-55acedd1d7f6b",
+                "status": "DATA_RECIEVED",
+                "progress": 100,
+                "readyStatus": {
+                    "_id": "r-v3-55acedd1d7f6b",
+                    "lastUpdate": {
+                        "sec": 1437396553,
+                        "usec": 0
+                    },
+                    "servers": [
+                        {
+                            "server_id": "i-95be8b46",
+                            "server_type": "console"
+                        }
+                    ],
+                    "plannedServersCount": 1,
+                    "isDelayedStart": false
+                },
+                "locationId": "us-east-1"
+            }
+        ],
+        "events": [
+            {
+                "t": 1437396593,
+                "from": null,
+                "source": "system",
+                "message": "Status changed to DATA_RECIEVED (100)",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396553,
+                "from": -6,
+                "source": "system",
+                "message": "Session is starting because all the engines have started",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396553,
+                "from": -6,
+                "source": "system",
+                "message": "Session is starting because all the engines have started",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396553,
+                "from": "i-95be8b46",
+                "source": "console",
+                "message": "Server is ready to run JMeter",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396510,
+                "from": -6,
+                "source": "system",
+                "message": "Status changed to INIT_SCRIPT (50)",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396435,
+                "from": 1689,
+                "source": "system",
+                "message": "Console starting",
+                "level": "INFO",
+                "params": [
+                    "i-95be8b46"
+                ],
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396434,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to BOOT_STARTING (25)",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            },
+            {
+                "t": 1437396433,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to CREATE (5)",
+                "level": "INFO",
+                "session_id": "r-v3-55acedd1d7f6b"
+            }
+        ],
+        "isFailed": false
+    }
+}

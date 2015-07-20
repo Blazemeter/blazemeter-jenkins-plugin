@@ -25,7 +25,7 @@ public class TestBlazemeterApiV3Impl {
     public static void setUp()throws IOException{
         MockedAPI.startAPI();
         MockedAPI.userProfile();
-        MockedAPI.getSessionStatus();
+        MockedAPI.getMasterStatus();
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
@@ -62,21 +62,19 @@ public class TestBlazemeterApiV3Impl {
         Assert.assertEquals(blazemeterApiV3.getTestConfig(null), null);
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestStatus_Running(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
-        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_SESSION_100);
+        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_100);
         Assert.assertEquals(testStatus, TestStatus.Running);
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestInfo_NotRunning(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
-        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_SESSION_140);
+        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_140);
         Assert.assertEquals(testStatus, TestStatus.NotRunning);
     }
 
@@ -85,7 +83,7 @@ public class TestBlazemeterApiV3Impl {
     public void getTestInfo_Error(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,
                 TestConstants.mockedApiUrl);
-        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_SESSION_NOT_FOUND);
+        TestStatus testStatus=blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_NOT_FOUND);
         Assert.assertEquals(testStatus, TestStatus.Error);
     }
 
@@ -141,25 +139,25 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void startTest_http() throws JSONException{
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
-       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.http), "15102806");
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http), "15102806");
     }
 
     @Test
     public void startTest_jmeter() throws JSONException{
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
-       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.jmeter), "15102806");
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter), "15102806");
     }
 
     @Test
     public void startTest_followme() throws JSONException{
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
-       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID, TestType.followme), "15102806");
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme), "15102806");
     }
 
     @Test
     public void startTest_multi() throws JSONException{
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
-       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_SESSION_ID,TestType.multi), "15105877");
+       Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID,TestType.multi), "15105877");
     }
 
 
@@ -196,12 +194,11 @@ public class TestBlazemeterApiV3Impl {
 
     }
 
-    @Ignore("Broken while cherry-pick action")
     @Test
     public void getTestReport(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        JSONObject testReport=blazemeterApiV3.testReport(TestConstants.TEST_SESSION_ID);
+        JSONObject testReport=blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(testReport.length()==33);
 
 
@@ -252,39 +249,35 @@ public class TestBlazemeterApiV3Impl {
 
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestSessionStatusCode_25(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_SESSION_25);
+        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_25);
         Assert.assertTrue(status==25);
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestSessionStatusCode_70(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_SESSION_70);
+        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_70);
         Assert.assertTrue(status==70);
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestSessionStatusCode_140(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_SESSION_140);
+        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_140);
         Assert.assertTrue(status==140);
     }
 
-    @Ignore("Broken during cherry-pick action")
     @Test
     public void getTestSessionStatusCode_100(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_SESSION_100);
+        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_100);
         Assert.assertTrue(status==100);
     }
 
@@ -292,16 +285,8 @@ public class TestBlazemeterApiV3Impl {
     public void getTestSessionStatusCode_0(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_EXCEPTION,
                 ApiVersion.v3,TestConstants.mockedApiUrl);
-        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_SESSION_0);
+        int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status==0);
     }
 
-
-
-    @Ignore("Incomplete")
-    @Test
-    public void putTestInfo(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
-
-    }
 }

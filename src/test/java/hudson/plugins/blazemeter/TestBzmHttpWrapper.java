@@ -22,7 +22,7 @@ public class TestBzmHttpWrapper {
     public static void setUp()throws IOException{
         MockedAPI.startAPI();
         MockedAPI.userProfile();
-        MockedAPI.getSessionStatus();
+        MockedAPI.getMasterStatus();
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();

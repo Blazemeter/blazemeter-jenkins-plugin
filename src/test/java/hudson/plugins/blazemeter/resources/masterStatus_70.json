@@ -1,0 +1,143 @@
+{
+    "api_version": 2,
+    "error": null,
+    "result": {
+        "progress": 70,
+        "status": "JMETER_ENGINE_INIT",
+        "jmeterLogSummary": [],
+        "jmeterLogTypeSummary": [],
+        "sessions": [
+            {
+                "id": "r-v3-55acef5cdb68e",
+                "status": "JMETER_ENGINE_INIT",
+                "progress": 70,
+                "readyStatus": {
+                    "_id": "r-v3-55acef5cdb68e",
+                    "lastUpdate": {
+                        "sec": 1437396920,
+                        "usec": 0
+                    },
+                    "servers": [
+                        {
+                            "server_id": "i-3ca693ef",
+                            "server_type": "console"
+                        }
+                    ],
+                    "plannedServersCount": 1,
+                    "isDelayedStart": true
+                },
+                "locationId": "us-east-1"
+            },
+            {
+                "id": "r-v3-55acef5ce044a",
+                "status": "JMETER_ENGINE_INIT",
+                "progress": 70,
+                "readyStatus": {
+                    "_id": "r-v3-55acef5ce044a",
+                    "lastUpdate": {
+                        "sec": 1437396920,
+                        "usec": 0
+                    },
+                    "servers": [
+                        {
+                            "server_id": "i-34a693e7",
+                            "server_type": "console"
+                        }
+                    ],
+                    "plannedServersCount": 1,
+                    "isDelayedStart": true
+                },
+                "locationId": "us-east-1"
+            }
+        ],
+        "events": [
+            {
+                "t": 1437396920,
+                "from": "i-3ca693ef",
+                "source": "console",
+                "message": "Server is ready to run JMeter",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5cdb68e"
+            },
+            {
+                "t": 1437396920,
+                "from": "i-34a693e7",
+                "source": "console",
+                "message": "Server is ready to run JMeter",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5ce044a"
+            },
+            {
+                "t": 1437396890,
+                "from": -6,
+                "source": "system",
+                "message": "Status changed to INIT_SCRIPT (50)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5ce044a"
+            },
+            {
+                "t": 1437396889,
+                "from": -6,
+                "source": "system",
+                "message": "Status changed to INIT_SCRIPT (50)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5cdb68e"
+            },
+            {
+                "t": 1437396835,
+                "from": 1689,
+                "source": "system",
+                "message": "Console starting",
+                "level": "INFO",
+                "params": [
+                    "i-34a693e7"
+                ],
+                "session_id": "r-v3-55acef5ce044a"
+            },
+            {
+                "t": 1437396834,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to BOOT_STARTING (25)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5ce044a"
+            },
+            {
+                "t": 1437396834,
+                "from": 1689,
+                "source": "system",
+                "message": "Console starting",
+                "level": "INFO",
+                "params": [
+                    "i-3ca693ef"
+                ],
+                "session_id": "r-v3-55acef5cdb68e"
+            },
+            {
+                "t": 1437396833,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to BOOT_STARTING (25)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5cdb68e"
+            },
+            {
+                "t": 1437396828,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to CREATE (5)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5ce044a"
+            },
+            {
+                "t": 1437396828,
+                "from": 1689,
+                "source": "user",
+                "message": "Status changed to CREATE (5)",
+                "level": "INFO",
+                "session_id": "r-v3-55acef5cdb68e"
+            }
+        ],
+        "isFailed": false
+    }
+}
