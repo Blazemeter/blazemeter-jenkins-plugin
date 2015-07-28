@@ -496,44 +496,6 @@ public class MockedAPI {
 
     }
 
-    public static void createTest() throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/createTest.json");
-        String createTest= FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-                request()
-                        .withMethod("POST")
-                        .withPath("/api/latest/tests/custom")
-                        .withHeader("Accept", "application/json")
-                        .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID),
-                                new Parameter("custom_test_type", TestConstants.YAHOO)
-                        ),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader("application/json")
-                                .withStatusCode(200).withBody(createTest));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
-        createTest= FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-                request()
-                        .withMethod("POST")
-                        .withPath("/api/latest/tests/custom")
-                        .withHeader("Accept", "application/json")
-                        .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_INVALID),
-                                new Parameter("custom_test_type", TestConstants.YAHOO)
-                        ),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader("application/json")
-                                .withStatusCode(200).withBody(createTest));
-
-    }
-
-
     public static void stopAPI(){
         mockServer.reset();
         mockServer.stop();

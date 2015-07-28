@@ -36,7 +36,6 @@ public class TestBzmServiceManager {
         MockedAPI.getCIStatus();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
-        MockedAPI.createTest();
         MockedAPI.getTestConfig();
         MockedAPI.putTestInfo();
         MockedAPI.getTests();
@@ -90,49 +89,6 @@ public class TestBzmServiceManager {
     }
 
     @Test
-    public void validateLocalTr() throws IOException,JSONException{
-        File summaryFile = new File(TestConstants.RESOURCES + "/summary.json");
-        String summaryStr= FileUtils.readFileToString(summaryFile);
-        JSONObject summaryJson=new JSONObject(summaryStr);
-        TestResult testResult=new TestResult(summaryJson);
-        Result result= null;
-        result = BzmServiceManager.validateLocalTresholds(testResult, "1", "", "", "", stdErrLog);
-        Assert.assertEquals(result, Result.UNSTABLE);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "", "1", "", "", stdErrLog);
-        Assert.assertEquals(result, Result.FAILURE);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "1", "", stdErrLog);
-        Assert.assertEquals(result,Result.UNSTABLE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","","","1",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"1","2","","",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"1","2","3","4",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","","1","2",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "50", "", "", "", stdErrLog);
-        Assert.assertEquals(result, null);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "", "50", "", "", stdErrLog);
-        Assert.assertEquals(result, null);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "50", "50", "", "", stdErrLog);
-        Assert.assertEquals(result, null);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "60", "", stdErrLog);
-        Assert.assertEquals(result, null);
-        result = BzmServiceManager.validateLocalTresholds(testResult, "", "", "", "60", stdErrLog);
-        Assert.assertEquals(result, null);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","","60","60",stdErrLog);
-        Assert.assertEquals(result,null);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"0","","","",stdErrLog);
-        Assert.assertEquals(result,Result.UNSTABLE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","","0","",stdErrLog);
-        Assert.assertEquals(result,Result.UNSTABLE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","0","","",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-        result=BzmServiceManager.validateLocalTresholds(testResult,"","","","0",stdErrLog);
-        Assert.assertEquals(result,Result.FAILURE);
-
-    }
-    @Test
     public void stopMaster(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         boolean terminate = BzmServiceManager.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
@@ -173,24 +129,6 @@ public class TestBzmServiceManager {
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
-    }
-
-    @Test
-    public void createTest_pos() throws JSONException, IOException {
-        File jsonFile = new File(TestConstants.RESOURCES + "/createTest_body.json");
-        JSONObject createTestBody= new JSONObject(FileUtils.readFileToString(jsonFile));
-        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        String testId=BzmServiceManager.createTest(api, createTestBody, Constants.CREATE_BZM_TEST_NOTE, stdErrLog);
-        Assert.assertEquals(testId,"5086072");
-    }
-
-    @Test
-    public void createTest_neg() throws JSONException, IOException {
-        File jsonFile = new File(TestConstants.RESOURCES + "/createTest_body.json");
-        JSONObject createTestBody= new JSONObject(FileUtils.readFileToString(jsonFile));
-        BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        String testId=BzmServiceManager.createTest(api, createTestBody, Constants.CREATE_BZM_TEST_NOTE, stdErrLog);
-        Assert.assertEquals(testId,"");
     }
 
     @Test

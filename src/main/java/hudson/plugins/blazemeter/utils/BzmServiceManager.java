@@ -59,22 +59,13 @@ public class BzmServiceManager {
     public static JSONObject updateTestConfiguration(BlazemeterApi api,
                                                      String testId,
                                                      String testDuration,
-                                                     String location,
-                                                     JSONObject configNode,
                                                      StdErrLog bzmBuildLog) {
-        JSONObject updateResult=null;
+        JSONObject updateResult = null;
         try {
             JSONObject result = null;
-            if (configNode != null) {
-                result=configNode;
-                updateResult = api.postJsonConfig(testId, result);
-            } else {
-                if (testDuration != null && !testDuration.isEmpty()) {
-                    updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
-                }
-            }
-            if (location != null && !location.isEmpty() && !location.equals(Constants.USE_TEST_LOCATION)) {
-                updateResult = updateLocation(api, testId, location, bzmBuildLog);
+
+            if (testDuration != null && !testDuration.isEmpty()) {
+                updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
             }
         }catch (Exception e) {
             bzmBuildLog.warn("Received JSONException while updating test: ", e);
@@ -111,55 +102,6 @@ public class BzmServiceManager {
 
 
 
-    public static JSONObject updateLocation(BlazemeterApi api,
-                                                String testId,
-                                                String location,
-                                                StdErrLog bzmBuildLog){
-        JSONObject result;
-        JSONObject updateResult=null;
-        try {
-            JSONObject jo = api.getTestConfig(testId);
-            result = jo.getJSONObject(JsonConstants.RESULT);
-            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
-            configuration.put(JsonConstants.LOCATION, location);
-            updateResult = api.putTestInfo(testId, result);
-        } catch (JSONException je) {
-            bzmBuildLog.warn("Received JSONException while updating test duration: ", je);
-        } catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while updating test duration: ", e);
-        }
-        return updateResult;
-    }
-
-    public static void uploadDataFolderFiles(String dataFolder, String mainJMX, String testId,
-                                             BlazemeterApi bmAPI, StdErrLog bzmBuildLog) {
-
-        if (dataFolder == null || dataFolder.isEmpty())
-            return;
-
-        File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory()) {
-            bzmBuildLog.info("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
-            return;
-        }
-
-        File[] listOfFiles = folder.listFiles();
-
-        if (listOfFiles != null) {
-            for (File file : listOfFiles) {
-                String fileName;
-                if (file.isFile()) {
-                    fileName = file.getName();
-
-                    if (fileName.endsWith(mainJMX))
-                        bmAPI.uploadJmx(testId, file);
-                    else
-                        uploadFile(testId, bmAPI, file, bzmBuildLog);
-                }
-            }
-        }
-    }
-
     public static void waitForFinish(BlazemeterApi api, String apiVersion, String testId, AbstractLogger bzmBuildLog,
                                      String session) throws InterruptedException {
         Date start = null;
@@ -194,26 +136,6 @@ public class BzmServiceManager {
         }
     }
 
-    public static String createTest(BlazemeterApi api, JSONObject configNode,
-                                     String testId,StdErrLog jenBuildLog) throws JSONException {
-        try{
-
-        if(testId.equals(Constants.CREATE_BZM_TEST_NOTE)){
-            JSONObject jo = api.createTest(configNode);
-            if(jo.has(JsonConstants.ERROR)&&!jo.getString(JsonConstants.ERROR).equals("null")){
-                jenBuildLog.warn("Failed to create test: "+jo.getString(JsonConstants.ERROR));
-                testId="";
-            }else{
-                testId = jo.getJSONObject(JsonConstants.RESULT).getString(JsonConstants.ID);
-            }
-        }
-        }catch (Exception e){
-            jenBuildLog.warn("Unable to create test: check user-key and server-url");
-        }
-
-        return testId;
-    }
-
     public static String getReportUrl(BlazemeterApi api, String masterId,
                                       StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
         JSONObject jo=null;
@@ -242,31 +164,11 @@ public class BzmServiceManager {
 
     public static String prepareTestRun(PerformanceBuilder builder) {
         BlazemeterApi api = builder.getApi();
-        FilePath jsonConfigPath = null;
         StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
         StdErrLog jenBuildLog = builder.getJenBuildLog();
         String testId = builder.getTestId();
         try {
-            JSONObject configNode=null;
-            if(!StringUtils.isBlank(builder.getJsonConfig())){
-                jsonConfigPath=new FilePath(builder.getBuild().getWorkspace(), builder.getJsonConfig());
-                configNode = new JSONObject(jsonConfigPath.readToString());
-            }
-
-            if (testId.contains("create")) {
-                if (configNode != null) {
-                    testId = createTest(api, configNode, testId, jenBuildLog);
-                    builder.setTestId(testId);
-                } else {
-                    testId="";
-                    return testId;
-                }
-            }
-
-
-                JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),
-                        builder.getLocation(),
-                        configNode, bzmBuildLog);
+                JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),bzmBuildLog);
                 if(updateResult!=null&&updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
                     jenBuildLog.warn("Failed to update test with JSON configuration");
                     jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
@@ -274,13 +176,9 @@ public class BzmServiceManager {
                 }else{
                     jenBuildLog.info("Test " + testId + " was started on server");
                     }
-        } catch (IOException e) {
-            jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
-            bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + e.getMessage());
-            testId="";
         } catch (JSONException je) {
-            jenBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
-            bzmBuildLog.info("Failed to read JSON configuration from file " + builder.getJsonConfig() + ": " + je.getMessage());
+            jenBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
+            bzmBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
             testId="";
         } catch (Exception e){
             jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
@@ -289,12 +187,6 @@ public class BzmServiceManager {
         }
 
         finally {
-/*          TODO
-            These calls are not implemented for APIv3
-            Should be fixed in v.2.1
-
-            uploadDataFolderFiles(builder.getDataFolder(),builder.getMainJMX(),testId, api,bzmBuildLog);
-*/
             return testId;
         }
     }
@@ -576,21 +468,22 @@ public class BzmServiceManager {
         Result result = Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
-        if(apiVersion.equals(ApiVersion.v3)){
+        if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
             retrieveJUNITXMLreports(api,masterId,workspace,jenBuildLog);
-            Thread.sleep(30000);
-            AbstractBuild build=builder.getBuild();
-            FilePath jtlPath=new FilePath(build.getWorkspace().getParent(),"builds/"+build.getId());
-            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
-            if(builder.isUseServerTresholds()){
-                jenBuildLog.info("UseServerTresholds flag is set to TRUE, Server tresholds will be validated.");
-                result= BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
-            }else{
-                jenBuildLog.info("UseServerTresholds flag is set to FALSE, Server tresholds will not be validated.");
-            }
-        }else{
-            jenBuildLog.info("JUNIT adn JTL report report won't be requested: apiVersion is v2 or multi-test is selected.");
+            } else {
+            jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
         }
+        Thread.sleep(30000);
+        if(apiVersion.equals(ApiVersion.v3)&builder.isGetJtl()){
+            AbstractBuild build=builder.getBuild();
+            FilePath jtlPath = new FilePath(build.getWorkspace().getParent(), "builds/" + build.getId());
+            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
+        } else {
+            jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
+        }
+        result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
+
+
 
         //get testGetArchive information
         JSONObject testReport=null;
@@ -611,20 +504,6 @@ public class BzmServiceManager {
         try {
             testResult = new TestResult(testReport);
             jenBuildLog.info(testResult.toString());
-            String respTimeUTr=builder.getResponseTimeUnstableThreshold();
-            String respTimeFTr=builder.getResponseTimeFailedThreshold();
-            String errUTr=builder.getErrorUnstableThreshold();
-            String errFTr=builder.getErrorFailedThreshold();
-
-            if (apiVersion.equals(ApiVersion.v3)
-                    &&(!builder.isUseServerTresholds()|(builder.isUseServerTresholds()&result.equals(Result.SUCCESS)))) {
-                jenBuildLog.info("UseServerTresholds flag was set to FALSE or server tresholds validation was SUCCESS.");
-                jenBuildLog.info("Validating local tresholds...\n");
-                localTresholdsResult = validateLocalTresholds(testResult, respTimeUTr,respTimeFTr,errUTr,errFTr, jenBuildLog);
-            }
-            if(apiVersion.equals(ApiVersion.v2)){
-                localTresholdsResult = validateLocalTresholds(testResult, respTimeUTr,respTimeFTr,errUTr,errFTr, jenBuildLog);
-            }
         } catch (IOException ioe) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
@@ -656,85 +535,6 @@ public class BzmServiceManager {
             return terminate;
         }
     }
-
-    public static Result validateLocalTresholds(TestResult testResult,
-                                                String respTimeUTr,
-                                                String respTimeFTr,
-                                                String errUTr,
-                                                String errFTr,
-                                                StdErrLog jenBuildLog) {
-        Result result=null;
-        try {
-            int responseTimeUnstable = Integer.valueOf(respTimeUTr.isEmpty()
-                    ? Constants.MINUS_ONE : respTimeUTr);
-            int responseTimeFailed = Integer.valueOf(respTimeFTr.isEmpty()
-                    ? Constants.MINUS_ONE : respTimeFTr);
-            int errorUnstable = Integer.valueOf(errUTr.isEmpty()
-                    ? Constants.MINUS_ONE : errUTr);
-            int errorFailed = Integer.valueOf(errFTr.isEmpty()
-                    ? Constants.MINUS_ONE : errFTr);
-
-            if (errorUnstable < 0) {
-                jenBuildLog.info("ErrorUnstable percentage validation will be skipped: value was not set in configuration");
-            }else{
-                jenBuildLog.info("ErrorUnstable percentage value="+errorUnstable+". It will be compared with errorPercentage="+testResult.getErrorPercentage());
-            }
-
-            if (errorFailed < 0) {
-                jenBuildLog.info("ErrorFailed percentage validation will be skipped: value was not set in configuration");
-            }else{
-                jenBuildLog.info("ErrorFailed percentage value="+errorFailed+". It will be compared with errorPercentage="+testResult.getErrorPercentage());
-            }
-
-            if (responseTimeUnstable < 0) {
-                jenBuildLog.info("ResponseTimeUnstable validation will be skipped: value was not set in configuration");
-            }else{
-                jenBuildLog.info("ResponseTimeUnstable value="+responseTimeUnstable+". It will be compared with averageResponseTime="+testResult.getAverage());
-            }
-
-
-            if (responseTimeFailed < 0) {
-                jenBuildLog.info("ResponseTimeFailed validation will be skipped: value was not set in configuration");
-            }else{
-                jenBuildLog.info("ResponseTimeFailed value="+responseTimeFailed+". It will be compared with averageResponseTime="+testResult.getAverage());
-            }
-
-            if (responseTimeUnstable >= 0 & testResult.getAverage() > responseTimeUnstable) {
-                jenBuildLog.info("Validating responseTimeUnstable...\n");
-                jenBuildLog.info("Actual average_response_time="+testResult.getAverage()+" is higher than RESPONSE_TIME_UNSTABLE_treshold="+responseTimeUnstable+"\n");
-                jenBuildLog.info("Marking build as unstable");
-                result = Result.UNSTABLE;
-            }
-
-            if (errorUnstable >= 0 & testResult.getErrorPercentage() > errorUnstable) {
-                jenBuildLog.info("Validating errorPercentageUnstable...\n");
-                jenBuildLog.info("Actual error_percentage="+testResult.getErrorPercentage()+" is higher than ERROR_PERCENTAGE_UNSTABLE_treshold="+errorUnstable+"\n");
-                jenBuildLog.info("Marking build as unstable");
-                result = Result.UNSTABLE;
-            }
-
-            if (responseTimeFailed >= 0 & testResult.getAverage() >= responseTimeFailed) {
-                jenBuildLog.info("Validating responseTimeFailed...\n");
-                jenBuildLog.info("Actual average_response_time="+testResult.getAverage()+" is higher than RESPONSE_TIME_FAILED treshold="+responseTimeFailed+"\n");
-                jenBuildLog.info("Marking build as failed");
-                result = Result.FAILURE;
-                return result;
-            }
-
-            if (errorFailed >= 0 & testResult.getErrorPercentage() >= errorFailed) {
-                jenBuildLog.info("Validating errorPercentageFailed...\n");
-                jenBuildLog.info("Actual error_percentage="+testResult.getErrorPercentage()+" is higher than ERROR_PERCENTAGE_FAILED treshold="+errorFailed+"\n");
-                jenBuildLog.info("Marking build as failed");
-                result = Result.FAILURE;
-                return result;
-            }
-
-        } catch (Exception e) {
-            jenBuildLog.info("Error occured while validating local tresholds. Check that test was finished correctly or turn to customer support");
-        } finally {
-            return result;
-        }
-}
 
     public static String getVersion() {
         Properties props = new Properties();

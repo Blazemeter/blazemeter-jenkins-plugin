@@ -64,8 +64,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             BlazemeterApi api = APIFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
-                items.add(Constants.CREATE_BZM_TEST, Constants.CREATE_BZM_TEST_NOTE);
-
                 if (testList == null){
                     items.add("Invalid API key ", "-1");
                 } else if (testList.isEmpty()){
@@ -82,43 +80,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
         return items;
-    }
-
-    // Used by config.jelly to display the test list.
-    public ListBoxModel doFillLocationItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
-        if(apiKey.contains(Constants.CREDENTIALS_KEY)){
-            apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
-        }
-        ListBoxModel items = new ListBoxModel();
-        if (apiKey == null) {
-            items.add(Constants.NO_API_KEY, Constants.MINUS_ONE);
-            return items;
-        }
-        BlazemeterApi bzm = APIFactory.getAPI(apiKey, ApiVersion.v3,this.blazeMeterURL);
-        try {
-            LinkedHashMap<String, String> locationList = new LinkedHashMap<String, String>();
-            items.add(Constants.USE_TEST_LOCATION, Constants.USE_TEST_LOCATION);
-            JSONObject jo = JSONObject.fromObject(bzm.getUser().toString());
-            if (!jo.has(JsonConstants.LOCATIONS)) {
-                items.add("Invalid API key ", Constants.MINUS_ONE);
-                return items;
-            }
-            Iterator<JSONObject> locations = jo.getJSONArray(JsonConstants.LOCATIONS).iterator();
-            while (locations.hasNext()) {
-                JSONObject location = locations.next();
-                locationList.put(location.getString("id"), location.getString("title"));
-            }
-            Set set = locationList.entrySet();
-            for (Object test : set) {
-                Map.Entry me = (Map.Entry) test;
-                items.add(new ListBoxModel.Option(String.valueOf(me.getValue()), String.valueOf(me.getKey()), false));
-            }
-
-        } catch (Exception e) {
-            throw FormValidation.error(e.getMessage(), e);
-        } finally {
-            return items;
-        }
     }
 
     public ListBoxModel doFillApiVersionItems(@QueryParameter String apiVersion) throws FormValidation {

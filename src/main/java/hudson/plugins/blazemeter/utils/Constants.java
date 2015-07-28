@@ -8,9 +8,6 @@ public interface Constants {
     String BZM_JEN="BZM-JEN";
     String BUILD_JEN="BUILD-JEN";
     String BZM_JEN_LOG="bzm-jen-log";
-    String CREATE_BZM_TEST="Create BZM test using JSON configuration";
-    String USE_TEST_LOCATION = "Use Location specified in test/JSON";
-    String CREATE_BZM_TEST_NOTE="createBZMTestFromJSON";
     String BM_TRESHOLDS="bm-thresholds.xml";
     String BM_KPIS="bm-kpis.jtl";
     String SAMPLE="sample.jtl";

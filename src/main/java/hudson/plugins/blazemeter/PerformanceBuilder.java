@@ -40,27 +40,9 @@ public class PerformanceBuilder extends Builder {
 
     private String testDuration = "";
 
-/*  TODO
-    This calls are not implemented in v.2.0
-    Therefor they will be hidden from GUI
-    Should be implemented in v.2.1
+    private boolean getJtl = false;
 
-    private String mainJMX = "";
-
-    private String dataFolder = "";
-*/
-
-    private String location = "";
-
-    private String jsonConfig = "";
-
-    private String errorFailedThreshold = "";
-
-    private String errorUnstableThreshold = "";
-
-    private String responseTimeFailedThreshold = "";
-
-    private String responseTimeUnstableThreshold = "";
+    private boolean getJunit = false;
 
     private BlazemeterApi api = null;
 
@@ -70,7 +52,6 @@ public class PerformanceBuilder extends Builder {
      */
     private transient String filename;
 
-    private boolean useServerTresholds;
     /**
      * Configured report parsers.
      */
@@ -80,33 +61,17 @@ public class PerformanceBuilder extends Builder {
                               String testDuration,
                               String testId,
                               String apiVersion,
-                              String location,
-                              String jsonConfig,
-                              boolean useServerTresholds,
-                              String errorFailedThreshold,
-                              String errorUnstableThreshold,
-                              String responseTimeFailedThreshold,
-                              String responseTimeUnstableThreshold
+                              boolean getJtl,
+                              boolean getJunit
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
-        this.errorFailedThreshold = errorFailedThreshold;
-        this.errorUnstableThreshold = errorUnstableThreshold;
         this.testId = testId;
         this.apiVersion = apiVersion.equals("autoDetect")?
                 BzmServiceManager.autoDetectApiVersion(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL()):apiVersion;
-    /*  TODO
-    This calls are not implemented in v.2.0
-    Therefor they will be hidden from GUI
-    Should be implemented in v.2.1
-
-    */
-        this.location = location;
-        this.jsonConfig = jsonConfig;
-        this.useServerTresholds=useServerTresholds;
-        this.responseTimeFailedThreshold = responseTimeFailedThreshold;
-        this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
         this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion),DESCRIPTOR.getBlazeMeterURL());
         this.testDuration=testDuration;
+        this.getJtl=getJtl;
+        this.getJunit=getJunit;
     }
 
 
@@ -213,22 +178,6 @@ public class PerformanceBuilder extends Builder {
 
 
 
-    public String getResponseTimeFailedThreshold() {
-        return responseTimeFailedThreshold;
-    }
-
-    public void setResponseTimeFailedThreshold(String responseTimeFailedThreshold) {
-        this.responseTimeFailedThreshold = responseTimeFailedThreshold;
-    }
-
-    public String getResponseTimeUnstableThreshold() {
-        return responseTimeUnstableThreshold;
-    }
-
-    public void setResponseTimeUnstableThreshold(String responseTimeUnstableThreshold) {
-        this.responseTimeUnstableThreshold = responseTimeUnstableThreshold;
-    }
-
     public String getTestDuration() {
         return testDuration;
     }
@@ -254,43 +203,6 @@ public class PerformanceBuilder extends Builder {
         this.jobApiKey = jobApiKey;
     }
 
-    /* TODO
-        This calls are not implemented in v.2.0
-        Therefor they will be hidden from GUI
-        Should be implemented in v.2.1
-
-        public String getMainJMX() {
-            return mainJMX;
-        }
-
-        public void setMainJMX(String mainJMX) {
-            this.mainJMX = mainJMX;
-        }
-
-        public String getDataFolder() {
-            return dataFolder;
-        }
-
-        public void setDataFolder(String dataFolder) {
-            this.dataFolder = dataFolder;
-        }
-    */
-    public String getErrorFailedThreshold() {
-        return errorFailedThreshold;
-    }
-
-    public void setErrorFailedThreshold(String errorFailedThreshold) {
-        this.errorFailedThreshold = errorFailedThreshold;
-    }
-
-    public String getErrorUnstableThreshold() {
-        return errorUnstableThreshold;
-    }
-
-    public void setErrorUnstableThreshold(String errorUnstableThreshold) {
-        this.errorUnstableThreshold = errorUnstableThreshold;
-    }
-
     public String getTestId() {
         return testId;
     }
@@ -305,10 +217,6 @@ public class PerformanceBuilder extends Builder {
 
     public void setFilename(String filename) {
         this.filename = filename;
-    }
-
-    public String getJsonConfig() {
-        return jsonConfig;
     }
 
     public AbstractBuild<?, ?> getBuild() {
@@ -326,21 +234,12 @@ public class PerformanceBuilder extends Builder {
     public BlazemeterApi getApi() {
         return api;
     }
-
-    public String getLocation() {
-        return location;
+    public boolean isGetJtl() {
+        return getJtl;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public boolean isUseServerTresholds() {
-        return useServerTresholds;
-    }
-
-    public void setUseServerTresholds(boolean useServerTresholds) {
-        this.useServerTresholds = useServerTresholds;
+    public boolean isGetJunit() {
+        return getJunit;
     }
 
     @Override
