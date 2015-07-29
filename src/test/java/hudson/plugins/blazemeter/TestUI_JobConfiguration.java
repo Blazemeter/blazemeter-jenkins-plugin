@@ -21,7 +21,6 @@ public class TestUI_JobConfiguration {
 
     public FreeStyleProject project= null;
     public String jobApiKey="jobApiKey";
-    public String testDuration="testDuration";
     public String testId="testId";
     public String getJtl="getJtl";
     public String getJunit="getJunit";
@@ -35,7 +34,7 @@ public class TestUI_JobConfiguration {
     @Test
     public void configure_save_check() throws Exception {
         // Create performance builder with initial settings
-        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890","60", testId,
+        PerformanceBuilder pbBefore=new PerformanceBuilder("1234567890", testId,
                                                                       "v3",false,true);
         project.getBuildersList().add(pbBefore);
         //Go to "congigure" page
@@ -44,6 +43,6 @@ public class TestUI_JobConfiguration {
         j.submit(htmlForms.get(1));
         //make sure that builder settings did not change
         PerformanceBuilder pbAfter=project.getBuildersList().get(PerformanceBuilder.class);
-        j.assertEqualBeans(pbBefore,pbAfter,jobApiKey+","+testDuration+","+getJtl+","+getJunit);
+        j.assertEqualBeans(pbBefore,pbAfter,jobApiKey+","+getJtl+","+getJunit);
     }
 }

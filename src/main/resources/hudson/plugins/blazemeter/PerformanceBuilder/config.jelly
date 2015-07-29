@@ -8,12 +8,12 @@
         <f:select>
         </f:select>
     </f:entry>
-    <f:entry title="${%Test Duration, min}:"
+    <!--<f:entry title="${%Test Duration, min}:"
              field="testDuration"
              description="${%TestDuration}">
         <f:textbox field="testDuration"
                    checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
-    </f:entry>
+    </f:entry>-->
     <f:entry title="Download JTL report:" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
     </f:entry>

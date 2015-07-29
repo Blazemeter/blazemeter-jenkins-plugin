@@ -38,7 +38,7 @@ public class PerformanceBuilder extends Builder {
 
     private String apiVersion = "v3";
 
-    private String testDuration = "";
+//    private String testDuration = "";
 
     private boolean getJtl = false;
 
@@ -58,7 +58,7 @@ public class PerformanceBuilder extends Builder {
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
-                              String testDuration,
+//                              String testDuration,
                               String testId,
                               String apiVersion,
                               boolean getJtl,
@@ -69,7 +69,7 @@ public class PerformanceBuilder extends Builder {
         this.apiVersion = apiVersion.equals("autoDetect")?
                 BzmServiceManager.autoDetectApiVersion(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL()):apiVersion;
         this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion),DESCRIPTOR.getBlazeMeterURL());
-        this.testDuration=testDuration;
+//        this.testDuration=testDuration;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
     }
@@ -111,16 +111,16 @@ public class PerformanceBuilder extends Builder {
         TestType testType= Utils.getTestType(this.testId);
         this.testId=Utils.getTestId(this.testId);
         // implemented only with V3
-        if(this.api instanceof BlazemeterApiV3Impl){
+        /*if(this.api instanceof BlazemeterApiV3Impl){
             this.testId= BzmServiceManager.prepareTestRun(this);
             if(this.testId.isEmpty()){
                 jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
                 return false;
             }
-        }
+        }*/
 
 
-        bzmBuildLog.info("Expected test duration=" + this.testDuration);
+//        bzmBuildLog.info("Expected test duration=" + this.testDuration);
         String masterId="";
         bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
@@ -178,6 +178,7 @@ public class PerformanceBuilder extends Builder {
 
 
 
+/*
     public String getTestDuration() {
         return testDuration;
     }
@@ -185,6 +186,7 @@ public class PerformanceBuilder extends Builder {
     public void setTestDuration(String testDuration) {
         this.testDuration = testDuration;
     }
+*/
 
     public String getApiVersion() {
         return apiVersion;

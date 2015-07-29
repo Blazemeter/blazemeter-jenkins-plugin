@@ -55,6 +55,7 @@ public class BzmServiceManager {
             }
     }
 
+/*
 
     public static JSONObject updateTestConfiguration(BlazemeterApi api,
                                                      String testId,
@@ -73,6 +74,7 @@ public class BzmServiceManager {
         return updateResult;
     }
 
+*/
 
     public static JSONObject updateTestDuration(BlazemeterApi api,
                                           String testId,
@@ -161,6 +163,7 @@ public class BzmServiceManager {
                 return reportUrl;
         }
     }
+/*
 
     public static String prepareTestRun(PerformanceBuilder builder) {
         BlazemeterApi api = builder.getApi();
@@ -190,6 +193,7 @@ public class BzmServiceManager {
             return testId;
         }
     }
+*/
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
         String fileName = file.getName();
