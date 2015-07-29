@@ -135,6 +135,10 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("Unable to start test: check userKey, testId, server url.");
             bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);
             return false;
+        } catch (Exception e) {
+            jenBuildLog.warn("Unable to start test: check userKey, testId, server url.");
+            bzmBuildLog.warn("Exception while starting BlazeMeter Test ", e);
+            return false;
         }
 
         // add the report to the build object.

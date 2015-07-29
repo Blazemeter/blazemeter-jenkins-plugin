@@ -11,7 +11,6 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -154,7 +153,6 @@ public class BzmServiceManager {
                 bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 reportUrl=api.getBlazeMeterURL()+"/app/#masters/"+masterId+"/summary";
             }
-            jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
 
         } catch (Exception e){
           jenBuildLog.warn("Problems with generating public-token for report URL");
@@ -247,10 +245,10 @@ public class BzmServiceManager {
 
     }
 
-    public static void saveFile(String filename,
-                                String report,
-                                FilePath filePath,
-                                StdErrLog jenBuildLog) {
+    public static void saveReport(String filename,
+                                  String report,
+                                  FilePath filePath,
+                                  StdErrLog jenBuildLog) {
         File reportFile = new File(filePath.getParent()
                 + "/" + filePath.getName() + "/" + filename);
         try {
@@ -276,7 +274,7 @@ public class BzmServiceManager {
         JSONArray errors=new JSONArray();
         try {
             jo=api.getCIStatus(session);
-            jenBuildLog.info("Treshold object = " + jo.toString());
+            jenBuildLog.info("Test status object = " + jo.toString());
             success=jo.getString(JsonConstants.STATUS).equals(JsonConstants.SUCCESS);
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
@@ -287,11 +285,11 @@ public class BzmServiceManager {
             jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
             success=true;
         }
-        jenBuildLog.info("Validating server tresholds: " + (success ? "PASSED" : "FAILED") + "\n");
+        jenBuildLog.info("Validating test status: " + (success ? "PASSED" : "FAILED") + "\n");
 
         result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
-            jenBuildLog.info("Having problems while CI status validation....");
+            jenBuildLog.info("Having problems while test status validation....");
             jenBuildLog.info("Errors: "+errors.toString());
             jenBuildLog.info("Failures: "+failures.toString());
             return result;
@@ -459,8 +457,10 @@ public class BzmServiceManager {
         }catch (Exception e){
             jenBuildLog.warn("Problems with receiving JUNIT report from server, sessionId="+s+" "+e.getMessage());
         }
-        jenBuildLog.info("Received Junit report from server.... sessionId="+s+" Saving it to the disc...");
-        saveFile(s+"-"+Constants.BM_TRESHOLDS, junitReport, workspace, jenBuildLog);
+            String junitReportPath=workspace.getParent()
+                    + "/" + workspace.getName() + "/" +masterId+"-"+ Constants.BM_TRESHOLDS;
+        jenBuildLog.info("Received Junit report from server.... sessionId="+s);
+        jenBuildLog.info("Saving it to "+junitReportPath);
         }
     }
 

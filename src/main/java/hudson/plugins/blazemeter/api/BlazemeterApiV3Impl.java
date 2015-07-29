@@ -153,7 +153,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public synchronized String startTest(String testId,TestType testType) throws JSONException{
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
-        logger.info("Calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
+        logger.info("StartTest: calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
         String url="";
         switch (testType){
             case multi:
@@ -163,7 +163,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                 url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
         JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
-
+        logger.info("StartTest: Received JSON:"+jo.toString());
         JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
         return  result.getString(JsonConstants.ID);
     }
