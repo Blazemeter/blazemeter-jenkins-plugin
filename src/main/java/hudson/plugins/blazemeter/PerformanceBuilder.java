@@ -108,8 +108,15 @@ public class PerformanceBuilder extends Builder {
         }
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
-        TestType testType= Utils.getTestType(this.testId);
-        this.testId=Utils.getTestId(this.testId);
+        TestType testType= null;
+        try {
+            testType = Utils.getTestType(this.testId);
+        } catch (Exception e) {
+            jenBuildLog.warn("Failed to detect testType for starting test=" + e);
+        }
+        String testId_num=Utils.getTestId(this.testId);
+        jenBuildLog.info("TestId="+this.testId);
+        jenBuildLog.info("Test type="+testType.toString());
         // implemented only with V3
         /*if(this.api instanceof BlazemeterApiV3Impl){
             this.testId= BzmServiceManager.prepareTestRun(this);
@@ -122,11 +129,11 @@ public class PerformanceBuilder extends Builder {
 
 //        bzmBuildLog.info("Expected test duration=" + this.testDuration);
         String masterId="";
-        bzmBuildLog.info("### About to start Blazemeter test # " + this.testId);
+        bzmBuildLog.info("### About to start Blazemeter test # " + testId_num);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
-            masterId = api.startTest(testId,testType);
+            masterId = api.startTest(testId_num,testType);
             if(masterId.isEmpty()){
                 build.setResult(Result.FAILURE);
                 return false;
@@ -146,10 +153,10 @@ public class PerformanceBuilder extends Builder {
         BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
 
         try {
-            BzmServiceManager.waitForFinish(this.api, this.apiVersion, this.testId,
+            BzmServiceManager.waitForFinish(this.api, this.apiVersion, testId_num,
                     bzmBuildLog, masterId);
 
-            bzmBuildLog.info("BlazeMeter test# " + this.testId + " was terminated at " + Calendar.getInstance().getTime());
+            bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
             Result result = BzmServiceManager.postProcess(this,masterId);
 

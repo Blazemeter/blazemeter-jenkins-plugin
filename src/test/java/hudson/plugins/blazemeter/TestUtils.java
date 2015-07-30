@@ -12,15 +12,13 @@ public class TestUtils {
     public String testId_http="429381.http";
     public String testId_jmeter="429381.jmeter";
     public String testId_followme="429381.followme";
-    public String testId_unkown_type="429381.cvbhgy";
     public String testId_multi="429381.multi";
 
     @Test
-    public void getTestType(){
+    public void getTestType() throws Exception{
         Assert.assertEquals(TestType.http, Utils.getTestType(testId_http));
         Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter));
         Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme));
-        Assert.assertEquals(TestType.unknown_type, Utils.getTestType(testId_unkown_type));
         Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi));
 
     }

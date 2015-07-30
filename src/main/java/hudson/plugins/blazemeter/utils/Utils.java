@@ -9,13 +9,13 @@ public class Utils {
 
     private Utils(){}
 
-    public static TestType getTestType(String testId){
+    public static TestType getTestType(String testId) throws Exception{
         int dotPos=testId.indexOf(".");
         TestType testType=null;
         try{
             testType=TestType.valueOf(testId.substring(dotPos+1));
         }catch (Exception e){
-            testType = TestType.unknown_type;
+            throw e;
         }
         return testType;
     }
