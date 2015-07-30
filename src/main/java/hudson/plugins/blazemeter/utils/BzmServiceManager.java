@@ -269,13 +269,13 @@ public class BzmServiceManager {
     public static Result validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
         Result result;
         JSONObject jo;
-        boolean success;
+        boolean success=true;
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
             jo=api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            success=jo.getString(JsonConstants.STATUS).equals(JsonConstants.SUCCESS);
+            success=!jo.getString(JsonConstants.STATUS).equals(JsonConstants.FAILURE);
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
@@ -289,10 +289,12 @@ public class BzmServiceManager {
 
         result = success?Result.SUCCESS:Result.FAILURE;
         if(result.equals(Result.FAILURE)){
-            jenBuildLog.info("Having problems while test status validation....");
-            jenBuildLog.info("Errors: "+errors.toString());
+            jenBuildLog.info("Having failure while test status validation....");
             jenBuildLog.info("Failures: "+failures.toString());
             return result;
+        }else{
+            jenBuildLog.info("Setting SUCCESS for build after test status validation...");
+            jenBuildLog.info("Errors: "+errors.toString());
         }
         return result;
     }
@@ -381,13 +383,13 @@ public class BzmServiceManager {
         }
     }
 
-        public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
+    public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
                                           StdErrLog jenBuildLog,
-                                          StdErrLog bzmBuildLog){
-            List<String> sessionsIds=api.getListOfSessionIds(masterId);
-            for(String s:sessionsIds){
-                downloadJtlReport(api, s, filePath, jenBuildLog, bzmBuildLog);
-            }
+                                          StdErrLog bzmBuildLog) {
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        for (String s : sessionsIds) {
+            downloadJtlReport(api, s, filePath, jenBuildLog, bzmBuildLog);
+        }
     }
 
 
@@ -454,13 +456,15 @@ public class BzmServiceManager {
         jenBuildLog.info("Requesting JUNIT report from server, sessionId="+s);
         try{
             junitReport = api.retrieveJUNITXML(s);
-        }catch (Exception e){
-            jenBuildLog.warn("Problems with receiving JUNIT report from server, sessionId="+s+" "+e.getMessage());
+        } catch (Exception e) {
+            jenBuildLog.warn("Problems with receiving JUNIT report from server, sessionId=" + s + " " + e.getMessage());
         }
-            String junitReportPath=workspace.getParent()
-                    + "/" + workspace.getName() + "/" +masterId+"-"+ Constants.BM_TRESHOLDS;
-        jenBuildLog.info("Received Junit report from server.... sessionId="+s);
-        jenBuildLog.info("Saving it to "+junitReportPath);
+            String junitReportName = s + "-" + Constants.BM_TRESHOLDS;
+            String junitReportPath = workspace.getParent()
+                    + "/" + workspace.getName() + "/" + s + "-" + Constants.BM_TRESHOLDS;
+            jenBuildLog.info("Received Junit report from server.... sessionId=" + s);
+            jenBuildLog.info("Saving it to " + junitReportPath);
+            saveReport(junitReportName, junitReport, workspace, jenBuildLog);
         }
     }
 

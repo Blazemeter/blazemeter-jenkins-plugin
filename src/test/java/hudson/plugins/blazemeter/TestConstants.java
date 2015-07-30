@@ -28,6 +28,7 @@ public interface TestConstants {
     String TEST_MASTER_140 ="testMaster-140";
     String TEST_MASTER_SUCCESS ="testMasterSuccess";
     String TEST_MASTER_FAILURE ="testMasterFailure";
+    String TEST_MASTER_ERROR ="testMasterError";
 
     String YAHOO="yahoo";
 }
