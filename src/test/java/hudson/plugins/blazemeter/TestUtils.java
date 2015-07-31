@@ -13,6 +13,7 @@ public class TestUtils {
     public String testId_jmeter="429381.jmeter";
     public String testId_followme="429381.followme";
     public String testId_multi="429381.multi";
+    public String testId_webdriver="429381.webdriver";
 
     @Test
     public void getTestType() throws Exception{
@@ -20,6 +21,7 @@ public class TestUtils {
         Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter));
         Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme));
         Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi));
+        Assert.assertEquals(TestType.webdriver, Utils.getTestType(testId_webdriver));
 
     }
 
