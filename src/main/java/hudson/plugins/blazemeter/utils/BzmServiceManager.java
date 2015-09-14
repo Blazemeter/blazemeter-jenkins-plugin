@@ -484,7 +484,7 @@ public class BzmServiceManager {
         Thread.sleep(30000);
         if(apiVersion.equals(ApiVersion.v3)&builder.isGetJtl()){
             AbstractBuild build=builder.getBuild();
-            FilePath jtlPath = new FilePath(build.getWorkspace().getParent(), "builds/" + build.getId());
+            FilePath jtlPath = new FilePath(build.getWorkspace(), build.getId());
             BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
