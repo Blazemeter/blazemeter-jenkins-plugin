@@ -253,6 +253,7 @@ public class BzmServiceManager {
                 + "/" + filePath.getName() + "/" + filename);
         try {
             if (!reportFile.exists()) {
+                FileUtils.forceMkdir(reportFile.getParentFile());
                 reportFile.createNewFile();
             }
             BufferedWriter out = new BufferedWriter(new FileWriter(reportFile));
@@ -448,24 +449,21 @@ public class BzmServiceManager {
         }
     }
 
-    public static void retrieveJUNITXMLreports(BlazemeterApi api, String masterId, FilePath workspace, StdErrLog jenBuildLog){
-        List<String> sessionsIds=api.getListOfSessionIds(masterId);
-        for(String s:sessionsIds){
+    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId, FilePath workspace, String buildNumber, StdErrLog jenBuildLog){
         String junitReport="";
-
-        jenBuildLog.info("Requesting JUNIT report from server, sessionId="+s);
+        jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
         try{
-            junitReport = api.retrieveJUNITXML(s);
+            junitReport = api.retrieveJUNITXML(masterId);
         } catch (Exception e) {
-            jenBuildLog.warn("Problems with receiving JUNIT report from server, sessionId=" + s + " " + e.getMessage());
+            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + " " + e.getMessage());
         }
-            String junitReportName = s + "-" + Constants.BM_TRESHOLDS;
-            String junitReportPath = workspace.getParent()
-                    + "/" + workspace.getName() + "/" + s + "-" + Constants.BM_TRESHOLDS;
-            jenBuildLog.info("Received Junit report from server.... sessionId=" + s);
-            jenBuildLog.info("Saving it to " + junitReportPath);
-            saveReport(junitReportName, junitReport, workspace, jenBuildLog);
-        }
+        String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
+        FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
+        String junitReportPath = workspace.getParent()
+                + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
+        jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
+        jenBuildLog.info("Saving it to " + junitReportPath);
+        saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
     }
 
     public static Result postProcess(PerformanceBuilder builder,String masterId) throws InterruptedException {
@@ -477,7 +475,8 @@ public class BzmServiceManager {
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
-            retrieveJUNITXMLreports(api,masterId,workspace,jenBuildLog);
+            String buildNumber=builder.getBuild().getId();
+            retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
             } else {
             jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
         }

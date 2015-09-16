@@ -203,7 +203,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String retrieveJUNITXML(String appKey, String userKey, String sessionId) {
+    public String retrieveJUNITXML(String appKey, String userKey, String masterId) {
         String retrieveJUNITXML=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -212,8 +212,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
             e.printStackTrace();
         }
 
-        retrieveJUNITXML= serverUrl +"/api/latest/sessions/"+sessionId+
-                "/reports/thresholds/data?format=junit&api_key="
+        retrieveJUNITXML= serverUrl +"/api/latest/masters/"+masterId+
+                "/reports/thresholds?format=junit&api_key="
                 +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return retrieveJUNITXML;

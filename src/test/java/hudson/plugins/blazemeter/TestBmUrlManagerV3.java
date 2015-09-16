@@ -131,18 +131,9 @@ public class TestBmUrlManagerV3 {
     }
 
     @Test
-    public void retrieveJUNITXML_tests(){
-        String expRetrieveJUNITXML=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+ masterId +
-                "/reports/thresholds/data?format=junit&api_key="
-                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actRetrieveJUNITXML=bmUrlManager.retrieveJUNITXML(appKey, userKey, masterId);
-        Assert.assertEquals(expRetrieveJUNITXML,actRetrieveJUNITXML);
-    }
-
-    @Test
-    public void retrieveJUNITXML_sessions(){
-        String expRetrieveJUNITXML=bmUrlManager.getServerUrl()+"/api/latest/sessions/"+ masterId +
-                "/reports/thresholds/data?format=junit&api_key="
+    public void retrieveJUNITXML(){
+        String expRetrieveJUNITXML=bmUrlManager.getServerUrl()+"/api/latest/masters/"+ masterId +
+                "/reports/thresholds?format=junit&api_key="
                 +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actRetrieveJUNITXML=bmUrlManager.retrieveJUNITXML(appKey, userKey, masterId);
         Assert.assertEquals(expRetrieveJUNITXML,actRetrieveJUNITXML);
