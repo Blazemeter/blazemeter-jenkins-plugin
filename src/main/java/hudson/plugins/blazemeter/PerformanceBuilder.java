@@ -106,6 +106,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+DESCRIPTOR.getBlazeMeterURL());
             return false;
         }
+        jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
         TestType testType= null;

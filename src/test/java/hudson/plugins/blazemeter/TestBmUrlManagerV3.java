@@ -35,7 +35,7 @@ public class TestBmUrlManagerV3 {
     @Test
     public void testStatus(){
         String expTestGetStatus=bmUrlManager.getServerUrl()+"/api/latest/masters/"
-                + masterId +"/status?api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+                + masterId +"/status?events=false&api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
         String actTestGetStatus=bmUrlManager.testMasterStatus(appKey, userKey, masterId);
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }

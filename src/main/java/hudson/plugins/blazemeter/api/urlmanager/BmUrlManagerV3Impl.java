@@ -30,7 +30,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStatus= serverUrl +"/api/latest/masters/"+masterId+"/status?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        testStatus= serverUrl +"/api/latest/masters/"+masterId+"/status?events=false&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
          return testStatus;
     }
 
