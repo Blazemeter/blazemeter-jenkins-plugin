@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
@@ -109,6 +110,9 @@ public class PerformanceBuilder extends Builder {
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
+        FilePath workspace=build.getWorkspace();
+        jenBuildLog.warn("Workspace path=" + workspace.getParent().getName()+"/"+workspace.getName());
+
         TestType testType= null;
         try {
             testType = Utils.getTestType(this.testId);

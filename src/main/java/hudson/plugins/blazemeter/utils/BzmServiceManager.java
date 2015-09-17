@@ -20,7 +20,11 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -459,6 +463,10 @@ public class BzmServiceManager {
         }
         String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
         FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
+        jenBuildLog.warn("workspace.getParent()="+workspace.getParent().getName());
+        jenBuildLog.warn("workspace.getName()="+workspace.getName());
+        jenBuildLog.warn("build number="+buildNumber);
+        jenBuildLog.warn("masterId=" + masterId);
         String junitReportPath = workspace.getParent()
                 + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
         jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
@@ -476,6 +484,7 @@ public class BzmServiceManager {
         FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
             String buildNumber=builder.getBuild().getId();
+            jenBuildLog.info("builder.getBuild().getId()="+builder.getBuild().getId());
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
             } else {
             jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
