@@ -13,6 +13,7 @@ import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -89,8 +90,11 @@ public class PerformanceBuilder extends Builder {
         this.build=build;
         jenBuildLog=new StdErrLog(Constants.BUILD_JEN);
         jenBuildLog.setStdErrStream(listener.getLogger());
-        File bzmLogFile = new File(build.getLogFile().getParentFile()+"/"+Constants.BZM_JEN_LOG);
+        String buildNumber=build.getEnvironment(listener).get("BUILD_NUMBER");
+        String bzmBuildLogPath=build.getLogFile().getParentFile().getParent()+"/"+buildNumber+"/"+Constants.BZM_JEN_LOG;
+        File bzmLogFile = new File(bzmBuildLogPath);
         if(!bzmLogFile.exists()){
+            FileUtils.forceMkdir(bzmLogFile.getParentFile());
             bzmLogFile.createNewFile();
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
@@ -112,7 +116,8 @@ public class PerformanceBuilder extends Builder {
         jenBuildLog.warn("User's e-mail="+userEmail);
         FilePath workspace=build.getWorkspace();
         jenBuildLog.warn("Workspace path=" + workspace.getParent().getName()+"/"+workspace.getName());
-
+        jenBuildLog.info("${BUILD_ID}="+build.getEnvironment(listener).get("BUILD_ID"));
+        jenBuildLog.info("${BUILD_NUMBER}="+buildNumber);
         TestType testType= null;
         try {
             testType = Utils.getTestType(this.testId);
@@ -155,7 +160,7 @@ public class PerformanceBuilder extends Builder {
 
         // add the report to the build object.
 
-        BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
+        BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
 
         try {
             BzmServiceManager.waitForFinish(this.api, this.apiVersion, testId_num,
@@ -163,7 +168,7 @@ public class PerformanceBuilder extends Builder {
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,masterId);
+            Result result = BzmServiceManager.postProcess(this,masterId,buildNumber);
 
             build.setResult(result);
 

@@ -236,12 +236,13 @@ public class BzmServiceManager {
 
     public static void publishReport(BlazemeterApi api, String masterId,
                                      AbstractBuild<?, ?> build,
+                                     String bzmBuildLogPath,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
 
         String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
         jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-        jenBuildLog.info("Blazemeter test log will be available at " + build.getLogFile().getParent() + "/" + Constants.BZM_JEN_LOG);
+        jenBuildLog.info("Blazemeter test log will be available at " + bzmBuildLogPath);
 
         PerformanceBuildAction a = new PerformanceBuildAction(build);
         a.setReportUrl(reportUrl);
@@ -339,8 +340,9 @@ public class BzmServiceManager {
     }
 
     public static void downloadJtlReport(BlazemeterApi api, String sessionId, FilePath filePath,
-                                          StdErrLog jenBuildLog,
-                                          StdErrLog bzmBuildLog) {
+                                         String buildNumber,
+                                         StdErrLog jenBuildLog,
+                                         StdErrLog bzmBuildLog) {
 
         JSONObject jo=api.retrieveJtlZip(sessionId);
         String dataUrl=null;
@@ -355,7 +357,7 @@ public class BzmServiceManager {
                 }
             }
             File jtlZip=new File(filePath.getParent()
-                    + "/" + filePath.getName() + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
+                    + "/" + buildNumber + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
 
             if(!dataUrl.contains("amazonaws")){
                 url=new URL(dataUrl+"?api_key="+api.getApiKey());
@@ -389,11 +391,11 @@ public class BzmServiceManager {
     }
 
     public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
-                                          StdErrLog jenBuildLog,
+                                          String buildNumber, StdErrLog jenBuildLog,
                                           StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
-            downloadJtlReport(api, s, filePath, jenBuildLog, bzmBuildLog);
+            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
         }
     }
 
@@ -474,7 +476,7 @@ public class BzmServiceManager {
         saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
     }
 
-    public static Result postProcess(PerformanceBuilder builder,String masterId) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
@@ -483,8 +485,6 @@ public class BzmServiceManager {
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
-            String buildNumber=builder.getBuild().getId();
-            jenBuildLog.info("builder.getBuild().getId()="+builder.getBuild().getId());
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
             } else {
             jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
@@ -493,7 +493,7 @@ public class BzmServiceManager {
         if(apiVersion.equals(ApiVersion.v3)&builder.isGetJtl()){
             AbstractBuild build=builder.getBuild();
             FilePath jtlPath = new FilePath(build.getWorkspace(), build.getId());
-            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
+            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, buildNumber, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
         }
