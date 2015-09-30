@@ -20,11 +20,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -465,8 +461,6 @@ public class BzmServiceManager {
         }
         String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
         FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
-        jenBuildLog.warn("workspace.getParent()="+workspace.getParent().getName());
-        jenBuildLog.warn("workspace.getName()="+workspace.getName());
         jenBuildLog.warn("build number="+buildNumber);
         jenBuildLog.warn("masterId=" + masterId);
         String junitReportPath = workspace.getParent()

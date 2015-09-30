@@ -114,10 +114,6 @@ public class PerformanceBuilder extends Builder {
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
-        FilePath workspace=build.getWorkspace();
-        jenBuildLog.warn("Workspace path=" + workspace.getParent().getName()+"/"+workspace.getName());
-        jenBuildLog.info("${BUILD_ID}="+build.getEnvironment(listener).get("BUILD_ID"));
-        jenBuildLog.info("${BUILD_NUMBER}="+buildNumber);
         TestType testType= null;
         try {
             testType = Utils.getTestType(this.testId);
