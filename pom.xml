@@ -8,15 +8,15 @@
     </parent>
 
     <properties>
-        <jenkins.build.number />
-        <jenkins.git.commit />
+        <jenkins.build.number></jenkins.build.number>
+        <jenkins.git.commit></jenkins.git.commit>
     </properties>
 
 
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>2.1</version>
+    <version>2.1.${jenkins.build.number}-${jenkins.git.commit}-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -39,7 +39,7 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-      <tag>BlazeMeterJenkinsPlugin-2.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <licenses>
