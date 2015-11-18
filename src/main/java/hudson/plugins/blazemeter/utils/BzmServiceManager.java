@@ -560,7 +560,7 @@ public class BzmServiceManager {
         BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
         try{
         net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
-        if (user.has("error")) {
+        if (user.has("error")&&!user.get("error").equals(null)) {
             return FormValidation.errorWithMarkup("Invalid user key. Error - "+user.get("error").toString());
         } else {
             return FormValidation.ok("User Key Valid. Email - "+user.getString("mail"));
