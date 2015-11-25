@@ -16,7 +16,7 @@ public interface TestConstants {
     String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
     String MOCKED_USER_KEY_INVALID ="mockedAPIKeyInValid";
     String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
-    int mockedApiPort=2234;
+    int mockedApiPort=2222;
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
