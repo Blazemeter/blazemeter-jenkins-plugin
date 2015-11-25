@@ -172,7 +172,7 @@ public class PerformanceBuilder extends Builder {
         } catch (Exception e){
             jenCommonLog.warn("Test execution was interrupted or network connection is broken: ", e);
             jenBuildLog.warn("Test execution was interrupted or network connection is broken: check test state on server");
-//            return true;
+            return false;
         }
 
         finally {
@@ -182,17 +182,12 @@ public class PerformanceBuilder extends Builder {
                 bzmBuildLog.info("Shutting down test");
                 BzmServiceManager.stopTestSession(this.api, masterId, jenBuildLog);
                 build.setResult(Result.ABORTED);
-                return false;
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
                 bzmBuildLog.warn("Test not found error");
-                return false;
             } else if (testStatus.equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
-                return false;
-            } else{
-                return true;
             }
         }
     }
