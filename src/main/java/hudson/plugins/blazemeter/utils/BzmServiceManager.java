@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
  * Created by dzmitrykashlach on 18/11/14.
  */
 public class BzmServiceManager {
+    private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final static int BUFFER_SIZE = 2048;
     private final static String ZIP_EXTENSION = ".zip";
     private BzmServiceManager() {
@@ -54,26 +55,6 @@ public class BzmServiceManager {
             }
     }
 
-/*
-
-    public static JSONObject updateTestConfiguration(BlazemeterApi api,
-                                                     String testId,
-                                                     String testDuration,
-                                                     StdErrLog bzmBuildLog) {
-        JSONObject updateResult = null;
-        try {
-            JSONObject result = null;
-
-            if (testDuration != null && !testDuration.isEmpty()) {
-                updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
-            }
-        }catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while updating test: ", e);
-        }
-        return updateResult;
-    }
-
-*/
 
     public static JSONObject updateTestDuration(BlazemeterApi api,
                                           String testId,
@@ -161,37 +142,6 @@ public class BzmServiceManager {
                 return reportUrl;
         }
     }
-/*
-
-    public static String prepareTestRun(PerformanceBuilder builder) {
-        BlazemeterApi api = builder.getApi();
-        StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
-        StdErrLog jenBuildLog = builder.getJenBuildLog();
-        String testId = builder.getTestId();
-        try {
-                JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),bzmBuildLog);
-                if(updateResult!=null&&updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
-                    jenBuildLog.warn("Failed to update test with JSON configuration");
-                    jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
-                    testId="";
-                }else{
-                    jenBuildLog.info("Test " + testId + " was started on server");
-                    }
-        } catch (JSONException je) {
-            jenBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
-            bzmBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
-            testId="";
-        } catch (Exception e){
-            jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
-            bzmBuildLog.info("Unknown error while preparing test for execution: " + e.getMessage());
-            testId="";
-        }
-
-        finally {
-            return testId;
-        }
-    }
-*/
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
         String fileName = file.getName();
@@ -556,18 +506,31 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey,String blazeMeterUrl){
-        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
-        try{
-        net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
-        if (user.has("error")&&!user.get("error").equals(null)) {
-            return FormValidation.errorWithMarkup("Invalid user key. Error - "+user.get("error").toString());
-        } else {
-            return FormValidation.ok("User Key Valid. Email - "+user.getString("mail"));
+    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
+        try {
+            logger.info("Validating user-key started: user-key=" + userKey);
+            BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
+            logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
+            JSONObject u = bzm.getUser();
+            net.sf.json.JSONObject user = null;
+            if (u!= null) {
+                user = net.sf.json.JSONObject.fromObject(u.toString());
+                if (user.has("error") && !user.get("error").equals(null)) {
+                    logger.warn("UserKey is not valid: error=" + user.get("error").toString());
+                    logger.warn("User profile: "+user.toString());
+                    return FormValidation.errorWithMarkup("UserKey is not valid: error=" + user.get("error").toString());
+                } else {
+                    logger.warn("UserKey is valid: user e-mail=" + user.getString("mail"));
+                    return FormValidation.ok("User Key Valid. Email - " + user.getString("mail"));
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("UserKey is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn(e);
+            return FormValidation.errorWithMarkup("UserKey is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        }catch (Exception e){
-            return FormValidation.errorWithMarkup("Invalid user key. Unknown error");
-        }
+        logger.warn("UserKey is not valid: userKey="+userKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        return FormValidation.error("UserKey is not valid: userKey="+userKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl){
