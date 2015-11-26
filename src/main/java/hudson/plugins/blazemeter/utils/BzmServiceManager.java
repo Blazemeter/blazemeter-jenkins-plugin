@@ -507,8 +507,9 @@ public class BzmServiceManager {
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
+        String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
-            logger.info("Validating user-key started: user-key=" + userKey);
+            logger.info("Validating user-key started: user-key=" + encryptedKey);
             BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
@@ -529,8 +530,8 @@ public class BzmServiceManager {
             logger.warn(e);
             return FormValidation.errorWithMarkup("UserKey is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        logger.warn("UserKey is not valid: userKey="+userKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
-        return FormValidation.error("UserKey is not valid: userKey="+userKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        logger.warn("UserKey is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        return FormValidation.error("UserKey is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl){
