@@ -446,17 +446,11 @@ public class BzmServiceManager {
 
 
         //get testGetArchive information
-        JSONObject testReport=null;
-        try{
-            testReport = api.testReport(masterId);
-        }catch (Exception e){
-            jenBuildLog.info("Failed to get test report from server.");
-        }
+        JSONObject testReport=requestAggregateReport(api,jenBuildLog,masterId);
 
 
         if (testReport == null || testReport.equals("null")) {
-            jenBuildLog.warn("Requesting aggregate is not available. " +
-                    "Build won't be validated against local tresholds");
+            jenBuildLog.warn("Requesting aggregate is not available after 4 attempts.");
             return result;
         }
         TestResult testResult = null;
@@ -476,6 +470,32 @@ public class BzmServiceManager {
 
     }
 
+
+    public static JSONObject requestAggregateReport(BlazemeterApi api,StdErrLog jenBuildLog,String masterId){
+        JSONObject testReport=null;
+        int retries=0;
+        while(testReport==null||retries<4){
+            try{
+                jenBuildLog.info("");
+                testReport = api.testReport(masterId);
+                if(testReport!=null){
+                    return testReport;
+                }
+            }catch (Exception e){
+                jenBuildLog.info("Failed to get test report from server.");
+            }finally {
+                try {
+                    Thread.sleep(5000);
+                    testReport = api.testReport(masterId);
+                } catch (InterruptedException e) {
+                    jenBuildLog.info("Delay was interrupted during requesting aggregate report");
+                }finally {
+                    retries++;
+                }
+            }
+        }
+        return testReport;
+    }
 
     public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
