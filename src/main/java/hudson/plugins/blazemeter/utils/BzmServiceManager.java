@@ -520,6 +520,10 @@ public class BzmServiceManager {
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
+        if(userKey.isEmpty()){
+            logger.warn("UserKey is empty: please, enter valid userKey");
+            return FormValidation.errorWithMarkup("UserKey is empty: please, enter valid userKey");
+        }
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
             logger.info("Validating user-key started: user-key=" + encryptedKey);
