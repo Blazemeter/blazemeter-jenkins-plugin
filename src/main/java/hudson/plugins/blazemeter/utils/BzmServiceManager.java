@@ -221,13 +221,13 @@ public class BzmServiceManager {
     public static Result validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
         Result result;
         JSONObject jo;
-        boolean success=true;
+        boolean success=false;
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
             jo=api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            success=!jo.getString(JsonConstants.STATUS).equals(JsonConstants.FAILURE);
+            success=jo.getString(JsonConstants.STATUS).equals(JsonConstants.SUCCESS);
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
@@ -240,12 +240,12 @@ public class BzmServiceManager {
         jenBuildLog.info("Validating test status: " + (success ? "PASSED" : "FAILED") + "\n");
 
         result = success?Result.SUCCESS:Result.FAILURE;
-        if(result.equals(Result.FAILURE)){
-            jenBuildLog.info("Having failure while test status validation....");
-            jenBuildLog.info("Failures: "+failures.toString());
+        if(result.equals(Result.SUCCESS)){
+            jenBuildLog.info("Setting SUCCESS for build after test status validation...");
             return result;
         }else{
-            jenBuildLog.info("Setting SUCCESS for build after test status validation...");
+            jenBuildLog.info("Having errors/failure while test status validation....");
+            jenBuildLog.info("Failures: "+failures.toString());
             jenBuildLog.info("Errors: "+errors.toString());
         }
         return result;
@@ -450,7 +450,7 @@ public class BzmServiceManager {
 
 
         if (testReport == null || testReport.equals("null")) {
-            jenBuildLog.warn("Requesting aggregate is not available after 4 attempts.");
+            jenBuildLog.warn("Aggregate report is not available after 4 attempts.");
             return result;
         }
         TestResult testResult = null;
@@ -473,26 +473,19 @@ public class BzmServiceManager {
 
     public static JSONObject requestAggregateReport(BlazemeterApi api,StdErrLog jenBuildLog,String masterId){
         JSONObject testReport=null;
-        int retries=0;
-        while(testReport==null||retries<4){
-            try{
-                jenBuildLog.info("");
+        int retries = 1;
+        try {
+            while (retries < 5 && testReport == null) {
+                jenBuildLog.info("Trying to get aggregate test report from server, attempt# "+retries);
                 testReport = api.testReport(masterId);
-                if(testReport!=null){
+                if (testReport != null) {
                     return testReport;
                 }
-            }catch (Exception e){
-                jenBuildLog.info("Failed to get test report from server.");
-            }finally {
-                try {
-                    Thread.sleep(5000);
-                    testReport = api.testReport(masterId);
-                } catch (InterruptedException e) {
-                    jenBuildLog.info("Delay was interrupted during requesting aggregate report");
-                }finally {
-                    retries++;
-                }
+                Thread.sleep(5000);
+                retries++;
             }
+        } catch (Exception e) {
+            jenBuildLog.info("Failed to get test report from server.");
         }
         return testReport;
     }

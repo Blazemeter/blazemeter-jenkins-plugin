@@ -186,6 +186,6 @@ public class TestBzmServiceManager {
     public void getCIStatus_error(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR, stdErrLog);
-        Assert.assertEquals(Result.SUCCESS,result);
+        Assert.assertEquals(Result.FAILURE,result);
     }
 }
