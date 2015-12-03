@@ -187,8 +187,8 @@ public class BzmServiceManager {
                                      StdErrLog bzmBuildLog){
 
         String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
-        jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-        jenBuildLog.info("Blazemeter test log will be available at " + bzmBuildLogPath);
+        jenBuildLog.info("BlazeMeter test report will be available at " + reportUrl);
+        jenBuildLog.info("BlazeMeter test log will be available at " + bzmBuildLogPath);
 
         PerformanceBuildAction a = new PerformanceBuildAction(build);
         a.setReportUrl(reportUrl);

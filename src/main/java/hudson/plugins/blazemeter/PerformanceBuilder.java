@@ -136,7 +136,7 @@ public class PerformanceBuilder extends Builder {
 
 //        bzmBuildLog.info("Expected test duration=" + this.testDuration);
         String masterId="";
-        bzmBuildLog.info("### About to start Blazemeter test # " + testId_num);
+        bzmBuildLog.info("### About to start BlazeMeter test # " + testId_num);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
