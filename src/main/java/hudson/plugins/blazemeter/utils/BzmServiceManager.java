@@ -112,8 +112,8 @@ public class BzmServiceManager {
             }
 
             if (Thread.interrupted()) {
-                bzmBuildLog.info("Test was interrupted: throwing Interrupted Exception");
-                throw new InterruptedException();
+                bzmBuildLog.info("Job was stopped by user");
+                throw new InterruptedException("Job was stopped by user");
             }
         }
     }

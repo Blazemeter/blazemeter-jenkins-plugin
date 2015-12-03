@@ -170,9 +170,12 @@ public class PerformanceBuilder extends Builder {
             build.setResult(result);
 
             return true;
-        } catch (Exception e){
-            jenCommonLog.warn("Test execution was interrupted or network connection is broken: ", e);
-            jenBuildLog.warn("Test execution was interrupted or network connection is broken: check test state on server");
+        } catch (InterruptedException e){
+            jenBuildLog.warn("Job was stopped by user");
+            return true;
+        }
+            catch (Exception e){
+            jenBuildLog.warn("Job was stopped due to unknown reason", e);
             return false;
         }
 
@@ -180,12 +183,12 @@ public class PerformanceBuilder extends Builder {
             TestStatus testStatus = this.api.getTestStatus(apiVersion.equals("v2") ? testId : masterId);
 
             if (testStatus.equals(TestStatus.Running)) {
-                bzmBuildLog.info("Shutting down test");
+                jenBuildLog.info("Shutting down test");
                 BzmServiceManager.stopTestSession(this.api, masterId, jenBuildLog);
                 build.setResult(Result.ABORTED);
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
-                bzmBuildLog.warn("Test not found error");
+                jenBuildLog.warn("Test not found error");
             } else if (testStatus.equals(TestStatus.Error)) {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
