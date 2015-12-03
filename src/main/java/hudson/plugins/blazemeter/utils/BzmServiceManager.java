@@ -521,8 +521,8 @@ public class BzmServiceManager {
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
         if(userKey.isEmpty()){
-            logger.warn("API key is empty: please, enter valid API key");
-            return FormValidation.errorWithMarkup("UserKey is empty: please, enter valid userKey");
+            logger.warn(Constants.API_KEY_EMPTY);
+            return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
         }
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
