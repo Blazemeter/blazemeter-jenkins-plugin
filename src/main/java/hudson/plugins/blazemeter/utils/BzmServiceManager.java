@@ -425,10 +425,14 @@ public class BzmServiceManager {
         //get tresholds from server and check if test is success
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
-        Result result = Result.SUCCESS;
+        Result result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
+        if(result.equals(Result.FAILURE)){
+            jenBuildLog.warn("Test was failed on server: reports won't be downloaded.");
+            return result;
+        }
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
-        if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
+        if(apiVersion.equals(ApiVersion.v3) & builder.isGetJunit()) {
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
             } else {
             jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
@@ -441,7 +445,6 @@ public class BzmServiceManager {
         } else {
             jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
         }
-        result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
 
 
 
@@ -454,7 +457,6 @@ public class BzmServiceManager {
             return result;
         }
         TestResult testResult = null;
-        Result localTresholdsResult=null;
         try {
             testResult = new TestResult(testReport);
             jenBuildLog.info(testResult.toString());
@@ -465,7 +467,7 @@ public class BzmServiceManager {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
         }finally{
-            return localTresholdsResult!=null?localTresholdsResult:result;
+            return result;
         }
 
     }
