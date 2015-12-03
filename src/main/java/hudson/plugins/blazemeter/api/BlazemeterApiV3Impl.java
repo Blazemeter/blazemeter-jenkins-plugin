@@ -153,7 +153,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public synchronized String startTest(String testId,TestType testType) throws JSONException{
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
-        logger.info("StartTest: calling urlManager with parameters: APP_KEY="+APP_KEY+" apiKey="+apiKey+" testId="+testId);
         String url="";
         switch (testType){
             case multi:
@@ -163,7 +162,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                 url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
         JSONObject jo=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.POST);
-        logger.info("StartTest: Received JSON:"+jo.toString());
         JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
         return  result.getString(JsonConstants.ID);
     }
@@ -221,14 +219,22 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
         String url = this.urlManager.testReport(APP_KEY, apiKey, reportId);
         JSONObject summary = null;
+        JSONObject result=null;
         try {
-            summary = (JSONObject) this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET).getJSONObject(JsonConstants.RESULT)
-                    .getJSONArray("summary")
+            result=this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET).getJSONObject(JsonConstants.RESULT);
+            summary = (JSONObject) result.getJSONArray("summary")
                     .get(0);
         } catch (JSONException je) {
-            logger.warn("Error while parsing summary :", je);
+            logger.warn("Aggregate report(result object): "+result);
+            logger.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
+                    "is valid/not empty.",je);
+        }catch (Exception e) {
+            logger.warn("Aggregate report(result object): "+result);
+            logger.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
+                    "is valid/not empty.",e);
+        }finally {
+            return summary;
         }
-        return summary;
     }
     @Override
     public LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException {
