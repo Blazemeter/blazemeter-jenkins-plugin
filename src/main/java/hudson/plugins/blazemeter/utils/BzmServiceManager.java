@@ -521,12 +521,12 @@ public class BzmServiceManager {
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
         if(userKey.isEmpty()){
-            logger.warn("UserKey is empty: please, enter valid userKey");
+            logger.warn("API key is empty: please, enter valid API key");
             return FormValidation.errorWithMarkup("UserKey is empty: please, enter valid userKey");
         }
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
-            logger.info("Validating user-key started: user-key=" + encryptedKey);
+            logger.info("Validating API key started: API key=" + encryptedKey);
             BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
@@ -534,21 +534,21 @@ public class BzmServiceManager {
             if (u!= null) {
                 user = net.sf.json.JSONObject.fromObject(u.toString());
                 if (user.has("error") && !user.get("error").equals(null)) {
-                    logger.warn("UserKey is not valid: error=" + user.get("error").toString());
+                    logger.warn("API key is not valid: error=" + user.get("error").toString());
                     logger.warn("User profile: "+user.toString());
-                    return FormValidation.errorWithMarkup("UserKey is not valid: error=" + user.get("error").toString());
+                    return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get("error").toString());
                 } else {
-                    logger.warn("UserKey is valid: user e-mail=" + user.getString("mail"));
-                    return FormValidation.ok("User Key Valid. Email - " + user.getString("mail"));
+                    logger.warn("API key is valid: user e-mail=" + user.getString("mail"));
+                    return FormValidation.ok("API key Valid. Email - " + user.getString("mail"));
                 }
             }
         } catch (Exception e) {
-            logger.warn("UserKey is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
             logger.warn(e);
-            return FormValidation.errorWithMarkup("UserKey is not valid: unexpected exception=" + e.getMessage().toString());
+            return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        logger.warn("UserKey is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
-        return FormValidation.error("UserKey is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl){
