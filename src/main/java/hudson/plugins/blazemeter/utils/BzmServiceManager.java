@@ -312,7 +312,7 @@ public class BzmServiceManager {
             }
 
             FileUtils.copyURLToFile(url, jtlZip);
-            jenBuildLog.info("Downloading JTLZIP from " + url);
+            jenBuildLog.info("Downloading JTLZIP .... ");
             String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
             jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
             unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), jenBuildLog);

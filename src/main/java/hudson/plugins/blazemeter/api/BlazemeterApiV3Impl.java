@@ -244,7 +244,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             return null;
         } else {
             String url = this.urlManager.getTests(APP_KEY, apiKey);
-            logger.info("Getting testList with URL=" + url);
+            logger.info("Getting testList with URL=" + url.substring(0,url.indexOf("?")+14));
             try {
                 JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
                 JSONArray result = null;
@@ -350,10 +350,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public JSONObject retrieveJtlZip(String sessionId) {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(sessionId)) return null;
-        logger.info("Trying to get JTLZIP url with the following parameters: APP_KEY="+APP_KEY+" apiKey="
-                +apiKey+" sessionId="+sessionId);
+        logger.info("Trying to get JTLZIP url for the sessionId="+sessionId);
         String url = this.urlManager.retrieveJTLZIP(APP_KEY, apiKey, sessionId);
-        logger.info("Trying to retrieve JTLZIP json with the following url: "+url);
+        logger.info("Trying to retrieve JTLZIP json for the sessionId="+sessionId);
         JSONObject jtlzip = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         return jtlzip;
     }
@@ -412,7 +411,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     @Override
     public JSONObject getTestsJSON() {
         String url = this.urlManager.getTests(APP_KEY, apiKey);
-        logger.info("Getting testList with URL=" + url);
+        logger.info("Getting testList with URL=" + url.substring(0,url.indexOf("?")+14));
         JSONObject jo = this.bzmhc.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
         return jo;
     }

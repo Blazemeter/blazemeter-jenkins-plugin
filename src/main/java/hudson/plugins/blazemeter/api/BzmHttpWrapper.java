@@ -40,7 +40,7 @@ public class BzmHttpWrapper {
     public HttpResponse getHttpResponse(String url, JSONObject data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
-            logger.debug("Requesting : " + url);
+            logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
         HttpResponse response = null;
         HttpRequestBase request = null;
 
@@ -81,7 +81,7 @@ public class BzmHttpWrapper {
 
     public HttpResponse getFileUploadHttpResponse(String url, File file) throws IOException {
         if(logger.isDebugEnabled())
-            logger.debug("Requesting : " + url);
+            logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
         HttpResponse response = null;
 
         try {
