@@ -134,7 +134,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                 if (result.has("status")&&!result.getString("status").equals("ENDED")) {
                     testStatus=TestStatus.Running;
                 } else {
-                    logger.info("Test is not running. Quiting job...");
+                    logger.info("Test is not running on server");
                      if(result.has("errors")&&!result.get("errors").equals(JSONObject.NULL)){
                          logger.debug("Error received from server: "+result.get("errors").toString());
                          testStatus=TestStatus.Error;

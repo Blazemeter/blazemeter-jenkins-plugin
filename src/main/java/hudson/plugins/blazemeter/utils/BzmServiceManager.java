@@ -426,10 +426,10 @@ public class BzmServiceManager {
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
         Result result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
-        if(result.equals(Result.FAILURE)){
+        /*if(result.equals(Result.FAILURE)){
             jenBuildLog.warn("Test was failed on server: reports won't be downloaded.");
             return result;
-        }
+        }*/
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3) & builder.isGetJunit()) {
