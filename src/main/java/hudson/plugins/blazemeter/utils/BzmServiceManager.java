@@ -7,6 +7,7 @@ import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
@@ -218,37 +219,38 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
-        Result result;
+    public static CIStatus validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
+        CIStatus ciStatus=CIStatus.success;
         JSONObject jo;
-        boolean success=false;
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
             jo=api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            success=jo.getString(JsonConstants.STATUS).equals(JsonConstants.SUCCESS);
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
+            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
-            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
+            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+        }finally {
+            if(errors.length()>0){
+                jenBuildLog.info("Having errors while test status validation...");
+                jenBuildLog.info("Errors: " + errors.toString());
+                ciStatus=CIStatus.errors;
+                jenBuildLog.info("Setting CIStatus="+CIStatus.errors.name());
+                return ciStatus;
+            }
+            if(failures.length()>0){
+                jenBuildLog.info("Having failures while test status validation...");
+                jenBuildLog.info("Failures: " + failures.toString());
+                ciStatus=CIStatus.failures;
+                jenBuildLog.info("Setting CIStatus="+CIStatus.failures.name());
+                return ciStatus;
+            }
+            jenBuildLog.info("No errors/failures while validating CIStatus: setting "+CIStatus.success.name());
         }
-        jenBuildLog.info("Validating test status: " + (success ? "PASSED" : "FAILED") + "\n");
-
-        result = success?Result.SUCCESS:Result.FAILURE;
-        if(result.equals(Result.SUCCESS)){
-            jenBuildLog.info("Setting SUCCESS for build after test status validation...");
-            return result;
-        }else{
-            jenBuildLog.info("Having errors/failure while test status validation....");
-            jenBuildLog.info("Failures: "+failures.toString());
-            jenBuildLog.info("Errors: "+errors.toString());
-        }
-        return result;
+        return ciStatus;
     }
 
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
@@ -423,13 +425,15 @@ public class BzmServiceManager {
     public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
+        Result result;
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
-        Result result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
-        /*if(result.equals(Result.FAILURE)){
-            jenBuildLog.warn("Test was failed on server: reports won't be downloaded.");
+        CIStatus ciStatus = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
+        if(ciStatus.equals(CIStatus.errors)){
+            result=Result.FAILURE;
             return result;
-        }*/
+        }
+        result=ciStatus.equals(CIStatus.failures)?Result.FAILURE:Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
         if(apiVersion.equals(ApiVersion.v3) & builder.isGetJunit()) {

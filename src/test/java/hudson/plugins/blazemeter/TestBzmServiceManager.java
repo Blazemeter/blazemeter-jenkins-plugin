@@ -4,6 +4,7 @@ import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
@@ -182,21 +183,21 @@ public class TestBzmServiceManager {
     @Test
     public void getCIStatus_success(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog);
-        Assert.assertEquals(Result.SUCCESS,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog);
+        Assert.assertEquals(CIStatus.success,ciStatus);
     }
 
     @Test
     public void getCIStatus_failure(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog);
-        Assert.assertEquals(Result.FAILURE,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog);
+        Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
     @Test
     public void getCIStatus_error(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR, stdErrLog);
-        Assert.assertEquals(Result.FAILURE,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR, stdErrLog);
+        Assert.assertEquals(CIStatus.errors,ciStatus);
     }
 }
