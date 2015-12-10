@@ -54,6 +54,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by config.jelly to display the test list.
     public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter String apiVersion) throws FormValidation {
+        if(apiKey.isEmpty()){
+            ListBoxModel keys=getKeys();
+            apiKey=keys.get(0).value;
+
+        }
         ListBoxModel items = new ListBoxModel();
         if (apiKey == null) {
             items.add(Constants.NO_API_KEY, "-1");
@@ -61,7 +66,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
-            BlazemeterApi api = APIFactory.getAPI(apiKey, ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
+            BlazemeterApi api = APIFactory.getAPI(apiKey,
+                    apiVersion.isEmpty()?ApiVersion.v3:ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
@@ -95,20 +101,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
-        ListBoxModel items = new ListBoxModel();
-        Set<String> apiKeys = new HashSet<String>();
+        ListBoxModel items = getKeys();
 
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
-                items.add(new ListBoxModel.Option(c.getDescription(),
-                        c.getId(),
-                        false));
-                apiKeys.add(id);
-            }
-        }
         Iterator<ListBoxModel.Option> iterator=items.iterator();
         while(iterator.hasNext()){
             ListBoxModel.Option option=iterator.next();
@@ -150,6 +144,24 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return FormValidation.warning("Default value will be fetched from server");
         }
         return FormValidation.ok();
+    }
+
+    public ListBoxModel getKeys(){
+        ListBoxModel items = new ListBoxModel();
+        Set<String> apiKeys = new HashSet<String>();
+
+        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+        for (BlazemeterCredential c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+            String id = c.getId();
+            if (!apiKeys.contains(id)) {
+                items.add(new ListBoxModel.Option(c.getDescription(),
+                        c.getId(),
+                        false));
+                apiKeys.add(id);
+            }
+        }
+        return items;
     }
 
 

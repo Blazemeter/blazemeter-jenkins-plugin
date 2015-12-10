@@ -17,5 +17,6 @@ public interface Constants {
     String NO_API_KEY="No API Key";
     String MINUS_ONE="-1";
     String UNKNOWN_TYPE="unknown_type";
+    String API_KEY_EMPTY ="API key is empty: please, enter valid API key";
 
 }

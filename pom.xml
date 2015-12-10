@@ -8,8 +8,7 @@
     </parent>
 
     <properties>
-        <jenkins.build.number />
-        <jenkins.git.commit />
+        <jenkins.build.number></jenkins.build.number>
     </properties>
 
 

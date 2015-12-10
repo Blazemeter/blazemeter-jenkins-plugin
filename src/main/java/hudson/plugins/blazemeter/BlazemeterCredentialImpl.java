@@ -7,9 +7,7 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
-import org.eclipse.jetty.util.log.AbstractLogger;
-import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -27,7 +25,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
      * Ensure consistent serialization.
      */
     private static final long serialVersionUID = 1L;
-    private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
+    private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
     //private final Secret apiKey;
     private final String apiKey;

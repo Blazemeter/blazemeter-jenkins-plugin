@@ -7,6 +7,7 @@ import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
@@ -28,6 +29,7 @@ import java.util.zip.ZipFile;
  * Created by dzmitrykashlach on 18/11/14.
  */
 public class BzmServiceManager {
+    private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final static int BUFFER_SIZE = 2048;
     private final static String ZIP_EXTENSION = ".zip";
     private BzmServiceManager() {
@@ -54,26 +56,6 @@ public class BzmServiceManager {
             }
     }
 
-/*
-
-    public static JSONObject updateTestConfiguration(BlazemeterApi api,
-                                                     String testId,
-                                                     String testDuration,
-                                                     StdErrLog bzmBuildLog) {
-        JSONObject updateResult = null;
-        try {
-            JSONObject result = null;
-
-            if (testDuration != null && !testDuration.isEmpty()) {
-                updateResult = updateTestDuration(api, testId, testDuration, bzmBuildLog);
-            }
-        }catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while updating test: ", e);
-        }
-        return updateResult;
-    }
-
-*/
 
     public static JSONObject updateTestDuration(BlazemeterApi api,
                                           String testId,
@@ -131,8 +113,8 @@ public class BzmServiceManager {
             }
 
             if (Thread.interrupted()) {
-                bzmBuildLog.info("Test was interrupted: throwing Interrupted Exception");
-                throw new InterruptedException();
+                bzmBuildLog.info("Job was stopped by user");
+                throw new InterruptedException("Job was stopped by user");
             }
         }
     }
@@ -161,37 +143,6 @@ public class BzmServiceManager {
                 return reportUrl;
         }
     }
-/*
-
-    public static String prepareTestRun(PerformanceBuilder builder) {
-        BlazemeterApi api = builder.getApi();
-        StdErrLog bzmBuildLog = PerformanceBuilder.getBzmBuildLog();
-        StdErrLog jenBuildLog = builder.getJenBuildLog();
-        String testId = builder.getTestId();
-        try {
-                JSONObject updateResult= updateTestConfiguration(api, testId, builder.getTestDuration(),bzmBuildLog);
-                if(updateResult!=null&&updateResult.has(JsonConstants.ERROR)&&!updateResult.get(JsonConstants.ERROR).equals(null)){
-                    jenBuildLog.warn("Failed to update test with JSON configuration");
-                    jenBuildLog.warn("Error:"+updateResult.getString(JsonConstants.ERROR));
-                    testId="";
-                }else{
-                    jenBuildLog.info("Test " + testId + " was started on server");
-                    }
-        } catch (JSONException je) {
-            jenBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
-            bzmBuildLog.info("Failed to prepare test configuration : " + je.getMessage());
-            testId="";
-        } catch (Exception e){
-            jenBuildLog.info("Unknown error while preparing test for execution: " +e.getMessage());
-            bzmBuildLog.info("Unknown error while preparing test for execution: " + e.getMessage());
-            testId="";
-        }
-
-        finally {
-            return testId;
-        }
-    }
-*/
 
     public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
         String fileName = file.getName();
@@ -237,8 +188,8 @@ public class BzmServiceManager {
                                      StdErrLog bzmBuildLog){
 
         String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
-        jenBuildLog.info("Blazemeter test report will be available at " + reportUrl);
-        jenBuildLog.info("Blazemeter test log will be available at " + bzmBuildLogPath);
+        jenBuildLog.info("BlazeMeter test report will be available at " + reportUrl);
+        jenBuildLog.info("BlazeMeter test log will be available at " + bzmBuildLogPath);
 
         PerformanceBuildAction a = new PerformanceBuildAction(build);
         a.setReportUrl(reportUrl);
@@ -268,37 +219,38 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
-        Result result;
+    public static CIStatus validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
+        CIStatus ciStatus=CIStatus.success;
         JSONObject jo;
-        boolean success=true;
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
             jo=api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            success=!jo.getString(JsonConstants.STATUS).equals(JsonConstants.FAILURE);
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
+            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
-            jenBuildLog.warn("No tresholds on server: setting SUCCESS for build ");
-            success=true;
+            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+        }finally {
+            if(errors.length()>0){
+                jenBuildLog.info("Having errors while test status validation...");
+                jenBuildLog.info("Errors: " + errors.toString());
+                ciStatus=CIStatus.errors;
+                jenBuildLog.info("Setting CIStatus="+CIStatus.errors.name());
+                return ciStatus;
+            }
+            if(failures.length()>0){
+                jenBuildLog.info("Having failures while test status validation...");
+                jenBuildLog.info("Failures: " + failures.toString());
+                ciStatus=CIStatus.failures;
+                jenBuildLog.info("Setting CIStatus="+CIStatus.failures.name());
+                return ciStatus;
+            }
+            jenBuildLog.info("No errors/failures while validating CIStatus: setting "+CIStatus.success.name());
         }
-        jenBuildLog.info("Validating test status: " + (success ? "PASSED" : "FAILED") + "\n");
-
-        result = success?Result.SUCCESS:Result.FAILURE;
-        if(result.equals(Result.FAILURE)){
-            jenBuildLog.info("Having failure while test status validation....");
-            jenBuildLog.info("Failures: "+failures.toString());
-            return result;
-        }else{
-            jenBuildLog.info("Setting SUCCESS for build after test status validation...");
-            jenBuildLog.info("Errors: "+errors.toString());
-        }
-        return result;
+        return ciStatus;
     }
 
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
@@ -362,7 +314,7 @@ public class BzmServiceManager {
             }
 
             FileUtils.copyURLToFile(url, jtlZip);
-            jenBuildLog.info("Downloading JTLZIP from " + url);
+            jenBuildLog.info("Downloading JTLZIP .... ");
             String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
             jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
             unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), jenBuildLog);
@@ -473,12 +425,18 @@ public class BzmServiceManager {
     public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get tresholds from server and check if test is success
+        Result result;
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
-        Result result = Result.SUCCESS;
+        CIStatus ciStatus = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
+        if(ciStatus.equals(CIStatus.errors)){
+            result=Result.FAILURE;
+            return result;
+        }
+        result=ciStatus.equals(CIStatus.failures)?Result.FAILURE:Result.SUCCESS;
         ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
         FilePath workspace=builder.getBuild().getWorkspace();
-        if(apiVersion.equals(ApiVersion.v3)&builder.isGetJunit()){
+        if(apiVersion.equals(ApiVersion.v3) & builder.isGetJunit()) {
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
             } else {
             jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
@@ -491,26 +449,18 @@ public class BzmServiceManager {
         } else {
             jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
         }
-        result = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
 
 
 
         //get testGetArchive information
-        JSONObject testReport=null;
-        try{
-            testReport = api.testReport(masterId);
-        }catch (Exception e){
-            jenBuildLog.info("Failed to get test report from server.");
-        }
+        JSONObject testReport=requestAggregateReport(api,jenBuildLog,masterId);
 
 
         if (testReport == null || testReport.equals("null")) {
-            jenBuildLog.warn("Requesting aggregate is not available. " +
-                    "Build won't be validated against local tresholds");
+            jenBuildLog.warn("Aggregate report is not available after 4 attempts.");
             return result;
         }
         TestResult testResult = null;
-        Result localTresholdsResult=null;
         try {
             testResult = new TestResult(testReport);
             jenBuildLog.info(testResult.toString());
@@ -521,11 +471,30 @@ public class BzmServiceManager {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
         }finally{
-            return localTresholdsResult!=null?localTresholdsResult:result;
+            return result;
         }
 
     }
 
+
+    public static JSONObject requestAggregateReport(BlazemeterApi api,StdErrLog jenBuildLog,String masterId){
+        JSONObject testReport=null;
+        int retries = 1;
+        try {
+            while (retries < 5 && testReport == null) {
+                jenBuildLog.info("Trying to get aggregate test report from server, attempt# "+retries);
+                testReport = api.testReport(masterId);
+                if (testReport != null) {
+                    return testReport;
+                }
+                Thread.sleep(5000);
+                retries++;
+            }
+        } catch (Exception e) {
+            jenBuildLog.info("Failed to get test report from server.");
+        }
+        return testReport;
+    }
 
     public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
@@ -556,18 +525,36 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey,String blazeMeterUrl){
-        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
-        try{
-        net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
-        if (user.has("error")) {
-            return FormValidation.errorWithMarkup("Invalid user key. Error - "+user.get("error").toString());
-        } else {
-            return FormValidation.ok("User Key Valid. Email - "+user.getString("mail"));
+    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
+        if(userKey.isEmpty()){
+            logger.warn(Constants.API_KEY_EMPTY);
+            return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
         }
-        }catch (Exception e){
-            return FormValidation.errorWithMarkup("Invalid user key. Unknown error");
+        String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
+        try {
+            logger.info("Validating API key started: API key=" + encryptedKey);
+            BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
+            logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
+            JSONObject u = bzm.getUser();
+            net.sf.json.JSONObject user = null;
+            if (u!= null) {
+                user = net.sf.json.JSONObject.fromObject(u.toString());
+                if (user.has("error") && !user.get("error").equals(null)) {
+                    logger.warn("API key is not valid: error=" + user.get("error").toString());
+                    logger.warn("User profile: "+user.toString());
+                    return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get("error").toString());
+                } else {
+                    logger.warn("API key is valid: user e-mail=" + user.getString("mail"));
+                    return FormValidation.ok("API key Valid. Email - " + user.getString("mail"));
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn(e);
+            return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
         }
+        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl){

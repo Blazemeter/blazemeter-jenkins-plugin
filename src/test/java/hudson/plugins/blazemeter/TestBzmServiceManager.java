@@ -4,7 +4,7 @@ import hudson.model.Result;
 import hudson.plugins.blazemeter.api.APIFactory;
 import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
@@ -68,18 +68,30 @@ public class TestBzmServiceManager {
     public void validateUserKey_positive() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.OK);
+        Assert.assertEquals(validation.getMessage(), "API key Valid. Email - dzmitry.kashlach@blazemeter.com");
     }
 
     @Test
     public void validateUserKey_negative() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
+        Assert.assertEquals(validation.getMessage(),
+                "API key is not valid: unexpected exception=JSONObject[\"mail\"] not found.");
     }
 
     @Test
     public void validateUserKey_exception() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
+        Assert.assertEquals(validation.getMessage(),
+                "API key is not valid: API key=mock...tion blazemeterUrl=http://127.0.0.1:1234. Please, check manually.");
+    }
+
+    @Test
+    public void validateUserKey_empty() throws IOException,JSONException{
+        FormValidation validation=BzmServiceManager.validateUserKey("", TestConstants.mockedApiUrl);
+        Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
+        Assert.assertEquals(validation.getMessage(), Constants.API_KEY_EMPTY);
     }
 
     @Test
@@ -171,21 +183,21 @@ public class TestBzmServiceManager {
     @Test
     public void getCIStatus_success(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog);
-        Assert.assertEquals(Result.SUCCESS,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog);
+        Assert.assertEquals(CIStatus.success,ciStatus);
     }
 
     @Test
     public void getCIStatus_failure(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog);
-        Assert.assertEquals(Result.FAILURE,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog);
+        Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
     @Test
     public void getCIStatus_error(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
-        Result result=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR, stdErrLog);
-        Assert.assertEquals(Result.SUCCESS,result);
+        CIStatus ciStatus=BzmServiceManager.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR, stdErrLog);
+        Assert.assertEquals(CIStatus.errors,ciStatus);
     }
 }
