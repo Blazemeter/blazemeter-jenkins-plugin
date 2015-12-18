@@ -28,7 +28,7 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL;
+    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
 
@@ -167,7 +167,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-        blazeMeterURL = formData.optString("blazeMeterURL");
+        String blazeMeterURL = formData.optString("blazeMeterURL");
+        this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
         save();
         return true;
     }
