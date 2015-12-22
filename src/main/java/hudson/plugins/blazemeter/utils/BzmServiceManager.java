@@ -230,9 +230,9 @@ public class BzmServiceManager {
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
-            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         }finally {
             if(errors.length()>0){
                 jenBuildLog.info("Having errors while test status validation...");
@@ -424,7 +424,7 @@ public class BzmServiceManager {
 
     public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
-        //get tresholds from server and check if test is success
+        //get thresholds from server and check if test is success
         Result result;
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
