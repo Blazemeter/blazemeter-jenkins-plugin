@@ -36,29 +36,27 @@ public class TestBzmHttpWrapper {
     @Test
     public void getResponseAsJson_25() throws IOException {
         String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
-        JSONObject response=bzmHttpWrapper.getResponseAsJson(url, null, BzmHttpWrapper.Method.GET);
+        JSONObject response=bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET,JSONObject.class,true);
         Assert.assertTrue(response.length()==25);
     }
 
     @Test
-    public void getResponseAsJson_null() throws IOException {
-        JSONObject response=bzmHttpWrapper.getResponseAsJson(null, null, BzmHttpWrapper.Method.GET);
-        Assert.assertTrue(response==null);
+    public void getResponseAsJson_null() throws IOException,RuntimeException {
+        try{
+            JSONObject response=bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET,JSONObject.class,false);
+        }catch (RuntimeException re){
+
+        }
     }
 
 
     @Test
-    public void getResponseAsString_5438() throws IOException {
-        String url="http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
-        String response=bzmHttpWrapper.getResponseAsString(url, null, BzmHttpWrapper.Method.GET);
-        Assert.assertTrue(response.length()==5438);
-    }
+    public void getResponseAsString_null() throws IOException,RuntimeException{
+        try{
+        String response=bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET,String.class,false);
+        }catch (RuntimeException re){
 
-
-    @Test
-    public void getResponseAsString_null() throws IOException {
-        String response=bzmHttpWrapper.getResponseAsString(null, null, BzmHttpWrapper.Method.GET);
-        Assert.assertTrue(response==null);
+        }
     }
 
 

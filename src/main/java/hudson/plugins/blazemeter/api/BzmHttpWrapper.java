@@ -27,7 +27,7 @@ public class BzmHttpWrapper {
         this.logger.setDebugEnabled(false);
     }
 
-    public HttpResponse getHttpResponse(String url, JSONObject data, Method method) throws IOException {
+    public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
@@ -49,7 +49,7 @@ public class BzmHttpWrapper {
                 }
             }
             else {
-                throw new Exception("Unsupported method: " + method.toString());
+                throw new RuntimeException("Unsupported method: " + method.toString());
             }
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json; charset=UTF-8");
@@ -70,40 +70,56 @@ public class BzmHttpWrapper {
     }
 
 
-    public JSONObject getResponseAsJson(String url, JSONObject data, Method method) {
+    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType, boolean responseBody) throws RuntimeException{
         JSONObject jo = null;
+        String output = null;
+        HttpResponse response = null;
         try {
-            HttpResponse response = getHttpResponse(url, data, method);
+            response = httpResponse(url, data, method);
             if (response != null) {
-                String output = EntityUtils.toString(response.getEntity());
-                if(logger.isDebugEnabled())
-                    logger.debug("Received JSON object: "+output);
-                jo = new JSONObject(output);
+                output = EntityUtils.toString(response.getEntity());
+                if (logger.isDebugEnabled())
+                    logger.debug("Received object from server: " + output);
+                if (output.isEmpty()) {
+                    throw new IOException();
+                }
             }
-        } catch (IOException e) {
-            if(logger.isDebugEnabled())
-                logger.debug("ERROR decoding Json ", e);
-        } catch (JSONException e) {
-            if(logger.isDebugEnabled())
-            logger.debug("ERROR decoding Json ", e);
+        } catch (IOException ioe) {
+            if (logger.isDebugEnabled())
+                logger.debug("Received empty response from server: making retries...");
+            int retries = 1;
+            while (retries < 6) {
+                try {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Trying to repeat request to server after failure: " + retries + " retry ");
+                    response = httpResponse(url, data, method);
+                    output = EntityUtils.toString(response.getEntity());
+                    if (!output.isEmpty()) {
+                        break;
+                    }
+                } catch (IOException ioex) {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Received bad response from server while doing: " + retries + " retry");
+                } finally {
+                    retries++;
+                }
+            }
         }
-        return jo;
-    }
+        if(output==null||(responseBody&&output.isEmpty())){
+            if (logger.isDebugEnabled())
+                logger.debug("Received empty response from server after 5 retries: throwing exception");
+            throw new RuntimeException();
+        }
 
-    public String getResponseAsString(String url, JSONObject data, Method method){
-        String  str = null;
         try {
-            HttpResponse response = getHttpResponse(url, data, method);
-            if (response != null) {
-                str = EntityUtils.toString(response.getEntity());
-                if(logger.isDebugEnabled())
-                    logger.debug(str);
-            }
-        } catch (IOException e) {
-            if(logger.isDebugEnabled())
-                logger.debug("ERROR decoding Json ", e);
+            jo = new JSONObject(output);
+        } catch (JSONException e) {
+            if (logger.isDebugEnabled())
+                logger.debug("ERROR decoding Json: ", e);
+            returnType= (Class<T>) String.class;
+            return returnType.cast(output);
         }
-        return str;
+        return returnType.cast(jo);
     }
 
     public DefaultHttpClient getHttpClient() {

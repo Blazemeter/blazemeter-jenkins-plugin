@@ -42,7 +42,7 @@ public interface BlazemeterApi {
 
     JSONObject stopTest(String testId);
 
-    JSONObject terminateTest(String testId);
+    void terminateTest(String testId);
 
     JSONObject testReport(String reportId);
 

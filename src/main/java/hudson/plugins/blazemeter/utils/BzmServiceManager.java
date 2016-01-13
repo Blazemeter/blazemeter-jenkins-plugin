@@ -536,7 +536,11 @@ public class BzmServiceManager {
                     return FormValidation.ok("API key Valid. Email - " + user.getString("mail"));
                 }
             }
-        } catch (Exception e) {
+        } catch (ClassCastException e) {
+            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn(e);
+        }
+        catch (Exception e) {
             logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
             logger.warn(e);
             return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
