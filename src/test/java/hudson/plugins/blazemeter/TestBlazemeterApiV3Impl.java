@@ -168,13 +168,6 @@ public class TestBlazemeterApiV3Impl {
     }
 
     @Test
-    public void uploadBinaryFile_null(){
-        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3,TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.uploadBinaryFile(null, null), null);
-    }
-
-
-    @Test
     public void getTestList_6_10() throws IOException,JSONException,ServletException,MessagingException{
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
                 ApiVersion.v3,TestConstants.mockedApiUrl);

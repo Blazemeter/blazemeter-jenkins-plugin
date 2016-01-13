@@ -144,18 +144,6 @@ public class BzmServiceManager {
         }
     }
 
-    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
-        String fileName = file.getName();
-        org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
-        try {
-            if (!json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
-                bzmBuildLog.info("Could not upload file " + fileName + " " + json.get(JsonConstants.ERROR).toString());
-            }
-        } catch (JSONException e) {
-            bzmBuildLog.info("Could not upload file " + fileName + " " + e.getMessage());
-        }
-    }
-
     public static String getSessionId(JSONObject json,
                                 ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
         String session = "";

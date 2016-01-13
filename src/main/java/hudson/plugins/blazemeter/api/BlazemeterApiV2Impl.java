@@ -55,53 +55,6 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
 
-    /**
-     * @param testId  - test id
-     * @param file    - jmx file
-     *                //     * @return test id
-     *                //     * @throws java.io.IOException
-     *                //     * @throws org.json.JSONException
-     */
-    @Override
-    public synchronized void uploadJmx(String testId, File file) {
-
-        if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) {
-            return;
-        }
-
-        String url = this.urlManager.scriptUpload(APP_KEY, apiKey, testId, file.getName());
-        JSONObject json = this.bzmhc.getFileUploadJsonResponse(url, file);
-        try {
-            if (!json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
-                logger.warn("Could not upload file " + file.getName() + " " + json.get(JsonConstants.ERROR).toString());
-            }
-        } catch (JSONException e) {
-            logger.warn("Could not upload file " + file.getName() + " ", e);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param testId  - test id
-     * @param file    - the file (Java class) you like to upload
-     * @return test id
-     * //     * @throws java.io.IOException
-     * //     * @throws org.json.JSONException
-     */
-
-    @Override
-    public synchronized JSONObject uploadBinaryFile(String testId, File file) {
-
-        if (StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) {
-            return null;
-        }
-
-        String url = this.urlManager.fileUpload(APP_KEY, apiKey, testId, file.getName());
-
-        return this.bzmhc.getFileUploadJsonResponse(url, file);
-    }
-
-
     @Override
     public TestStatus getTestStatus(String id) {
         TestStatus testStatus=null;

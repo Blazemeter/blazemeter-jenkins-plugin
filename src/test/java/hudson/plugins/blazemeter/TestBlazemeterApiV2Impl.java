@@ -106,9 +106,4 @@ public class TestBlazemeterApiV2Impl {
         Assert.assertEquals(blazemeterApiV2.getTestStatus(null), TestStatus.NotFound);
     }
 
-    @Test
-    public void uploadBinaryFile(){
-        Assert.assertEquals(blazemeterApiV2.uploadBinaryFile(null, null), null);
-    }
-
 }

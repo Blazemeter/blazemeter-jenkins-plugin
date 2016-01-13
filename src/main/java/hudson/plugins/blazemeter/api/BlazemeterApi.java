@@ -32,10 +32,6 @@ public interface BlazemeterApi {
 
     String APP_KEY = "jnk100x987c06f4e10c4";
 
-    void uploadJmx(String testId, File file);
-
-    JSONObject uploadBinaryFile(String testId, File file);
-
     TestStatus getTestStatus(String id);
 
     int getTestMasterStatusCode(String id);
