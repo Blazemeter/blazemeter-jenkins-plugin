@@ -92,7 +92,9 @@ public class BzmHttpWrapper {
             while (retries < 6) {
                 try {
                     if (logger.isDebugEnabled())
-                        logger.debug("Trying to repeat request to server after failure: " + retries + " retry ");
+                        logger.debug("Trying to repeat request to server after failure: " + retries + " retry.");
+                        logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
+                    Thread.sleep(10000*retries);
                     response = httpResponse(url, data, method);
                     output = EntityUtils.toString(response.getEntity());
                     if (!output.isEmpty()) {
@@ -100,8 +102,12 @@ public class BzmHttpWrapper {
                     }
                 } catch (IOException ioex) {
                     if (logger.isDebugEnabled())
-                        logger.debug("Received bad response from server while doing: " + retries + " retry");
-                } finally {
+                        logger.debug("Received bad response from server while doing: " + retries + " retry.");
+                } catch (InterruptedException ie) {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Job was interrupted at pause during " + retries + " request retry.");
+                }
+                finally {
                     retries++;
                 }
             }
@@ -127,7 +133,7 @@ public class BzmHttpWrapper {
         }catch (ClassCastException cce){
             if (logger.isDebugEnabled())
                 logger.debug("Failed to parse response from server: ", cce);
-            throw new RuntimeException("Failed to parse response from server: "+jo.toString());
+            throw new RuntimeException(jo.toString());
 
         }
 

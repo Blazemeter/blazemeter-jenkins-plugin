@@ -81,6 +81,21 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(userProfile));
 
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/user")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(""));
+
+
     }
 
     public static void getMasterStatus() throws IOException{
