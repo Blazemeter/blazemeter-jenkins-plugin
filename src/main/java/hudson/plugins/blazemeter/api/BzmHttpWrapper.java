@@ -70,7 +70,8 @@ public class BzmHttpWrapper {
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType, boolean responseBody) throws RuntimeException{
+    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType, boolean responseBody){
+        T returnObj=null;
         JSONObject jo = null;
         String output = null;
         HttpResponse response = null;
@@ -119,7 +120,18 @@ public class BzmHttpWrapper {
             returnType= (Class<T>) String.class;
             return returnType.cast(output);
         }
-        return returnType.cast(jo);
+
+        try{
+            returnObj=returnType.cast(jo);
+
+        }catch (ClassCastException cce){
+            if (logger.isDebugEnabled())
+                logger.debug("Failed to parse response from server: ", cce);
+            throw new RuntimeException("Failed to parse response from server: "+jo.toString());
+
+        }
+
+        return returnObj;
     }
 
     public DefaultHttpClient getHttpClient() {

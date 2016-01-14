@@ -396,18 +396,18 @@ public class BzmServiceManager {
         jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
         try{
             junitReport = api.retrieveJUNITXML(masterId);
+            String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
+            FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
+            jenBuildLog.warn("build number="+buildNumber);
+            jenBuildLog.warn("masterId=" + masterId);
+            String junitReportPath = workspace.getParent()
+                    + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
+            jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
+            jenBuildLog.info("Saving it to " + junitReportPath);
+            saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
         } catch (Exception e) {
-            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + " " + e.getMessage());
+            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
-        String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
-        FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
-        jenBuildLog.warn("build number="+buildNumber);
-        jenBuildLog.warn("masterId=" + masterId);
-        String junitReportPath = workspace.getParent()
-                + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
-        jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-        jenBuildLog.info("Saving it to " + junitReportPath);
-        saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
     }
 
     public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
