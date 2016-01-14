@@ -28,7 +28,8 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
+//    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
+    private String blazeMeterURL=null;
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
 
@@ -96,6 +97,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 ApiVersion.v3.name().equals(apiVersion)));
         items.add(new ListBoxModel.Option("V2(deprecated)",ApiVersion.v2.name(),
                 ApiVersion.v2.name().equals(apiVersion)));
+        return items;
+    }
+
+    public ListBoxModel doFillBlazeMeterURLItems(@QueryParameter String blazeMeterURL) throws FormValidation {
+        ListBoxModel items = new ListBoxModel();
+        items.add(new ListBoxModel.Option(Constants.A_BLAZEMETER_COM,Constants.A_BLAZEMETER_COM,Constants.A_BLAZEMETER_COM.equals(blazeMeterURL)));
+        items.add(new ListBoxModel.Option(Constants.QA_BLAZEMETER_COM,Constants.QA_BLAZEMETER_COM,Constants.QA_BLAZEMETER_COM.equals(blazeMeterURL)));
         return items;
     }
 
