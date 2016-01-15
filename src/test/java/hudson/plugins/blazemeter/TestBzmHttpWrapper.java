@@ -37,7 +37,7 @@ public class TestBzmHttpWrapper {
 
     @Test
     public void response_25() throws IOException {
-        String url = "http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
+        String url = TestConstants.mockedApiUrl+"/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
         JSONObject response = bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class, true);
         Assert.assertTrue(response.length() == 25);
     }
@@ -63,7 +63,7 @@ public class TestBzmHttpWrapper {
     @Test
     public void responseEmptyFiveRetries() throws IOException, RuntimeException {
         BzmHttpWrapper mockBzmHttpWrapper= Mockito.spy(new BzmHttpWrapper());
-        String url = "http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
+        String url = TestConstants.mockedApiUrl+"/api/latest/user?api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
         try {
             Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,0)==90000);
             Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.SO_TIMEOUT,0)==90000);

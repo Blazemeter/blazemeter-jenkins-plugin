@@ -84,7 +84,7 @@ public class TestBzmServiceManager {
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
-                "API key is not valid: API key=mock...tion blazemeterUrl=http://127.0.0.1:1234. Please, check manually.");
+                "API key is not valid: API key=mock...tion blazemeterUrl="+TestConstants.mockedApiUrl+". Please, check manually.");
     }
 
     @Test
@@ -129,7 +129,7 @@ public class TestBzmServiceManager {
 
     @Test
     public void getReportUrl_pos(){
-        String expectedReportUrl="http://127.0.0.1:1234/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
+        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
@@ -137,7 +137,7 @@ public class TestBzmServiceManager {
 
     @Test
     public void getReportUrl_neg(){
-        String expectedReportUrl="http://127.0.0.1:1234/app/#masters/testMasterId/summary";
+        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_INVALID, ApiVersion.v3, TestConstants.mockedApiUrl);
         String actReportUrl=BzmServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
