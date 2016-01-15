@@ -207,7 +207,7 @@ public class MockedAPI {
         String terminateTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
-                        .withMethod("GET")
+                        .withMethod("POST")
                         .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_25 +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
@@ -220,7 +220,7 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(terminateTest));
         mockServer.when(
                 request()
-                        .withMethod("GET")
+                        .withMethod("POST")
                         .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_70 +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
@@ -237,7 +237,7 @@ public class MockedAPI {
         String stopTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
-                        .withMethod("GET")
+                        .withMethod("POST")
                         .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_100 +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
@@ -250,7 +250,7 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(stopTest));
         mockServer.when(
                 request()
-                        .withMethod("GET")
+                        .withMethod("POST")
                         .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_140 +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
