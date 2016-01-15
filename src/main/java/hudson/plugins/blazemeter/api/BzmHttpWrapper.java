@@ -9,6 +9,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
@@ -25,6 +28,10 @@ public class BzmHttpWrapper {
     public BzmHttpWrapper() {
         this.httpClient = new DefaultHttpClient();
         this.logger.setDebugEnabled(false);
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, 90000);
+        HttpConnectionParams.setSoTimeout(httpParams, 90000);
+        this.httpClient.setParams(httpParams);
     }
 
     public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {

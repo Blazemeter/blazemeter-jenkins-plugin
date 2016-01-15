@@ -143,7 +143,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     public JSONObject stopTest(String testId) {
     if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return null;
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
-        JSONObject stopJSON=this.bzmhc.response(url, null, BzmHttpWrapper.Method.GET,JSONObject.class,false);
+        JSONObject stopJSON=this.bzmhc.response(url, null, BzmHttpWrapper.Method.GET,JSONObject.class,true);
         return stopJSON;
     }
 
@@ -152,7 +152,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         if(StringUtils.isBlank(apiKey)&StringUtils.isBlank(testId)) return;
 
         String url = this.urlManager.testTerminate(APP_KEY, apiKey, testId);
-        this.bzmhc.response(url, null, BzmHttpWrapper.Method.GET,JSONObject.class,false);
+        this.bzmhc.response(url, null, BzmHttpWrapper.Method.GET,JSONObject.class,true);
         return;
     }
 

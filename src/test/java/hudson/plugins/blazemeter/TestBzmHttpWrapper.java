@@ -1,9 +1,9 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.BzmHttpWrapper;
+import org.apache.http.params.CoreConnectionPNames;
 import org.json.JSONObject;
 import org.junit.*;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -65,6 +65,8 @@ public class TestBzmHttpWrapper {
         BzmHttpWrapper mockBzmHttpWrapper= Mockito.spy(new BzmHttpWrapper());
         String url = "http://127.0.0.1:1234/api/latest/user?api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
         try {
+            Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,0)==90000);
+            Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.SO_TIMEOUT,0)==90000);
             mockBzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class, true);
         } catch (RuntimeException re) {
 
