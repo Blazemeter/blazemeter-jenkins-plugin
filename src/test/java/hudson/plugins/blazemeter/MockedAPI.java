@@ -556,6 +556,7 @@ public class MockedAPI {
 
     public static void stopAPI(){
         mockServer.reset();
-        mockServer.stop(true);
+//        mockServer.stop(true);
+        mockServer.stop();
     }
 }
