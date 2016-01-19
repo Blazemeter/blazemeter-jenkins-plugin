@@ -19,6 +19,7 @@ import java.io.IOException;
  */
 public class TestBlazemeterApiV3Impl {
     private BlazemeterApiV3Impl blazemeterApiV3 =null;
+/*
 
 
     @BeforeClass
@@ -36,7 +37,9 @@ public class TestBlazemeterApiV3Impl {
         MockedAPI.stopAPI();
     }
 
+*/
 
+/*
     @Test
     public void createTest_null(){
         blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(null,ApiVersion.v3, TestConstants.mockedApiUrl);
@@ -281,5 +284,6 @@ public class TestBlazemeterApiV3Impl {
         int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status==0);
     }
+*/
 
 }
