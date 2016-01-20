@@ -22,7 +22,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String testMasterStatus(String appKey, String userKey, String testId) {
+    public String masterStatus(String appKey, String userKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
@@ -35,14 +35,14 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
     }
 
     @Override
-    public String getTests(String appKey, String userKey) {
+    public String tests(String appKey, String userKey) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return String.format("%s/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all",
+        return String.format("%s/api/rest/blazemeter/tests.json/?app_key=%s&user_key=%s&test_id=all",
                 serverUrl, appKey, userKey)+ CLIENT_IDENTIFICATION;
 
     }
@@ -192,6 +192,11 @@ public class BmUrlManagerV2Impl implements BmUrlManager {
 
     @Override
     public String listOfSessionIds(String appKey, String userKey, String masterId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public String activeTests(String appKey, String userKey) {
         return Constants.NOT_IMPLEMENTED;
     }
 }

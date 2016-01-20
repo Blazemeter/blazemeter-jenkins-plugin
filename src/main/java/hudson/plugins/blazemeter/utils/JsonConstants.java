@@ -22,6 +22,8 @@ public interface JsonConstants {
     String TEST_ID="test_id";
     String TYPE="type";
     String TEST="test";
+    String TESTS="tests";
+    String COLLECTIONS="collections";
     String HTTP="http";
     String ID="id";
     String LOCATION="location";

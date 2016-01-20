@@ -14,9 +14,11 @@ public interface BmUrlManager {
 
     void setServerUrl(String serverUrl);
 
-    String testMasterStatus(String appKey, String userKey, String testId);
+    String masterStatus(String appKey, String userKey, String testId);
 
-    String getTests(String appKey, String userKey);
+    String tests(String appKey, String userKey);
+
+    String activeTests(String appKey, String userKey);
 
     String scriptUpload(String appKey, String userKey, String testId, String fileName);
 

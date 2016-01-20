@@ -77,7 +77,7 @@ public class BzmHttpWrapper {
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType, boolean responseBody){
+    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType){
         T returnObj=null;
         JSONObject jo = null;
         String output = null;
@@ -91,42 +91,12 @@ public class BzmHttpWrapper {
                 if (output.isEmpty()) {
                     throw new IOException();
                 }
+                jo = new JSONObject(output);
             }
         } catch (IOException ioe) {
             if (logger.isDebugEnabled())
-                logger.debug("Received empty response from server: making retries...");
-            int retries = 1;
-            while (retries < 6) {
-                try {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Trying to repeat request to server after failure: " + retries + " retry.");
-                        logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
-                    Thread.sleep(10000*retries);
-                    response = httpResponse(url, data, method);
-                    output = EntityUtils.toString(response.getEntity());
-                    if (!output.isEmpty()) {
-                        break;
-                    }
-                } catch (IOException ioex) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Received bad response from server while doing: " + retries + " retry.");
-                } catch (InterruptedException ie) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Job was interrupted at pause during " + retries + " request retry.");
-                }
-                finally {
-                    retries++;
-                }
-            }
-        }
-        if(output==null||(responseBody&&output.isEmpty())){
-            if (logger.isDebugEnabled())
-                logger.debug("Received empty response from server after 5 retries: throwing exception");
-            throw new RuntimeException();
-        }
-
-        try {
-            jo = new JSONObject(output);
+                logger.debug("Received empty response from server: ",ioe);
+            return null;
         } catch (JSONException e) {
             if (logger.isDebugEnabled())
                 logger.debug("ERROR decoding Json: ", e);
@@ -143,7 +113,6 @@ public class BzmHttpWrapper {
             throw new RuntimeException(jo.toString());
 
         }
-
         return returnObj;
     }
 

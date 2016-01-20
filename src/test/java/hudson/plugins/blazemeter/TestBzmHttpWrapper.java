@@ -26,7 +26,7 @@ public class TestBzmHttpWrapper {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.getMasterStatus();
-        MockedAPI.getTests();
+        MockedAPI.tests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
     }
@@ -41,7 +41,7 @@ public class TestBzmHttpWrapper {
     @Test
     public void response_25() throws IOException {
         String url = TestConstants.mockedApiUrl+"/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
-        JSONObject response = bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class, true);
+        JSONObject response = bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class);
         Assert.assertTrue(response.length() == 25);
     }
 
@@ -49,7 +49,7 @@ public class TestBzmHttpWrapper {
     @Test
     public void response_null() throws IOException, RuntimeException {
         try {
-            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, JSONObject.class, false);
+            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, JSONObject.class);
         } catch (RuntimeException re) {
 
         }
@@ -60,26 +60,9 @@ public class TestBzmHttpWrapper {
     @Test
     public void responseString_null() throws IOException, RuntimeException {
         try {
-            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, String.class, false);
+            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, String.class);
         } catch (RuntimeException re) {
 
-        }
-    }
-
-    @Ignore
-    @Test
-    public void responseEmptyFiveRetries() throws IOException, RuntimeException {
-        BzmHttpWrapper mockBzmHttpWrapper= Mockito.spy(new BzmHttpWrapper());
-        String url = TestConstants.mockedApiUrl+"/api/latest/user?api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
-        try {
-            Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,0)==90000);
-            Assert.assertTrue(mockBzmHttpWrapper.getHttpClient().getParams().getIntParameter(CoreConnectionPNames.SO_TIMEOUT,0)==90000);
-            mockBzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class, true);
-        } catch (RuntimeException re) {
-
-        }finally {
-            Mockito.verify(mockBzmHttpWrapper,Mockito.atMost(6)).httpResponse(url, null, BzmHttpWrapper.Method.GET);
-            Mockito.verify(mockBzmHttpWrapper,Mockito.atLeast(6)).httpResponse(url, null, BzmHttpWrapper.Method.GET);
         }
     }
 }

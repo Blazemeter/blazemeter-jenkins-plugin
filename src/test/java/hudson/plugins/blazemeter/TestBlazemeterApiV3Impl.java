@@ -27,7 +27,7 @@ public class TestBlazemeterApiV3Impl {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.getMasterStatus();
-        MockedAPI.getTests();
+        MockedAPI.tests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
     }

@@ -37,15 +37,15 @@ public class TestBmUrlManagerV2 {
     public void testStatus(){
         String expTestGetStatus=bmUrlManager.getServerUrl()+"/api/rest/blazemeter/testGetStatus.json/?app_key="
                 +appKey+"&user_key="+userKey+"&test_id="+testId+"&"+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actTestGetStatus=bmUrlManager.testMasterStatus(appKey, userKey, testId);
+        String actTestGetStatus=bmUrlManager.masterStatus(appKey, userKey, testId);
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }
 
     @Test
     public void getTests(){
-    String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/rest/blazemeter/getTests.json/?app_key="+appKey+
+    String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/rest/blazemeter/tests.json/?app_key="+appKey+
             "&user_key="+userKey+"&test_id=all"+BmUrlManager.CLIENT_IDENTIFICATION;
-    String actGetTestsUrl=bmUrlManager.getTests(appKey,userKey);
+    String actGetTestsUrl=bmUrlManager.tests(appKey,userKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
     }
 
@@ -131,6 +131,13 @@ public class TestBmUrlManagerV2 {
         String expRetrieveJUNITXML=Constants.NOT_IMPLEMENTED;
         String actRetrieveJUNITXML=bmUrlManager.retrieveJUNITXML(appKey, userKey, sessionId);
         Assert.assertEquals(expRetrieveJUNITXML,actRetrieveJUNITXML);
+    }
+
+    @Test
+    public void activeTests(){
+        String expActiveTests=Constants.NOT_IMPLEMENTED;
+        String actActiveTests=bmUrlManager.activeTests(appKey, userKey);
+        Assert.assertEquals(expActiveTests,actActiveTests);
     }
 
 }

@@ -21,7 +21,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String testMasterStatus(String appKey, String userKey, String masterId) {
+    public String masterStatus(String appKey, String userKey, String masterId) {
         String testStatus=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -35,7 +35,7 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String getTests(String appKey, String userKey) {
+    public String tests(String appKey, String userKey) {
         String getTests=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -279,6 +279,19 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
                 "/sessions?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return listOfSessionIds;
+    }
+
+    @Override
+    public String activeTests(String appKey, String userKey) {
+        String activeTests=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return activeTests= serverUrl +"/api/latest/web/active?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
     }
 }
 

@@ -39,7 +39,7 @@ public class TestBzmServiceManager {
         MockedAPI.getReportUrl();
         MockedAPI.getTestConfig();
         MockedAPI.putTestInfo();
-        MockedAPI.getTests();
+        MockedAPI.tests();
     }
 
     @AfterClass
