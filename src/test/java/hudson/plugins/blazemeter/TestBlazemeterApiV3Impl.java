@@ -158,7 +158,7 @@ public class TestBlazemeterApiV3Impl {
        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,ApiVersion.v3,TestConstants.mockedApiUrl);
        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID,TestType.multi), "15105877");
     }
-
+    @Ignore
     @Test
     public void startTest_Retries() throws JSONException {
         blazemeterApiV3 = (BlazemeterApiV3Impl) APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_RETRIES,
