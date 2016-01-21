@@ -108,9 +108,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         }
         JSONObject jo = this.bzmhc.response(url, null, BzmHttpWrapper.Method.POST, JSONObject.class);
 
-        if (jo.equals(JSONObject.NULL)) {
+        if (jo==null) {
             if (logger.isDebugEnabled())
-                logger.debug("Received JSONObject.NULL while start operation: will do 5 retries");
+                logger.debug("Received NULL from server while start operation: will do 5 retries");
             boolean isActive=this.isActive(testId);
             if(!isActive){
                 int retries = 1;
@@ -121,7 +121,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                         logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
                         Thread.sleep(10000*retries);
                         jo = this.bzmhc.response(url, null, BzmHttpWrapper.Method.POST, JSONObject.class);
-                        if (!jo.equals(JSONObject.NULL)) {
+                        if (jo!=null) {
                             break;
                         }
                     } catch (InterruptedException ie) {
