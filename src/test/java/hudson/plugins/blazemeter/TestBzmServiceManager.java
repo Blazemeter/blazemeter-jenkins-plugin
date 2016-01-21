@@ -26,7 +26,6 @@ public class TestBzmServiceManager {
 
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
 
-/*
 
     @BeforeClass
     public static void setUp()throws IOException{
@@ -39,37 +38,31 @@ public class TestBzmServiceManager {
         MockedAPI.getReportUrl();
         MockedAPI.getTestConfig();
         MockedAPI.putTestInfo();
-        MockedAPI.tests();
     }
 
     @AfterClass
     public static void tearDown()throws IOException{
         MockedAPI.stopAPI();
     }
-*/
 
-    @Ignore
     @Test
     public void getUserEmail_positive() throws IOException,JSONException{
         String email=BzmServiceManager.getUserEmail(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
 
-    @Ignore
     @Test
     public void getUserEmail_negative() throws IOException,JSONException{
         String email=BzmServiceManager.getUserEmail(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(email,"");
     }
 
-    @Ignore
     @Test
     public void getUserEmail_exception() throws IOException,JSONException{
         String email=BzmServiceManager.getUserEmail(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
         Assert.assertEquals(email,"");
     }
 
-    @Ignore
     @Test
     public void validateUserKey_positive() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
@@ -77,7 +70,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(validation.getMessage(), "API key Valid. Email - dzmitry.kashlach@blazemeter.com");
     }
 
-    @Ignore
     @Test
     public void validateUserKey_negative() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
@@ -86,7 +78,6 @@ public class TestBzmServiceManager {
                 "API key is not valid: unexpected exception=JSONObject[\"mail\"] not found.");
     }
 
-    @Ignore
     @Test
     public void validateUserKey_exception() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
@@ -95,7 +86,6 @@ public class TestBzmServiceManager {
                 "API key is not valid: API key=mock...tion blazemeterUrl="+TestConstants.mockedApiUrl+". Please, check manually.");
     }
 
-    @Ignore
     @Test
     public void validateUserKey_empty() throws IOException,JSONException{
         FormValidation validation=BzmServiceManager.validateUserKey("", TestConstants.mockedApiUrl);
@@ -103,14 +93,12 @@ public class TestBzmServiceManager {
         Assert.assertEquals(validation.getMessage(), Constants.API_KEY_EMPTY);
     }
 
-    @Ignore
     @Test
     public void getVersion() throws IOException,JSONException{
         String version=BzmServiceManager.getVersion();
         Assert.assertTrue(version.matches("^(\\d{1,}\\.+\\d{1,2}\\S*)$"));
     }
 
-    @Ignore
     @Test
     public void stopMaster(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
@@ -124,7 +112,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(terminate, false);
     }
 
-    @Ignore
     @Test
     public void autoDetectApiVersion_v2(){
         String apiVersion=BzmServiceManager.autoDetectApiVersion(TestConstants.MOCKED_USER_KEY_V2, TestConstants.mockedApiUrl);
@@ -132,7 +119,6 @@ public class TestBzmServiceManager {
     }
 
 
-    @Ignore
     @Test
     public void autoDetectApiVersion_v3(){
         String apiVersion=BzmServiceManager.autoDetectApiVersion(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
@@ -140,7 +126,6 @@ public class TestBzmServiceManager {
     }
 
 
-    @Ignore
     @Test
     public void getReportUrl_pos(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
@@ -149,7 +134,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
-    @Ignore
     @Test
     public void getReportUrl_neg(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
@@ -158,7 +142,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
-    @Ignore
     @Test
     public void updateTestDuration() throws JSONException, IOException {
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
@@ -169,7 +152,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(testDuration,"6");
     }
 
-    @Ignore
     @Test
     public void getSessionId_v3() throws JSONException, IOException {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
@@ -179,7 +161,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(session,"r-v3-55a6136b314bd");
     }
 
-    @Ignore
     @Test
     public void getSessionId_v2() throws JSONException, IOException {
         File getSessionId_v2=new File(TestConstants.RESOURCES+"/getSessionId_v2.json");
@@ -190,7 +171,6 @@ public class TestBzmServiceManager {
     }
 
     @Test
-    @Ignore
     public void getSessionId_empty() throws JSONException, IOException {
         File getSessionId_v2=new File(TestConstants.RESOURCES+"/getSessionId_v2_500.json");
         String getSessionId_v2_str=FileUtils.readFileToString(getSessionId_v2);
@@ -199,7 +179,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(session,"");
     }
 
-    @Ignore
     @Test
     public void getCIStatus_success(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
@@ -207,7 +186,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(CIStatus.success,ciStatus);
     }
 
-    @Ignore
     @Test
     public void getCIStatus_failure(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
@@ -215,7 +193,6 @@ public class TestBzmServiceManager {
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
-    @Ignore
     @Test
     public void getCIStatus_error(){
         BlazemeterApi api = APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID, ApiVersion.v3, TestConstants.mockedApiUrl);
