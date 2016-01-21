@@ -7,7 +7,6 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -111,7 +110,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         if (jo==null) {
             if (logger.isDebugEnabled())
                 logger.debug("Received NULL from server while start operation: will do 5 retries");
-            boolean isActive=this.isActive(testId);
+            boolean isActive=this.active(testId);
             if(!isActive){
                 int retries = 1;
                 while (retries < 6) {
@@ -135,9 +134,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                         retries++;
                     }
                 }
+
+
             }
         }
-        JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
+        JSONObject result=null;
+        try{
+            result = (JSONObject) jo.get(JsonConstants.RESULT);
+        }catch (Exception e){
+            if (logger.isDebugEnabled())
+                logger.debug("Error while starting test: ",e);
+            throw new JSONException("Faild to get 'result' node "+e.getMessage());
+
+        }
         return result.getString(JsonConstants.ID);
     }
 
@@ -416,7 +425,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public boolean isActive(String testId) {
+    public boolean active(String testId) {
         boolean isActive=false;
         String url = this.urlManager.activeTests(APP_KEY, apiKey);
         JSONObject jo = null;

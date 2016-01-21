@@ -56,7 +56,7 @@ public interface BlazemeterApi {
 
     JSONObject getTestConfig(String testId);
 
-    boolean isActive(String testId);
+    boolean active(String testId);
 
     JSONObject postJsonConfig(String testId, JSONObject data);
 

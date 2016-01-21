@@ -1,14 +1,12 @@
 package hudson.plugins.blazemeter;
 
 import com.google.common.collect.LinkedHashMultimap;
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.ApiVersion;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
-import hudson.plugins.blazemeter.api.TestType;
+import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
+import org.mockito.Mockito;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -29,6 +27,7 @@ public class TestBlazemeterApiV3Impl {
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
+        MockedAPI.active();
     }
 
     @AfterClass
@@ -160,6 +159,25 @@ public class TestBlazemeterApiV3Impl {
        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID,TestType.multi), "15105877");
     }
 
+    @Test
+    public void startTest_Retries() throws JSONException {
+        blazemeterApiV3 = (BlazemeterApiV3Impl) APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_RETRIES,
+                ApiVersion.v3,
+                TestConstants.mockedApiUrl);
+        BlazemeterApi spyApi = Mockito.spy(blazemeterApiV3);
+        BzmHttpWrapper spyWrapper=Mockito.spy(blazemeterApiV3.getBzmHttpWr());
+        spyApi.setBzmHttpWr(spyWrapper);
+        try {
+            spyApi.startTest(TestConstants.TEST_MASTER_ID, TestType.http);
+        } catch (JSONException je) {
+            Mockito.verify(spyApi, Mockito.times(1)).active(TestConstants.TEST_MASTER_ID);
+            String url="http://127.0.0.1:1234/api/latest/tests/testMasterId/start?" +
+                    "api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.2.-SNAPSHOT&​";
+            Mockito.verify(spyWrapper, Mockito.times(6)).response(url,null, BzmHttpWrapper.Method.POST, JSONObject.class);
+
+        }
+    }
+
 
    @Test
     public void getTestRunStatus_notFound(){
@@ -280,6 +298,22 @@ public class TestBlazemeterApiV3Impl {
                 ApiVersion.v3,TestConstants.mockedApiUrl);
         int status=blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status==0);
+    }
+
+   @Test
+    public void active(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        boolean active=blazemeterApiV3.active("5133848");
+        Assert.assertTrue(active);
+    }
+
+    @Test
+    public void activeNot(){
+        blazemeterApiV3=(BlazemeterApiV3Impl)APIFactory.getAPI(TestConstants.MOCKED_USER_KEY_VALID,
+                ApiVersion.v3,TestConstants.mockedApiUrl);
+        boolean active=blazemeterApiV3.active("51338483");
+        Assert.assertFalse(active);
     }
 
 }

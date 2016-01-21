@@ -303,7 +303,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi {
     }
 
     @Override
-    public boolean isActive(String testId) {
+    public boolean active(String testId) {
         return false;
     }
 }

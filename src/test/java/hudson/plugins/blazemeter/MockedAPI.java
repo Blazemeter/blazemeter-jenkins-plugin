@@ -297,6 +297,19 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(startCollection));
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(""));
     }
 
     public static void getTests() throws IOException{
@@ -554,9 +567,29 @@ public class MockedAPI {
 
     }
 
+
+    public static void active() throws IOException{
+        String expectedPath="/api/latest/web/active";
+        File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
+        String active= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(expectedPath)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(active));
+    }
+
+
     public static void stopAPI(){
         mockServer.reset();
-//        mockServer.stop(true);
         mockServer.stop();
     }
 }
