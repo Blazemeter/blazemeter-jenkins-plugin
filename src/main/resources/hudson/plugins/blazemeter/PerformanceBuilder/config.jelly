@@ -8,12 +8,6 @@
         <f:select>
         </f:select>
     </f:entry>
-    <!--<f:entry title="${%Test Duration, min}:"
-             field="testDuration"
-             description="${%TestDuration}">
-        <f:textbox field="testDuration"
-                   checkUrl="'descriptorByName/hudson.plugins.blazemeter.PerformanceBuilder/checkTestDuration?value='+escape(this.value)"/>
-    </f:entry>-->
     <f:entry title="Download JTL report:" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
     </f:entry>
@@ -21,14 +15,4 @@
     <f:entry title="Download JUNIT report:" description="If checked, download Junit report" field="getJunit">
         <f:checkbox/>
     </f:entry>
-
-    <f:advanced>
-    <f:entry title="Select API version">
-            <f:select style="width:16em;" field="apiVersion">
-                <option value="autoDetect">Auto Detect</option>
-                <option value="v3">V3(force)</option>
-                <option value="v2">V2(deprecated)</option>
-            </f:select>
-        </f:entry>
-    </f:advanced>
 </j:jelly>

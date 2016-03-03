@@ -1,8 +1,7 @@
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
+import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,9 +16,7 @@ public class TestBmUrlManagerV3 {
     private String testId="123456789";
     private String masterId ="987654321";
     private String fileName="111111111";
-    private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLManager(ApiVersion.v3,
-                    TestConstants.mockedApiUrl);
+    private BmUrlManager bmUrlManager=new BmUrlManagerV3Impl(TestConstants.mockedApiUrl);
 
     @Test
     public void getServerUrl(){

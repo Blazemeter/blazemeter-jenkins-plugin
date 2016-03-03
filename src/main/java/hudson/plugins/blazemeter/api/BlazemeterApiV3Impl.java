@@ -2,7 +2,7 @@ package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
+import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
@@ -27,10 +27,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BmUrlManager urlManager;
     private BzmHttpWrapper bzmhc = null;
 
-    BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl) {
+    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl) {
         this.apiKey = apiKey;
-        urlManager = UrlManagerFactory.
-                getURLManager(ApiVersion.v3, blazeMeterUrl);
+        urlManager = new BmUrlManagerV3Impl(blazeMeterUrl);
         try {
             bzmhc = new BzmHttpWrapper();
         } catch (Exception ex) {

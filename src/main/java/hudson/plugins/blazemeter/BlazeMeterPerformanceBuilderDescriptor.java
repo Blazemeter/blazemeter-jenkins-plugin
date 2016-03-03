@@ -4,12 +4,10 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.utils.BzmServiceManager;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JsonConstants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -67,8 +65,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
-            BlazemeterApi api = APIFactory.getAPI(apiKey,
-                    apiVersion.isEmpty()?ApiVersion.v3:ApiVersion.valueOf(apiVersion),this.blazeMeterURL);
+            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
@@ -86,17 +83,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 throw FormValidation.error(e.getMessage(), e);
             }
         }
-        return items;
-    }
-
-    public ListBoxModel doFillApiVersionItems(@QueryParameter String apiVersion) throws FormValidation {
-        ListBoxModel items = new ListBoxModel();
-        items.add(new ListBoxModel.Option("AutoDetect",ApiVersion.autoDetect.name(),
-                ApiVersion.autoDetect.name().equals(apiVersion)));
-        items.add(new ListBoxModel.Option("V3(force)",ApiVersion.v3.name(),
-                ApiVersion.v3.name().equals(apiVersion)));
-        items.add(new ListBoxModel.Option("V2(deprecated)",ApiVersion.v2.name(),
-                ApiVersion.v2.name().equals(apiVersion)));
         return items;
     }
 
