@@ -8,7 +8,7 @@
     </parent>
 
     <properties>
-        <jenkins.build.number></jenkins.build.number>
+        <jenkins.build.number>local</jenkins.build.number>
     </properties>
 
 
