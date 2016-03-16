@@ -26,8 +26,11 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-//    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
     private String blazeMeterURL=null;
+    private String proxyHost=null;
+    private String proxyPort=null;
+    private String proxyUser=null;
+    private String proxyPass=null;
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
 
@@ -85,14 +88,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
         return items;
     }
-
-    public ListBoxModel doFillBlazeMeterURLItems(@QueryParameter String blazeMeterURL) throws FormValidation {
-        ListBoxModel items = new ListBoxModel();
-        items.add(new ListBoxModel.Option(Constants.A_BLAZEMETER_COM,Constants.A_BLAZEMETER_COM,Constants.A_BLAZEMETER_COM.equals(blazeMeterURL)));
-        items.add(new ListBoxModel.Option(Constants.QA_BLAZEMETER_COM,Constants.QA_BLAZEMETER_COM,Constants.QA_BLAZEMETER_COM.equals(blazeMeterURL)));
-        return items;
-    }
-
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
         ListBoxModel items = getKeys();
@@ -163,6 +158,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
         this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
+        this.proxyHost=formData.optString("proxyHost");
+        this.proxyPort=formData.optString("proxyPort");
+        this.proxyUser=formData.optString("proxyUser");
+        this.proxyPass=formData.optString("proxyPass");
         save();
         return true;
     }
@@ -179,6 +178,23 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public String getBlazeMeterURL() {
         return blazeMeterURL;
     }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public String getProxyPort() {
+        return proxyPort;
+    }
+
+    public String getProxyUser() {
+        return proxyUser;
+    }
+
+    public String getProxyPass() {
+        return proxyPass;
+    }
+
 
     public void setBlazeMeterURL(String blazeMeterURL) {
         this.blazeMeterURL = blazeMeterURL;

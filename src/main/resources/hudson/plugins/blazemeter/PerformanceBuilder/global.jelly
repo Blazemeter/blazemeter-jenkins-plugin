@@ -5,13 +5,20 @@
          xmlns:t="/lib/hudson"
          xmlns:f="/lib/form">
     <f:section title="BlazeMeter Cloud">
-    <f:entry title="${%BlazeMeter Server}:">
-        <f:select field="blazeMeterURL">
-        <option value="http://a.blazemeter.com">a.blazemeter.com</option>
-        <option value="http://qa.blazemeter.com">qa.blazemeter.com</option>
-
-        </f:select>
-    </f:entry>
-
+        <f:entry title="${%Server URL}" field="blazeMeterURL">
+            <f:textbox style="width:20em;"/>
+        </f:entry>
+        <f:entry title="${%Proxy host}" field="proxyHost">
+            <f:textbox style="width:20em;"/>
+        </f:entry>
+        <f:entry title="${%Proxy port}" field="proxyPort">
+            <f:textbox style="width:20em;"/>
+        </f:entry>
+        <f:entry title="${%Proxy user}" field="proxyUser">
+            <f:textbox style="width:20em;"/>
+        </f:entry>
+        <f:entry title="${%Proxy password}" field="proxyPass">
+            <f:textbox style="width:20em;"/>
+        </f:entry>
     </f:section>
 </j:jelly>
