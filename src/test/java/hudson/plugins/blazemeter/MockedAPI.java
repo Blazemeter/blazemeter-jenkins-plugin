@@ -24,6 +24,24 @@ public class MockedAPI {
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
 
     }
+
+    public static void ping() throws IOException{
+        File jsonFile = new File(TestConstants.RESOURCES + "/ping_true.json");
+        String ping_true= FileUtils.readFileToString(jsonFile);
+
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/web/version")
+                        .withHeader("Accept", "application/json"),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(ping_true));
+
+    }
+
     public static void userProfile() throws IOException{
 
 

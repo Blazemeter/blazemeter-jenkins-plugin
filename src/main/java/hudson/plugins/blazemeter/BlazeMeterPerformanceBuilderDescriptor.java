@@ -133,9 +133,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                       @QueryParameter("proxyPass") final String proxyPass)
             throws MessagingException, IOException, JSONException, ServletException {
         BlazemeterApi api = new BlazemeterApiV3Impl("",this.blazeMeterURL);
-        FormValidation f=api.ping()?FormValidation.okWithMarkup("Server is available with " +
-                "current proxy settings"):
-                FormValidation.error("Error while validating proxy settings");
+        FormValidation f= null;
+        try {
+            f = api.ping()? FormValidation.okWithMarkup("Server is available with " +
+                    "current proxy settings"):
+                    FormValidation.error("Error while validating proxy settings");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return f;
     }
 

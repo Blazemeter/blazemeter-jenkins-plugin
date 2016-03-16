@@ -459,7 +459,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public boolean ping() {
+    public boolean ping() throws Exception{
         String url = this.urlManager.version(APP_KEY);
         JSONObject jo=null;
         boolean ping=false;
@@ -468,6 +468,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             ping=jo.isNull(JsonConstants.ERROR);
         }catch (Exception e){
             logger.info("Failed to ping server: "+jo,e);
+            throw e;
         }
         return ping;
     }
