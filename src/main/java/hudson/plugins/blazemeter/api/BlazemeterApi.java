@@ -85,4 +85,6 @@ public interface BlazemeterApi {
     String getBlazeMeterURL();
 
     BmUrlManager getUrlManager();
+
+    boolean ping();
 }

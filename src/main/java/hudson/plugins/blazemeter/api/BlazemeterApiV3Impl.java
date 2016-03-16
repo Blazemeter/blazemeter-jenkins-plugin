@@ -457,4 +457,18 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
             return false;
         }
     }
+
+    @Override
+    public boolean ping() {
+        String url = this.urlManager.version(APP_KEY);
+        JSONObject jo=null;
+        boolean ping=false;
+        try{
+            jo = this.bzmhc.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class);
+            ping=jo.isNull(JsonConstants.ERROR);
+        }catch (Exception e){
+            logger.info("Failed to ping server: "+jo,e);
+        }
+        return ping;
+    }
 }

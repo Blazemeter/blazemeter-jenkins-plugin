@@ -160,4 +160,13 @@ public class TestBmUrlManagerV3 {
         String actActiveTests=bmUrlManager.activeTests(appKey, userKey);
         Assert.assertEquals(expActiveTests,actActiveTests);
     }
+
+    @Test
+    public void version(){
+        String expVersion=bmUrlManager.getServerUrl()+BmUrlManager.LATEST+
+                BmUrlManager.WEB+"/version?app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actVersion=bmUrlManager.version(appKey);
+        Assert.assertEquals(expVersion,actVersion);
+    }
+
 }

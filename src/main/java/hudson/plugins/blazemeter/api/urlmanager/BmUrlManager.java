@@ -10,6 +10,10 @@ public interface BmUrlManager {
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
             + BzmServiceManager.getVersion()+"&​";
 
+    String LATEST="/api/latest";
+    String TESTS="/tests";
+    String MASTERS="/masters";
+    String WEB="/web";
     String getServerUrl();
 
     void setServerUrl(String serverUrl);
@@ -52,5 +56,6 @@ public interface BmUrlManager {
 
     String listOfSessionIds(String appKey, String userKey, String masterId);
 
+    String version(String appKey);
 }
 
