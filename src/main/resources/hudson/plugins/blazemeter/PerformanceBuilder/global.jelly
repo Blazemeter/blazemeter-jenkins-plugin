@@ -20,5 +20,10 @@
         <f:entry title="${%Proxy password}" field="proxyPass">
             <f:textbox style="width:20em;"/>
         </f:entry>
+        <f:validateButton
+                title="${%Test Proxy Server}"
+                progress="${%Validating proxy server settings}"
+                method="testProxy"
+                with="blazeMeterUrl,proxyHost,proxyPort,proxyUser,proxyPass"/>
     </f:section>
 </j:jelly>

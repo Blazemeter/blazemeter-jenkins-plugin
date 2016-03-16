@@ -126,13 +126,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL);
     }
 
-    public FormValidation doCheckTestDuration(@QueryParameter String value) throws IOException, ServletException {
-        if(value.equals("0")) {
-            return FormValidation.warning("TestDuration should be more than ZERO");
-        }if(value.equals("")) {
-            return FormValidation.warning("Default value will be fetched from server");
-        }
-        return FormValidation.ok();
+    public FormValidation doTestProxy(@QueryParameter("blazemeterUrl") final String blazemeterUrl,
+                                      @QueryParameter("proxyHost") final String proxyHost,
+                                      @QueryParameter("proxyPort") final String proxyPort,
+                                      @QueryParameter("proxyUser") final String proxyUser,
+                                      @QueryParameter("proxyPass") final String proxyPass)
+            throws MessagingException, IOException, JSONException, ServletException {
+        return FormValidation.error("Error while validating proxy settings");
     }
 
     public ListBoxModel getKeys(){
