@@ -62,7 +62,11 @@ public class PerformanceBuilder extends Builder {
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
-        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
 //        this.testDuration=testDuration;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
@@ -91,14 +95,22 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
+        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
 //        this.api.setLogger(bzmBuildLog);
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
             jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+DESCRIPTOR.getBlazeMeterURL());

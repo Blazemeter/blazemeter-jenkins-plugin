@@ -24,6 +24,6 @@
                 title="${%Test Proxy Server}"
                 progress="${%Validating proxy server settings}"
                 method="testProxy"
-                with="blazeMeterUrl,proxyHost,proxyPort,proxyUser,proxyPass"/>
+                with="blazeMeterURL,proxyHost,proxyPort,proxyUser,proxyPass"/>
     </f:section>
 </j:jelly>

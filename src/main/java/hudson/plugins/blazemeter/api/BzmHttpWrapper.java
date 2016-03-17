@@ -25,7 +25,8 @@ public class BzmHttpWrapper {
 
     private transient DefaultHttpClient httpClient = null;
 
-    public BzmHttpWrapper() {
+    public BzmHttpWrapper(String proxyHost,String proxyPort,
+                          String proxyUser,String proxyPass) {
         this.httpClient = new DefaultHttpClient();
         this.logger.setDebugEnabled(false);
         HttpParams httpParams = new BasicHttpParams();

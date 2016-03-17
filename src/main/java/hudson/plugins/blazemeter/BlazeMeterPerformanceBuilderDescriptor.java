@@ -68,7 +68,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
-            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL);
+            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL,
+                    this.proxyHost,
+                    this.proxyPort,
+                    this.proxyUser,
+                    this.proxyPass);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
@@ -123,16 +127,20 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL);
+        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL,
+                this.proxyHost,
+                this.proxyPort,
+                this.proxyUser,
+                this.proxyPass);
     }
 
-    public FormValidation doTestProxy(@QueryParameter("blazemeterUrl") final String blazemeterUrl,
+    public FormValidation doTestProxy(@QueryParameter("blazeMeterURL") final String url,
                                       @QueryParameter("proxyHost") final String proxyHost,
                                       @QueryParameter("proxyPort") final String proxyPort,
                                       @QueryParameter("proxyUser") final String proxyUser,
                                       @QueryParameter("proxyPass") final String proxyPass)
             throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterApi api = new BlazemeterApiV3Impl("",this.blazeMeterURL);
+        BlazemeterApi api = new BlazemeterApiV3Impl("",url,proxyHost,proxyPort,proxyUser,proxyPass);
         FormValidation f= null;
         try {
             f = api.ping()? FormValidation.okWithMarkup("Server is available with " +
@@ -140,6 +148,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     FormValidation.error("Error while validating proxy settings");
         } catch (Exception e) {
             e.printStackTrace();
+            f=FormValidation.error("Error while validating proxy settings");
         }
         return f;
     }

@@ -27,11 +27,13 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BmUrlManager urlManager;
     private BzmHttpWrapper bzmhc = null;
 
-    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl) {
+    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl,
+                               String proxyHost,String proxyPort,
+                               String proxyUser,String proxyPass) {
         this.apiKey = apiKey;
         urlManager = new BmUrlManagerV3Impl(blazeMeterUrl);
         try {
-            bzmhc = new BzmHttpWrapper();
+            bzmhc = new BzmHttpWrapper(proxyHost, proxyPort,proxyUser,proxyPass);
         } catch (Exception ex) {
             logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
