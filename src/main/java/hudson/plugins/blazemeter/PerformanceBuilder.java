@@ -113,7 +113,12 @@ public class PerformanceBuilder extends Builder {
                 DESCRIPTOR.getProxyPass());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
-            jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+DESCRIPTOR.getBlazeMeterURL());
+            jenBuildLog.warn("Please, check that settings are valid.");
+            jenBuildLog.warn("UserKey=" + userKeyId + ", serverUrl=" + DESCRIPTOR.getBlazeMeterURL());
+            jenBuildLog.warn("ProxyHost=" + DESCRIPTOR.getProxyHost());
+            jenBuildLog.warn("ProxyPort=" + DESCRIPTOR.getProxyPort());
+            jenBuildLog.warn("ProxyUser=" + DESCRIPTOR.getProxyUser());
+            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass());
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());

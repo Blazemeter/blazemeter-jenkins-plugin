@@ -67,7 +67,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestStatus_Running() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl,"","","","");
+                TestConstants.mockedApiUrl,"",TestConstants.proxyPort,"","");
         TestStatus testStatus = blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_100);
         Assert.assertEquals(testStatus, TestStatus.Running);
     }
@@ -75,7 +75,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestInfo_NotRunning() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl,"","","","");
+                TestConstants.mockedApiUrl,"",TestConstants.proxyPort,"","");
         TestStatus testStatus = blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_140);
         Assert.assertEquals(testStatus, TestStatus.NotRunning);
     }
@@ -84,7 +84,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestInfo_Error() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl,"","","","");
+                TestConstants.mockedApiUrl,"",TestConstants.proxyPort,"","");
         TestStatus testStatus = blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_NOT_FOUND);
         Assert.assertEquals(testStatus, TestStatus.Error);
     }
@@ -140,28 +140,28 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void startTest_http() throws JSONException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl,
-                "","","","");
+                "",TestConstants.proxyPort,"","");
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http), "15102806");
     }
 
     @Test
     public void startTest_jmeter() throws JSONException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter), "15102806");
     }
 
     @Test
     public void startTest_followme() throws JSONException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme), "15102806");
     }
 
     @Test
     public void startTest_multi() throws JSONException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi), "15105877");
     }
 
@@ -194,7 +194,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestList_6_10() throws IOException, JSONException, ServletException, MessagingException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         LinkedHashMultimap<String, String> testList = blazemeterApiV3.getTestsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 6);
         Assert.assertTrue(testList.size() == 10);
@@ -204,7 +204,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestList_6_6() throws IOException, JSONException, ServletException, MessagingException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_6_TESTS, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         LinkedHashMultimap<String, String> testList = blazemeterApiV3.getTestsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 6);
         Assert.assertTrue(testList.size() == 6);
@@ -214,7 +214,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestReport() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         JSONObject testReport = blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(testReport.length() == 33);
 
@@ -233,7 +233,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestsCount_10() throws IOException, JSONException, ServletException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int count = blazemeterApiV3.getTestCount();
         Assert.assertTrue(count == 10);
 
@@ -242,7 +242,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestsCount_1() throws IOException, JSONException, ServletException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_1_TEST, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int count = blazemeterApiV3.getTestCount();
         Assert.assertTrue(count == 1);
 
@@ -251,7 +251,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestsCount_0() throws IOException, JSONException, ServletException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_0_TESTS, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int count = blazemeterApiV3.getTestCount();
         Assert.assertTrue(count == 0);
 
@@ -269,7 +269,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestSessionStatusCode_25() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_25);
         Assert.assertTrue(status == 25);
     }
@@ -277,7 +277,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestSessionStatusCode_70() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_70);
         Assert.assertTrue(status == 70);
     }
@@ -285,7 +285,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestSessionStatusCode_140() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_140);
         Assert.assertTrue(status == 140);
     }
@@ -293,7 +293,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void getTestSessionStatusCode_100() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_100);
         Assert.assertTrue(status == 100);
     }
@@ -309,7 +309,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void active() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         boolean active = blazemeterApiV3.active("5133848");
         Assert.assertTrue(active);
     }
@@ -326,7 +326,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void ping_true() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl
-                ,"","","","");
+                ,"",TestConstants.proxyPort,"","");
         boolean ping = false;
         try {
             ping = blazemeterApiV3.ping();

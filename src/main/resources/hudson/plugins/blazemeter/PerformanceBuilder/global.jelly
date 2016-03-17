@@ -15,10 +15,10 @@
             <f:textbox style="width:20em;"/>
         </f:entry>
         <f:entry title="${%Proxy user}" field="proxyUser">
-            <f:textbox style="width:20em;"/>
+            <f:textbox style="width:20em;" disabled="true" default="Authentication is not implemented yet"/>
         </f:entry>
         <f:entry title="${%Proxy password}" field="proxyPass">
-            <f:textbox style="width:20em;"/>
+            <f:textbox style="width:20em;" disabled="true" default="Authentication is not implemented yet"/>
         </f:entry>
         <f:validateButton
                 title="${%Test Proxy Server}"

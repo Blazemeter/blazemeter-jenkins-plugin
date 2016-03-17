@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import org.apache.commons.io.FileUtils;
+import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Parameter;
 
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -17,12 +19,12 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class MockedAPI {
     private static ClientAndServer mockServer;
-
+    private static ClientAndProxy proxy;
     private MockedAPI(){}
 
     public static void startAPI(){
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
-
+        proxy = startClientAndProxy(Integer.parseInt(TestConstants.proxyPort));
     }
 
     public static void ping() throws IOException{
@@ -609,5 +611,6 @@ public class MockedAPI {
     public static void stopAPI(){
         mockServer.reset();
         mockServer.stop();
+        proxy.stop();
     }
 }
