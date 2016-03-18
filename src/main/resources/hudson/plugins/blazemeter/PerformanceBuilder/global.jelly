@@ -18,7 +18,7 @@
             <f:textbox style="width:20em;"/>
         </f:entry>
         <f:entry title="${%Proxy password}" field="proxyPass">
-            <f:textbox style="width:20em;"/>
+            <f:password style="width:20em;"/>
         </f:entry>
         <f:validateButton
                 title="${%Test Proxy Server}"
