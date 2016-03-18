@@ -4,12 +4,16 @@ import hudson.plugins.blazemeter.utils.Constants;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -31,7 +35,16 @@ public class BzmHttpWrapper {
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
         if(!proxyHost.isEmpty()&&!proxyPort.isEmpty()){
-            this.proxy=new HttpHost(proxyHost,Integer.parseInt(proxyPort));
+            int proxyInt=Integer.parseInt(proxyPort);
+            this.proxy=new HttpHost(proxyHost,proxyInt);
+            if(!proxyUser.isEmpty()&&!proxyPass.isEmpty()){
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(
+                        new AuthScope(proxyHost, proxyInt),
+                        new UsernamePasswordCredentials(proxyUser, proxyPass));
+                this.httpClient = HttpClients.custom()
+                        .setDefaultCredentialsProvider(credsProvider).build();
+            }
         }
     }
 
