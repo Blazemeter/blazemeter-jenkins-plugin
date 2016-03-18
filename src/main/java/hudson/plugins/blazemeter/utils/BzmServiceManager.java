@@ -486,8 +486,10 @@ public class BzmServiceManager {
             logger.warn(e);
             return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
-        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl);
+        logger.warn(" Please, check proxy settings, serverUrl and userKey.");
+        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+
+                ". Please, check proxy settings, serverUrl and userKey.");
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl,
