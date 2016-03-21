@@ -26,7 +26,7 @@ import java.util.*;
 
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL=null;
+    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
     private String proxyHost=null;
     private String proxyPort=null;
     private String proxyUser=null;

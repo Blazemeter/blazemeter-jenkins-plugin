@@ -118,7 +118,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("ProxyHost=" + DESCRIPTOR.getProxyHost());
             jenBuildLog.warn("ProxyPort=" + DESCRIPTOR.getProxyPort());
             jenBuildLog.warn("ProxyUser=" + DESCRIPTOR.getProxyUser());
-            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass());
+            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass().substring(0,3)+"...");
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
