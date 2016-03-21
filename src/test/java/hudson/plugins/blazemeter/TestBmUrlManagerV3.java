@@ -1,8 +1,7 @@
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManagerFactory;
+import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,9 +16,7 @@ public class TestBmUrlManagerV3 {
     private String testId="123456789";
     private String masterId ="987654321";
     private String fileName="111111111";
-    private BmUrlManager bmUrlManager=
-            UrlManagerFactory.getURLManager(ApiVersion.v3,
-                    TestConstants.mockedApiUrl);
+    private BmUrlManager bmUrlManager=new BmUrlManagerV3Impl(TestConstants.mockedApiUrl);
 
     @Test
     public void getServerUrl(){
@@ -36,7 +33,7 @@ public class TestBmUrlManagerV3 {
     public void testStatus(){
         String expTestGetStatus=bmUrlManager.getServerUrl()+"/api/latest/masters/"
                 + masterId +"/status?events=false&api_key="+userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-        String actTestGetStatus=bmUrlManager.testMasterStatus(appKey, userKey, masterId);
+        String actTestGetStatus=bmUrlManager.masterStatus(appKey, userKey, masterId);
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }
 
@@ -44,7 +41,7 @@ public class TestBmUrlManagerV3 {
     public void getTests(){
     String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/web/tests?api_key="+userKey+
             "&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
-    String actGetTestsUrl=bmUrlManager.getTests(appKey, userKey);
+    String actGetTestsUrl=bmUrlManager.tests(appKey, userKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
     }
 
@@ -155,4 +152,21 @@ public class TestBmUrlManagerV3 {
         String actListOfSessionsIds=bmUrlManager.listOfSessionIds(appKey, userKey, masterId);
         Assert.assertEquals(expListOfSessionIds,actListOfSessionsIds);
     }
+
+    @Test
+    public void activeTests(){
+        String expActiveTests=bmUrlManager.getServerUrl()+"/api/latest/web/active?api_key="
+                +userKey+"&app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actActiveTests=bmUrlManager.activeTests(appKey, userKey);
+        Assert.assertEquals(expActiveTests,actActiveTests);
+    }
+
+    @Test
+    public void version(){
+        String expVersion=bmUrlManager.getServerUrl()+BmUrlManager.LATEST+
+                BmUrlManager.WEB+"/version?app_key="+appKey+BmUrlManager.CLIENT_IDENTIFICATION;
+        String actVersion=bmUrlManager.version(appKey);
+        Assert.assertEquals(expVersion,actVersion);
+    }
+
 }

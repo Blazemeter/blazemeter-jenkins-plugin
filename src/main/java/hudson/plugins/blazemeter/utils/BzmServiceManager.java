@@ -4,9 +4,8 @@ import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.*;
-import hudson.plugins.blazemeter.api.APIFactory;
-import hudson.plugins.blazemeter.api.ApiVersion;
 import hudson.plugins.blazemeter.api.BlazemeterApi;
+import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -35,69 +34,19 @@ public class BzmServiceManager {
     private BzmServiceManager() {
     }
 
-    public static String autoDetectApiVersion(String apiKey,String blazeMeterUrl) {
-        BlazemeterApi api = null;
-        String detectedApiVersion = null;
-            api = APIFactory.getAPI(apiKey, ApiVersion.v3, blazeMeterUrl);
-            boolean isV3 = false;
-            try {
-                isV3 = api.getUser().getJSONObject("features").getBoolean("v3");
-                if (isV3) {
-                    detectedApiVersion="v3";
-                } else {
-                    detectedApiVersion="v2";
-                }
-            } catch (JSONException je) {
-                detectedApiVersion="v3";
-            } catch (NullPointerException npe) {
-                detectedApiVersion="v3";
-            }finally {
-                return detectedApiVersion;
-            }
-    }
-
-
-    public static JSONObject updateTestDuration(BlazemeterApi api,
-                                          String testId,
-                                          String testDuration,
-                                          StdErrLog bzmBuildLog){
-        JSONObject result;
-        JSONObject updateResult=null;
-        try {
-            JSONObject jo = api.getTestConfig(testId);
-            result = jo.getJSONObject(JsonConstants.RESULT);
-            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
-            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
-            String type = configuration.getString(JsonConstants.TYPE);
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
-            override.put(JsonConstants.DURATION, testDuration);
-            override.put("threads", JSONObject.NULL);
-            configuration.put("serversCount", JSONObject.NULL);
-            updateResult = api.putTestInfo(testId, result);
-        } catch (JSONException je) {
-            bzmBuildLog.warn("Received JSONException while updating test duration: ", je);
-        } catch (Exception e) {
-            bzmBuildLog.warn("Received JSONException while updating test duration: ", e);
-        }
-        return updateResult;
-    }
-
-
-
-    public static void waitForFinish(BlazemeterApi api, String apiVersion, String testId, AbstractLogger bzmBuildLog,
+    public static void waitForFinish(BlazemeterApi api, String testId, AbstractLogger bzmBuildLog,
                                      String session) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
             Thread.sleep(15000);
-            TestStatus testStatus = api.getTestStatus(apiVersion.equals("v2") ? testId : session);
+            TestStatus testStatus = api.getTestStatus(session);
 
             if (!testStatus.equals(TestStatus.Running)) {
-                bzmBuildLog.info("TestStatus for session " + (apiVersion.equals("v2") ? testId : session)
-                        + testStatus);
+                bzmBuildLog.info("TestStatus for session " + session +
+                        " " + testStatus);
                 bzmBuildLog.info("BlazeMeter TestStatus for session" +
-                        (apiVersion.equals("v2") ? testId : session)
+                        session
                         + " is not 'Running': finishing build.... ");
                 bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
@@ -144,36 +93,13 @@ public class BzmServiceManager {
         }
     }
 
-    public static void uploadFile(String testId, BlazemeterApi bmAPI, File file, StdErrLog bzmBuildLog) {
-        String fileName = file.getName();
-        org.json.JSONObject json = bmAPI.uploadBinaryFile(testId, file);
-        try {
-            if (!json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
-                bzmBuildLog.info("Could not upload file " + fileName + " " + json.get(JsonConstants.ERROR).toString());
-            }
-        } catch (JSONException e) {
-            bzmBuildLog.info("Could not upload file " + fileName + " " + e.getMessage());
-        }
-    }
-
-    public static String getSessionId(JSONObject json,
-                                ApiVersion apiVersion,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
+    public static String getSessionId(JSONObject json,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
         String session = "";
         try {
-            if (apiVersion.equals(ApiVersion.v2.name()) && !json.get(JsonConstants.RESPONSE_CODE).equals(200)) {
-                if (json.get(JsonConstants.RESPONSE_CODE).equals(500) && json.get(JsonConstants.ERROR).toString()
-                        .startsWith("Test already running")) {
-                    bzmBuildLog.warn("Test already running, please stop it first");
-                    return session;
-                }
-            }
+
             // get sessionId add to interface
-            if (apiVersion.equals(ApiVersion.v2)) {
-                session = json.get("session_id").toString();
-            } else {
                 JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
                 session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
-            }
         } catch (Exception e) {
             jenBuildLog.info("Failed to get session_id: " + e.getMessage());
             bzmBuildLog.info("Failed to get session_id. ", e);
@@ -230,9 +156,9 @@ public class BzmServiceManager {
             failures=jo.getJSONArray(JsonConstants.FAILURES);
             errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
-            jenBuildLog.warn("No tresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         }finally {
             if(errors.length()>0){
                 jenBuildLog.info("Having errors while test status validation...");
@@ -408,23 +334,23 @@ public class BzmServiceManager {
         jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
         try{
             junitReport = api.retrieveJUNITXML(masterId);
+            String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
+            FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
+            jenBuildLog.warn("build number="+buildNumber);
+            jenBuildLog.warn("masterId=" + masterId);
+            String junitReportPath = workspace.getParent()
+                    + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
+            jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
+            jenBuildLog.info("Saving it to " + junitReportPath);
+            saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
         } catch (Exception e) {
-            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + " " + e.getMessage());
+            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
-        String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
-        FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
-        jenBuildLog.warn("build number="+buildNumber);
-        jenBuildLog.warn("masterId=" + masterId);
-        String junitReportPath = workspace.getParent()
-                + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
-        jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-        jenBuildLog.info("Saving it to " + junitReportPath);
-        saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
     }
 
     public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
-        //get tresholds from server and check if test is success
+        //get thresholds from server and check if test is success
         Result result;
         BlazemeterApi api=builder.getApi();
         StdErrLog jenBuildLog=builder.getJenBuildLog();
@@ -434,20 +360,19 @@ public class BzmServiceManager {
             return result;
         }
         result=ciStatus.equals(CIStatus.failures)?Result.FAILURE:Result.SUCCESS;
-        ApiVersion apiVersion=ApiVersion.valueOf(builder.getApiVersion());
-        FilePath workspace=builder.getBuild().getWorkspace();
-        if(apiVersion.equals(ApiVersion.v3) & builder.isGetJunit()) {
+        FilePath workspace = builder.getBuild().getWorkspace();
+        if (builder.isGetJunit()) {
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
-            } else {
-            jenBuildLog.info("JUNIT report won't be requested: apiVersion is v2 or check-box is unchecked.");
+        } else {
+            jenBuildLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
-        if(apiVersion.equals(ApiVersion.v3)&builder.isGetJtl()){
+        if(builder.isGetJtl()){
             AbstractBuild build=builder.getBuild();
             FilePath jtlPath = new FilePath(build.getWorkspace(), build.getId());
             BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, buildNumber, jenBuildLog, jenBuildLog);
         } else {
-            jenBuildLog.info("JTL report won't be requested: apiVersion is v2 or check-box is unchecked.");
+            jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
         }
 
 
@@ -525,7 +450,11 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
+    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl,
+                                                 String proxyHost,
+                                                 String proxyPort,
+                                                 String proxyUser,
+                                                 String proxyPass) {
         if(userKey.isEmpty()){
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
@@ -533,7 +462,7 @@ public class BzmServiceManager {
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
-            BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazeMeterUrl);
+            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl,proxyHost,proxyPort,proxyUser,proxyPass);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
@@ -548,17 +477,28 @@ public class BzmServiceManager {
                     return FormValidation.ok("API key Valid. Email - " + user.getString("mail"));
                 }
             }
-        } catch (Exception e) {
+        } catch (ClassCastException e) {
+            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn(e);
+        }
+        catch (Exception e) {
             logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
             logger.warn(e);
             return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
-        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+". Please, check manually.");
+        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl);
+        logger.warn(" Please, check proxy settings, serverUrl and userKey.");
+        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+
+                ". Please, check proxy settings, serverUrl and userKey.");
     }
 
-    public static String getUserEmail(String userKey,String blazemeterUrl){
-        BlazemeterApi bzm = APIFactory.getAPI(userKey, ApiVersion.v3, blazemeterUrl);
+    public static String getUserEmail(String userKey,String blazemeterUrl,
+                                      String proxyHost,
+                                      String proxyPort,
+                                      String proxyUser,
+                                      String proxyPass){
+        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl,
+                proxyHost,proxyPort,proxyUser,proxyPass);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {

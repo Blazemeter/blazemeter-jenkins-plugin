@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter;
 
 import org.apache.commons.io.FileUtils;
+import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Parameter;
 
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -17,13 +19,31 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class MockedAPI {
     private static ClientAndServer mockServer;
-
+    private static ClientAndProxy proxy;
     private MockedAPI(){}
 
     public static void startAPI(){
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
+        proxy = startClientAndProxy(Integer.parseInt(TestConstants.proxyPort));
+    }
+
+    public static void ping() throws IOException{
+        File jsonFile = new File(TestConstants.RESOURCES + "/ping_true.json");
+        String ping_true= FileUtils.readFileToString(jsonFile);
+
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/web/version")
+                        .withHeader("Accept", "application/json"),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(ping_true));
 
     }
+
     public static void userProfile() throws IOException{
 
 
@@ -80,6 +100,21 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(userProfile));
+
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/user")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(""));
+
 
     }
 
@@ -192,8 +227,21 @@ public class MockedAPI {
         String terminateTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
-                        .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/terminate")
+                        .withMethod("POST")
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_25 +"/terminate")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(terminateTest));
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_70 +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -209,8 +257,21 @@ public class MockedAPI {
         String stopTest= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
-                        .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/stop")
+                        .withMethod("POST")
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_100 +"/stop")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(stopTest));
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_140 +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -256,6 +317,19 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(startCollection));
+        mockServer.when(
+                request()
+                        .withMethod("POST")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(""));
     }
 
     public static void getTests() throws IOException{
@@ -513,8 +587,30 @@ public class MockedAPI {
 
     }
 
+
+    public static void active() throws IOException{
+        String expectedPath="/api/latest/web/active";
+        File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
+        String active= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(expectedPath)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(active));
+    }
+
+
     public static void stopAPI(){
         mockServer.reset();
         mockServer.stop();
+        proxy.stop();
     }
 }

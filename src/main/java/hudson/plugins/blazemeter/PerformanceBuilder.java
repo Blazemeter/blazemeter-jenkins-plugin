@@ -38,10 +38,6 @@ public class PerformanceBuilder extends Builder {
 
     private String testId = "";
 
-    private String apiVersion = "v3";
-
-//    private String testDuration = "";
-
     private boolean getJtl = false;
 
     private boolean getJunit = false;
@@ -60,17 +56,17 @@ public class PerformanceBuilder extends Builder {
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
-//                              String testDuration,
                               String testId,
-                              String apiVersion,
                               boolean getJtl,
                               boolean getJunit
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
-        this.apiVersion = apiVersion.equals("autoDetect")?
-                BzmServiceManager.autoDetectApiVersion(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL()):apiVersion;
-        this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion),DESCRIPTOR.getBlazeMeterURL());
+        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
 //        this.testDuration=testDuration;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
@@ -99,17 +95,30 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = APIFactory.getAPI(jobApiKey, ApiVersion.valueOf(this.apiVersion), DESCRIPTOR.getBlazeMeterURL());
+        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
 //        this.api.setLogger(bzmBuildLog);
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
+                DESCRIPTOR.getProxyHost(),
+                DESCRIPTOR.getProxyPort(),
+                DESCRIPTOR.getProxyUser(),
+                DESCRIPTOR.getProxyPass());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
-            jenBuildLog.warn("Invalid user key. UserKey="+userKeyId+", serverUrl="+DESCRIPTOR.getBlazeMeterURL());
+            jenBuildLog.warn("Please, check that settings are valid.");
+            jenBuildLog.warn("UserKey=" + userKeyId + ", serverUrl=" + DESCRIPTOR.getBlazeMeterURL());
+            jenBuildLog.warn("ProxyHost=" + DESCRIPTOR.getProxyHost());
+            jenBuildLog.warn("ProxyPort=" + DESCRIPTOR.getProxyPort());
+            jenBuildLog.warn("ProxyUser=" + DESCRIPTOR.getProxyUser());
+            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass().substring(0,3)+"...");
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
@@ -124,17 +133,6 @@ public class PerformanceBuilder extends Builder {
         String testId_num=Utils.getTestId(this.testId);
         jenBuildLog.info("TestId="+this.testId);
         jenBuildLog.info("Test type="+testType.toString());
-        // implemented only with V3
-        /*if(this.api instanceof BlazemeterApiV3Impl){
-            this.testId= BzmServiceManager.prepareTestRun(this);
-            if(this.testId.isEmpty()){
-                jenBuildLog.warn("Failed to start test on server: check that JSON configuration is valid.");
-                return false;
-            }
-        }*/
-
-
-//        bzmBuildLog.info("Expected test duration=" + this.testDuration);
         String masterId="";
         bzmBuildLog.info("### About to start BlazeMeter test # " + testId_num);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
@@ -160,8 +158,7 @@ public class PerformanceBuilder extends Builder {
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
 
         try {
-            BzmServiceManager.waitForFinish(this.api, this.apiVersion, testId_num,
-                    bzmBuildLog, masterId);
+            BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
@@ -180,7 +177,7 @@ public class PerformanceBuilder extends Builder {
         }
 
         finally {
-            TestStatus testStatus = this.api.getTestStatus(apiVersion.equals("v2") ? testId : masterId);
+            TestStatus testStatus = this.api.getTestStatus(masterId);
 
             if (testStatus.equals(TestStatus.Running)) {
                 jenBuildLog.info("Shutting down test");
@@ -194,26 +191,6 @@ public class PerformanceBuilder extends Builder {
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }
         }
-    }
-
-
-
-/*
-    public String getTestDuration() {
-        return testDuration;
-    }
-
-    public void setTestDuration(String testDuration) {
-        this.testDuration = testDuration;
-    }
-*/
-
-    public String getApiVersion() {
-        return apiVersion;
-    }
-
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
     }
 
 

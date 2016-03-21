@@ -7,16 +7,22 @@ import hudson.plugins.blazemeter.utils.BzmServiceManager;
  */
 public interface BmUrlManager {
 
-    String CLIENT_IDENTIFICATION = "_clientId=CI_JENKINS&_clientVersion="
+    String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
             + BzmServiceManager.getVersion()+"&​";
 
+    String LATEST="/api/latest";
+    String TESTS="/tests";
+    String MASTERS="/masters";
+    String WEB="/web";
     String getServerUrl();
 
     void setServerUrl(String serverUrl);
 
-    String testMasterStatus(String appKey, String userKey, String testId);
+    String masterStatus(String appKey, String userKey, String testId);
 
-    String getTests(String appKey, String userKey);
+    String tests(String appKey, String userKey);
+
+    String activeTests(String appKey, String userKey);
 
     String scriptUpload(String appKey, String userKey, String testId, String fileName);
 
@@ -50,5 +56,6 @@ public interface BmUrlManager {
 
     String listOfSessionIds(String appKey, String userKey, String masterId);
 
+    String version(String appKey);
 }
 
