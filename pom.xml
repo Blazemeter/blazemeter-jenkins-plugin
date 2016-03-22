@@ -13,7 +13,7 @@
 
 
     <groupId>com.blazemeter.plugins</groupId>
-    <artifactId>BlazeMeterJenkinsPlugin</artifactId>
+    <artifactId>BlazeMeterPlugin</artifactId>
     <packaging>hpi</packaging>
     <version>2.4-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
