@@ -13,9 +13,9 @@
 
 
     <groupId>com.blazemeter.plugins</groupId>
-    <artifactId>BlazeMeterJenkinsPlugin</artifactId>
+    <artifactId>BlazeMeterPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>2.2.${jenkins.build.number}-SNAPSHOT</version>
+    <version>2.3.${jenkins.build.number}-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -125,20 +125,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.pitest</groupId>
-                    <artifactId>pitest-maven</artifactId>
-                    <version>1.1.5</version>
-                    <configuration>
-                        <targetClasses>
-                            <param>hudson.plugins.blazemeter.*</param>
-                        </targetClasses>
-                        <targetTests>
-                            <param>hudson.plugins.blazemeter.*</param>
-                        </targetTests>
-                    </configuration>
-                </plugin>
-
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
