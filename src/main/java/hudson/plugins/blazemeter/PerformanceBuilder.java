@@ -1,8 +1,8 @@
 package hudson.plugins.blazemeter;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -62,11 +62,7 @@ public class PerformanceBuilder extends Builder {
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
-        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
+        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
 //        this.testDuration=testDuration;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
@@ -95,30 +91,23 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
+        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
 //        this.api.setLogger(bzmBuildLog);
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
+            ProxyConfiguration proxy=ProxyConfiguration.load();
             jenBuildLog.warn("Please, check that settings are valid.");
             jenBuildLog.warn("UserKey=" + userKeyId + ", serverUrl=" + DESCRIPTOR.getBlazeMeterURL());
-            jenBuildLog.warn("ProxyHost=" + DESCRIPTOR.getProxyHost());
-            jenBuildLog.warn("ProxyPort=" + DESCRIPTOR.getProxyPort());
-            jenBuildLog.warn("ProxyUser=" + DESCRIPTOR.getProxyUser());
-            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass().substring(0,3)+"...");
+            jenBuildLog.warn("ProxyHost=" + proxy.name);
+            jenBuildLog.warn("ProxyPort=" + proxy.port);
+            jenBuildLog.warn("ProxyUser=" + proxy.getUserName());
+            jenBuildLog.warn("ProxyPass=" + proxy.getPassword().substring(0,3)+"...");
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());

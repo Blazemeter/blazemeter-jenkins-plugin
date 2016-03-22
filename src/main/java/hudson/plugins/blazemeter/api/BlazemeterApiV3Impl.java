@@ -1,6 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
+import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
@@ -27,13 +28,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     BmUrlManager urlManager;
     private BzmHttpWrapper bzmhc = null;
 
-    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl,
-                               String proxyHost,String proxyPort,
-                               String proxyUser,String proxyPass) {
+    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl){
+        this(apiKey, blazeMeterUrl,null);
+    }
+    public BlazemeterApiV3Impl(String apiKey, String blazeMeterUrl, ProxyConfiguration proxy) {
         this.apiKey = apiKey;
         urlManager = new BmUrlManagerV3Impl(blazeMeterUrl);
         try {
-            bzmhc = new BzmHttpWrapper(proxyHost, proxyPort,proxyUser,proxyPass);
+            bzmhc = new BzmHttpWrapper(proxy);
         } catch (Exception ex) {
             logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }

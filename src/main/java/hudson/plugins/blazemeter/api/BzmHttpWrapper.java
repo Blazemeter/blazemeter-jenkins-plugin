@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
+import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
@@ -30,18 +31,28 @@ public class BzmHttpWrapper {
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy=null;
 
-    public BzmHttpWrapper(String proxyHost,String proxyPort,
-                          String proxyUser,String proxyPass) {
+    public BzmHttpWrapper(ProxyConfiguration proxy) {
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
-        if(!proxyHost.isEmpty()&&!proxyPort.isEmpty()){
-            int proxyInt=Integer.parseInt(proxyPort);
-            this.proxy=new HttpHost(proxyHost,proxyInt);
+        try {
+            proxy=proxy==null?ProxyConfiguration.load():proxy;
+        }catch (IOException ie){
+            logger.warn("Failed to load jenkins proxy configuration: ",ie);
+            proxy=null;
+        }catch (Exception e){
+            proxy=null;
+            logger.warn("Failed to load jenkins proxy configuration: ",e);
+        }
+
+        if(proxy!=null){
+            this.proxy=new HttpHost(proxy.name,proxy.port);
+            String proxyUser=proxy.getUserName();
+            String proxyPass=proxy.getPassword();
             if(!proxyUser.isEmpty()&&!proxyPass.isEmpty()){
                 CredentialsProvider credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(
-                        new AuthScope(proxyHost, proxyInt),
-                        new UsernamePasswordCredentials(proxyUser, proxyPass));
+                        new AuthScope(proxy.name, proxy.port),
+                        new UsernamePasswordCredentials(proxyUser,proxyPass));
                 this.httpClient = HttpClients.custom()
                         .setDefaultCredentialsProvider(credsProvider).build();
             }

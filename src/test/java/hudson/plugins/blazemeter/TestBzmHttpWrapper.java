@@ -18,7 +18,7 @@ public class TestBzmHttpWrapper {
     private String userKey = "1234567890";
     private String appKey = "jnk100x987c06f4e10c4";
     private String testId = "12345";
-    private BzmHttpWrapper bzmHttpWrapper = new BzmHttpWrapper("",TestConstants.proxyPort,"","");
+    private static BzmHttpWrapper bzmHttpWrapper = null;
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -27,6 +27,7 @@ public class TestBzmHttpWrapper {
         MockedAPI.getMasterStatus();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
+        bzmHttpWrapper=new BzmHttpWrapper(MockedAPI.proxyConfig);
     }
 
     @AfterClass

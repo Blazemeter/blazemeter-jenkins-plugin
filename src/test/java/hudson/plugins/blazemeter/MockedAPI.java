@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import hudson.ProxyConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
@@ -18,6 +19,7 @@ import static org.mockserver.model.HttpResponse.response;
  * Created by zmicer on 9.7.15.
  */
 public class MockedAPI {
+    public static ProxyConfiguration proxyConfig=null;
     private static ClientAndServer mockServer;
     private static ClientAndProxy proxy;
     private MockedAPI(){}

@@ -450,11 +450,7 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl,
-                                                 String proxyHost,
-                                                 String proxyPort,
-                                                 String proxyUser,
-                                                 String proxyPass) {
+    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
         if(userKey.isEmpty()){
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
@@ -462,7 +458,7 @@ public class BzmServiceManager {
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
-            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl,proxyHost,proxyPort,proxyUser,proxyPass);
+            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
@@ -492,13 +488,8 @@ public class BzmServiceManager {
                 ". Please, check proxy settings, serverUrl and userKey.");
     }
 
-    public static String getUserEmail(String userKey,String blazemeterUrl,
-                                      String proxyHost,
-                                      String proxyPort,
-                                      String proxyUser,
-                                      String proxyPass){
-        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl,
-                proxyHost,proxyPort,proxyUser,proxyPass);
+    public static String getUserEmail(String userKey,String blazemeterUrl){
+        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {

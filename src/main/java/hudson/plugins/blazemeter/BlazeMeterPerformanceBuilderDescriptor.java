@@ -27,10 +27,6 @@ import java.util.*;
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
-    private String proxyHost="";
-    private String proxyPort="";
-    private String proxyUser="";
-    private String proxyPass="";
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
 
@@ -68,11 +64,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
                 apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
             }
-            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL,
-                    this.proxyHost,
-                    this.proxyPort,
-                    this.proxyUser,
-                    this.proxyPass);
+            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
@@ -127,30 +119,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL,
-                this.proxyHost,
-                this.proxyPort,
-                this.proxyUser,
-                this.proxyPass);
-    }
-
-    public FormValidation doTestProxy(@QueryParameter("blazeMeterURL") final String url,
-                                      @QueryParameter("proxyHost") final String proxyHost,
-                                      @QueryParameter("proxyPort") final String proxyPort,
-                                      @QueryParameter("proxyUser") final String proxyUser,
-                                      @QueryParameter("proxyPass") final String proxyPass)
-            throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterApi api = new BlazemeterApiV3Impl("",url,proxyHost,proxyPort,proxyUser,proxyPass);
-        FormValidation f= null;
-        try {
-            f = api.ping()? FormValidation.okWithMarkup("Server is available with " +
-                    "current proxy settings"):
-                    FormValidation.error("Error while validating proxy settings");
-        } catch (Exception e) {
-            e.printStackTrace();
-            f=FormValidation.error("Error while validating proxy settings");
-        }
-        return f;
+        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL);
     }
 
     public ListBoxModel getKeys(){
@@ -176,10 +145,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
         this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
-        this.proxyHost=formData.optString("proxyHost");
-        this.proxyPort=formData.optString("proxyPort");
-        this.proxyUser=formData.optString("proxyUser");
-        this.proxyPass=formData.optString("proxyPass");
         save();
         return true;
     }
@@ -196,23 +161,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public String getBlazeMeterURL() {
         return blazeMeterURL;
     }
-
-    public String getProxyHost() {
-        return proxyHost;
-    }
-
-    public String getProxyPort() {
-        return proxyPort;
-    }
-
-    public String getProxyUser() {
-        return proxyUser;
-    }
-
-    public String getProxyPass() {
-        return proxyPass;
-    }
-
 
     public void setBlazeMeterURL(String blazeMeterURL) {
         this.blazeMeterURL = blazeMeterURL;
