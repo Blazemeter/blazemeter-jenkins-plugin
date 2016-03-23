@@ -267,7 +267,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
                     }
                 }
             } catch (NullPointerException npe) {
-                logger.warn("Error while receiving answer from server - check connection ", npe);
+                logger.warn("Error while receiving answer from server - check connection/proxy settings ", npe);
             } catch (Exception e) {
                 logger.warn("Error while populating test list, ", e);
             } finally {
