@@ -232,13 +232,7 @@ public class BzmServiceManager {
             }
             File jtlZip=new File(filePath.getParent()
                     + "/" + buildNumber + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
-
-            if(!dataUrl.contains("amazonaws")){
-                url=new URL(dataUrl+"?api_key="+api.getApiKey());
-            }else{
-                url=new URL(dataUrl);
-            }
-
+            url=new URL(dataUrl);
             FileUtils.copyURLToFile(url, jtlZip);
             jenBuildLog.info("Downloading JTLZIP .... ");
             String jtlZipCanonicalPath=jtlZip.getCanonicalPath();

@@ -8,7 +8,7 @@ import hudson.plugins.blazemeter.utils.BzmServiceManager;
 public interface BmUrlManager {
 
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
-            + BzmServiceManager.getVersion()+"&​";
+            + BzmServiceManager.getVersion();
 
     String LATEST="/api/latest";
     String TESTS="/tests";

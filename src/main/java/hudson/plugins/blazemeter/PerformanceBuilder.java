@@ -14,6 +14,7 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -38,6 +39,8 @@ public class PerformanceBuilder extends Builder {
 
     private String testId = "";
 
+    private String notes = "";
+
     private boolean getJtl = false;
 
     private boolean getJunit = false;
@@ -57,6 +60,7 @@ public class PerformanceBuilder extends Builder {
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
                               String testId,
+                              String notes,
                               boolean getJtl,
                               boolean getJunit
     ) {
@@ -66,6 +70,7 @@ public class PerformanceBuilder extends Builder {
 //        this.testDuration=testDuration;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
+        this.notes=notes;
     }
 
 
@@ -107,7 +112,8 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("ProxyHost=" + proxy.name);
             jenBuildLog.warn("ProxyPort=" + proxy.port);
             jenBuildLog.warn("ProxyUser=" + proxy.getUserName());
-            jenBuildLog.warn("ProxyPass=" + proxy.getPassword().substring(0,3)+"...");
+            String proxyPass=proxy.getPassword();
+            jenBuildLog.warn("ProxyPass=" + (StringUtils.isBlank(proxyPass)?"":proxyPass.substring(0,3))+"...");
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
@@ -228,6 +234,14 @@ public class PerformanceBuilder extends Builder {
 
     public boolean isGetJunit() {
         return getJunit;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     @Override

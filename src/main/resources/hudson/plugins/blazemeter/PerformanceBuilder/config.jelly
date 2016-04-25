@@ -15,4 +15,10 @@
     <f:entry title="Download JUNIT report:" description="If checked, download Junit report" field="getJunit">
         <f:checkbox/>
     </f:entry>
+
+    <f:advanced>
+        <f:entry title="${%Notes:}">
+            <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
+        </f:entry>
+    </f:advanced>
 </j:jelly>
