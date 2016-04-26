@@ -24,9 +24,7 @@ public interface BmUrlManager {
 
     String activeTests(String appKey, String userKey);
 
-    String scriptUpload(String appKey, String userKey, String testId, String fileName);
-
-    String fileUpload(String appKey, String userKey, String testId, String fileName);
+    String masterId(String appKey,String userKey, String masterId);
 
     String testStart(String appKey, String userKey, String testId);
 

@@ -148,7 +148,12 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        // add the report to the build object.
+        try {
+            api.notes(notes,masterId);
+        } catch (Exception e) {
+            jenBuildLog.warn("Failed to PATCH notes to test report on server");
+            bzmBuildLog.warn("Failed to PATCH notes to test report on server: masterId="+masterId+" ", e);
+        }
 
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
 

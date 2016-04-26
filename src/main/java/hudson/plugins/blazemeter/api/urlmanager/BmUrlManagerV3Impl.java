@@ -49,16 +49,6 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
     }
 
     @Override
-    public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
-    return Constants.NOT_IMPLEMENTED;
-    }
-
-    @Override
-    public String fileUpload(String appKey, String userKey, String testId, String fileName) {
-        return Constants.NOT_IMPLEMENTED;
-    }
-
-    @Override
     public String testStart(String appKey, String userKey, String testId) {
         String testStart=null;
         try {
@@ -303,6 +293,17 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
             e.printStackTrace();
         }
         return version= serverUrl +LATEST+WEB+"/version?app_key="+appKey+ CLIENT_IDENTIFICATION;
+    }
+
+    @Override
+    public String masterId(String appKey,String userKey,String masterId) {
+        String masterIdUrl=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return masterIdUrl= serverUrl +LATEST+"/masters/"+masterId+"?userKey="+userKey+"app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 }
 

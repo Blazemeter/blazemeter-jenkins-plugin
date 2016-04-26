@@ -28,4 +28,5 @@ public interface JsonConstants {
     String ID="id";
     String LOCATION="location";
     String LOCATIONS="locations";
+    String NOTE="note";
 }

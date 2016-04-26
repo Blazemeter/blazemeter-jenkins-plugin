@@ -9,10 +9,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,7 +23,7 @@ import java.io.IOException;
 public class BzmHttpWrapper {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
-    public enum Method {GET, POST, PUT}
+    public enum Method {GET, POST, PATCH, PUT}
 
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy=null;
@@ -76,6 +73,11 @@ public class BzmHttpWrapper {
                 }
             } else if (method == Method.PUT) {
                 request = new HttpPut(url);
+                if (data != null) {
+                    ((HttpPut) request).setEntity(new StringEntity(data.toString()));
+                }
+            } else if(method == Method.PATCH){
+                request = new HttpPatch(url);
                 if (data != null) {
                     ((HttpPut) request).setEntity(new StringEntity(data.toString()));
                 }

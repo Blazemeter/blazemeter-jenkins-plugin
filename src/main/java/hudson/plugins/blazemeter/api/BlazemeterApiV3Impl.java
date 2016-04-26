@@ -476,4 +476,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
         }
         return ping;
     }
+
+    @Override
+    public void notes(String note,String masterId) throws Exception {
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return;
+        JSONObject noteJson=new JSONObject("{'"+JsonConstants.NOTE+"':'"+note+"'}");
+        String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
+        this.bzmhc.response(url, noteJson, BzmHttpWrapper.Method.PATCH, JSONObject.class);
+        return;
+
+    }
 }

@@ -87,4 +87,6 @@ public interface BlazemeterApi {
     BmUrlManager getUrlManager();
 
     boolean ping() throws Exception;
+
+    void notes(String note,String masterId)throws Exception;
 }
