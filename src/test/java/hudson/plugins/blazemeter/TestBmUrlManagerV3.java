@@ -158,7 +158,7 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void masterId(){
-        String expMasterId=bmUrlManager.getServerUrl()+BmUrlManager.LATEST+"/masters/"+masterId+"?userKey="+userKey+"app_key="+appKey+
+        String expMasterId=bmUrlManager.getServerUrl()+BmUrlManager.LATEST+"/masters/"+masterId+"?api_key="+userKey+"&app_key="+appKey+
                 BmUrlManager.CLIENT_IDENTIFICATION;;
         String actMasterId=bmUrlManager.masterId(appKey,userKey,masterId);
         Assert.assertEquals(expMasterId,actMasterId);

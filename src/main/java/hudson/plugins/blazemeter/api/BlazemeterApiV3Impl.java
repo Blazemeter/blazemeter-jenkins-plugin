@@ -478,12 +478,19 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public void notes(String note,String masterId) throws Exception {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return;
+    public boolean notes(String note,String masterId) throws Exception {
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
         JSONObject noteJson=new JSONObject("{'"+JsonConstants.NOTE+"':'"+note+"'}");
         String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
-        this.bzmhc.response(url, noteJson, BzmHttpWrapper.Method.PATCH, JSONObject.class);
-        return;
+        JSONObject jo=this.bzmhc.response(url, noteJson, BzmHttpWrapper.Method.PATCH, JSONObject.class);
+        try{
+
+        if(!jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
+            return false;
+        }}catch (Exception e){
+            throw new Exception("Failed to submit report notest to masterId="+masterId,e);
+        }
+        return true ;
 
     }
 }

@@ -88,5 +88,5 @@ public interface BlazemeterApi {
 
     boolean ping() throws Exception;
 
-    void notes(String note,String masterId)throws Exception;
+    boolean notes(String note,String masterId)throws Exception;
 }

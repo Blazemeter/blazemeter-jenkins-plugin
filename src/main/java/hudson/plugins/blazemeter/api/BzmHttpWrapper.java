@@ -79,7 +79,7 @@ public class BzmHttpWrapper {
             } else if(method == Method.PATCH){
                 request = new HttpPatch(url);
                 if (data != null) {
-                    ((HttpPut) request).setEntity(new StringEntity(data.toString()));
+                    ((HttpPatch) request).setEntity(new StringEntity(data.toString()));
                 }
             }
             else {

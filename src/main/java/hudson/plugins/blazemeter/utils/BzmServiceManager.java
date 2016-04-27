@@ -30,7 +30,7 @@ import java.util.zip.ZipFile;
 public class BzmServiceManager {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final static int BUFFER_SIZE = 2048;
-    private final static String ZIP_EXTENSION = ".zip";
+    private final static int DELAY=20000;
     private BzmServiceManager() {
     }
 
@@ -413,6 +413,26 @@ public class BzmServiceManager {
             jenBuildLog.info("Failed to get test report from server.");
         }
         return testReport;
+    }
+
+    public static boolean notes(BlazemeterApi api, String masterId, String notes,StdErrLog jenBuildLog){
+        boolean note=false;
+        int n = 1;
+        while (!note && n < 6) {
+            try {
+                Thread.sleep(DELAY);
+                int statusCode = api.getTestMasterStatusCode(masterId);
+                if (statusCode > 20) {
+                    note = api.notes(notes, masterId);
+                }
+            } catch (Exception e) {
+                jenBuildLog.warn("Failed to PATCH notes to test report on server: masterId=" + masterId + " " + e.getMessage());
+            } finally {
+                n++;
+            }
+
+        }
+        return note;
     }
 
     public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {

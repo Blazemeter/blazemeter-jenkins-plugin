@@ -148,15 +148,8 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        try {
-            api.notes(notes,masterId);
-        } catch (Exception e) {
-            jenBuildLog.warn("Failed to PATCH notes to test report on server");
-            bzmBuildLog.warn("Failed to PATCH notes to test report on server: masterId="+masterId+" ", e);
-        }
-
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
-
+        BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
             BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
