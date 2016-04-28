@@ -25,5 +25,9 @@
         <f:entry title="${%Notes:}">
             <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
         </f:entry>
+        <f:entry title="${%Session properties}:"
+                 field="sessionProperties" description="${%SessionProperties}">
+            <f:textbox field="sessionProperties"></f:textbox>
+        </f:entry>
     </f:advanced>
 </j:jelly>

@@ -435,6 +435,32 @@ public class BzmServiceManager {
         return note;
     }
 
+    public static JSONObject prepareSessionProperties(String sesssionProperties,StdErrLog jenBuildLog) throws JSONException {
+        List<String> propList = Arrays.asList(sesssionProperties.split(","));
+        JSONArray remoteControl = new JSONArray();
+        JSONObject configuration = new JSONObject();
+        try{
+            jenBuildLog.info("Preparing jmeter properties for the test...");
+            for (String s : propList) {
+                JSONObject prop = new JSONObject();
+                prop.put("key", s.split("=")[0]);
+                prop.put("value", s.split("=")[1]);
+                remoteControl.put(prop);
+
+            }
+            JSONObject plugins = new JSONObject();
+            plugins.put(JsonConstants.REMOTE_CONTROL, remoteControl);
+            configuration.put(JsonConstants.PLUGINS, plugins);
+            JSONObject props = new JSONObject();
+            props.put(JsonConstants.CONFIGURATION, configuration);
+        }catch (Exception e){
+            jenBuildLog.warn("Failed to prepare jmeter properties for the test. ",e);
+        }
+
+        return configuration;
+    }
+
+
     public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
         try {

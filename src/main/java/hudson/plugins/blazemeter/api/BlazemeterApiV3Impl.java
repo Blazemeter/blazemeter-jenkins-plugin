@@ -295,23 +295,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
     }
 
     @Override
-    public JSONObject postJsonConfig(String testId, JSONObject data) {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.postJsonConfig(APP_KEY, apiKey, testId);
-        JSONObject jo = this.bzmhc.response(url, data, BzmHttpWrapper.Method.POST, JSONObject.class);
-        return jo;
-    }
-
-    @Override
-    public JSONObject createTest(JSONObject data) {
-        if (StringUtils.isBlank(apiKey)) return null;
-        String url = this.urlManager.createTest(APP_KEY, apiKey);
-        JSONObject jo = this.bzmhc.response(url, data, BzmHttpWrapper.Method.POST, JSONObject.class);
-        return jo;
-    }
-
-    @Override
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
@@ -371,16 +354,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi {
 
     public BmUrlManager getUrlManager() {
         return urlManager;
-    }
-
-
-    @Override
-    public JSONObject putTestInfo(String testId, JSONObject data) {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.getTestConfig(APP_KEY, apiKey, testId);
-        JSONObject jo = this.bzmhc.response(url, data, BzmHttpWrapper.Method.PUT, JSONObject.class);
-        return jo;
     }
 
     @Override

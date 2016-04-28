@@ -19,6 +19,7 @@ import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -41,6 +42,8 @@ public class PerformanceBuilder extends Builder {
 
     private String notes = "";
 
+    private String sessionProperties = "";
+
     private boolean getJtl = false;
 
     private boolean getJunit = false;
@@ -61,6 +64,7 @@ public class PerformanceBuilder extends Builder {
     public PerformanceBuilder(String jobApiKey,
                               String testId,
                               String notes,
+                              String sessionProperties,
                               boolean getJtl,
                               boolean getJunit
     ) {
@@ -71,6 +75,7 @@ public class PerformanceBuilder extends Builder {
         this.getJtl=getJtl;
         this.getJunit=getJunit;
         this.notes=notes;
+        this.sessionProperties = sessionProperties;
     }
 
 
@@ -133,6 +138,7 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
+            JSONObject testProps=BzmServiceManager.prepareSessionProperties(this.sessionProperties,jenBuildLog);
             masterId = api.startTest(testId_num,testType);
             if(masterId.isEmpty()){
                 build.setResult(Result.FAILURE);
@@ -240,6 +246,14 @@ public class PerformanceBuilder extends Builder {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getSessionProperties() {
+        return sessionProperties;
+    }
+
+    public void setSessionProperties(String sessionProperties) {
+        this.sessionProperties = sessionProperties;
     }
 
     @Override

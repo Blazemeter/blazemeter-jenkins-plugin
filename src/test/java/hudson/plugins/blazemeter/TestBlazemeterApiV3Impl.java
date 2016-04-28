@@ -38,23 +38,11 @@ public class TestBlazemeterApiV3Impl {
 
 
     @Test
-    public void createTest_null() {
-        blazemeterApiV3 = new BlazemeterApiV3Impl(null, TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.createTest(null), null);
-    }
-
-    @Test
     public void retrieveJUNITXML_null() {
         blazemeterApiV3 = new BlazemeterApiV3Impl(null, TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
         Assert.assertEquals(blazemeterApiV3.retrieveJUNITXML(null), null);
     }
 
-
-    @Test
-    public void updateTestInfo_null() {
-        blazemeterApiV3 = new BlazemeterApiV3Impl(null, TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.postJsonConfig(null, null), null);
-    }
 
     @Test
     public void getTestInfo_null() {
@@ -131,7 +119,7 @@ public class TestBlazemeterApiV3Impl {
     @Test
     public void startTest_null() throws JSONException {
         blazemeterApiV3 = new BlazemeterApiV3Impl(null, null,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(null, null), null);
+        Assert.assertEquals(blazemeterApiV3.startTest(null,null), null);
     }
 
     @Test

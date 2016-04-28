@@ -36,7 +36,7 @@ public interface BlazemeterApi {
 
     int getTestMasterStatusCode(String id);
 
-    String startTest(String testId,TestType testType) throws JSONException;
+    String startTest(String testId, TestType testType) throws JSONException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 
@@ -58,15 +58,9 @@ public interface BlazemeterApi {
 
     boolean active(String testId);
 
-    JSONObject postJsonConfig(String testId, JSONObject data);
-
-    JSONObject createTest(JSONObject data);
-
     String retrieveJUNITXML(String sessionId);
 
     JSONObject retrieveJtlZip(String sessionId);
-
-    JSONObject putTestInfo(String testId, JSONObject data);
 
     List<String> getListOfSessionIds(String masterId);
 

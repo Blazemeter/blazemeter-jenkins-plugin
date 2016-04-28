@@ -29,4 +29,5 @@ public interface JsonConstants {
     String LOCATION="location";
     String LOCATIONS="locations";
     String NOTE="note";
+    String REMOTE_CONTROL="remoteControl";
 }
