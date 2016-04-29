@@ -11,17 +11,16 @@
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
     </f:entry>
-    <!--
-    TODO
-    - look at git plugin - show path text-box only if jtl check-box is checked
-    <f:entry title="${%Path to jtl report:}">
-        <f:textarea name="notes" field="jtlPath" previewEndpoint="/markupFormatter/previewDescription"/>
-    </f:entry>
-    -->
     <f:entry title="${%Download JUNIT report:}" description="If checked, download Junit report" field="getJunit">
         <f:checkbox/>
     </f:entry>
     <f:advanced>
+        <f:entry title="${%Path to jtl report}:">
+            <f:textbox field="jtlPath"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Path to junit report}:">
+            <f:textbox field="junitPath"></f:textbox>
+        </f:entry>
         <f:entry title="${%Notes:}">
             <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
         </f:entry>

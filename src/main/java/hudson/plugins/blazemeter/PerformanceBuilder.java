@@ -45,6 +45,10 @@ public class PerformanceBuilder extends Builder {
 
     private String sessionProperties = "";
 
+    private String jtlPath = "";
+
+    private String junitPath = "";
+
     private boolean getJtl = false;
 
     private boolean getJunit = false;
@@ -66,13 +70,16 @@ public class PerformanceBuilder extends Builder {
                               String testId,
                               String notes,
                               String sessionProperties,
+                              String jtlPath,
+                              String junitPath,
                               boolean getJtl,
                               boolean getJunit
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
         this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
-//        this.testDuration=testDuration;
+        this.jtlPath = jtlPath;
+        this.junitPath = junitPath;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
         this.notes=notes;
@@ -251,6 +258,22 @@ public class PerformanceBuilder extends Builder {
 
     public String getSessionProperties() {
         return sessionProperties;
+    }
+
+    public String getJtlPath() {
+        return jtlPath;
+    }
+
+    public void setJtlPath(String jtlPath) {
+        this.jtlPath = jtlPath;
+    }
+
+    public String getJunitPath() {
+        return junitPath;
+    }
+
+    public void setJunitPath(String junitPath) {
+        this.junitPath = junitPath;
     }
 
     public void setSessionProperties(String sessionProperties) {
