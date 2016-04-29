@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,4 +84,6 @@ public interface BlazemeterApi {
     boolean ping() throws Exception;
 
     boolean notes(String note,String masterId)throws Exception;
+
+    boolean properties(JSONArray properties, String sessionId) throws Exception;
 }

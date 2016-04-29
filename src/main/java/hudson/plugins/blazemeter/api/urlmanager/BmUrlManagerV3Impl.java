@@ -305,5 +305,16 @@ public class BmUrlManagerV3Impl implements BmUrlManager {
         }
         return masterIdUrl= serverUrl +LATEST+"/masters/"+masterId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
+
+    @Override
+    public String properties(String appKey, String userKey, String sessionId) {
+        String properties=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return properties= serverUrl +LATEST+"/sessions/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+    }
 }
 

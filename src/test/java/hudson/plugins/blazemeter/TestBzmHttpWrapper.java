@@ -38,14 +38,14 @@ public class TestBzmHttpWrapper {
     @Test
     public void response_25() throws IOException {
         String url = TestConstants.mockedApiUrl+"/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
-        JSONObject response = bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class);
+        JSONObject response = bzmHttpWrapper.response(url, null, BzmHttpWrapper.Method.GET, JSONObject.class,null);
         Assert.assertTrue(response.length() == 25);
     }
 
     @Test
     public void response_null() throws IOException, RuntimeException {
         try {
-            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, JSONObject.class);
+            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, JSONObject.class,null);
         } catch (RuntimeException re) {
 
         }
@@ -55,7 +55,7 @@ public class TestBzmHttpWrapper {
     @Test
     public void responseString_null() throws IOException, RuntimeException {
         try {
-            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, String.class);
+            bzmHttpWrapper.response(null, null, BzmHttpWrapper.Method.GET, String.class,null);
         } catch (RuntimeException re) {
 
         }

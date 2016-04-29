@@ -30,7 +30,7 @@ import java.util.zip.ZipFile;
 public class BzmServiceManager {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final static int BUFFER_SIZE = 2048;
-    private final static int DELAY=20000;
+    private final static int DELAY=10000;
     private BzmServiceManager() {
     }
 
@@ -435,29 +435,24 @@ public class BzmServiceManager {
         return note;
     }
 
-    public static JSONObject prepareSessionProperties(String sesssionProperties,StdErrLog jenBuildLog) throws JSONException {
+    public static JSONArray prepareSessionProperties(String sesssionProperties, StdErrLog jenBuildLog) throws JSONException {
         List<String> propList = Arrays.asList(sesssionProperties.split(","));
-        JSONArray remoteControl = new JSONArray();
+        JSONArray props = new JSONArray();
         JSONObject configuration = new JSONObject();
-        try{
+        try {
             jenBuildLog.info("Preparing jmeter properties for the test...");
             for (String s : propList) {
                 JSONObject prop = new JSONObject();
                 prop.put("key", s.split("=")[0]);
                 prop.put("value", s.split("=")[1]);
-                remoteControl.put(prop);
+                props.put(prop);
 
             }
-            JSONObject plugins = new JSONObject();
-            plugins.put(JsonConstants.REMOTE_CONTROL, remoteControl);
-            configuration.put(JsonConstants.PLUGINS, plugins);
-            JSONObject props = new JSONObject();
-            props.put(JsonConstants.CONFIGURATION, configuration);
-        }catch (Exception e){
-            jenBuildLog.warn("Failed to prepare jmeter properties for the test. ",e);
+        } catch (Exception e) {
+            jenBuildLog.warn("Failed to prepare jmeter properties for the test. ", e);
         }
 
-        return configuration;
+        return props;
     }
 
 
@@ -539,6 +534,29 @@ public class BzmServiceManager {
             }
         }catch (Exception e){
             return "";
+        }
+    }
+
+    public static void properties(BlazemeterApi api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
+        for (String s : sessionsIds) {
+            jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
+            int n = 1;
+            boolean submit = false;
+            while (!submit && n < 6) {
+                try {
+                    submit = api.properties(properties, s);
+                    if (!submit) {
+                        jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s+" retry # "+n);
+                        Thread.sleep(DELAY);
+                    }
+                } catch (Exception e) {
+                    jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s, e);
+                } finally {
+                    n++;
+                }
+            }
         }
     }
 }

@@ -56,7 +56,7 @@ public class BzmHttpWrapper {
         }
     }
 
-    public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
+    public <V> HttpResponse httpResponse(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
@@ -109,7 +109,7 @@ public class BzmHttpWrapper {
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType){
+    public <T,V> T response(String url, V data, Method method, Class<T> returnType,Class<V> dataType){
         T returnObj=null;
         JSONObject jo = null;
         String output = null;

@@ -164,7 +164,7 @@ public class TestBlazemeterApiV3Impl {
             Mockito.verify(spyApi, Mockito.times(1)).active(TestConstants.TEST_MASTER_ID);
             String url = "http://127.0.0.1:1234/api/latest/tests/testMasterId/start?" +
                     "api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.2.-SNAPSHOT&​";
-            Mockito.verify(spyWrapper, Mockito.times(6)).response(url, null, BzmHttpWrapper.Method.POST, JSONObject.class);
+            Mockito.verify(spyWrapper, Mockito.times(6)).response(url, null, BzmHttpWrapper.Method.POST, JSONObject.class,null);
 
         }
     }

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -102,7 +103,6 @@ public class PerformanceBuilder extends Builder {
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
         this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
-//        this.api.setLogger(bzmBuildLog);
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
@@ -138,7 +138,6 @@ public class PerformanceBuilder extends Builder {
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
 
         try {
-            JSONObject testProps=BzmServiceManager.prepareSessionProperties(this.sessionProperties,jenBuildLog);
             masterId = api.startTest(testId_num,testType);
             if(masterId.isEmpty()){
                 build.setResult(Result.FAILURE);
@@ -157,6 +156,8 @@ public class PerformanceBuilder extends Builder {
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
         BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
+            JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,jenBuildLog);
+            BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
             BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());

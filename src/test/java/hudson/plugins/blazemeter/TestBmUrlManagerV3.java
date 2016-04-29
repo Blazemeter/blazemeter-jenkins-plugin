@@ -15,6 +15,7 @@ public class TestBmUrlManagerV3 {
     private String appKey="jnk100x987c06f4e10c4";
     private String testId="123456789";
     private String masterId ="987654321";
+    private String sessionId ="r-v3-57230c5251da9";
     private String fileName="111111111";
     private BmUrlManager bmUrlManager=new BmUrlManagerV3Impl(TestConstants.mockedApiUrl);
 
@@ -162,6 +163,14 @@ public class TestBmUrlManagerV3 {
                 BmUrlManager.CLIENT_IDENTIFICATION;;
         String actMasterId=bmUrlManager.masterId(appKey,userKey,masterId);
         Assert.assertEquals(expMasterId,actMasterId);
+    }
+
+    @Test
+    public void properties(){
+        String expProperties=bmUrlManager.getServerUrl()+BmUrlManager.LATEST+"/sessions/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+
+                BmUrlManager.CLIENT_IDENTIFICATION;;
+        String actProperties=bmUrlManager.properties(appKey,userKey,sessionId);
+        Assert.assertEquals(expProperties,actProperties);
     }
 
 }

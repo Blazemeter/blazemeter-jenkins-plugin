@@ -55,5 +55,7 @@ public interface BmUrlManager {
     String listOfSessionIds(String appKey, String userKey, String masterId);
 
     String version(String appKey);
+
+    String properties(String appKey, String userKey, String sessionId);
 }
 
