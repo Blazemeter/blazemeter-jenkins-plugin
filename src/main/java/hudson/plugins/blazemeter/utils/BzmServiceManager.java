@@ -11,6 +11,7 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -230,8 +231,7 @@ public class BzmServiceManager {
                     break;
                 }
             }
-            File jtlZip=new File(filePath.getParent()
-                    + "/" + buildNumber + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
+            File jtlZip=new File(filePath + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
             url=new URL(dataUrl);
             FileUtils.copyURLToFile(url, jtlZip);
             jenBuildLog.info("Downloading JTLZIP .... ");
@@ -342,18 +342,18 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder, String masterId, String buildNumber) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        BlazemeterApi api=builder.getApi();
-        StdErrLog jenBuildLog=builder.getJenBuildLog();
+        BlazemeterApi api = builder.getApi();
+        StdErrLog jenBuildLog = builder.getJenBuildLog();
         CIStatus ciStatus = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
-        if(ciStatus.equals(CIStatus.errors)){
-            result=Result.FAILURE;
+        if (ciStatus.equals(CIStatus.errors)) {
+            result = Result.FAILURE;
             return result;
         }
-        result=ciStatus.equals(CIStatus.failures)?Result.FAILURE:Result.SUCCESS;
+        result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
         FilePath workspace = builder.getBuild().getWorkspace();
         if (builder.isGetJunit()) {
             retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
@@ -361,18 +361,29 @@ public class BzmServiceManager {
             jenBuildLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
-        if(builder.isGetJtl()){
-            AbstractBuild build=builder.getBuild();
-            FilePath jtlPath = new FilePath(build.getWorkspace(), build.getId());
+        FilePath jtlPath = null;
+        if (builder.isGetJtl()) {
+            AbstractBuild build = builder.getBuild();
+            FilePath dfp=new FilePath(build.getWorkspace(), build.getId());
+            if (StringUtil.isBlank(builder.getJtlPath())) {
+                jtlPath = dfp;
+            }else{
+                try {
+                    jtlPath=Utils.resolvePath(dfp,builder.getJtlPath());
+                } catch (Exception e) {
+                    jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
+                    jenBuildLog.warn("JTL report will be saved to workspace");
+                    jtlPath=dfp;
+                }
+            }
             BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, buildNumber, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
         }
 
 
-
         //get testGetArchive information
-        JSONObject testReport=requestAggregateReport(api,jenBuildLog,masterId);
+        JSONObject testReport = requestAggregateReport(api, jenBuildLog, masterId);
 
 
         if (testReport == null || testReport.equals("null")) {
@@ -389,7 +400,7 @@ public class BzmServiceManager {
         } catch (JSONException je) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
-        }finally{
+        } finally {
             return result;
         }
 

@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.utils;
-
+import java.io.File;
+import hudson.FilePath;
 import hudson.plugins.blazemeter.api.TestType;
 
 /**
@@ -27,4 +28,27 @@ public class Utils {
             return testId;
         }
      }
+
+    public static FilePath resolvePath(FilePath workspace,String path) throws Exception{
+        FilePath fp=null;
+        FilePath root=new FilePath(new File("/"));
+        if(path.startsWith("/")){
+            fp=new FilePath(root,path);
+        }else{
+            fp=new FilePath(workspace,path);
+        }
+        if(!fp.exists()){
+            /*
+            TODO
+            - try to create absent foldeer before throwing exception
+             */
+            throw new Exception("Failed to find filepath = "+fp.getName());
+        }
+
+        /*
+          TODO
+        - resolve jenkins variable;
+         */
+        return fp;
+    }
 }
