@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.utils;
 
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
@@ -215,7 +216,6 @@ public class BzmServiceManager {
     }
 
     public static void downloadJtlReport(BlazemeterApi api, String sessionId, FilePath filePath,
-                                         String buildNumber,
                                          StdErrLog jenBuildLog,
                                          StdErrLog bzmBuildLog) {
 
@@ -259,11 +259,11 @@ public class BzmServiceManager {
     }
 
     public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
-                                          String buildNumber, StdErrLog jenBuildLog,
+                                          StdErrLog jenBuildLog,
                                           StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
-            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
+            downloadJtlReport(api, s, filePath,jenBuildLog, bzmBuildLog);
         }
     }
 
@@ -342,7 +342,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder, String masterId, String buildNumber) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder, String masterId, String buildNumber, EnvVars envVars) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
@@ -369,14 +369,14 @@ public class BzmServiceManager {
                 jtlPath = dfp;
             }else{
                 try {
-                    jtlPath=Utils.resolvePath(dfp,builder.getJtlPath());
+                    jtlPath=Utils.resolvePath(dfp,builder.getJtlPath(),envVars);
                 } catch (Exception e) {
                     jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
                     jenBuildLog.warn("JTL report will be saved to workspace");
                     jtlPath=dfp;
                 }
             }
-            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, buildNumber, jenBuildLog, jenBuildLog);
+            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
         }

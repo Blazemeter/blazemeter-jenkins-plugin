@@ -1,7 +1,9 @@
 package hudson.plugins.blazemeter.utils;
 import java.io.File;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.plugins.blazemeter.api.TestType;
+import org.apache.commons.lang3.text.StrSubstitutor;
 
 /**
  * Created by zmicer on 17.7.15.
@@ -29,13 +31,15 @@ public class Utils {
         }
      }
 
-    public static FilePath resolvePath(FilePath workspace, String path) throws Exception {
+    public static FilePath resolvePath(FilePath workspace, String path, EnvVars vars) throws Exception {
         FilePath fp = null;
         FilePath root = new FilePath(new File("/"));
-        if (path.startsWith("/")) {
-            fp = new FilePath(root, path);
+        StrSubstitutor strSubstr=new StrSubstitutor(vars);
+        String resolvedPath=strSubstr.replace(path);
+        if (resolvedPath.startsWith("/")) {
+            fp = new FilePath(root, resolvedPath);
         } else {
-            fp = new FilePath(workspace, path);
+            fp = new FilePath(workspace, resolvedPath);
         }
         if (!fp.exists()) {
             try {
@@ -44,11 +48,6 @@ public class Utils {
                 throw new Exception("Failed to find filepath = " + fp.getName());
             }
         }
-
-        /*
-          TODO
-        - resolve jenkins variable;
-         */
         return fp;
     }
 }

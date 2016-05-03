@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.ProxyConfiguration;
@@ -20,7 +21,6 @@ import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -143,7 +143,7 @@ public class PerformanceBuilder extends Builder {
         String masterId="";
         bzmBuildLog.info("### About to start BlazeMeter test # " + testId_num);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
-
+        EnvVars envVars = build.getEnvironment(listener);
         try {
             masterId = api.startTest(testId_num,testType);
             if(masterId.isEmpty()){
@@ -169,7 +169,7 @@ public class PerformanceBuilder extends Builder {
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,masterId,buildNumber);
+            Result result = BzmServiceManager.postProcess(this,masterId,buildNumber,envVars);
 
             build.setResult(result);
 
