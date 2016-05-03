@@ -18,9 +18,9 @@
         <f:entry title="${%Path to jtl report}:">
             <f:textbox field="jtlPath"></f:textbox>
         </f:entry>
-        <!--<f:entry title="${%Path to junit report}:">
+        <f:entry title="${%Path to junit report}:">
             <f:textbox field="junitPath"></f:textbox>
-        </f:entry>-->
+        </f:entry>
         <f:entry title="${%Notes:}">
             <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
         </f:entry>

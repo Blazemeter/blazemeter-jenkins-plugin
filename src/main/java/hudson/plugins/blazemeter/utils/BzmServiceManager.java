@@ -323,20 +323,16 @@ public class BzmServiceManager {
         }
     }
 
-    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId, FilePath workspace, String buildNumber, StdErrLog jenBuildLog){
+    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId,
+                                              FilePath junitPath, StdErrLog jenBuildLog){
         String junitReport="";
         jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
         try{
             junitReport = api.retrieveJUNITXML(masterId);
-            String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
-            FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
-            jenBuildLog.warn("build number="+buildNumber);
-            jenBuildLog.warn("masterId=" + masterId);
-            String junitReportPath = workspace.getParent()
-                    + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
+            String junitName = masterId + "-" + Constants.BM_TRESHOLDS;
             jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-            jenBuildLog.info("Saving it to " + junitReportPath);
-            saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
+            jenBuildLog.info("Saving it to " + junitPath);
+            saveReport(junitName, junitReport, junitPath, jenBuildLog);
         } catch (Exception e) {
             jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
@@ -354,17 +350,24 @@ public class BzmServiceManager {
             return result;
         }
         result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
-        FilePath workspace = builder.getBuild().getWorkspace();
+        AbstractBuild build = builder.getBuild();
+        FilePath dfp=new FilePath(build.getWorkspace(), build.getId());
         if (builder.isGetJunit()) {
-            retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
+            FilePath junitPath=null;
+            try{
+                junitPath=Utils.resolvePath(dfp,builder.getJunitPath(),envVars);
+            }catch (Exception e){
+                jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
+                jenBuildLog.warn("JTL report will be saved to workspace");
+                junitPath=dfp;
+        }
+            retrieveJUNITXMLreport(api, masterId, junitPath, jenBuildLog);
         } else {
             jenBuildLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
         FilePath jtlPath = null;
         if (builder.isGetJtl()) {
-            AbstractBuild build = builder.getBuild();
-            FilePath dfp=new FilePath(build.getWorkspace(), build.getId());
             if (StringUtil.isBlank(builder.getJtlPath())) {
                 jtlPath = dfp;
             }else{
