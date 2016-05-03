@@ -29,20 +29,20 @@ public class Utils {
         }
      }
 
-    public static FilePath resolvePath(FilePath workspace,String path) throws Exception{
-        FilePath fp=null;
-        FilePath root=new FilePath(new File("/"));
-        if(path.startsWith("/")){
-            fp=new FilePath(root,path);
-        }else{
-            fp=new FilePath(workspace,path);
+    public static FilePath resolvePath(FilePath workspace, String path) throws Exception {
+        FilePath fp = null;
+        FilePath root = new FilePath(new File("/"));
+        if (path.startsWith("/")) {
+            fp = new FilePath(root, path);
+        } else {
+            fp = new FilePath(workspace, path);
         }
-        if(!fp.exists()){
-            /*
-            TODO
-            - try to create absent foldeer before throwing exception
-             */
-            throw new Exception("Failed to find filepath = "+fp.getName());
+        if (!fp.exists()) {
+            try {
+                fp.mkdirs();
+            } catch (Exception e) {
+                throw new Exception("Failed to find filepath = " + fp.getName());
+            }
         }
 
         /*
