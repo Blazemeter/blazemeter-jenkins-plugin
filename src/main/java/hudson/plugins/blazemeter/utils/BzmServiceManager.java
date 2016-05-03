@@ -12,6 +12,7 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -338,7 +339,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder, String masterId, String buildNumber, EnvVars envVars) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder, String masterId, EnvVars envVars) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
@@ -449,23 +450,21 @@ public class BzmServiceManager {
         return note;
     }
 
-    public static JSONArray prepareSessionProperties(String sesssionProperties, StdErrLog jenBuildLog) throws JSONException {
+    public static JSONArray prepareSessionProperties(String sesssionProperties, EnvVars vars,StdErrLog jenBuildLog) throws JSONException {
         List<String> propList = Arrays.asList(sesssionProperties.split(","));
         JSONArray props = new JSONArray();
-        JSONObject configuration = new JSONObject();
+        StrSubstitutor strSubstr=new StrSubstitutor(vars);
         try {
             jenBuildLog.info("Preparing jmeter properties for the test...");
             for (String s : propList) {
                 JSONObject prop = new JSONObject();
-                prop.put("key", s.split("=")[0]);
-                prop.put("value", s.split("=")[1]);
+                prop.put("key", strSubstr.replace(s.split("=")[0]));
+                prop.put("value", strSubstr.replace(s.split("=")[1]));
                 props.put(prop);
-
             }
         } catch (Exception e) {
             jenBuildLog.warn("Failed to prepare jmeter properties for the test. ", e);
         }
-
         return props;
     }
 

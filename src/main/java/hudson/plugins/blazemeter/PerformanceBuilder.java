@@ -16,8 +16,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.log.AbstractLogger;
-import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,13 +25,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PerformanceBuilder extends Builder {
-    DateFormat df = new SimpleDateFormat("dd/MM/yy");
-    private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
     private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
     private StdErrLog jenBuildLog;
 
@@ -163,13 +157,13 @@ public class PerformanceBuilder extends Builder {
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
         BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
-            JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,jenBuildLog);
+            JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
             BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
             BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,masterId,buildNumber,envVars);
+            Result result = BzmServiceManager.postProcess(this,masterId,envVars);
 
             build.setResult(result);
 
