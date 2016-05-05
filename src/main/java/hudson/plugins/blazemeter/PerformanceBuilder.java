@@ -157,8 +157,10 @@ public class PerformanceBuilder extends Builder {
         BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
         BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
-            JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
-            BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+            if(!StringUtils.isBlank(this.sessionProperties)){
+                JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
+                BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+            }
             BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());

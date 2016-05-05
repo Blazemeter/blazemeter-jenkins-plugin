@@ -450,20 +450,23 @@ public class BzmServiceManager {
         return note;
     }
 
-    public static JSONArray prepareSessionProperties(String sesssionProperties, EnvVars vars,StdErrLog jenBuildLog) throws JSONException {
+    public static JSONArray prepareSessionProperties(String sesssionProperties, EnvVars vars, StdErrLog jenBuildLog) throws JSONException {
         List<String> propList = Arrays.asList(sesssionProperties.split(","));
         JSONArray props = new JSONArray();
-        StrSubstitutor strSubstr=new StrSubstitutor(vars);
-        try {
-            jenBuildLog.info("Preparing jmeter properties for the test...");
-            for (String s : propList) {
+        StrSubstitutor strSubstr = new StrSubstitutor(vars);
+        jenBuildLog.info("Preparing jmeter properties for the test...");
+        for (String s : propList) {
+            try {
                 JSONObject prop = new JSONObject();
-                prop.put("key", strSubstr.replace(s.split("=")[0]));
-                prop.put("value", strSubstr.replace(s.split("=")[1]));
+                List<String> pr = Arrays.asList(s.split("="));
+                if (pr.size() > 1) {
+                    prop.put("key", strSubstr.replace(pr.get(0)));
+                    prop.put("value", strSubstr.replace(pr.get(1)));
+                }
                 props.put(prop);
+            } catch (Exception e) {
+                jenBuildLog.warn("Failed to prepare jmeter property " + s + " for the test: " + e.getMessage());
             }
-        } catch (Exception e) {
-            jenBuildLog.warn("Failed to prepare jmeter properties for the test. ", e);
         }
         return props;
     }
