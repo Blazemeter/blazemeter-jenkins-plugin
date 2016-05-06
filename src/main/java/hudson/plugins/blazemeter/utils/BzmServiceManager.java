@@ -220,42 +220,56 @@ public class BzmServiceManager {
                                          StdErrLog jenBuildLog,
                                          StdErrLog bzmBuildLog) {
 
-        JSONObject jo=api.retrieveJtlZip(sessionId);
-        String dataUrl=null;
-        URL url=null;
+        JSONObject jo = api.retrieveJtlZip(sessionId);
+        String dataUrl = null;
+        URL url = null;
         try {
-            JSONArray data=jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
-            for(int i=0;i<data.length();i++){
-                String title=data.getJSONObject(i).getString("title");
-                if(title.equals("Zip")){
-                    dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
+            JSONArray data = jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
+            for (int i = 0; i < data.length(); i++) {
+                String title = data.getJSONObject(i).getString("title");
+                if (title.equals("Zip")) {
+                    dataUrl = data.getJSONObject(i).getString(JsonConstants.DATA_URL);
                     break;
                 }
             }
-            File jtlZip=new File(filePath + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
-            url=new URL(dataUrl);
-            FileUtils.copyURLToFile(url, jtlZip);
-            jenBuildLog.info("Downloading JTLZIP .... ");
-            String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
+            File jtlZip = new File(filePath + "/" + sessionId + "-" + Constants.BM_ARTEFACTS);
+            url = new URL(dataUrl);
+            jenBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            bzmBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            int i = 1;
+            boolean jtl = false;
+            while (!jtl && i < 4) {
+                try {
+                    jenBuildLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
+                    int conTo = (int) (10000 * Math.pow(3, i - 1));
+                    FileUtils.copyURLToFile(url, jtlZip, conTo, 30000);
+                    jtl = true;
+                } catch (Exception e) {
+                    bzmBuildLog.warn("Unable to get JTLZIP from " + url + ", " + e);
+                } finally {
+                    i++;
+                }
+            }
+            String jtlZipCanonicalPath = jtlZip.getCanonicalPath();
             jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
-            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), jenBuildLog);
-            FilePath sample_jtl=new FilePath(filePath,"sample.jtl");
-            FilePath bm_kpis_jtl=new FilePath(filePath,Constants.BM_KPIS);
-            if(sample_jtl.exists()){
+            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0, jtlZipCanonicalPath.length() - 4), jenBuildLog);
+            FilePath sample_jtl = new FilePath(filePath, "sample.jtl");
+            FilePath bm_kpis_jtl = new FilePath(filePath, Constants.BM_KPIS);
+            if (sample_jtl.exists()) {
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
         } catch (JSONException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (MalformedURLException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (IOException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (InterruptedException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         }
     }
 
