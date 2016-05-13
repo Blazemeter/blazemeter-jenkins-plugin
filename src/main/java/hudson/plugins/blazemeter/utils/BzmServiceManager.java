@@ -25,15 +25,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
  */
 public class BzmServiceManager {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-    private final static int BUFFER_SIZE = 2048;
     private final static int DELAY=10000;
     private BzmServiceManager() {
     }
@@ -127,25 +124,23 @@ public class BzmServiceManager {
 
     }
 
-    public static void saveReport(String filename,
+    public static void saveReport(String reportName,
                                   String report,
                                   FilePath filePath,
                                   StdErrLog jenBuildLog) {
-        File reportFile = new File(filePath.getParent()
-                + "/" + filePath.getName() + "/" + filename);
+        FilePath junit=null;
         try {
-            if (!reportFile.exists()) {
-                FileUtils.forceMkdir(reportFile.getParentFile());
-                reportFile.createNewFile();
+            junit=new FilePath(filePath,reportName);
+            if (!junit.exists()) {
+                junit.touch(System.currentTimeMillis());
             }
-            BufferedWriter out = new BufferedWriter(new FileWriter(reportFile));
-            out.write(report);
-            out.close();
-
-        } catch (FileNotFoundException fnfe) {
-            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
+            junit.write(report, System.getProperty("file.encoding"));
+        } catch (FileNotFoundException e) {
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+junit.getParent()+"/"+junit.getName()+" : " + e.getMessage());
         } catch (IOException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
+        } catch (InterruptedException e) {
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
         }
     }
 
@@ -286,61 +281,6 @@ public class BzmServiceManager {
     }
 
 
-
-    public static void unzip(String srcZipFileName,
-                             String destDirectoryName, StdErrLog jenBuildLog) {
-        try {
-            BufferedInputStream bufIS = null;
-            // create the destination directory structure (if needed)
-            File destDirectory = new File(destDirectoryName);
-            destDirectory.mkdirs();
-
-            // open archive for reading
-            File file = new File(srcZipFileName);
-            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-
-            //for every zip archive entry do
-            Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
-            while (zipFileEntries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                if(entry.getName().substring((entry.getName().length()-4)).equals(".jtl")&!entry.isDirectory()){
-                    jenBuildLog.info("\tExtracting jtl report: " + entry);
-
-                    //create destination file
-                    File destFile = new File(destDirectory, entry.getName());
-
-                    //create parent directories if needed
-                    File parentDestFile = destFile.getParentFile();
-                    parentDestFile.mkdirs();
-
-                        bufIS = new BufferedInputStream(
-                                zipFile.getInputStream(entry));
-                        int currentByte;
-
-                        // buffer for writing file
-                        byte data[] = new byte[BUFFER_SIZE];
-
-                        // write the current file to disk
-                        FileOutputStream fOS = new FileOutputStream(destFile);
-                        BufferedOutputStream bufOS = new BufferedOutputStream(fOS, BUFFER_SIZE);
-
-                        while ((currentByte = bufIS.read(data, 0, BUFFER_SIZE)) != -1) {
-                            bufOS.write(data, 0, currentByte);
-                        }
-
-                        // close BufferedOutputStream
-                        bufOS.flush();
-                        bufOS.close();
-
-                }
-
-            }
-            bufIS.close();
-        } catch (Exception e) {
-            jenBuildLog.warn("Failed to unzip report: check that it is downloaded");
-        }
-    }
-
     public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId,
                                               FilePath junitPath, StdErrLog jenBuildLog){
         String junitReport="";
@@ -349,8 +289,8 @@ public class BzmServiceManager {
             junitReport = api.retrieveJUNITXML(masterId);
             String junitName = masterId + "-" + Constants.BM_TRESHOLDS;
             jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-            jenBuildLog.info("Saving it to " + junitPath);
-            saveReport(junitName, junitReport, junitPath, jenBuildLog);
+            jenBuildLog.info("Saving it to " + junitPath+" with name="+junitName);
+            saveReport(junitName,junitReport, junitPath, jenBuildLog);
         } catch (Exception e) {
             jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
