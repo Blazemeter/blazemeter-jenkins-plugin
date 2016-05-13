@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -232,7 +233,6 @@ public class BzmServiceManager {
                     break;
                 }
             }
-            File jtlZip = new File(filePath + "/" + sessionId + "-" + Constants.BM_ARTEFACTS);
             url = new URL(dataUrl);
             jenBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
             bzmBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
@@ -242,7 +242,11 @@ public class BzmServiceManager {
                 try {
                     jenBuildLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
                     int conTo = (int) (10000 * Math.pow(3, i - 1));
-                    FileUtils.copyURLToFile(url, jtlZip, conTo, 30000);
+                    URLConnection connection = url.openConnection();
+                    connection.setConnectTimeout(conTo);
+                    connection.setReadTimeout(30000);
+                    InputStream input = connection.getInputStream();
+                    filePath.unzipFrom(input);
                     jtl = true;
                 } catch (Exception e) {
                     bzmBuildLog.warn("Unable to get JTLZIP from " + url + ", " + e);
@@ -250,9 +254,7 @@ public class BzmServiceManager {
                     i++;
                 }
             }
-            String jtlZipCanonicalPath = jtlZip.getCanonicalPath();
-            jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
-            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0, jtlZipCanonicalPath.length() - 4), jenBuildLog);
+
             FilePath sample_jtl = new FilePath(filePath, "sample.jtl");
             FilePath bm_kpis_jtl = new FilePath(filePath, Constants.BM_KPIS);
             if (sample_jtl.exists()) {
@@ -278,7 +280,8 @@ public class BzmServiceManager {
                                           StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
-            downloadJtlReport(api, s, filePath,jenBuildLog, bzmBuildLog);
+            FilePath jtl=new FilePath(filePath,s + Constants.BM_ARTEFACTS);
+            downloadJtlReport(api, s, jtl,jenBuildLog, bzmBuildLog);
         }
     }
 
