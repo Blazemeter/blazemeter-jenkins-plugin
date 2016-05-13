@@ -1,9 +1,6 @@
 package hudson.plugins.blazemeter;
 
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.ProxyConfiguration;
+import hudson.*;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -94,9 +91,7 @@ public class PerformanceBuilder extends Builder {
         this.build=build;
         jenBuildLog=new StdErrLog(Constants.BUILD_JEN);
         jenBuildLog.setStdErrStream(listener.getLogger());
-        String buildNumber=build.getEnvironment(listener).get("BUILD_NUMBER");
-        String bzmBuildLogPath=build.getLogFile().getParentFile().getParent()+"/"+buildNumber+"/"+Constants.BZM_JEN_LOG;
-        File bzmLogFile = new File(bzmBuildLogPath);
+        File bzmLogFile = new File(build.getLogFile().getParentFile(),Constants.BZM_JEN_LOG);
         if(!bzmLogFile.exists()){
             FileUtils.forceMkdir(bzmLogFile.getParentFile());
             bzmLogFile.createNewFile();
@@ -154,7 +149,9 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
+        BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
+        jenBuildLog.info("BlazeMeter test log will be available at " + bzmLogFile.getAbsolutePath());
+
         BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
             if(!StringUtils.isBlank(this.sessionProperties)){
@@ -193,6 +190,10 @@ public class PerformanceBuilder extends Builder {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }
+            FilePath bzmLogPath=new FilePath(bzmLogFile.getParentFile());
+            FilePath bzmLogPathWS=new FilePath(build.getWorkspace(),build.getId());
+            jenBuildLog.warn("Copying bzm log files to build workspace: "+bzmLogPathWS.getRemote());
+            bzmLogPath.copyRecursiveTo(bzmLogPathWS);
         }
     }
 

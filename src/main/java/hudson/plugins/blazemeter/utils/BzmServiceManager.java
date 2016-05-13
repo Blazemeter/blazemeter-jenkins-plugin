@@ -11,7 +11,6 @@ import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -110,13 +109,11 @@ public class BzmServiceManager {
 
     public static void publishReport(BlazemeterApi api, String masterId,
                                      AbstractBuild<?, ?> build,
-                                     String bzmBuildLogPath,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
 
         String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
         jenBuildLog.info("BlazeMeter test report will be available at " + reportUrl);
-        jenBuildLog.info("BlazeMeter test log will be available at " + bzmBuildLogPath);
 
         PerformanceBuildAction a = new PerformanceBuildAction(build);
         a.setReportUrl(reportUrl);
