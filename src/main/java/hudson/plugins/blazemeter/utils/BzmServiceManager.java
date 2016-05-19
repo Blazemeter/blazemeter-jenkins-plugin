@@ -422,6 +422,7 @@ public class BzmServiceManager {
                 jenBuildLog.warn("Failed to prepare jmeter property " + s + " for the test: " + e.getMessage());
             }
         }
+        jenBuildLog.info("Prepared JSONArray of jmeter properties: "+props.toString());
         return props;
     }
 
