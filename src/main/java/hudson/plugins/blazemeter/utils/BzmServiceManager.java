@@ -414,8 +414,8 @@ public class BzmServiceManager {
                 JSONObject prop = new JSONObject();
                 List<String> pr = Arrays.asList(s.split("="));
                 if (pr.size() > 1) {
-                    prop.put("key", strSubstr.replace(pr.get(0)));
-                    prop.put("value", strSubstr.replace(pr.get(1)));
+                    prop.put("key", strSubstr.replace(pr.get(0)).trim());
+                    prop.put("value", strSubstr.replace(pr.get(1)).trim());
                 }
                 props.put(prop);
             } catch (Exception e) {
