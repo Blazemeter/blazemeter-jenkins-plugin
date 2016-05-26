@@ -1,5 +1,4 @@
 package hudson.plugins.blazemeter.utils;
-import java.io.File;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.plugins.blazemeter.api.TestType;
@@ -33,11 +32,10 @@ public class Utils {
 
     public static FilePath resolvePath(FilePath workspace, String path, EnvVars vars) throws Exception {
         FilePath fp = null;
-        FilePath root = new FilePath(new File("/"));
         StrSubstitutor strSubstr=new StrSubstitutor(vars);
         String resolvedPath=strSubstr.replace(path);
         if (resolvedPath.startsWith("/")) {
-            fp = new FilePath(root, resolvedPath);
+            fp = new FilePath(workspace.getChannel(), resolvedPath);
         } else {
             fp = new FilePath(workspace, resolvedPath);
         }
