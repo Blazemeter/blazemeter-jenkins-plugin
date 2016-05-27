@@ -34,7 +34,7 @@ public class Utils {
         FilePath fp = null;
         StrSubstitutor strSubstr=new StrSubstitutor(vars);
         String resolvedPath=strSubstr.replace(path);
-        if (resolvedPath.startsWith("/")) {
+        if (resolvedPath.startsWith("/")|resolvedPath.matches("(^[a-zA-Z][:][\\\\].+)")) {
             fp = new FilePath(workspace.getChannel(), resolvedPath);
         } else {
             fp = new FilePath(workspace, resolvedPath);
@@ -48,4 +48,6 @@ public class Utils {
         }
         return fp;
     }
+
+
 }

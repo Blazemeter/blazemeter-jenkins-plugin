@@ -328,11 +328,15 @@ public class BzmServiceManager {
             }else{
                 try {
                     jtlPath=Utils.resolvePath(dfp,builder.getJtlPath(),envVars);
+                    jenBuildLog.info("Will use the following path for JTL: "+
+                    jtlPath.getParent().getName()+"/"+jtlPath.getName());
                 } catch (Exception e) {
                     jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
                     jenBuildLog.warn("JTL report will be saved to workspace");
                     jtlPath=dfp;
                 }
+                jenBuildLog.info("Will use the following path for JTL: "+
+                        jtlPath.getParent().getName()+"/"+jtlPath.getName());
             }
             BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
         } else {
