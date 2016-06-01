@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.api;
 
+import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.utils.Constants;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
@@ -8,10 +9,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -25,30 +23,40 @@ import java.io.IOException;
 public class BzmHttpWrapper {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
-    public enum Method {GET, POST, PUT}
+    public enum Method {GET, POST, PATCH, PUT}
 
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy=null;
 
-    public BzmHttpWrapper(String proxyHost,String proxyPort,
-                          String proxyUser,String proxyPass) {
+    public BzmHttpWrapper(ProxyConfiguration proxy) {
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
-        if(!proxyHost.isEmpty()&&!proxyPort.isEmpty()){
-            int proxyInt=Integer.parseInt(proxyPort);
-            this.proxy=new HttpHost(proxyHost,proxyInt);
+        try {
+            proxy=proxy==null?ProxyConfiguration.load():proxy;
+        }catch (IOException ie){
+            logger.warn("Failed to load jenkins proxy configuration: ",ie);
+            proxy=null;
+        }catch (Exception e){
+            proxy=null;
+            logger.warn("Failed to load jenkins proxy configuration: ",e);
+        }
+
+        if(proxy!=null){
+            this.proxy=new HttpHost(proxy.name,proxy.port);
+            String proxyUser=proxy.getUserName();
+            String proxyPass=proxy.getPassword();
             if(!proxyUser.isEmpty()&&!proxyPass.isEmpty()){
                 CredentialsProvider credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(
-                        new AuthScope(proxyHost, proxyInt),
-                        new UsernamePasswordCredentials(proxyUser, proxyPass));
+                        new AuthScope(proxy.name, proxy.port),
+                        new UsernamePasswordCredentials(proxyUser,proxyPass));
                 this.httpClient = HttpClients.custom()
                         .setDefaultCredentialsProvider(credsProvider).build();
             }
         }
     }
 
-    public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
+    public <V> HttpResponse httpResponse(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
@@ -67,6 +75,11 @@ public class BzmHttpWrapper {
                 request = new HttpPut(url);
                 if (data != null) {
                     ((HttpPut) request).setEntity(new StringEntity(data.toString()));
+                }
+            } else if(method == Method.PATCH){
+                request = new HttpPatch(url);
+                if (data != null) {
+                    ((HttpPatch) request).setEntity(new StringEntity(data.toString()));
                 }
             }
             else {
@@ -96,7 +109,7 @@ public class BzmHttpWrapper {
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType){
+    public <T,V> T response(String url, V data, Method method, Class<T> returnType,Class<V> dataType){
         T returnObj=null;
         JSONObject jo = null;
         String output = null;

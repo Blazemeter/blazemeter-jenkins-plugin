@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,7 +37,7 @@ public interface BlazemeterApi {
 
     int getTestMasterStatusCode(String id);
 
-    String startTest(String testId,TestType testType) throws JSONException;
+    String startTest(String testId, TestType testType) throws JSONException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 
@@ -58,15 +59,9 @@ public interface BlazemeterApi {
 
     boolean active(String testId);
 
-    JSONObject postJsonConfig(String testId, JSONObject data);
-
-    JSONObject createTest(JSONObject data);
-
     String retrieveJUNITXML(String sessionId);
 
     JSONObject retrieveJtlZip(String sessionId);
-
-    JSONObject putTestInfo(String testId, JSONObject data);
 
     List<String> getListOfSessionIds(String masterId);
 
@@ -87,4 +82,8 @@ public interface BlazemeterApi {
     BmUrlManager getUrlManager();
 
     boolean ping() throws Exception;
+
+    boolean notes(String note,String masterId)throws Exception;
+
+    boolean properties(JSONArray properties, String sessionId) throws Exception;
 }

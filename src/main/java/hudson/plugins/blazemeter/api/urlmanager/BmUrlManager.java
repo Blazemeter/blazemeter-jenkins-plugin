@@ -8,7 +8,7 @@ import hudson.plugins.blazemeter.utils.BzmServiceManager;
 public interface BmUrlManager {
 
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
-            + BzmServiceManager.getVersion()+"&​";
+            + BzmServiceManager.getVersion();
 
     String LATEST="/api/latest";
     String TESTS="/tests";
@@ -24,9 +24,7 @@ public interface BmUrlManager {
 
     String activeTests(String appKey, String userKey);
 
-    String scriptUpload(String appKey, String userKey, String testId, String fileName);
-
-    String fileUpload(String appKey, String userKey, String testId, String fileName);
+    String masterId(String appKey,String userKey, String masterId);
 
     String testStart(String appKey, String userKey, String testId);
 
@@ -57,5 +55,7 @@ public interface BmUrlManager {
     String listOfSessionIds(String appKey, String userKey, String masterId);
 
     String version(String appKey);
+
+    String properties(String appKey, String userKey, String sessionId);
 }
 

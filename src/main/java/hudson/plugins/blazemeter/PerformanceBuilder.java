@@ -1,8 +1,6 @@
 package hudson.plugins.blazemeter;
 
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
+import hudson.*;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -14,9 +12,9 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.util.log.AbstractLogger;
-import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,19 +22,23 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PerformanceBuilder extends Builder {
-    DateFormat df = new SimpleDateFormat("dd/MM/yy");
-    private static AbstractLogger jenCommonLog =new JavaUtilLog(Constants.BZM_JEN);
     private static StdErrLog bzmBuildLog =new StdErrLog(Constants.BZM_JEN);
     private StdErrLog jenBuildLog;
 
     private String jobApiKey = "";
 
     private String testId = "";
+
+    private String notes = "";
+
+    private String sessionProperties = "";
+
+    private String jtlPath = "";
+
+    private String junitPath = "";
 
     private boolean getJtl = false;
 
@@ -57,19 +59,22 @@ public class PerformanceBuilder extends Builder {
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
                               String testId,
+                              String notes,
+                              String sessionProperties,
+                              String jtlPath,
+                              String junitPath,
                               boolean getJtl,
                               boolean getJunit
     ) {
         this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
-        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
-//        this.testDuration=testDuration;
+        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        this.jtlPath = jtlPath;
+        this.junitPath = junitPath;
         this.getJtl=getJtl;
         this.getJunit=getJunit;
+        this.notes=notes;
+        this.sessionProperties = sessionProperties;
     }
 
 
@@ -86,39 +91,30 @@ public class PerformanceBuilder extends Builder {
         this.build=build;
         jenBuildLog=new StdErrLog(Constants.BUILD_JEN);
         jenBuildLog.setStdErrStream(listener.getLogger());
-        String buildNumber=build.getEnvironment(listener).get("BUILD_NUMBER");
-        String bzmBuildLogPath=build.getLogFile().getParentFile().getParent()+"/"+buildNumber+"/"+Constants.BZM_JEN_LOG;
-        File bzmLogFile = new File(bzmBuildLogPath);
+        File bzmLogFile = new File(build.getLogFile().getParentFile(),Constants.BZM_JEN_LOG);
         if(!bzmLogFile.exists()){
             FileUtils.forceMkdir(bzmLogFile.getParentFile());
             bzmLogFile.createNewFile();
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
-//        this.api.setLogger(bzmBuildLog);
+        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL(),
-                DESCRIPTOR.getProxyHost(),
-                DESCRIPTOR.getProxyPort(),
-                DESCRIPTOR.getProxyUser(),
-                DESCRIPTOR.getProxyPass());
+        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
         String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
+            ProxyConfiguration proxy=ProxyConfiguration.load();
             jenBuildLog.warn("Please, check that settings are valid.");
             jenBuildLog.warn("UserKey=" + userKeyId + ", serverUrl=" + DESCRIPTOR.getBlazeMeterURL());
-            jenBuildLog.warn("ProxyHost=" + DESCRIPTOR.getProxyHost());
-            jenBuildLog.warn("ProxyPort=" + DESCRIPTOR.getProxyPort());
-            jenBuildLog.warn("ProxyUser=" + DESCRIPTOR.getProxyUser());
-            jenBuildLog.warn("ProxyPass=" + DESCRIPTOR.getProxyPass().substring(0,3)+"...");
+            jenBuildLog.warn("ProxyHost=" + proxy.name);
+            jenBuildLog.warn("ProxyPort=" + proxy.port);
+            jenBuildLog.warn("ProxyUser=" + proxy.getUserName());
+            String proxyPass=proxy.getPassword();
+            jenBuildLog.warn("ProxyPass=" + (StringUtils.isBlank(proxyPass)?"":proxyPass.substring(0,3))+"...");
             return false;
         }
         jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
@@ -136,7 +132,7 @@ public class PerformanceBuilder extends Builder {
         String masterId="";
         bzmBuildLog.info("### About to start BlazeMeter test # " + testId_num);
         bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
-
+        EnvVars envVars = build.getEnvironment(listener);
         try {
             masterId = api.startTest(testId_num,testType);
             if(masterId.isEmpty()){
@@ -153,16 +149,20 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        // add the report to the build object.
+        BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
+        jenBuildLog.info("BlazeMeter test log will be available at " + bzmLogFile.getAbsolutePath());
 
-        BzmServiceManager.publishReport(this.api,masterId,build,bzmBuildLogPath,jenBuildLog,bzmBuildLog);
-
+        BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
+            if(!StringUtils.isBlank(this.sessionProperties)){
+                JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
+                BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+            }
             BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,masterId,buildNumber);
+            Result result = BzmServiceManager.postProcess(this,masterId,envVars);
 
             build.setResult(result);
 
@@ -190,6 +190,10 @@ public class PerformanceBuilder extends Builder {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }
+            FilePath bzmLogPath=new FilePath(bzmLogFile.getParentFile());
+            FilePath bzmLogPathWS=new FilePath(build.getWorkspace(),build.getId());
+            jenBuildLog.warn("Copying bzm log files to build workspace: "+bzmLogPathWS.getRemote());
+            bzmLogPath.copyRecursiveTo(bzmLogPathWS);
         }
     }
 
@@ -239,6 +243,38 @@ public class PerformanceBuilder extends Builder {
 
     public boolean isGetJunit() {
         return getJunit;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getSessionProperties() {
+        return sessionProperties;
+    }
+
+    public String getJtlPath() {
+        return jtlPath;
+    }
+
+    public void setJtlPath(String jtlPath) {
+        this.jtlPath = jtlPath;
+    }
+
+    public String getJunitPath() {
+        return junitPath;
+    }
+
+    public void setJunitPath(String junitPath) {
+        this.junitPath = junitPath;
+    }
+
+    public void setSessionProperties(String sessionProperties) {
+        this.sessionProperties = sessionProperties;
     }
 
     @Override

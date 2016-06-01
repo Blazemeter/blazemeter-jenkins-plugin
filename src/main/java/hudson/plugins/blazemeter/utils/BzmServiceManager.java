@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter.utils;
 
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
@@ -10,7 +11,8 @@ import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.util.FormValidation;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -20,17 +22,15 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Created by dzmitrykashlach on 18/11/14.
  */
 public class BzmServiceManager {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-    private final static int BUFFER_SIZE = 2048;
-    private final static String ZIP_EXTENSION = ".zip";
+    private final static int DELAY=10000;
     private BzmServiceManager() {
     }
 
@@ -109,13 +109,11 @@ public class BzmServiceManager {
 
     public static void publishReport(BlazemeterApi api, String masterId,
                                      AbstractBuild<?, ?> build,
-                                     String bzmBuildLogPath,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
 
         String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
         jenBuildLog.info("BlazeMeter test report will be available at " + reportUrl);
-        jenBuildLog.info("BlazeMeter test log will be available at " + bzmBuildLogPath);
 
         PerformanceBuildAction a = new PerformanceBuildAction(build);
         a.setReportUrl(reportUrl);
@@ -123,25 +121,23 @@ public class BzmServiceManager {
 
     }
 
-    public static void saveReport(String filename,
+    public static void saveReport(String reportName,
                                   String report,
                                   FilePath filePath,
                                   StdErrLog jenBuildLog) {
-        File reportFile = new File(filePath.getParent()
-                + "/" + filePath.getName() + "/" + filename);
+        FilePath junit=null;
         try {
-            if (!reportFile.exists()) {
-                FileUtils.forceMkdir(reportFile.getParentFile());
-                reportFile.createNewFile();
+            junit=new FilePath(filePath,reportName);
+            if (!junit.exists()) {
+                junit.touch(System.currentTimeMillis());
             }
-            BufferedWriter out = new BufferedWriter(new FileWriter(reportFile));
-            out.write(report);
-            out.close();
-
-        } catch (FileNotFoundException fnfe) {
-            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + fnfe.getMessage());
+            junit.write(report, System.getProperty("file.encoding"));
+        } catch (FileNotFoundException e) {
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+junit.getParent()+"/"+junit.getName()+" : " + e.getMessage());
         } catch (IOException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to workspace " + e.getMessage());
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
+        } catch (InterruptedException e) {
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
         }
     }
 
@@ -214,171 +210,142 @@ public class BzmServiceManager {
     }
 
     public static void downloadJtlReport(BlazemeterApi api, String sessionId, FilePath filePath,
-                                         String buildNumber,
                                          StdErrLog jenBuildLog,
                                          StdErrLog bzmBuildLog) {
 
-        JSONObject jo=api.retrieveJtlZip(sessionId);
-        String dataUrl=null;
-        URL url=null;
+        JSONObject jo = api.retrieveJtlZip(sessionId);
+        String dataUrl = null;
+        URL url = null;
         try {
-            JSONArray data=jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
-            for(int i=0;i<data.length();i++){
-                String title=data.getJSONObject(i).getString("title");
-                if(title.equals("Zip")){
-                    dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
+            JSONArray data = jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
+            for (int i = 0; i < data.length(); i++) {
+                String title = data.getJSONObject(i).getString("title");
+                if (title.equals("Zip")) {
+                    dataUrl = data.getJSONObject(i).getString(JsonConstants.DATA_URL);
                     break;
                 }
             }
-            File jtlZip=new File(filePath.getParent()
-                    + "/" + buildNumber + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
-
-            if(!dataUrl.contains("amazonaws")){
-                url=new URL(dataUrl+"?api_key="+api.getApiKey());
-            }else{
-                url=new URL(dataUrl);
+            url = new URL(dataUrl);
+            jenBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            bzmBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            int i = 1;
+            boolean jtl = false;
+            while (!jtl && i < 4) {
+                try {
+                    jenBuildLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
+                    int conTo = (int) (10000 * Math.pow(3, i - 1));
+                    URLConnection connection = url.openConnection();
+                    connection.setConnectTimeout(conTo);
+                    connection.setReadTimeout(30000);
+                    InputStream input = connection.getInputStream();
+                    filePath.unzipFrom(input);
+                    jtl = true;
+                } catch (Exception e) {
+                    bzmBuildLog.warn("Unable to get JTLZIP from " + url + ", " + e);
+                } finally {
+                    i++;
+                }
             }
 
-            FileUtils.copyURLToFile(url, jtlZip);
-            jenBuildLog.info("Downloading JTLZIP .... ");
-            String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
-            jenBuildLog.info("Saving ZIP to " + jtlZipCanonicalPath);
-            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), jenBuildLog);
-            FilePath sample_jtl=new FilePath(filePath,"sample.jtl");
-            FilePath bm_kpis_jtl=new FilePath(filePath,Constants.BM_KPIS);
-            if(sample_jtl.exists()){
+            FilePath sample_jtl = new FilePath(filePath, "sample.jtl");
+            FilePath bm_kpis_jtl = new FilePath(filePath, Constants.BM_KPIS);
+            if (sample_jtl.exists()) {
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
         } catch (JSONException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (MalformedURLException e) {
-            bzmBuildLog.warn("Unable to get  JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (IOException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         } catch (InterruptedException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from "+url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
+            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
         }
     }
 
     public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
-                                          String buildNumber, StdErrLog jenBuildLog,
+                                          StdErrLog jenBuildLog,
                                           StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
-            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
+            FilePath jtl=new FilePath(filePath,s + Constants.BM_ARTEFACTS);
+            downloadJtlReport(api, s, jtl,jenBuildLog, bzmBuildLog);
         }
     }
 
 
-
-    public static void unzip(String srcZipFileName,
-                             String destDirectoryName, StdErrLog jenBuildLog) {
-        try {
-            BufferedInputStream bufIS = null;
-            // create the destination directory structure (if needed)
-            File destDirectory = new File(destDirectoryName);
-            destDirectory.mkdirs();
-
-            // open archive for reading
-            File file = new File(srcZipFileName);
-            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-
-            //for every zip archive entry do
-            Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
-            while (zipFileEntries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                if(entry.getName().substring((entry.getName().length()-4)).equals(".jtl")&!entry.isDirectory()){
-                    jenBuildLog.info("\tExtracting jtl report: " + entry);
-
-                    //create destination file
-                    File destFile = new File(destDirectory, entry.getName());
-
-                    //create parent directories if needed
-                    File parentDestFile = destFile.getParentFile();
-                    parentDestFile.mkdirs();
-
-                        bufIS = new BufferedInputStream(
-                                zipFile.getInputStream(entry));
-                        int currentByte;
-
-                        // buffer for writing file
-                        byte data[] = new byte[BUFFER_SIZE];
-
-                        // write the current file to disk
-                        FileOutputStream fOS = new FileOutputStream(destFile);
-                        BufferedOutputStream bufOS = new BufferedOutputStream(fOS, BUFFER_SIZE);
-
-                        while ((currentByte = bufIS.read(data, 0, BUFFER_SIZE)) != -1) {
-                            bufOS.write(data, 0, currentByte);
-                        }
-
-                        // close BufferedOutputStream
-                        bufOS.flush();
-                        bufOS.close();
-
-                }
-
-            }
-            bufIS.close();
-        } catch (Exception e) {
-            jenBuildLog.warn("Failed to unzip report: check that it is downloaded");
-        }
-    }
-
-    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId, FilePath workspace, String buildNumber, StdErrLog jenBuildLog){
+    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId,
+                                              FilePath junitPath, StdErrLog jenBuildLog){
         String junitReport="";
         jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
         try{
             junitReport = api.retrieveJUNITXML(masterId);
-            String junitReportName = masterId + "-" + Constants.BM_TRESHOLDS;
-            FilePath junitReportFilePath = new FilePath(workspace,buildNumber);
-            jenBuildLog.warn("build number="+buildNumber);
-            jenBuildLog.warn("masterId=" + masterId);
-            String junitReportPath = workspace.getParent()
-                    + "/" + workspace.getName() + "/" +buildNumber+"/"+ masterId + "-" + Constants.BM_TRESHOLDS;
+            String junitName = masterId + "-" + Constants.BM_TRESHOLDS;
             jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-            jenBuildLog.info("Saving it to " + junitReportPath);
-            saveReport(junitReportName, junitReport, junitReportFilePath, jenBuildLog);
+            jenBuildLog.info("Saving it to " + junitPath+" with name="+junitName);
+            saveReport(junitName,junitReport, junitPath, jenBuildLog);
         } catch (Exception e) {
             jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder,String masterId,String buildNumber) throws InterruptedException {
+    public static Result postProcess(PerformanceBuilder builder, String masterId, EnvVars envVars) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        BlazemeterApi api=builder.getApi();
-        StdErrLog jenBuildLog=builder.getJenBuildLog();
+        BlazemeterApi api = builder.getApi();
+        StdErrLog jenBuildLog = builder.getJenBuildLog();
         CIStatus ciStatus = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
-        if(ciStatus.equals(CIStatus.errors)){
-            result=Result.FAILURE;
+        if (ciStatus.equals(CIStatus.errors)) {
+            result = Result.FAILURE;
             return result;
         }
-        result=ciStatus.equals(CIStatus.failures)?Result.FAILURE:Result.SUCCESS;
-        FilePath workspace = builder.getBuild().getWorkspace();
+        result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
+        AbstractBuild build = builder.getBuild();
+        FilePath dfp=new FilePath(build.getWorkspace(), build.getId());
         if (builder.isGetJunit()) {
-            retrieveJUNITXMLreport(api, masterId, workspace, buildNumber, jenBuildLog);
+            FilePath junitPath=null;
+            try{
+                junitPath=Utils.resolvePath(dfp,builder.getJunitPath(),envVars);
+            }catch (Exception e){
+                jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
+                jenBuildLog.warn("JTL report will be saved to workspace");
+                junitPath=dfp;
+        }
+            retrieveJUNITXMLreport(api, masterId, junitPath, jenBuildLog);
         } else {
             jenBuildLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
-        if(builder.isGetJtl()){
-            AbstractBuild build=builder.getBuild();
-            FilePath jtlPath = new FilePath(build.getWorkspace(), build.getId());
-            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, buildNumber, jenBuildLog, jenBuildLog);
+        FilePath jtlPath = null;
+        if (builder.isGetJtl()) {
+            if (StringUtil.isBlank(builder.getJtlPath())) {
+                jtlPath = dfp;
+            }else{
+                try {
+                    jtlPath=Utils.resolvePath(dfp,builder.getJtlPath(),envVars);
+                    jenBuildLog.info("Will use the following path for JTL: "+
+                    jtlPath.getParent().getName()+"/"+jtlPath.getName());
+                } catch (Exception e) {
+                    jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
+                    jenBuildLog.warn("JTL report will be saved to workspace");
+                    jtlPath=dfp;
+                }
+                jenBuildLog.info("Will use the following path for JTL: "+
+                        jtlPath.getParent().getName()+"/"+jtlPath.getName());
+            }
+            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
         }
 
 
-
         //get testGetArchive information
-        JSONObject testReport=requestAggregateReport(api,jenBuildLog,masterId);
+        JSONObject testReport = requestAggregateReport(api, jenBuildLog, masterId);
 
 
         if (testReport == null || testReport.equals("null")) {
@@ -395,7 +362,7 @@ public class BzmServiceManager {
         } catch (JSONException je) {
             jenBuildLog.info("Failed to get test result. Try to check server for it");
             jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
-        }finally{
+        } finally {
             return result;
         }
 
@@ -420,6 +387,49 @@ public class BzmServiceManager {
         }
         return testReport;
     }
+
+    public static boolean notes(BlazemeterApi api, String masterId, String notes,StdErrLog jenBuildLog){
+        boolean note=false;
+        int n = 1;
+        while (!note && n < 6) {
+            try {
+                Thread.sleep(DELAY);
+                int statusCode = api.getTestMasterStatusCode(masterId);
+                if (statusCode > 20) {
+                    note = api.notes(notes, masterId);
+                }
+            } catch (Exception e) {
+                jenBuildLog.warn("Failed to PATCH notes to test report on server: masterId=" + masterId + " " + e.getMessage());
+            } finally {
+                n++;
+            }
+
+        }
+        return note;
+    }
+
+    public static JSONArray prepareSessionProperties(String sesssionProperties, EnvVars vars, StdErrLog jenBuildLog) throws JSONException {
+        List<String> propList = Arrays.asList(sesssionProperties.split(","));
+        JSONArray props = new JSONArray();
+        StrSubstitutor strSubstr = new StrSubstitutor(vars);
+        jenBuildLog.info("Preparing jmeter properties for the test...");
+        for (String s : propList) {
+            try {
+                JSONObject prop = new JSONObject();
+                List<String> pr = Arrays.asList(s.split("="));
+                if (pr.size() > 1) {
+                    prop.put("key", strSubstr.replace(pr.get(0)).trim());
+                    prop.put("value", strSubstr.replace(pr.get(1)).trim());
+                }
+                props.put(prop);
+            } catch (Exception e) {
+                jenBuildLog.warn("Failed to prepare jmeter property " + s + " for the test: " + e.getMessage());
+            }
+        }
+        jenBuildLog.info("Prepared JSONArray of jmeter properties: "+props.toString());
+        return props;
+    }
+
 
     public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
@@ -450,11 +460,7 @@ public class BzmServiceManager {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl,
-                                                 String proxyHost,
-                                                 String proxyPort,
-                                                 String proxyUser,
-                                                 String proxyPass) {
+    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
         if(userKey.isEmpty()){
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
@@ -462,7 +468,7 @@ public class BzmServiceManager {
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
-            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl,proxyHost,proxyPort,proxyUser,proxyPass);
+            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
@@ -492,13 +498,8 @@ public class BzmServiceManager {
                 ". Please, check proxy settings, serverUrl and userKey.");
     }
 
-    public static String getUserEmail(String userKey,String blazemeterUrl,
-                                      String proxyHost,
-                                      String proxyPort,
-                                      String proxyUser,
-                                      String proxyPass){
-        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl,
-                proxyHost,proxyPort,proxyUser,proxyPass);
+    public static String getUserEmail(String userKey,String blazemeterUrl){
+        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {
@@ -508,6 +509,29 @@ public class BzmServiceManager {
             }
         }catch (Exception e){
             return "";
+        }
+    }
+
+    public static void properties(BlazemeterApi api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
+        for (String s : sessionsIds) {
+            jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
+            int n = 1;
+            boolean submit = false;
+            while (!submit && n < 6) {
+                try {
+                    submit = api.properties(properties, s);
+                    if (!submit) {
+                        jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s+" retry # "+n);
+                        Thread.sleep(DELAY);
+                    }
+                } catch (Exception e) {
+                    jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s, e);
+                } finally {
+                    n++;
+                }
+            }
         }
     }
 }

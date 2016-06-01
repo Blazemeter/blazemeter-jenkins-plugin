@@ -67,11 +67,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
             BlazeMeterPerformanceBuilderDescriptor descriptor=BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
-            return  BzmServiceManager.validateUserKey(userKey,descriptor.getBlazeMeterURL(),
-                    descriptor.getProxyHost(),
-                    descriptor.getProxyPort(),
-                    descriptor.getProxyUser(),
-                    descriptor.getProxyPass());
+            return  BzmServiceManager.validateUserKey(userKey,descriptor.getBlazeMeterURL());
         }
 
     }
