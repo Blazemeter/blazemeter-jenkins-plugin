@@ -19,7 +19,8 @@ public interface TestConstants {
     String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
     int mockedApiPort=1234;
     String proxyPort="2345";
-    String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
+    String mockedApiHost="http://127.0.0.1:";
+    String mockedApiUrl=mockedApiHost+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
     String TEST_MASTER_NOT_FOUND ="testMaster-not-found";

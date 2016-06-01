@@ -8,22 +8,5 @@
         <f:entry title="${%Server URL}" field="blazeMeterURL">
             <f:textbox style="width:20em;"/>
         </f:entry>
-        <f:entry title="${%Proxy host}" field="proxyHost">
-            <f:textbox style="width:20em;"/>
-        </f:entry>
-        <f:entry title="${%Proxy port}" field="proxyPort">
-            <f:textbox style="width:20em;"/>
-        </f:entry>
-        <f:entry title="${%Proxy user}" field="proxyUser">
-            <f:textbox style="width:20em;"/>
-        </f:entry>
-        <f:entry title="${%Proxy password}" field="proxyPass">
-            <f:password style="width:20em;"/>
-        </f:entry>
-        <f:validateButton
-                title="${%Test Proxy Server}"
-                progress="${%Validating proxy server settings}"
-                method="testProxy"
-                with="blazeMeterURL,proxyHost,proxyPort,proxyUser,proxyPass"/>
     </f:section>
 </j:jelly>
