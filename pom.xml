@@ -8,14 +8,14 @@
     </parent>
 
     <properties>
-        <jenkins.build.number/>
+        <jenkins.build.number />
     </properties>
 
 
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.5-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
