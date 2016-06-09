@@ -7,6 +7,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConstants;
+import hudson.remoting.VirtualChannel;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -29,13 +30,19 @@ public class ApiV3Impl implements Api {
     private HttpUtil bzmhc = null;
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,null);
+        this(apiKey, blazeMeterUrl,null,null);
     }
-    public ApiV3Impl(String apiKey, String blazeMeterUrl, ProxyConfiguration proxy) {
+
+    public ApiV3Impl(String apiKey, String blazeMeterUrl,VirtualChannel c){
+        this(apiKey, blazeMeterUrl,null,c);
+    }
+
+    public ApiV3Impl(String apiKey, String blazeMeterUrl,
+                     ProxyConfiguration proxy, VirtualChannel c) {
         this.apiKey = apiKey;
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
-            bzmhc = new HttpUtil(proxy);
+            bzmhc = new HttpUtil(proxy,c);
         } catch (Exception ex) {
             logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }

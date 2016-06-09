@@ -16,4 +16,7 @@ public interface Constants {
     String UNKNOWN_TYPE="unknown_type";
     String API_KEY_EMPTY ="API key is empty: please, enter valid API key";
     String A_BLAZEMETER_COM="https://a.blazemeter.com";
+    String URL="url";
+    String METHOD="method";
+    String DATA="data";
 }

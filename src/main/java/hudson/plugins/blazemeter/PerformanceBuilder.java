@@ -98,7 +98,7 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
+        this.api = new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),build.getWorkspace().getChannel());
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
