@@ -7,7 +7,7 @@ import hudson.model.Result;
 import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -44,7 +44,7 @@ public class PerformanceBuilder extends Builder {
 
     private boolean getJunit = false;
 
-    private BlazemeterApi api = null;
+    private Api api = null;
 
     private AbstractBuild<?, ?> build=null;
     /**
@@ -66,9 +66,9 @@ public class PerformanceBuilder extends Builder {
                               boolean getJtl,
                               boolean getJunit
     ) {
-        this.jobApiKey = BzmServiceManager.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
+        this.jobApiKey = JobUtility.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
         this.testId = testId;
-        this.api = new BlazemeterApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        this.api = new ApiV3Impl(jobApiKey,DESCRIPTOR.getBlazeMeterURL());
         this.jtlPath = jtlPath;
         this.junitPath = junitPath;
         this.getJtl=getJtl;
@@ -98,14 +98,14 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new BlazemeterApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
+        this.api = new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail=BzmServiceManager.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
-        String userKeyId=BzmServiceManager.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
+        String userEmail= JobUtility.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        String userKeyId= JobUtility.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
             ProxyConfiguration proxy=ProxyConfiguration.load();
             jenBuildLog.warn("Please, check that settings are valid.");
@@ -117,7 +117,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("ProxyPass=" + (StringUtils.isBlank(proxyPass)?"":proxyPass.substring(0,3))+"...");
             return false;
         }
-        jenBuildLog.warn("BlazeMeter plugin version ="+BzmServiceManager.getVersion());
+        jenBuildLog.warn("BlazeMeter plugin version ="+ JobUtility.getVersion());
         jenBuildLog.warn("User key ="+userKeyId+" is valid with "+DESCRIPTOR.getBlazeMeterURL());
         jenBuildLog.warn("User's e-mail="+userEmail);
         TestType testType= null;
@@ -149,20 +149,20 @@ public class PerformanceBuilder extends Builder {
             return false;
         }
 
-        BzmServiceManager.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
+        JobUtility.publishReport(this.api,masterId,build,jenBuildLog,bzmBuildLog);
         jenBuildLog.info("BlazeMeter test log will be available at " + bzmLogFile.getAbsolutePath());
 
-        BzmServiceManager.notes(this.api,masterId,this.notes,jenBuildLog);
+        JobUtility.notes(this.api,masterId,this.notes,jenBuildLog);
         try {
             if(!StringUtils.isBlank(this.sessionProperties)){
-                JSONArray props=BzmServiceManager.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
-                BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+                JSONArray props= JobUtility.prepareSessionProperties(this.sessionProperties,envVars,jenBuildLog);
+                JobUtility.properties(this.api,props,masterId,jenBuildLog);
             }
-            BzmServiceManager.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
+            JobUtility.waitForFinish(this.api,testId_num,bzmBuildLog, masterId);
 
             bzmBuildLog.info("BlazeMeter test# " + testId_num + " was terminated at " + Calendar.getInstance().getTime());
 
-            Result result = BzmServiceManager.postProcess(this,masterId,envVars);
+            Result result = JobUtility.postProcess(this,masterId,envVars);
 
             build.setResult(result);
 
@@ -181,7 +181,7 @@ public class PerformanceBuilder extends Builder {
 
             if (testStatus.equals(TestStatus.Running)) {
                 jenBuildLog.info("Shutting down test");
-                BzmServiceManager.stopTestSession(this.api, masterId, jenBuildLog);
+                JobUtility.stopTestSession(this.api, masterId, jenBuildLog);
                 build.setResult(Result.ABORTED);
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 build.setResult(Result.FAILURE);
@@ -234,7 +234,7 @@ public class PerformanceBuilder extends Builder {
         return jenBuildLog;
     }
 
-    public BlazemeterApi getApi() {
+    public Api getApi() {
         return api;
     }
     public boolean isGetJtl() {

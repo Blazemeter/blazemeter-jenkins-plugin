@@ -4,9 +4,9 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
-import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -62,9 +62,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(Constants.NO_API_KEY, "-1");
         } else {
             if(apiKey.contains(Constants.CREDENTIALS_KEY)){
-                apiKey=BzmServiceManager.selectUserKeyOnId(this,apiKey);
+                apiKey= JobUtility.selectUserKeyOnId(this,apiKey);
             }
-            BlazemeterApi api = new BlazemeterApiV3Impl(apiKey,this.blazeMeterURL);
+            Api api = new ApiV3Impl(apiKey,this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
@@ -119,7 +119,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {
-        return BzmServiceManager.validateUserKey(userKey,this.blazeMeterURL);
+        return JobUtility.validateUserKey(userKey,this.blazeMeterURL);
     }
 
     public ListBoxModel getKeys(){

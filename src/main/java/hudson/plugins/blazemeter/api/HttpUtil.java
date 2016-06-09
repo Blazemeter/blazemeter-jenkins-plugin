@@ -20,15 +20,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 
-public class BzmHttpWrapper {
+public class HttpUtil {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-
-    public enum Method {GET, POST, PATCH, PUT}
 
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy=null;
 
-    public BzmHttpWrapper(ProxyConfiguration proxy) {
+    public HttpUtil(ProxyConfiguration proxy) {
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
         try {
@@ -64,30 +62,34 @@ public class BzmHttpWrapper {
         HttpRequestBase request = null;
 
         try {
-            if (method == Method.GET) {
-                request = new HttpGet(url);
-            } else if (method == Method.POST) {
-                request = new HttpPost(url);
-                if (data != null) {
-                    ((HttpPost) request).setEntity(new StringEntity(data.toString()));
-                }
-            } else if (method == Method.PUT) {
-                request = new HttpPut(url);
-                if (data != null) {
-                    ((HttpPut) request).setEntity(new StringEntity(data.toString()));
-                }
-            } else if(method == Method.PATCH){
-                request = new HttpPatch(url);
-                if (data != null) {
-                    ((HttpPatch) request).setEntity(new StringEntity(data.toString()));
-                }
-            }
-            else {
-                throw new RuntimeException("Unsupported method: " + method.toString());
+            switch (method) {
+                case GET:
+                    request = new HttpGet(url);
+                    break;
+                case POST:
+                    request = new HttpPost(url);
+                    if (data != null) {
+                        ((HttpPost) request).setEntity(new StringEntity(data.toString()));
+                    }
+                    break;
+                case PUT:
+                    request = new HttpPut(url);
+                    if (data != null) {
+                        ((HttpPut) request).setEntity(new StringEntity(data.toString()));
+                    }
+                    break;
+                case PATCH:
+                    request = new HttpPatch(url);
+                    if (data != null) {
+                        ((HttpPatch) request).setEntity(new StringEntity(data.toString()));
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported method: " + method.toString());
             }
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json; charset=UTF-8");
-            if(proxy!=null){
+            if (proxy != null) {
                 RequestConfig conf = RequestConfig.custom()
                         .setProxy(proxy)
                         .build();
@@ -97,12 +99,12 @@ public class BzmHttpWrapper {
 
 
             if (response == null || response.getStatusLine() == null) {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Erroneous response (Probably null) for url: \n", url);
                 response = null;
             }
         } catch (Exception e) {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Problems with creating and sending request: \n", e);
         }
         return response;

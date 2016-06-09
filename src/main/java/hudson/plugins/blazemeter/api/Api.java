@@ -1,7 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
-import hudson.plugins.blazemeter.api.urlmanager.BmUrlManager;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +28,7 @@ import java.util.List;
 
  */
 
-public interface BlazemeterApi {
+public interface Api {
 
     String APP_KEY = "jnk100x987c06f4e10c4";
 
@@ -65,9 +64,9 @@ public interface BlazemeterApi {
 
     List<String> getListOfSessionIds(String masterId);
 
-    void setBzmHttpWr(BzmHttpWrapper bzmhc);
+    void setBzmHttpWr(HttpUtil bzmhc);
 
-    BzmHttpWrapper getBzmHttpWr();
+    HttpUtil getBzmHttpWr();
 
     StdErrLog getLogger();
 
@@ -79,7 +78,7 @@ public interface BlazemeterApi {
 
     String getBlazeMeterURL();
 
-    BmUrlManager getUrlManager();
+    UrlManager getUrlManager();
 
     boolean ping() throws Exception;
 

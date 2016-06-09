@@ -5,8 +5,8 @@ import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.*;
-import hudson.plugins.blazemeter.api.BlazemeterApi;
-import hudson.plugins.blazemeter.api.BlazemeterApiV3Impl;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
@@ -28,13 +28,13 @@ import java.util.*;
 /**
  * Created by dzmitrykashlach on 18/11/14.
  */
-public class BzmServiceManager {
+public class JobUtility {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
     private final static int DELAY=10000;
-    private BzmServiceManager() {
+    private JobUtility() {
     }
 
-    public static void waitForFinish(BlazemeterApi api, String testId, AbstractLogger bzmBuildLog,
+    public static void waitForFinish(Api api, String testId, AbstractLogger bzmBuildLog,
                                      String session) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
@@ -68,7 +68,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static String getReportUrl(BlazemeterApi api, String masterId,
+    public static String getReportUrl(Api api, String masterId,
                                       StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
         JSONObject jo=null;
         String publicToken="";
@@ -107,7 +107,7 @@ public class BzmServiceManager {
         return session;
     }
 
-    public static void publishReport(BlazemeterApi api, String masterId,
+    public static void publishReport(Api api, String masterId,
                                      AbstractBuild<?, ?> build,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
@@ -141,7 +141,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static CIStatus validateCIStatus(BlazemeterApi api, String session, StdErrLog jenBuildLog){
+    public static CIStatus validateCIStatus(Api api, String session, StdErrLog jenBuildLog){
         CIStatus ciStatus=CIStatus.success;
         JSONObject jo;
         JSONArray failures=new JSONArray();
@@ -209,7 +209,7 @@ public class BzmServiceManager {
         return userKeyId;
     }
 
-    public static void downloadJtlReport(BlazemeterApi api, String sessionId, FilePath filePath,
+    public static void downloadJtlReport(Api api, String sessionId, FilePath filePath,
                                          StdErrLog jenBuildLog,
                                          StdErrLog bzmBuildLog) {
 
@@ -267,7 +267,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static void downloadJtlReports(BlazemeterApi api, String masterId, FilePath filePath,
+    public static void downloadJtlReports(Api api, String masterId, FilePath filePath,
                                           StdErrLog jenBuildLog,
                                           StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
@@ -278,7 +278,7 @@ public class BzmServiceManager {
     }
 
 
-    public static void retrieveJUNITXMLreport(BlazemeterApi api, String masterId,
+    public static void retrieveJUNITXMLreport(Api api, String masterId,
                                               FilePath junitPath, StdErrLog jenBuildLog){
         String junitReport="";
         jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
@@ -297,9 +297,9 @@ public class BzmServiceManager {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        BlazemeterApi api = builder.getApi();
+        Api api = builder.getApi();
         StdErrLog jenBuildLog = builder.getJenBuildLog();
-        CIStatus ciStatus = BzmServiceManager.validateCIStatus(api, masterId, jenBuildLog);
+        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, jenBuildLog);
         if (ciStatus.equals(CIStatus.errors)) {
             result = Result.FAILURE;
             return result;
@@ -338,7 +338,7 @@ public class BzmServiceManager {
                 jenBuildLog.info("Will use the following path for JTL: "+
                         jtlPath.getParent().getName()+"/"+jtlPath.getName());
             }
-            BzmServiceManager.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
+            JobUtility.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
         } else {
             jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
         }
@@ -369,7 +369,7 @@ public class BzmServiceManager {
     }
 
 
-    public static JSONObject requestAggregateReport(BlazemeterApi api,StdErrLog jenBuildLog,String masterId){
+    public static JSONObject requestAggregateReport(Api api, StdErrLog jenBuildLog, String masterId){
         JSONObject testReport=null;
         int retries = 1;
         try {
@@ -388,7 +388,7 @@ public class BzmServiceManager {
         return testReport;
     }
 
-    public static boolean notes(BlazemeterApi api, String masterId, String notes,StdErrLog jenBuildLog){
+    public static boolean notes(Api api, String masterId, String notes, StdErrLog jenBuildLog){
         boolean note=false;
         int n = 1;
         while (!note && n < 6) {
@@ -431,7 +431,7 @@ public class BzmServiceManager {
     }
 
 
-    public static boolean stopTestSession(BlazemeterApi api, String masterId, StdErrLog jenBuildLog) {
+    public static boolean stopTestSession(Api api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
         try {
                 int statusCode = api.getTestMasterStatusCode(masterId);
@@ -453,7 +453,7 @@ public class BzmServiceManager {
     public static String getVersion() {
         Properties props = new Properties();
         try {
-            props.load(BzmServiceManager.class.getResourceAsStream("version.properties"));
+            props.load(JobUtility.class.getResourceAsStream("version.properties"));
         } catch (IOException ex) {
             props.setProperty(Constants.VERSION, "N/A");
         }
@@ -468,7 +468,7 @@ public class BzmServiceManager {
         String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
-            BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazeMeterUrl);
+            Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
@@ -499,7 +499,7 @@ public class BzmServiceManager {
     }
 
     public static String getUserEmail(String userKey,String blazemeterUrl){
-        BlazemeterApi bzm = new BlazemeterApiV3Impl(userKey, blazemeterUrl);
+        Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has("mail")) {
@@ -512,7 +512,7 @@ public class BzmServiceManager {
         }
     }
 
-    public static void properties(BlazemeterApi api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+    public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {

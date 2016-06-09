@@ -1,14 +1,14 @@
 package hudson.plugins.blazemeter.api.urlmanager;
 
-import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.JobUtility;
 
 /**
  * Created by dzmitrykashlach on 10/11/14.
  */
-public interface BmUrlManager {
+public interface UrlManager {
 
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
-            + BzmServiceManager.getVersion();
+            + JobUtility.getVersion();
 
     String LATEST="/api/latest";
     String TESTS="/tests";

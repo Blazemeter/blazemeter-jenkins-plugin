@@ -4,7 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.BzmServiceManager;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -67,7 +67,7 @@ public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
         // Used by global.jelly to authenticate User key
         public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
             BlazeMeterPerformanceBuilderDescriptor descriptor=BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
-            return  BzmServiceManager.validateUserKey(userKey,descriptor.getBlazeMeterURL());
+            return  JobUtility.validateUserKey(userKey,descriptor.getBlazeMeterURL());
         }
 
     }
