@@ -31,7 +31,7 @@ public class HttpRemote implements Callable<String,Exception>, Serializable {
         this.httpClient = HttpClients.createDefault();
         HttpRequestBase r=null;
         String url=(String) rp.get(Constants.URL);
-        Method m=(Method) rp.get(Constants.METHOD);
+        Method m=Method.valueOf((String)rp.get(Constants.METHOD));
         String data = (String)rp.get(Constants.DATA);
         switch (m) {
             case GET:

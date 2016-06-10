@@ -10,6 +10,7 @@ import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
@@ -75,13 +76,13 @@ public class JobUtility {
         String reportUrl=null;
         try {
             jo = api.generatePublicToken(masterId);
-            if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
-                JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
+            if(jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)){
+                JSONObject result=jo.getJSONObject(JsonConsts.RESULT);
                 publicToken=result.getString("publicToken");
                 reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
             }else{
-                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
+                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConsts.ERROR).toString());
+                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConsts.ERROR).toString());
                 reportUrl=api.getBlazeMeterURL()+"/app/#masters/"+masterId+"/summary";
             }
 
@@ -98,7 +99,7 @@ public class JobUtility {
         try {
 
             // get sessionId add to interface
-                JSONObject startJO = (JSONObject) json.get(JsonConstants.RESULT);
+                JSONObject startJO = (JSONObject) json.get(JsonConsts.RESULT);
                 session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
         } catch (Exception e) {
             jenBuildLog.info("Failed to get session_id: " + e.getMessage());
@@ -149,8 +150,8 @@ public class JobUtility {
         try {
             jo=api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            failures=jo.getJSONArray(JsonConstants.FAILURES);
-            errors=jo.getJSONArray(JsonConstants.ERRORS);
+            failures=jo.getJSONArray(JsonConsts.FAILURES);
+            errors=jo.getJSONArray(JsonConsts.ERRORS);
         } catch (JSONException je) {
             jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
@@ -217,11 +218,11 @@ public class JobUtility {
         String dataUrl = null;
         URL url = null;
         try {
-            JSONArray data = jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
+            JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
             for (int i = 0; i < data.length(); i++) {
                 String title = data.getJSONObject(i).getString("title");
                 if (title.equals("Zip")) {
-                    dataUrl = data.getJSONObject(i).getString(JsonConstants.DATA_URL);
+                    dataUrl = data.getJSONObject(i).getString(JsonConsts.DATA_URL);
                     break;
                 }
             }
@@ -474,13 +475,13 @@ public class JobUtility {
             net.sf.json.JSONObject user = null;
             if (u!= null) {
                 user = net.sf.json.JSONObject.fromObject(u.toString());
-                if (user.has("error") && !user.get("error").equals(null)) {
-                    logger.warn("API key is not valid: error=" + user.get("error").toString());
+                if (user.has(JsonConsts.ERROR) && !user.get(JsonConsts.ERROR).equals(null)) {
+                    logger.warn("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
                     logger.warn("User profile: "+user.toString());
-                    return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get("error").toString());
+                    return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
                 } else {
-                    logger.warn("API key is valid: user e-mail=" + user.getString("mail"));
-                    return FormValidation.ok("API key Valid. Email - " + user.getString("mail"));
+                    logger.warn("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
+                    return FormValidation.ok("API key Valid. Email - " + user.getString(JsonConsts.MAIL));
                 }
             }
         } catch (ClassCastException e) {
@@ -498,12 +499,12 @@ public class JobUtility {
                 ". Please, check proxy settings, serverUrl and userKey.");
     }
 
-    public static String getUserEmail(String userKey,String blazemeterUrl){
-        Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
+    public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c){
+        Api bzm = new ApiV3Impl(userKey, blazemeterUrl,c);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
-            if (user.has("mail")) {
-                return user.getString("mail");
+            if (user.has(JsonConsts.MAIL)) {
+                return user.getString(JsonConsts.MAIL);
             } else {
                 return "";
             }
@@ -512,7 +513,12 @@ public class JobUtility {
         }
     }
 
-    public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+    public static String getUserEmail(String userKey, String blazemeterUrl){
+        return getUserEmail(userKey, blazemeterUrl,null);
+    }
+
+
+        public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {

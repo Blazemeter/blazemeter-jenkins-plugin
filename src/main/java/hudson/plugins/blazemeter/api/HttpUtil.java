@@ -67,14 +67,22 @@ public class HttpUtil {
 
     public <V> String responseRC(String url, V data, Method method) throws Exception {
         HashMap<String, Object> rp = new HashMap<String, Object>();
-        rp.put(Constants.URL, url);
-        rp.put(Constants.METHOD, method.name());
-        if (data != null) {
-            rp.put(Constants.DATA, data.toString());
+        String entity = null;
+        try {
+            rp.put(Constants.URL, url);
+            rp.put(Constants.METHOD, method.name());
+            if (data != null) {
+                rp.put(Constants.DATA, data.toString());
+            }
+            this.r.setRp(rp);
+            entity = c.call(this.r);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled())
+                logger.debug("Problems with executing http request at remote channel(slave)=" + this.c.toString(), e);
+            throw e;
+        } finally {
+            return entity;
         }
-        this.r.setRp(rp);
-        String entity = c.call(this.r);
-        return entity;
     }
 
     public <V> HttpResponse responseLC(String url, V data, Method method) throws IOException {

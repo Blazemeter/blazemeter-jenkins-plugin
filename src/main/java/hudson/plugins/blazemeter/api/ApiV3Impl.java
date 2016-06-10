@@ -6,7 +6,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JsonConstants;
+import hudson.plugins.blazemeter.utils.JsonConsts;
 import hudson.remoting.VirtualChannel;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -58,7 +58,7 @@ public class ApiV3Impl implements Api {
         try {
             String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
-            JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
+            JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             statusCode = result.getInt("progress");
         } catch (Exception e) {
             logger.warn("Error getting status ", e);
@@ -81,8 +81,8 @@ public class ApiV3Impl implements Api {
         try {
             String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
             JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
-            JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-            if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
+            JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
+            if (result.has(JsonConsts.DATA_URL) && result.get(JsonConsts.DATA_URL) == null) {
                 testStatus = TestStatus.NotFound;
             } else {
                 if (result.has("status") && !result.getString("status").equals("ENDED")) {
@@ -150,14 +150,14 @@ public class ApiV3Impl implements Api {
         }
         JSONObject result=null;
         try{
-            result = (JSONObject) jo.get(JsonConstants.RESULT);
+            result = (JSONObject) jo.get(JsonConsts.RESULT);
         }catch (Exception e){
             if (logger.isDebugEnabled())
                 logger.debug("Error while starting test: ",e);
             throw new JSONException("Faild to get 'result' node "+e.getMessage());
 
         }
-        return result.getString(JsonConstants.ID);
+        return result.getString(JsonConsts.ID);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class ApiV3Impl implements Api {
             if (jo == null) {
                 return -1;
             } else {
-                JSONArray result = (JSONArray) jo.get(JsonConstants.RESULT);
+                JSONArray result = (JSONArray) jo.get(JsonConsts.RESULT);
                 return result.length();
             }
         } catch (JSONException e) {
@@ -218,7 +218,7 @@ public class ApiV3Impl implements Api {
         JSONObject summary = null;
         JSONObject result = null;
         try {
-            result = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConstants.RESULT);
+            result = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConsts.RESULT);
             summary = (JSONObject) result.getJSONArray("summary")
                     .get(0);
         } catch (JSONException je) {
@@ -246,8 +246,8 @@ public class ApiV3Impl implements Api {
             try {
                 JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
                 JSONArray result = null;
-                if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
-                    result = (JSONArray) jo.get(JsonConstants.RESULT);
+                if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
+                    result = (JSONArray) jo.get(JsonConsts.RESULT);
                 }
                 if (result != null && result.length() > 0) {
                     testListOrdered = LinkedHashMultimap.create(result.length(), result.length());
@@ -262,9 +262,9 @@ public class ApiV3Impl implements Api {
                         String name;
                         try {
                             if (en != null) {
-                                id = en.getString(JsonConstants.ID);
-                                name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-                                String testType = en.has(JsonConstants.TYPE) ? en.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
+                                id = en.getString(JsonConsts.ID);
+                                name = en.has(JsonConsts.NAME) ? en.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
+                                String testType = en.has(JsonConsts.TYPE) ? en.getString(JsonConsts.TYPE) : Constants.UNKNOWN_TYPE;
                                 testListOrdered.put(name, id + "." + testType);
 
                             }
@@ -305,7 +305,7 @@ public class ApiV3Impl implements Api {
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConstants.RESULT);
+        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConsts.RESULT);
         return jo;
     }
 
@@ -393,10 +393,10 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.listOfSessionIds(APP_KEY, apiKey, masterId);
         JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
         try {
-            JSONArray sessions = jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
+            JSONArray sessions = jo.getJSONObject(JsonConsts.RESULT).getJSONArray("sessions");
             int sessionsLength = sessions.length();
             for (int i = 0; i < sessionsLength; i++) {
-                sessionsIds.add(sessions.getJSONObject(i).getString(JsonConstants.ID));
+                sessionsIds.add(sessions.getJSONObject(i).getString(JsonConsts.ID));
             }
         } catch (JSONException je) {
             logger.info("Failed to get list of sessions from JSONObject " + jo, je);
@@ -415,16 +415,16 @@ public class ApiV3Impl implements Api {
         try {
             jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
             JSONObject result = null;
-            if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
-                result = (JSONObject) jo.get(JsonConstants.RESULT);
-                JSONArray tests = (JSONArray) result.get(JsonConstants.TESTS);
+            if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
+                result = (JSONObject) jo.get(JsonConsts.RESULT);
+                JSONArray tests = (JSONArray) result.get(JsonConsts.TESTS);
                 for(int i=0;i<tests.length();i++){
                     if(String.valueOf(tests.getInt(i)).equals(testId)){
                         isActive=true;
                         return isActive;
                     }
                 }
-                JSONArray collections = (JSONArray) result.get(JsonConstants.COLLECTIONS);
+                JSONArray collections = (JSONArray) result.get(JsonConsts.COLLECTIONS);
                 for(int i=0;i<collections.length();i++){
                     if(String.valueOf(collections.getInt(i)).equals(testId)){
                         isActive=true;
@@ -449,7 +449,7 @@ public class ApiV3Impl implements Api {
         boolean ping=false;
         try{
             jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
-            ping=jo.isNull(JsonConstants.ERROR);
+            ping=jo.isNull(JsonConsts.ERROR);
         }catch (Exception e){
             logger.info("Failed to ping server: "+jo,e);
             throw e;
@@ -460,12 +460,12 @@ public class ApiV3Impl implements Api {
     @Override
     public boolean notes(String note,String masterId) throws Exception {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
-        JSONObject noteJson=new JSONObject("{'"+JsonConstants.NOTE+"':'"+note+"'}");
+        JSONObject noteJson=new JSONObject("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
         String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
         JSONObject jo=this.bzmhc.response(url, noteJson, Method.PATCH, JSONObject.class,JSONObject.class);
         try{
 
-        if(!jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
+        if(!jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)){
             return false;
         }}catch (Exception e){
             throw new Exception("Failed to submit report notest to masterId="+masterId,e);
@@ -480,7 +480,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.properties(APP_KEY, apiKey, sessionId);
         JSONObject jo = this.bzmhc.response(url, properties, Method.POST, JSONObject.class,JSONArray.class);
         try {
-            if (jo.get(JsonConstants.RESULT).equals(JSONObject.NULL)) {
+            if (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) {
                 return false;
             }
         } catch (Exception e) {

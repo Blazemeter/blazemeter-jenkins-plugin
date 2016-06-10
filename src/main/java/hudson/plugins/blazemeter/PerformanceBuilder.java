@@ -9,6 +9,7 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Utils;
+import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import org.apache.commons.io.FileUtils;
@@ -98,13 +99,14 @@ public class PerformanceBuilder extends Builder {
         }
         PrintStream bzmBuildLogStream = new PrintStream(bzmLogFile);
         bzmBuildLog.setStdErrStream(bzmBuildLogStream);
-        this.api = new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),build.getWorkspace().getChannel());
+        VirtualChannel c=build.getWorkspace().getChannel();
+        this.api = new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL(),c);
         this.api.setLogger(jenBuildLog);
         bzmBuildLog.setDebugEnabled(true);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
         this.api.getBzmHttpWr().setLogger(bzmBuildLog);
 
-        String userEmail= JobUtility.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL());
+        String userEmail= JobUtility.getUserEmail(this.jobApiKey,DESCRIPTOR.getBlazeMeterURL(),c);
         String userKeyId= JobUtility.selectUserKeyId(DESCRIPTOR,this.jobApiKey);
         if(userEmail.isEmpty()){
             ProxyConfiguration proxy=ProxyConfiguration.load();
@@ -190,10 +192,11 @@ public class PerformanceBuilder extends Builder {
                 build.setResult(Result.FAILURE);
                 jenBuildLog.warn("Test is not running on server. Check logs for detailed errors");
             }
-            FilePath bzmLogPath=new FilePath(bzmLogFile.getParentFile());
-            FilePath bzmLogPathWS=new FilePath(build.getWorkspace(),build.getId());
-            jenBuildLog.warn("Copying bzm log files to build workspace: "+bzmLogPathWS.getRemote());
-            bzmLogPath.copyRecursiveTo(bzmLogPathWS);
+            FilePath bzmLogPath=new FilePath(bzmLogFile);
+            FilePath buildLogWs=new FilePath(build.getWorkspace(),build.getId()+"/"+Constants.BZM_JEN_LOG);
+            jenBuildLog.warn("Copying bzm-jen-log file to build workspace: "+buildLogWs.getRemote());
+            bzmLogPath.copyTo(buildLogWs);
+            bzmLogPath.delete();
         }
     }
 

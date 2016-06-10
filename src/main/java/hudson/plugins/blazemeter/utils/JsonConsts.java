@@ -3,7 +3,7 @@ package hudson.plugins.blazemeter.utils;
 /**
  * Created by dzmitrykashlach on 3/02/15.
  */
-public interface JsonConstants {
+public interface JsonConsts {
     String ERROR="error";
     String RESULT="result";
     String DATA="data";
@@ -16,4 +16,5 @@ public interface JsonConstants {
     String COLLECTIONS="collections";
     String ID="id";
     String NOTE="note";
+    String MAIL="mail";
 }
