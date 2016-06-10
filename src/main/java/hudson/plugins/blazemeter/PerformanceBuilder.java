@@ -197,6 +197,7 @@ public class PerformanceBuilder extends Builder {
             jenBuildLog.warn("Copying bzm-jen-log file to build workspace: "+buildLogWs.getRemote());
             bzmLogPath.copyTo(buildLogWs);
             bzmLogPath.delete();
+            this.api=new ApiV3Impl(jobApiKey, DESCRIPTOR.getBlazeMeterURL());
         }
     }
 
