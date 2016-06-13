@@ -1,9 +1,12 @@
 package hudson.plugins.blazemeter.api;
 
+import hudson.FilePath;
 import hudson.ProxyConfiguration;
+import hudson.model.Node;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
+import jenkins.model.Jenkins;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -23,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class HttpUtil {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
@@ -30,7 +34,7 @@ public class HttpUtil {
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy = null;
     private HttpRemote r = null;
-    private VirtualChannel c = null;
+    private transient VirtualChannel c = null;
     private HashMap<String, String> headers = new HashMap<String, String>();
 
     public HttpUtil(ProxyConfiguration proxy, VirtualChannel c) {
@@ -39,7 +43,7 @@ public class HttpUtil {
         this.r = new HttpRemote(this.headers);
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
-        this.c = c;
+        this.c = c == null ? selectCahnnel() : c;
         try {
             proxy = proxy == null ? ProxyConfiguration.load() : proxy;
         } catch (IOException ie) {
@@ -63,6 +67,19 @@ public class HttpUtil {
                         .setDefaultCredentialsProvider(credsProvider).build();
             }
         }
+    }
+
+    private VirtualChannel selectCahnnel() {
+        Jenkins j = Jenkins.getInstance();
+        if (j != null) {
+            List<Node> nodes = j.getNodes();
+            if (nodes.size() == 0) {
+                return FilePath.localChannel;
+            } else {
+                return nodes.get(0).getChannel();
+            }
+        }
+        return null;
     }
 
     public <V> String responseRC(String url, V data, Method method) throws Exception {
