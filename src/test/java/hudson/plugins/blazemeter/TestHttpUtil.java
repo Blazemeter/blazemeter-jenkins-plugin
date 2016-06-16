@@ -26,7 +26,7 @@ public class TestHttpUtil {
         MockedAPI.getMasterStatus();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
-        httpUtil =new HttpUtil(MockedAPI.proxyConfig,null);
+        httpUtil =new HttpUtil(MockedAPI.proxyConfig);
     }
 
     @AfterClass

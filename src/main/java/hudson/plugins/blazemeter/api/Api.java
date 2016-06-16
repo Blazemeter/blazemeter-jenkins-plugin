@@ -64,9 +64,9 @@ public interface Api {
 
     List<String> getListOfSessionIds(String masterId);
 
-    void setBzmHttpWr(HttpUtil bzmhc);
+    void setHttpUtil(HttpUtil bzmhc);
 
-    HttpUtil getBzmHttpWr();
+    HttpUtil getHttp();
 
     StdErrLog getLogger();
 

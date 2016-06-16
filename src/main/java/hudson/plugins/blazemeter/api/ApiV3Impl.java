@@ -30,19 +30,15 @@ public class ApiV3Impl implements Api {
     private HttpUtil bzmhc = null;
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,null,null);
-    }
-
-    public ApiV3Impl(String apiKey, String blazeMeterUrl,VirtualChannel c){
-        this(apiKey, blazeMeterUrl,null,c);
+        this(apiKey, blazeMeterUrl,null);
     }
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     ProxyConfiguration proxy, VirtualChannel c) {
+                     ProxyConfiguration proxy) {
         this.apiKey = apiKey;
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
-            bzmhc = new HttpUtil(proxy,c);
+            bzmhc = new HttpUtil(proxy);
         } catch (Exception ex) {
             logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
@@ -355,7 +351,7 @@ public class ApiV3Impl implements Api {
 
 
     @Override
-    public void setBzmHttpWr(HttpUtil bzmhc) {
+    public void setHttpUtil(HttpUtil bzmhc) {
         this.bzmhc = bzmhc;
     }
 
@@ -375,7 +371,7 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public HttpUtil getBzmHttpWr() {
+    public HttpUtil getHttp() {
         return this.bzmhc;
     }
 

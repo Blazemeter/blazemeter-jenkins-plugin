@@ -12,6 +12,8 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -108,7 +110,9 @@ public class JobUtility {
         return session;
     }
 
-    public static void publishReport(Api api, String masterId,
+    /* TODO
+    How to implement it in master-slave environment?
+       public static void publishReport(Api api, String masterId,
                                      AbstractBuild<?, ?> build,
                                      StdErrLog jenBuildLog,
                                      StdErrLog bzmBuildLog){
@@ -120,7 +124,7 @@ public class JobUtility {
         a.setReportUrl(reportUrl);
         build.addAction(a);
 
-    }
+    }*/
 
     public static void saveReport(String reportName,
                                   String report,
@@ -191,23 +195,6 @@ public class JobUtility {
             }
         }
         return userKey;
-    }
-
-    public static String selectUserKeyId(BlazeMeterPerformanceBuilderDescriptor descriptor,
-                                           String userKey){
-        String userKeyId=null;
-        List<BlazemeterCredential> credentialList=descriptor.getCredentials("Global");
-        if(credentialList.size()==1){
-            userKeyId=credentialList.get(0).getId();
-        }else{
-            for(BlazemeterCredential c:credentialList){
-                if(c.getApiKey().equals(userKey)){
-                    userKeyId=c.getId();
-                    break;
-                }
-            }
-        }
-        return userKeyId;
     }
 
     public static void downloadJtlReport(Api api, String sessionId, FilePath filePath,
@@ -294,24 +281,31 @@ public class JobUtility {
         }
     }
 
-    public static Result postProcess(PerformanceBuilder builder, String masterId, EnvVars envVars) throws InterruptedException {
+    public static Result postProcess(
+            FilePath workspace,
+            String buildId,
+            Api api,
+            String masterId,
+            EnvVars envVars,
+            boolean isJunit,
+            String junitPathStr,
+            boolean isJtl,
+            String jtlPathStr,
+            StdErrLog jenBuildLog) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        Api api = builder.getApi();
-        StdErrLog jenBuildLog = builder.getJenBuildLog();
         CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, jenBuildLog);
         if (ciStatus.equals(CIStatus.errors)) {
             result = Result.FAILURE;
             return result;
         }
         result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
-        AbstractBuild build = builder.getBuild();
-        FilePath dfp=new FilePath(build.getWorkspace(), build.getId());
-        if (builder.isGetJunit()) {
+        FilePath dfp=new FilePath(workspace, buildId);
+        if (isJunit) {
             FilePath junitPath=null;
             try{
-                junitPath=Utils.resolvePath(dfp,builder.getJunitPath(),envVars);
+                junitPath=Utils.resolvePath(dfp,junitPathStr,envVars);
             }catch (Exception e){
                 jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
                 jenBuildLog.warn("JTL report will be saved to workspace");
@@ -323,12 +317,12 @@ public class JobUtility {
         }
         Thread.sleep(30000);
         FilePath jtlPath = null;
-        if (builder.isGetJtl()) {
-            if (StringUtil.isBlank(builder.getJtlPath())) {
+        if (isJtl) {
+            if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
             }else{
                 try {
-                    jtlPath=Utils.resolvePath(dfp,builder.getJtlPath(),envVars);
+                    jtlPath=Utils.resolvePath(dfp,jtlPathStr,envVars);
                     jenBuildLog.info("Will use the following path for JTL: "+
                     jtlPath.getParent().getName()+"/"+jtlPath.getName());
                 } catch (Exception e) {
@@ -500,7 +494,7 @@ public class JobUtility {
     }
 
     public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c){
-        Api bzm = new ApiV3Impl(userKey, blazemeterUrl,c);
+        Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
         try {
             net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has(JsonConsts.MAIL)) {
@@ -539,5 +533,13 @@ public class JobUtility {
                 }
             }
         }
+    }
+
+    public static File mkLogDir(String logDir) throws Exception{
+        File l=new File(logDir);
+        if(!l.exists()){
+            FileUtils.forceMkdir(l);
+        }
+        return l;
     }
 }

@@ -26,7 +26,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 public class HttpUtil {
     private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
@@ -34,16 +33,14 @@ public class HttpUtil {
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy = null;
     private HttpRemote r = null;
-    private transient VirtualChannel c = null;
     private HashMap<String, String> headers = new HashMap<String, String>();
 
-    public HttpUtil(ProxyConfiguration proxy, VirtualChannel c) {
+    public HttpUtil(ProxyConfiguration proxy) {
         this.headers.put("Accept", "application/json");
         this.headers.put("Content-type", "application/json; charset=UTF-8");
         this.r = new HttpRemote(this.headers);
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
-        this.c = c == null ? selectCahnnel() : c;
         try {
             proxy = proxy == null ? ProxyConfiguration.load() : proxy;
         } catch (IOException ie) {
@@ -66,39 +63,6 @@ public class HttpUtil {
                 this.httpClient = HttpClients.custom()
                         .setDefaultCredentialsProvider(credsProvider).build();
             }
-        }
-    }
-
-    private VirtualChannel selectCahnnel() {
-        Jenkins j = Jenkins.getInstance();
-        if (j != null) {
-            List<Node> nodes = j.getNodes();
-            if (nodes.size() == 0) {
-                return FilePath.localChannel;
-            } else {
-                return nodes.get(0).getChannel();
-            }
-        }
-        return null;
-    }
-
-    public <V> String responseRC(String url, V data, Method method) throws Exception {
-        HashMap<String, Object> rp = new HashMap<String, Object>();
-        String entity = null;
-        try {
-            rp.put(Constants.URL, url);
-            rp.put(Constants.METHOD, method.name());
-            if (data != null) {
-                rp.put(Constants.DATA, data.toString());
-            }
-            this.r.setRp(rp);
-            entity = c.call(this.r);
-        } catch (Exception e) {
-            if (logger.isDebugEnabled())
-                logger.debug("Problems with executing http request at remote channel(slave)=" + this.c.toString(), e);
-            throw e;
-        } finally {
-            return entity;
         }
     }
 
@@ -166,7 +130,6 @@ public class HttpUtil {
         String output = null;
         HttpResponse response = null;
         try {
-            if ((this.c == null) | (this.c instanceof LocalChannel)) {
                 response = responseLC(url, data, method);
                 if (response != null) {
                     output = EntityUtils.toString(response.getEntity());
@@ -174,9 +137,6 @@ public class HttpUtil {
                         logger.debug("Received object from server: " + output);
 
                 }
-            } else {
-                output = responseRC(url, data, method);
-            }
             if (output.isEmpty()) {
                 throw new IOException();
             }
@@ -192,7 +152,7 @@ public class HttpUtil {
             return returnType.cast(output);
         } catch (Exception e) {
             if (logger.isDebugEnabled())
-                logger.debug("Failed to do request from slave: channell=" + c.toString(), e);
+                logger.debug("Failed to do request:", e);
 
         }
         try {
