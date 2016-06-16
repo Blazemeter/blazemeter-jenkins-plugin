@@ -63,9 +63,9 @@ public class PerformanceBuilder extends Builder {
         this.testId = testId;
         this.jtlPath = jtlPath;
         this.junitPath = junitPath;
-        this.getJtl=getJtl;
-        this.getJunit=getJunit;
-        this.notes=notes;
+        this.getJtl = getJtl;
+        this.getJunit = getJunit;
+        this.notes = notes;
         this.sessionProperties = sessionProperties;
     }
 
@@ -90,14 +90,14 @@ public class PerformanceBuilder extends Builder {
             b.setJunitPath(this.junitPath);
             b.setGetJtl(this.getJtl);
             b.setGetJunit(this.getJunit);
-            FilePath ws=build.getWorkspace();
+            FilePath ws = build.getWorkspace();
             b.setWs(ws);
             b.setBuildId(build.getId());
-            String jobName=build.getLogFile().getParentFile().getParentFile().getName();
+            String jobName = build.getLogFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
-            VirtualChannel c=launcher.getChannel();
-            if(c instanceof LocalChannel){
-                String logDir=build.getLogFile().getParent();
+            VirtualChannel c = launcher.getChannel();
+            if (c instanceof LocalChannel) {
+                String logDir = build.getLogFile().getParent();
                 b.setLogDir(logDir);
             }
             r = c.call(b);

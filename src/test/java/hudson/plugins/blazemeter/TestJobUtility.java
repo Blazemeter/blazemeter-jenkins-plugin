@@ -133,7 +133,7 @@ public class TestJobUtility {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
         String getSessionId_v3_str=FileUtils.readFileToString(getSessionId_v3);
         JSONObject getSession_json=new JSONObject(getSessionId_v3_str);
-        String session= JobUtility.getSessionId(getSession_json, stdErrLog, stdErrLog);
+        String session= JobUtility.getSessionId(getSession_json, stdErrLog);
         Assert.assertEquals(session,"r-v3-55a6136b314bd");
     }
 

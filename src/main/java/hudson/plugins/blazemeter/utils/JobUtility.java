@@ -33,7 +33,8 @@ import java.util.*;
  */
 public class JobUtility {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-    private final static int DELAY=10000;
+    private final static int DELAY = 10000;
+
     private JobUtility() {
     }
 
@@ -73,39 +74,36 @@ public class JobUtility {
 
     public static String getReportUrl(Api api, String masterId,
                                       StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
-        JSONObject jo=null;
-        String publicToken="";
-        String reportUrl=null;
+        JSONObject jo = null;
+        String publicToken = "";
+        String reportUrl = null;
         try {
             jo = api.generatePublicToken(masterId);
-            if(jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)){
-                JSONObject result=jo.getJSONObject(JsonConsts.RESULT);
-                publicToken=result.getString("publicToken");
-                reportUrl=api.getBlazeMeterURL()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
-            }else{
-                jenBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConsts.ERROR).toString());
-                bzmBuildLog.warn("Problems with generating public-token for report URL: "+jo.get(JsonConsts.ERROR).toString());
-                reportUrl=api.getBlazeMeterURL()+"/app/#masters/"+masterId+"/summary";
+            if (jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
+                JSONObject result = jo.getJSONObject(JsonConsts.RESULT);
+                publicToken = result.getString("publicToken");
+                reportUrl = api.getBlazeMeterURL() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
+            } else {
+                jenBuildLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+                bzmBuildLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+                reportUrl = api.getBlazeMeterURL() + "/app/#masters/" + masterId + "/summary";
             }
 
-        } catch (Exception e){
-          jenBuildLog.warn("Problems with generating public-token for report URL");
-          bzmBuildLog.warn("Problems with generating public-token for report URL",e);
-        }finally {
-                return reportUrl;
+        } catch (Exception e) {
+            jenBuildLog.warn("Problems with generating public-token for report URL");
+            bzmBuildLog.warn("Problems with generating public-token for report URL", e);
+        } finally {
+            return reportUrl;
         }
     }
 
-    public static String getSessionId(JSONObject json,StdErrLog bzmBuildLog,StdErrLog jenBuildLog) throws JSONException {
+    public static String getSessionId(JSONObject json, StdErrLog bzmLog) throws JSONException {
         String session = "";
         try {
-
-            // get sessionId add to interface
-                JSONObject startJO = (JSONObject) json.get(JsonConsts.RESULT);
-                session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
+            JSONObject startJO = (JSONObject) json.get(JsonConsts.RESULT);
+            session = ((JSONArray) startJO.get("sessionsId")).get(0).toString();
         } catch (Exception e) {
-            jenBuildLog.info("Failed to get session_id: " + e.getMessage());
-            bzmBuildLog.info("Failed to get session_id. ", e);
+            bzmLog.info("Failed to get session_id. ", e);
         }
         return session;
     }
@@ -130,66 +128,66 @@ public class JobUtility {
                                   String report,
                                   FilePath filePath,
                                   StdErrLog jenBuildLog) {
-        FilePath junit=null;
+        FilePath junit = null;
         try {
-            junit=new FilePath(filePath,reportName);
+            junit = new FilePath(filePath, reportName);
             if (!junit.exists()) {
                 junit.touch(System.currentTimeMillis());
             }
             junit.write(report, System.getProperty("file.encoding"));
         } catch (FileNotFoundException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+junit.getParent()+"/"+junit.getName()+" : " + e.getMessage());
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
         } catch (IOException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         } catch (InterruptedException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath="+filePath.getParent()+"/"+filePath.getName()+" : " + e.getMessage());
+            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         }
     }
 
-    public static CIStatus validateCIStatus(Api api, String session, StdErrLog jenBuildLog){
-        CIStatus ciStatus=CIStatus.success;
+    public static CIStatus validateCIStatus(Api api, String session, StdErrLog jenBuildLog) {
+        CIStatus ciStatus = CIStatus.success;
         JSONObject jo;
-        JSONArray failures=new JSONArray();
-        JSONArray errors=new JSONArray();
+        JSONArray failures = new JSONArray();
+        JSONArray errors = new JSONArray();
         try {
-            jo=api.getCIStatus(session);
+            jo = api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
-            failures=jo.getJSONArray(JsonConsts.FAILURES);
-            errors=jo.getJSONArray(JsonConsts.ERRORS);
+            failures = jo.getJSONArray(JsonConsts.FAILURES);
+            errors = jo.getJSONArray(JsonConsts.ERRORS);
         } catch (JSONException je) {
             jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
             jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
-        }finally {
-            if(errors.length()>0){
+        } finally {
+            if (errors.length() > 0) {
                 jenBuildLog.info("Having errors while test status validation...");
                 jenBuildLog.info("Errors: " + errors.toString());
-                ciStatus=CIStatus.errors;
-                jenBuildLog.info("Setting CIStatus="+CIStatus.errors.name());
+                ciStatus = CIStatus.errors;
+                jenBuildLog.info("Setting CIStatus=" + CIStatus.errors.name());
                 return ciStatus;
             }
-            if(failures.length()>0){
+            if (failures.length() > 0) {
                 jenBuildLog.info("Having failures while test status validation...");
                 jenBuildLog.info("Failures: " + failures.toString());
-                ciStatus=CIStatus.failures;
-                jenBuildLog.info("Setting CIStatus="+CIStatus.failures.name());
+                ciStatus = CIStatus.failures;
+                jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
                 return ciStatus;
             }
-            jenBuildLog.info("No errors/failures while validating CIStatus: setting "+CIStatus.success.name());
+            jenBuildLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
         }
         return ciStatus;
     }
 
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
-                                           String id){
-        String userKey=null;
-        List<BlazemeterCredential> credentialList=descriptor.getCredentials("Global");
-        if(credentialList.size()==1){
-            userKey=credentialList.get(0).getApiKey();
-        }else{
-            for(BlazemeterCredential c:credentialList){
-                if(c.getId().equals(id)){
-                    userKey=c.getApiKey();
+                                           String id) {
+        String userKey = null;
+        List<BlazemeterCredential> credentialList = descriptor.getCredentials("Global");
+        if (credentialList.size() == 1) {
+            userKey = credentialList.get(0).getApiKey();
+        } else {
+            for (BlazemeterCredential c : credentialList) {
+                if (c.getId().equals(id)) {
+                    userKey = c.getApiKey();
                     break;
                 }
             }
@@ -197,9 +195,7 @@ public class JobUtility {
         return userKey;
     }
 
-    public static void downloadJtlReport(Api api, String sessionId, FilePath filePath,
-                                         StdErrLog jenBuildLog,
-                                         StdErrLog bzmBuildLog) {
+    public static void downloadJtlReport(Api api, String sessionId, FilePath filePath, StdErrLog bzmLog) {
 
         JSONObject jo = api.retrieveJtlZip(sessionId);
         String dataUrl = null;
@@ -214,13 +210,12 @@ public class JobUtility {
                 }
             }
             url = new URL(dataUrl);
-            jenBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
-            bzmBuildLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            bzmLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
             int i = 1;
             boolean jtl = false;
             while (!jtl && i < 4) {
                 try {
-                    jenBuildLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
+                    bzmLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
                     int conTo = (int) (10000 * Math.pow(3, i - 1));
                     URLConnection connection = url.openConnection();
                     connection.setConnectTimeout(conTo);
@@ -229,7 +224,7 @@ public class JobUtility {
                     filePath.unzipFrom(input);
                     jtl = true;
                 } catch (Exception e) {
-                    bzmBuildLog.warn("Unable to get JTLZIP from " + url + ", " + e);
+                    bzmLog.warn("Unable to get JTLZIP from " + url + ", " + e);
                 } finally {
                     i++;
                 }
@@ -241,41 +236,35 @@ public class JobUtility {
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
         } catch (JSONException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
+            bzmLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (MalformedURLException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
+            bzmLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (IOException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
+            bzmLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (InterruptedException e) {
-            bzmBuildLog.warn("Unable to get JTLZIP from " + url, e);
-            jenBuildLog.warn("Unable to get JTLZIP from " + url + " " + e.getMessage());
+            bzmLog.warn("Unable to get JTLZIP from " + url, e);
         }
     }
 
-    public static void downloadJtlReports(Api api, String masterId, FilePath filePath,
-                                          StdErrLog jenBuildLog,
-                                          StdErrLog bzmBuildLog) {
+    public static void downloadJtlReports(Api api, String masterId, FilePath filePath, StdErrLog bzmBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
-            FilePath jtl=new FilePath(filePath,s + Constants.BM_ARTEFACTS);
-            downloadJtlReport(api, s, jtl,jenBuildLog, bzmBuildLog);
+            FilePath jtl = new FilePath(filePath, s + Constants.BM_ARTEFACTS);
+            downloadJtlReport(api, s, jtl, bzmBuildLog);
         }
     }
 
 
     public static void retrieveJUNITXMLreport(Api api, String masterId,
-                                              FilePath junitPath, StdErrLog jenBuildLog){
-        String junitReport="";
-        jenBuildLog.info("Requesting JUNIT report from server, masterId="+masterId);
-        try{
+                                              FilePath junitPath, StdErrLog jenBuildLog) {
+        String junitReport = "";
+        jenBuildLog.info("Requesting JUNIT report from server, masterId=" + masterId);
+        try {
             junitReport = api.retrieveJUNITXML(masterId);
             String junitName = masterId + "-" + Constants.BM_TRESHOLDS;
             jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-            jenBuildLog.info("Saving it to " + junitPath+" with name="+junitName);
-            saveReport(junitName,junitReport, junitPath, jenBuildLog);
+            jenBuildLog.info("Saving it to " + junitPath + " with name=" + junitName);
+            saveReport(junitName, junitReport, junitPath, jenBuildLog);
         } catch (Exception e) {
             jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
@@ -291,72 +280,72 @@ public class JobUtility {
             String junitPathStr,
             boolean isJtl,
             String jtlPathStr,
-            StdErrLog jenBuildLog) throws InterruptedException {
+            StdErrLog bzmLog) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, jenBuildLog);
+        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog);
         if (ciStatus.equals(CIStatus.errors)) {
             result = Result.FAILURE;
             return result;
         }
         result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
-        FilePath dfp=new FilePath(workspace, buildId);
+        FilePath dfp = new FilePath(workspace, buildId);
         if (isJunit) {
-            FilePath junitPath=null;
-            try{
-                junitPath=Utils.resolvePath(dfp,junitPathStr,envVars);
-            }catch (Exception e){
-                jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
-                jenBuildLog.warn("JTL report will be saved to workspace");
-                junitPath=dfp;
-        }
-            retrieveJUNITXMLreport(api, masterId, junitPath, jenBuildLog);
+            FilePath junitPath = null;
+            try {
+                junitPath = Utils.resolvePath(dfp, junitPathStr, envVars);
+            } catch (Exception e) {
+                bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
+                bzmLog.warn("JTL report will be saved to workspace");
+                junitPath = dfp;
+            }
+            retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog);
         } else {
-            jenBuildLog.info("JUNIT report won't be requested: check-box is unchecked.");
+            bzmLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
         FilePath jtlPath = null;
         if (isJtl) {
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
-            }else{
+            } else {
                 try {
-                    jtlPath=Utils.resolvePath(dfp,jtlPathStr,envVars);
-                    jenBuildLog.info("Will use the following path for JTL: "+
-                    jtlPath.getParent().getName()+"/"+jtlPath.getName());
+                    jtlPath = Utils.resolvePath(dfp, jtlPathStr, envVars);
+                    bzmLog.info("Will use the following path for JTL: " +
+                            jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 } catch (Exception e) {
-                    jenBuildLog.warn("Failed to resolve jtlPath: "+e.getMessage());
-                    jenBuildLog.warn("JTL report will be saved to workspace");
-                    jtlPath=dfp;
+                    bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
+                    bzmLog.warn("JTL report will be saved to workspace");
+                    jtlPath = dfp;
                 }
-                jenBuildLog.info("Will use the following path for JTL: "+
-                        jtlPath.getParent().getName()+"/"+jtlPath.getName());
+                bzmLog.info("Will use the following path for JTL: " +
+                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
             }
-            JobUtility.downloadJtlReports(api, masterId, jtlPath, jenBuildLog, jenBuildLog);
+            JobUtility.downloadJtlReports(api, masterId, jtlPath, bzmLog);
         } else {
-            jenBuildLog.info("JTL report won't be requested: check-box is unchecked.");
+            bzmLog.info("JTL report won't be requested: check-box is unchecked.");
         }
 
 
         //get testGetArchive information
-        JSONObject testReport = requestAggregateReport(api, jenBuildLog, masterId);
+        JSONObject testReport = requestAggregateReport(api, bzmLog, masterId);
 
 
         if (testReport == null || testReport.equals("null")) {
-            jenBuildLog.warn("Aggregate report is not available after 4 attempts.");
+            bzmLog.warn("Aggregate report is not available after 4 attempts.");
             return result;
         }
         TestResult testResult = null;
         try {
             testResult = new TestResult(testReport);
-            jenBuildLog.info(testResult.toString());
+            bzmLog.info(testResult.toString());
         } catch (IOException ioe) {
-            jenBuildLog.info("Failed to get test result. Try to check server for it");
-            jenBuildLog.info("ERROR: Failed to generate TestResult: " + ioe);
+            bzmLog.info("Failed to get test result. Try to check server for it");
+            bzmLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
-            jenBuildLog.info("Failed to get test result. Try to check server for it");
-            jenBuildLog.info("ERROR: Failed to generate TestResult: " + je);
+            bzmLog.info("Failed to get test result. Try to check server for it");
+            bzmLog.info("ERROR: Failed to generate TestResult: " + je);
         } finally {
             return result;
         }
@@ -364,12 +353,12 @@ public class JobUtility {
     }
 
 
-    public static JSONObject requestAggregateReport(Api api, StdErrLog jenBuildLog, String masterId){
-        JSONObject testReport=null;
+    public static JSONObject requestAggregateReport(Api api, StdErrLog jenBuildLog, String masterId) {
+        JSONObject testReport = null;
         int retries = 1;
         try {
             while (retries < 5 && testReport == null) {
-                jenBuildLog.info("Trying to get aggregate test report from server, attempt# "+retries);
+                jenBuildLog.info("Trying to get aggregate test report from server, attempt# " + retries);
                 testReport = api.testReport(masterId);
                 if (testReport != null) {
                     return testReport;
@@ -383,8 +372,8 @@ public class JobUtility {
         return testReport;
     }
 
-    public static boolean notes(Api api, String masterId, String notes, StdErrLog jenBuildLog){
-        boolean note=false;
+    public static boolean notes(Api api, String masterId, String notes, StdErrLog jenBuildLog) {
+        boolean note = false;
         int n = 1;
         while (!note && n < 6) {
             try {
@@ -421,7 +410,7 @@ public class JobUtility {
                 jenBuildLog.warn("Failed to prepare jmeter property " + s + " for the test: " + e.getMessage());
             }
         }
-        jenBuildLog.info("Prepared JSONArray of jmeter properties: "+props.toString());
+        jenBuildLog.info("Prepared JSONArray of jmeter properties: " + props.toString());
         return props;
     }
 
@@ -429,15 +418,15 @@ public class JobUtility {
     public static boolean stopTestSession(Api api, String masterId, StdErrLog jenBuildLog) {
         boolean terminate = false;
         try {
-                int statusCode = api.getTestMasterStatusCode(masterId);
-                if (statusCode < 100 & statusCode != 0) {
-                    api.terminateTest(masterId);
-                    terminate = true;
-                }
-                if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
-                    api.stopTest(masterId);
-                    terminate = false;
-                }
+            int statusCode = api.getTestMasterStatusCode(masterId);
+            if (statusCode < 100 & statusCode != 0) {
+                api.terminateTest(masterId);
+                terminate = true;
+            }
+            if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
+                api.stopTest(masterId);
+                terminate = false;
+            }
         } catch (Exception e) {
             jenBuildLog.warn("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
         } finally {
@@ -456,22 +445,22 @@ public class JobUtility {
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
-        if(userKey.isEmpty()){
+        if (userKey.isEmpty()) {
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
         }
-        String encryptedKey=userKey.substring(0,4)+"..."+userKey.substring(17);
+        String encryptedKey = userKey.substring(0, 4) + "..." + userKey.substring(17);
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
             Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
-            if (u!= null) {
+            if (u != null) {
                 user = net.sf.json.JSONObject.fromObject(u.toString());
                 if (user.has(JsonConsts.ERROR) && !user.get(JsonConsts.ERROR).equals(null)) {
                     logger.warn("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
-                    logger.warn("User profile: "+user.toString());
+                    logger.warn("User profile: " + user.toString());
                     return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
                 } else {
                     logger.warn("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
@@ -481,38 +470,37 @@ public class JobUtility {
         } catch (ClassCastException e) {
             logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
             logger.warn(e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
             logger.warn(e);
             return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
         }
-        logger.warn("API key is not valid: userKey="+encryptedKey+" blazemeterUrl="+blazeMeterUrl);
+        logger.warn("API key is not valid: userKey=" + encryptedKey + " blazemeterUrl=" + blazeMeterUrl);
         logger.warn(" Please, check proxy settings, serverUrl and userKey.");
-        return FormValidation.error("API key is not valid: API key="+encryptedKey+" blazemeterUrl="+blazeMeterUrl+
+        return FormValidation.error("API key is not valid: API key=" + encryptedKey + " blazemeterUrl=" + blazeMeterUrl +
                 ". Please, check proxy settings, serverUrl and userKey.");
     }
 
-    public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c){
+    public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c) {
         Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
         try {
-            net.sf.json.JSONObject user= net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
+            net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has(JsonConsts.MAIL)) {
                 return user.getString(JsonConsts.MAIL);
             } else {
                 return "";
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
-    public static String getUserEmail(String userKey, String blazemeterUrl){
-        return getUserEmail(userKey, blazemeterUrl,null);
+    public static String getUserEmail(String userKey, String blazemeterUrl) {
+        return getUserEmail(userKey, blazemeterUrl, null);
     }
 
 
-        public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+    public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {
@@ -523,7 +511,7 @@ public class JobUtility {
                 try {
                     submit = api.properties(properties, s);
                     if (!submit) {
-                        jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s+" retry # "+n);
+                        jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s + " retry # " + n);
                         Thread.sleep(DELAY);
                     }
                 } catch (Exception e) {
@@ -535,9 +523,9 @@ public class JobUtility {
         }
     }
 
-    public static File mkLogDir(String logDir) throws Exception{
-        File l=new File(logDir);
-        if(!l.exists()){
+    public static File mkLogDir(String logDir) throws Exception {
+        File l = new File(logDir);
+        if (!l.exists()) {
             FileUtils.forceMkdir(l);
         }
         return l;
