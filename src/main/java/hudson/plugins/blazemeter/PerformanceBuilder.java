@@ -100,6 +100,8 @@ public class PerformanceBuilder extends Builder {
                 String logDir = build.getLogFile().getParent();
                 b.setLogDir(logDir);
             }
+            EnvVars ev=EnvVars.getRemote(c);
+            b.setEv(ev);
             r = c.call(b);
         } catch (InterruptedException e) {
             r=Result.ABORTED;

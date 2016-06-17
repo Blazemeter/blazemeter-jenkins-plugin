@@ -53,6 +53,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private String logDir = null;
 
+    private EnvVars ev = null;
+
     @Override
     public Result call() throws Exception {
         Result result;
@@ -110,7 +112,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String masterId = "";
         bzmLog.info("### About to start BlazeMeter test # " + testId_num);
         bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());
-        EnvVars envVars = EnvVars.getRemote(ws.getChannel());
         try {
             masterId = api.startTest(testId_num, testType);
             if (masterId.isEmpty()) {
@@ -133,7 +134,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {
             if (!StringUtils.isBlank(this.sessionProperties)) {
-                JSONArray props = JobUtility.prepareSessionProperties(this.sessionProperties, envVars, bzmLog);
+                JSONArray props = JobUtility.prepareSessionProperties(this.sessionProperties, this.ev, bzmLog);
                 JobUtility.properties(api, props, masterId, bzmLog);
             }
             JobUtility.waitForFinish(api, testId_num, bzmLog, masterId);
@@ -143,11 +144,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     buildId,
                     api,
                     masterId,
-                    envVars,
-                    this.isGetJunit(),
+                    this.ev,
+                    this.getJunit,
                     this.junitPath,
-                    this.isGetJtl(),
-                    this.getJtlPath(),
+                    this.getJtl,
+                    this.jtlPath,
                     bzmLog);
             return result;
         } catch (InterruptedException e) {
@@ -182,9 +183,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
     }
 
-    public String getJobApiKey() {
-        return jobApiKey;
+
+    public void setEv(EnvVars ev) {
+        this.ev = ev;
     }
+
 
     public void setJobApiKey(String jobApiKey) {
         this.jobApiKey = jobApiKey;
@@ -198,64 +201,38 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         this.testId = testId;
     }
 
-    public String getNotes() {
-        return notes;
-    }
 
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
-    public String getSessionProperties() {
-        return sessionProperties;
-    }
 
     public void setSessionProperties(String sessionProperties) {
         this.sessionProperties = sessionProperties;
     }
 
-    public String getJtlPath() {
-        return jtlPath;
-    }
 
     public void setJtlPath(String jtlPath) {
         this.jtlPath = jtlPath;
     }
 
-    public String getJunitPath() {
-        return junitPath;
-    }
 
     public void setJunitPath(String junitPath) {
         this.junitPath = junitPath;
     }
 
-    public boolean isGetJtl() {
-        return getJtl;
-    }
 
     public void setGetJtl(boolean getJtl) {
         this.getJtl = getJtl;
     }
 
-    public boolean isGetJunit() {
-        return getJunit;
-    }
 
     public void setGetJunit(boolean getJunit) {
         this.getJunit = getJunit;
     }
 
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
-    }
-
-    public FilePath getWs() {
-        return ws;
     }
 
     public void setWs(FilePath ws) {
@@ -266,16 +243,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         this.buildId = buildId;
     }
 
-    public String getJobName() {
-        return jobName;
-    }
-
     public void setJobName(String jobName) {
         this.jobName = jobName;
-    }
-
-    public String getLogDir() {
-        return logDir;
     }
 
     public void setLogDir(String logDir) {
