@@ -55,8 +55,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     @Override
     public Result call() throws Exception {
-        Result result = Result.SUCCESS;
-        Computer c = Computer.currentComputer();
+        Result result;
         if (StringUtils.isBlank(this.logDir)) {
             this.logDir = System.getProperty("user.dir") +
                     File.separator + Constants.BZM_SLAVE_LOGS +
@@ -171,10 +170,15 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 bzmLog.warn("Test is not running on server. Check logs for detailed errors");
                 return Result.FAILURE;
             }
-            /*
-            TODO
-            - move log file to workspace
-            */
+            FilePath log_p = new FilePath(ws, buildId);
+            FilePath bzmLog_p=new FilePath(bzmLog_f);
+            FilePath httpLog_p=new FilePath(httpLog_f);
+            FilePath bzmLog_p_ws=new FilePath(log_p,bzmLog_f.getName());
+            FilePath httpLog_p_ws=new FilePath(log_p,httpLog_f.getName());
+            bzmLog_p_ws.copyFrom(bzmLog_p);
+            httpLog_p_ws.copyFrom(httpLog_p);
+            bzmLog_p.delete();
+            httpLog_p.delete();
         }
     }
 

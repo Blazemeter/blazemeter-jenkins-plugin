@@ -93,7 +93,7 @@ public class PerformanceBuilder extends Builder {
             FilePath ws = build.getWorkspace();
             b.setWs(ws);
             b.setBuildId(build.getId());
-            String jobName = build.getLogFile().getParentFile().getParentFile().getName();
+            String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
             if (c instanceof LocalChannel) {
