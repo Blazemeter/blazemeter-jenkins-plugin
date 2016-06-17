@@ -101,6 +101,8 @@ public class PerformanceBuilder extends Builder {
                 b.setLogDir(logDir);
             }
             r = c.call(b);
+        } catch (InterruptedException e) {
+            r=Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().print("Failed to run blazemeter test: " + e);
             r = Result.FAILURE;
