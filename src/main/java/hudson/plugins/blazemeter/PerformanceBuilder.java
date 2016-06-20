@@ -5,17 +5,14 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.utils.BuildResult;
-import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
-import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.io.File;
 import java.io.IOException;
 
 public class PerformanceBuilder extends Builder {
@@ -103,6 +100,10 @@ public class PerformanceBuilder extends Builder {
             EnvVars ev=EnvVars.getRemote(c);
             b.setEv(ev);
             r = c.call(b);
+            String reportUrl="";
+            PerformanceBuildAction a = new PerformanceBuildAction(build);
+            a.setReportUrl(reportUrl);
+            build.addAction(a);
         } catch (InterruptedException e) {
             r=Result.ABORTED;
         } catch (Exception e) {

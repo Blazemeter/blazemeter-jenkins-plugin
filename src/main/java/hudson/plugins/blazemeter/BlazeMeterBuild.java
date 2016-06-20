@@ -126,10 +126,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn("Exception while starting BlazeMeter Test ", e);
             return Result.FAILURE;
         }
-        /*
-        TODO
-        JobUtility.publishReport(api,masterId,build,jenBuildLog,bzmBuildLog);
-         */
+        String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
+        bzmLog.info("BlazeMeter test report will be available at " + reportUrl);
 
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {

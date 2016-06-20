@@ -116,7 +116,12 @@ public class TestJobUtility {
     public void getReportUrl_pos(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        String actReportUrl= JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
+        String actReportUrl= null;
+        try {
+            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
+        } catch (Exception e) {
+            Assert.fail();
+        }
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
@@ -124,7 +129,12 @@ public class TestJobUtility {
     public void getReportUrl_neg(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
-        String actReportUrl= JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
+        String actReportUrl= null;
+        try {
+            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
+        } catch (Exception e) {
+            Assert.fail();
+        }
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 

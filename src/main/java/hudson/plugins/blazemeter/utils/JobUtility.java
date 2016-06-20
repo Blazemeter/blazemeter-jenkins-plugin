@@ -72,8 +72,7 @@ public class JobUtility {
         }
     }
 
-    public static String getReportUrl(Api api, String masterId,
-                                      StdErrLog jenBuildLog, StdErrLog bzmBuildLog) {
+    public static String getReportUrl(Api api, String masterId,StdErrLog bzmLog) throws Exception {
         JSONObject jo = null;
         String publicToken = "";
         String reportUrl = null;
@@ -84,14 +83,12 @@ public class JobUtility {
                 publicToken = result.getString("publicToken");
                 reportUrl = api.getBlazeMeterURL() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
             } else {
-                jenBuildLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
-                bzmBuildLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+                bzmLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
                 reportUrl = api.getBlazeMeterURL() + "/app/#masters/" + masterId + "/summary";
             }
-
         } catch (Exception e) {
-            jenBuildLog.warn("Problems with generating public-token for report URL");
-            bzmBuildLog.warn("Problems with generating public-token for report URL", e);
+            bzmLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+            reportUrl = api.getBlazeMeterURL() + "/app/#masters/" + masterId + "/summary";
         } finally {
             return reportUrl;
         }
@@ -107,22 +104,6 @@ public class JobUtility {
         }
         return session;
     }
-
-    /* TODO
-    How to implement it in master-slave environment?
-       public static void publishReport(Api api, String masterId,
-                                     AbstractBuild<?, ?> build,
-                                     StdErrLog jenBuildLog,
-                                     StdErrLog bzmBuildLog){
-
-        String reportUrl= getReportUrl(api, masterId, jenBuildLog,bzmBuildLog);
-        jenBuildLog.info("BlazeMeter test report will be available at " + reportUrl);
-
-        PerformanceBuildAction a = new PerformanceBuildAction(build);
-        a.setReportUrl(reportUrl);
-        build.addAction(a);
-
-    }*/
 
     public static void saveReport(String reportName,
                                   String report,
