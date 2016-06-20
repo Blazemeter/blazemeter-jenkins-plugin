@@ -169,6 +169,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 bzmLog.warn("Test is not running on server. Check logs for detailed errors");
                 return Result.FAILURE;
             }
+            bzmLog.info("Copying bzm log files to build workspace folder...");
             FilePath log_p = new FilePath(ws, buildId);
             FilePath bzmLog_p=new FilePath(bzmLog_f);
             FilePath httpLog_p=new FilePath(httpLog_f);

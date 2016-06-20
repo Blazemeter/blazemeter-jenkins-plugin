@@ -103,7 +103,7 @@ public class PerformanceBuilder extends Builder {
             String reportUrl="";
             PerformanceBuildAction a = new PerformanceBuildAction(build);
             a.setReportUrl(reportUrl);
-            build.addAction(a);
+//            build.addAction(a);
         } catch (InterruptedException e) {
             r=Result.ABORTED;
         } catch (Exception e) {
