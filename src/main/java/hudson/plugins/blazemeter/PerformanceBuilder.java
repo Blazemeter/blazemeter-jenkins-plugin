@@ -6,6 +6,8 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.report.ReportUrlGetter;
+import hudson.plugins.blazemeter.utils.report.ReportUrlGetterTask;
 import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
@@ -99,17 +101,16 @@ public class PerformanceBuilder extends Builder {
             }
             EnvVars ev=EnvVars.getRemote(c);
             b.setEv(ev);
+            ReportUrlGetterTask rugt=new ReportUrlGetterTask(build,jobName,c);
+            ReportUrlGetter.run(rugt);
             r = c.call(b);
-            String reportUrl="";
-            PerformanceBuildAction a = new PerformanceBuildAction(build);
-            a.setReportUrl(reportUrl);
-//            build.addAction(a);
         } catch (InterruptedException e) {
             r=Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().print("Failed to run blazemeter test: " + e);
             r = Result.FAILURE;
         } finally {
+            ReportUrlGetter.stop();
             BuildResult rstr = BuildResult.valueOf(r.toString());
             build.setResult(r);
             switch (rstr) {

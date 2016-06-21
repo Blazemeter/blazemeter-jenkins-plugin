@@ -85,7 +85,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         api.getHttp().setLogger(httpLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
-        String apiKeyTrimmed = this.jobApiKey.substring(0, 4);
+        String apiKeyTrimmed = this.jobApiKey.substring(0, 4)+"...";
         if (userEmail.isEmpty()) {
             ProxyConfiguration proxy = ProxyConfiguration.load();
             bzmLog.warn("Please, check that settings are valid.");
@@ -128,7 +128,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
         String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
         bzmLog.info("BlazeMeter test report will be available at " + reportUrl);
-
+        ((EnvVars) EnvVars.masterEnvVars).put(this.jobName+"-"+this.buildId,reportUrl);
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {
             if (!StringUtils.isBlank(this.sessionProperties)) {
