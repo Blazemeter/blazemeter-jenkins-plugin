@@ -105,6 +105,7 @@ public class PerformanceBuilder extends Builder {
             ReportUrlGetter.run(rugt);
             r = c.call(b);
         } catch (InterruptedException e) {
+            listener.getLogger().print("Job was interrupted: " + e);
             r=Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().print("Failed to run blazemeter test: " + e);

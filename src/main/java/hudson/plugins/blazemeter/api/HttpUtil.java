@@ -1,12 +1,7 @@
 package hudson.plugins.blazemeter.api;
 
-import hudson.FilePath;
 import hudson.ProxyConfiguration;
-import hudson.model.Node;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.remoting.LocalChannel;
-import hudson.remoting.VirtualChannel;
-import jenkins.model.Jenkins;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -46,6 +41,9 @@ public class HttpUtil {
         } catch (IOException ie) {
             logger.warn("Failed to load jenkins proxy configuration: ", ie);
             proxy = null;
+        } catch (NullPointerException e) {
+            proxy = null;
+            logger.warn("No proxy configuration: check that jub is run on master node. ", e);
         } catch (Exception e) {
             proxy = null;
             logger.warn("Failed to load jenkins proxy configuration: ", e);

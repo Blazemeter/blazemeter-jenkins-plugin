@@ -2,7 +2,6 @@ package hudson.plugins.blazemeter.utils;
 
 import hudson.EnvVars;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.Api;
@@ -12,7 +11,6 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
@@ -38,7 +36,7 @@ public class JobUtility {
     private JobUtility() {
     }
 
-    public static void waitForFinish(Api api, String testId, AbstractLogger bzmBuildLog,
+    public static void waitForFinish(Api api, String testId, AbstractLogger bzmLog,
                                      String session) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
@@ -47,12 +45,12 @@ public class JobUtility {
             TestStatus testStatus = api.getTestStatus(session);
 
             if (!testStatus.equals(TestStatus.Running)) {
-                bzmBuildLog.info("TestStatus for session " + session +
+                bzmLog.info("TestStatus for session " + session +
                         " " + testStatus);
-                bzmBuildLog.info("BlazeMeter TestStatus for session" +
+                bzmLog.info("BlazeMeter TestStatus for session" +
                         session
                         + " is not 'Running': finishing build.... ");
-                bzmBuildLog.info("Timestamp: " + Calendar.getInstance().getTime());
+                bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
             }
 
@@ -60,13 +58,13 @@ public class JobUtility {
                 start = Calendar.getInstance().getTime();
             long now = Calendar.getInstance().getTime().getTime();
             long diffInSec = (now - start.getTime()) / 1000;
-            if (now - lastPrint > 10000) { //print every 10 sec.
-                bzmBuildLog.info("BlazeMeter test# " + testId + ", session # " + session + " running from " + start + " - for " + diffInSec + " seconds");
+            if (now - lastPrint > 60000) {
+                bzmLog.info("BlazeMeter test# " + testId + ", session # " + session + " running from " + start + " - for " + diffInSec + " seconds");
                 lastPrint = now;
             }
 
             if (Thread.interrupted()) {
-                bzmBuildLog.info("Job was stopped by user");
+                bzmLog.info("Job was stopped by user");
                 throw new InterruptedException("Job was stopped by user");
             }
         }
@@ -76,6 +74,8 @@ public class JobUtility {
         JSONObject jo = null;
         String publicToken = "";
         String reportUrl = null;
+        StringBuilder letnry=new StringBuilder();
+        letnry.append("Problems with generating public-token for report URL: ");
         try {
             jo = api.generatePublicToken(masterId);
             if (jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
@@ -83,11 +83,11 @@ public class JobUtility {
                 publicToken = result.getString("publicToken");
                 reportUrl = api.getBlazeMeterURL() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
             } else {
-                bzmLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+                bzmLog.warn(letnry.toString() + jo.get(JsonConsts.ERROR).toString());
                 reportUrl = api.getBlazeMeterURL() + "/app/#masters/" + masterId + "/summary";
             }
         } catch (Exception e) {
-            bzmLog.warn("Problems with generating public-token for report URL: " + jo.get(JsonConsts.ERROR).toString());
+            bzmLog.warn(letnry.toString() + jo.get(JsonConsts.ERROR).toString());
             reportUrl = api.getBlazeMeterURL() + "/app/#masters/" + masterId + "/summary";
         } finally {
             return reportUrl;
@@ -110,6 +110,9 @@ public class JobUtility {
                                   FilePath filePath,
                                   StdErrLog jenBuildLog) {
         FilePath junit = null;
+        StringBuilder letnry=new StringBuilder();
+        letnry.append("ERROR: Failed to save XML report to filepath=");
+
         try {
             junit = new FilePath(filePath, reportName);
             if (!junit.exists()) {
@@ -117,11 +120,11 @@ public class JobUtility {
             }
             junit.write(report, System.getProperty("file.encoding"));
         } catch (FileNotFoundException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
+            jenBuildLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
         } catch (IOException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            jenBuildLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         } catch (InterruptedException e) {
-            jenBuildLog.info("ERROR: Failed to save XML report to filepath=" + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            jenBuildLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         }
     }
 
@@ -130,25 +133,29 @@ public class JobUtility {
         JSONObject jo;
         JSONArray failures = new JSONArray();
         JSONArray errors = new JSONArray();
+        StringBuilder lentry=new StringBuilder();
+        lentry.append("No thresholds on server: setting 'success' for CIStatus ");
         try {
             jo = api.getCIStatus(session);
             jenBuildLog.info("Test status object = " + jo.toString());
             failures = jo.getJSONArray(JsonConsts.FAILURES);
             errors = jo.getJSONArray(JsonConsts.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn(lentry.toString());
         } catch (Exception e) {
-            jenBuildLog.warn("No thresholds on server: setting 'success' for CIStatus ");
+            jenBuildLog.warn(lentry.toString());
         } finally {
+            lentry.setLength(0);
+            lentry.append(" while test status validation...");
             if (errors.length() > 0) {
-                jenBuildLog.info("Having errors while test status validation...");
+                jenBuildLog.info("Having errors "+lentry.toString());
                 jenBuildLog.info("Errors: " + errors.toString());
                 ciStatus = CIStatus.errors;
                 jenBuildLog.info("Setting CIStatus=" + CIStatus.errors.name());
                 return ciStatus;
             }
             if (failures.length() > 0) {
-                jenBuildLog.info("Having failures while test status validation...");
+                jenBuildLog.info("Having failures "+lentry.toString());
                 jenBuildLog.info("Failures: " + failures.toString());
                 ciStatus = CIStatus.failures;
                 jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
