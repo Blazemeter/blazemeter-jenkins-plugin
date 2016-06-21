@@ -6,6 +6,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.LogEntries;
 import hudson.plugins.blazemeter.utils.report.ReportUrlGetter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlGetterTask;
 import hudson.remoting.LocalChannel;
@@ -105,7 +106,7 @@ public class PerformanceBuilder extends Builder {
             ReportUrlGetter.run(rugt);
             r = c.call(b);
         } catch (InterruptedException e) {
-            listener.getLogger().print("Job was interrupted: " + e);
+            listener.getLogger().print(LogEntries.JOB_WAS_STOPPED_BY_USER);
             r=Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().print("Failed to run blazemeter test: " + e);
@@ -115,13 +116,7 @@ public class PerformanceBuilder extends Builder {
             BuildResult rstr = BuildResult.valueOf(r.toString());
             build.setResult(r);
             switch (rstr) {
-                case ABORTED:
-                    return false;
                 case FAILURE:
-                    return false;
-                case NOT_BUILT:
-                    return false;
-                case UNSTABLE:
                     return false;
                 default:
                     return true;

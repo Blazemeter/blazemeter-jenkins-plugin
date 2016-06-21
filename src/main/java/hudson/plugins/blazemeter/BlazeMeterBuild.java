@@ -10,6 +10,7 @@ import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.LogEntries;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.remoting.Callable;
 import org.apache.commons.io.FileUtils;
@@ -228,7 +229,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     bzmLog);
             return result;
         } catch (InterruptedException e) {
-            lentry.append("Job was stopped by user");
+            lentry.append(LogEntries.JOB_WAS_STOPPED_BY_USER);
             bls.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);

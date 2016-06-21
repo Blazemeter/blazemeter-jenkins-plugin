@@ -21,6 +21,5 @@ public class ReportUrlGetter{
         if ((task != null || !task.isDone())) {
             task.cancel(true);
         }
-        exec.shutdownNow();
     }
 }
