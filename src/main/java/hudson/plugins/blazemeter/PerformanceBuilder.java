@@ -96,10 +96,6 @@ public class PerformanceBuilder extends Builder {
             String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            if (c instanceof LocalChannel) {
-                String logDir = build.getLogFile().getParent();
-                b.setLogDir(logDir);
-            }
             EnvVars ev=EnvVars.getRemote(c);
             b.setEv(ev);
             ReportUrlGetterTask rugt=new ReportUrlGetterTask(build,jobName,c);

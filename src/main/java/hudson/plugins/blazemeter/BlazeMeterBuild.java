@@ -51,21 +51,14 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private FilePath ws = null;
 
-    private String logDir = null;
-
     private EnvVars ev = null;
 
     @Override
     public Result call() throws Exception {
         Result result;
         StringBuilder lentry=new StringBuilder();
-        if (StringUtils.isBlank(this.logDir)) {
-            this.logDir = System.getProperty("user.dir") +
-                    File.separator + Constants.BZM_SLAVE_LOGS +
-                    File.separator + this.jobName +
-                    File.separator + this.buildId;
-        }
-        File ld = JobUtility.mkLogDir(this.logDir);
+        File ld = new File(this.ws.getRemote()+
+                File.separator + this.buildId);
         File httpLog_f = new File(ld, Constants.HTTP_LOG);
         File bzmLog_f = new File(ld, Constants.BZM_LOG);
         FileUtils.touch(httpLog_f);
@@ -263,30 +256,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 lentry.setLength(0);
                 return Result.FAILURE;
             }
-            lentry.append("Copying bzm log files to build workspace folder...");
-            bls.warn(lentry.toString());
-            bzmLog.warn(lentry.toString());
-            lentry.setLength(0);
-
-            FilePath log_p = new FilePath(ws, buildId);
-            FilePath bzmLog_p=new FilePath(bzmLog_f);
-            FilePath httpLog_p=new FilePath(httpLog_f);
-            FilePath bzmLog_p_ws=new FilePath(log_p,bzmLog_f.getName());
-            FilePath httpLog_p_ws=new FilePath(log_p,httpLog_f.getName());
-            bzmLog_p_ws.copyFrom(bzmLog_p);
-            httpLog_p_ws.copyFrom(httpLog_p);
-
-            lentry.append("Deleting "+bzmLog_f.getCanonicalPath());
-            bls.warn(lentry.toString());
-            bzmLog.warn(lentry.toString());
-            lentry.setLength(0);
-            bzmLog_p.delete();
-
-            lentry.append("Deleting "+httpLog_f.getCanonicalPath());
-            bls.warn(lentry.toString());
-            bzmLog.warn(lentry.toString());
-            lentry.setLength(0);
-            httpLog_p.delete();
         }
     }
 
@@ -354,7 +323,4 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         this.jobName = jobName;
     }
 
-    public void setLogDir(String logDir) {
-        this.logDir = logDir;
-    }
 }
