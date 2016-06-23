@@ -1,18 +1,21 @@
 package hudson.plugins.blazemeter;
 
 import hudson.*;
+import java.io.File;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.utils.BuildResult;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.LogEntries;
-import hudson.plugins.blazemeter.utils.report.ReportUrlGetter;
-import hudson.plugins.blazemeter.utils.report.ReportUrlGetterTask;
-import hudson.remoting.LocalChannel;
+import hudson.plugins.blazemeter.utils.report.BuildReporter;
+import hudson.plugins.blazemeter.utils.report.LoggerTask;
+import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -92,14 +95,17 @@ public class PerformanceBuilder extends Builder {
             b.setGetJunit(this.getJunit);
             FilePath ws = build.getWorkspace();
             b.setWs(ws);
-            b.setBuildId(build.getId());
+            String buildId=build.getId();
+            b.setBuildId(buildId);
             String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
             EnvVars ev=EnvVars.getRemote(c);
             b.setEv(ev);
-            ReportUrlGetterTask rugt=new ReportUrlGetterTask(build,jobName,c);
-            ReportUrlGetter.run(rugt);
+            ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
+            FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
+            LoggerTask logTask=new LoggerTask(listener.getLogger(),lp);
+            BuildReporter.run(rugt,logTask);
             r = c.call(b);
         } catch (InterruptedException e) {
             listener.getLogger().print(LogEntries.JOB_WAS_STOPPED_BY_USER);
@@ -108,7 +114,7 @@ public class PerformanceBuilder extends Builder {
             listener.getLogger().print("Failed to run blazemeter test: " + e);
             r = Result.FAILURE;
         } finally {
-            ReportUrlGetter.stop();
+            BuildReporter.stop();
             BuildResult rstr = BuildResult.valueOf(r.toString());
             build.setResult(r);
             switch (rstr) {

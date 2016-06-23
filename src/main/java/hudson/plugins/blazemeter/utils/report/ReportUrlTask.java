@@ -5,17 +5,19 @@ import hudson.model.AbstractBuild;
 import hudson.plugins.blazemeter.PerformanceBuildAction;
 import hudson.remoting.VirtualChannel;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by zmicer on 20.6.16.
  */
-public class ReportUrlGetterTask implements Runnable {
+public class ReportUrlTask implements Runnable {
     private VirtualChannel c = null;
     private AbstractBuild build = null;
     public boolean reportUrl = false;
     public String jobName = null;
 
-    public ReportUrlGetterTask(AbstractBuild build, String jobName,VirtualChannel c) {
+
+    public ReportUrlTask(AbstractBuild build, String jobName, VirtualChannel c) {
         this.build = build;
         this.jobName=jobName;
         this.c = c;
