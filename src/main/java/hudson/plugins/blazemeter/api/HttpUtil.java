@@ -27,13 +27,11 @@ public class HttpUtil {
 
     private transient CloseableHttpClient httpClient = null;
     private HttpHost proxy = null;
-    private HttpRemote r = null;
     private HashMap<String, String> headers = new HashMap<String, String>();
 
     public HttpUtil(ProxyConfiguration proxy) {
         this.headers.put("Accept", "application/json");
         this.headers.put("Content-type", "application/json; charset=UTF-8");
-        this.r = new HttpRemote(this.headers);
         this.httpClient = HttpClients.createDefault();
         this.logger.setDebugEnabled(false);
         try {
@@ -64,7 +62,7 @@ public class HttpUtil {
         }
     }
 
-    public <V> HttpResponse responseLC(String url, V data, Method method) throws IOException {
+    public <V> HttpResponse responseHTTP(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
         if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0, url.indexOf("?") + 14));
@@ -128,7 +126,7 @@ public class HttpUtil {
         String output = null;
         HttpResponse response = null;
         try {
-                response = responseLC(url, data, method);
+                response = responseHTTP(url, data, method);
                 if (response != null) {
                     output = EntityUtils.toString(response.getEntity());
                     if (logger.isDebugEnabled())
