@@ -56,7 +56,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     @Override
     public Result call() throws Exception {
-        Result result;
+        Result result=Result.SUCCESS;
         StringBuilder lentry=new StringBuilder();
         File ld = new File(this.ws.getRemote()+
                 File.separator + this.buildId);
@@ -227,13 +227,13 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bls.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.SUCCESS;
+            return Result.ABORTED;
         } catch (Exception e) {
             lentry.append("Job was stopped due to unknown reason");
             bls.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.FAILURE;
+            return Result.NOT_BUILT;
         } finally {
             TestStatus testStatus = api.getTestStatus(masterId);
 

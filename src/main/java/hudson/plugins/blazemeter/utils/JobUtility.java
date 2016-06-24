@@ -211,8 +211,11 @@ public class JobUtility {
                     InputStream input = connection.getInputStream();
                     filePath.unzipFrom(input);
                     jtl = true;
+                } catch (MalformedURLException e) {
+                    bzmLog.warn("It seems like test was terminated on server side...");
+                    bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts");
                 } catch (Exception e) {
-                    bzmLog.warn("Unable to get JTLZIP from " + url + ", " + e);
+                    bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts" + e);
                 } finally {
                     i++;
                 }
@@ -224,9 +227,10 @@ public class JobUtility {
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
         } catch (JSONException e) {
-            bzmLog.warn("Unable to get JTLZIP from " + url, e);
+            bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts "+e);
         } catch (MalformedURLException e) {
-            bzmLog.warn("Unable to get JTLZIP from " + url, e);
+            bzmLog.warn("It seems like test was terminated on server side...");
+            bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts "+e);
         } catch (IOException e) {
             bzmLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (InterruptedException e) {
