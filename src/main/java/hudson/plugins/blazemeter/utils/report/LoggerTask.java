@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by zmicer on 20.6.16.
  */
 public class LoggerTask implements Runnable {
+    private static String SPLIT_REG_EX="(channel:)|(#[0-9]{1,}:)";
     private FilePath l = null;
     private PrintStream ps = null;
     private int logged=0;
@@ -39,10 +40,14 @@ public class LoggerTask implements Runnable {
                 int currentLogged=0;
                 List<String> ls= Arrays.asList(s.split("\\n"));
                 int lss=ls.size();
-                for(int i=0+this.logged;i<lss;i++){
-                    String lstr=ls.get(i);
-                    errLog.info(lstr.substring(lstr.lastIndexOf(": ")+2));
-                    currentLogged++;
+                for (int i = 0 + this.logged; i < lss; i++) {
+                    String lstr = ls.get(i);
+                    try {
+                        errLog.info(lstr.split(SPLIT_REG_EX)[1]);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                    } finally {
+                        currentLogged++;
+                    }
                 }
                 this.logged=this.logged+currentLogged;
 

@@ -17,16 +17,16 @@ public class BuildReporter {
             urlTask = exec.scheduleAtFixedRate(g, 120, 120, TimeUnit.SECONDS);
         }
         if ((logTask == null || logTask.isDone())) {
-            logTask = exec.scheduleAtFixedRate(l, 60, 60, TimeUnit.SECONDS);
+            logTask = exec.scheduleAtFixedRate(l, 120, 10, TimeUnit.SECONDS);
         }
     }
 
     public static void stop() {
         if ((urlTask != null || !urlTask.isDone())) {
-            urlTask.cancel(true);
+            urlTask.cancel(false);
         }
         if ((logTask != null || !logTask.isDone())) {
-            logTask.cancel(true);
+            logTask.cancel(false);
         }
     }
 }

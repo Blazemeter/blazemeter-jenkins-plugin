@@ -514,12 +514,4 @@ public class JobUtility {
             }
         }
     }
-
-    public static File mkLogDir(String logDir) throws Exception {
-        File l = new File(logDir);
-        if (!l.exists()) {
-            FileUtils.forceMkdir(l);
-        }
-        return l;
-    }
 }

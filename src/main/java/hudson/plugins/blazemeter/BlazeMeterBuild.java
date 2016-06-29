@@ -221,6 +221,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     this.getJtl,
                     this.jtlPath,
                     bzmLog);
+            Thread.sleep(15000);//let master pull logs to browser
             return result;
         } catch (InterruptedException e) {
             lentry.append(LogEntries.JOB_WAS_STOPPED_BY_USER);
