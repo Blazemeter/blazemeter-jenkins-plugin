@@ -7,8 +7,8 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConsts;
-import hudson.remoting.VirtualChannel;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -454,20 +454,20 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public boolean notes(String note,String masterId) throws Exception {
+    public boolean notes(String note, String masterId) throws Exception {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
-        JSONObject noteJson=new JSONObject("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
+        String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
+        JSONObject noteJson = new JSONObject(noteEsc);
         String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
-        JSONObject jo=this.bzmhc.response(url, noteJson, Method.PATCH, JSONObject.class,JSONObject.class);
-        try{
-
-        if(!jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)){
-            return false;
-        }}catch (Exception e){
-            throw new Exception("Failed to submit report notest to masterId="+masterId,e);
+        JSONObject jo = this.bzmhc.response(url, noteJson, Method.PATCH, JSONObject.class, JSONObject.class);
+        try {
+            if (!jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to submit report notest to masterId=" + masterId, e);
         }
-        return true ;
-
+        return true;
     }
 
     @Override
