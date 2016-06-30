@@ -2,6 +2,7 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -19,7 +20,7 @@ import java.io.IOException;
 /**
  * @author Vivek Pandey
  */
-public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential {
+public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential implements StandardCredentials {
 
     /**
      * Ensure consistent serialization.
