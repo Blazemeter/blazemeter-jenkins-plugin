@@ -452,8 +452,8 @@ public class JobUtility {
                     logger.warn("User profile: " + user.toString());
                     return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
                 } else {
-                    logger.warn("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
-                    return FormValidation.ok("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
+                    logger.warn(Constants.API_KEY_VALID + user.getString(JsonConsts.MAIL));
+                    return FormValidation.ok(Constants.API_KEY_VALID + user.getString(JsonConsts.MAIL));
                 }
             }
         } catch (ClassCastException e) {

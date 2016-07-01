@@ -65,7 +65,7 @@ public class TestJobUtility {
         FormValidation validation= JobUtility.validateUserKey(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.OK);
-        Assert.assertEquals(validation.getMessage(), "API key Valid. Email - dzmitry.kashlach@blazemeter.com");
+        Assert.assertEquals(validation.getMessage(), Constants.API_KEY_VALID+"dzmitry.kashlach@blazemeter.com");
     }
 
     @Test

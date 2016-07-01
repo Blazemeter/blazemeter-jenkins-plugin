@@ -19,4 +19,5 @@ public interface Constants {
     String URL="url";
     String METHOD="method";
     String DATA="data";
+    String API_KEY_VALID="API key is valid: user e-mail=";
 }
