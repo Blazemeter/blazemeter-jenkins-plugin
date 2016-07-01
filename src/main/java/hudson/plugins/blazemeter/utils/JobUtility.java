@@ -11,7 +11,6 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -37,18 +36,16 @@ public class JobUtility {
     }
 
     public static void waitForFinish(Api api, String testId, AbstractLogger bzmLog,
-                                     String session) throws InterruptedException {
+                                     String masterId) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
             Thread.sleep(15000);
-            TestStatus testStatus = api.getTestStatus(session);
+            TestStatus testStatus = api.getTestStatus(masterId);
 
             if (!testStatus.equals(TestStatus.Running)) {
-                bzmLog.info("TestStatus for session " + session +
-                        " " + testStatus);
-                bzmLog.info("BlazeMeter TestStatus for session" +
-                        session
+                bzmLog.info("BlazeMeter TestStatus for masterId" +
+                        masterId
                         + " is not 'Running': finishing build.... ");
                 bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
@@ -59,7 +56,7 @@ public class JobUtility {
             long now = Calendar.getInstance().getTime().getTime();
             long diffInSec = (now - start.getTime()) / 1000;
             if (now - lastPrint > 60000) {
-                bzmLog.info("BlazeMeter test# " + testId + ", session # " + session + " running from " + start + " - for " + diffInSec + " seconds");
+                bzmLog.info("BlazeMeter test# " + testId + ", masterId # " + masterId + " running from " + start + " - for " + diffInSec + " seconds");
                 lastPrint = now;
             }
 
@@ -169,11 +166,11 @@ public class JobUtility {
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
                                            String id) {
         String userKey = null;
-        List<BlazemeterCredential> credentialList = descriptor.getCredentials("Global");
+        List<BlazemeterCredentialImpl> credentialList = descriptor.getCredentials("Global");
         if (credentialList.size() == 1) {
             userKey = credentialList.get(0).getApiKey();
         } else {
-            for (BlazemeterCredential c : credentialList) {
+            for (BlazemeterCredentialImpl c : credentialList) {
                 if (c.getId().equals(id)) {
                     userKey = c.getApiKey();
                     break;
@@ -456,7 +453,7 @@ public class JobUtility {
                     return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
                 } else {
                     logger.warn("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
-                    return FormValidation.ok("API key Valid. Email - " + user.getString(JsonConsts.MAIL));
+                    return FormValidation.ok("API key is valid: user e-mail=" + user.getString(JsonConsts.MAIL));
                 }
             }
         } catch (ClassCastException e) {

@@ -1,5 +1,6 @@
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.BaseCredentials;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
@@ -8,7 +9,7 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import org.eclipse.jetty.util.log.StdErrLog;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -20,32 +21,31 @@ import java.io.IOException;
 /**
  * @author Vivek Pandey
  */
-public class BlazemeterCredentialImpl extends AbstractBlazemeterCredential implements StandardCredentials {
-
-    /**
-     * Ensure consistent serialization.
-     */
+public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials {
     private static final long serialVersionUID = 1L;
-    private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
-    //private final Secret apiKey;
-    private final String apiKey;
-    private final String description;
+    private String apiKey =null;
+    private String description=null;
 
     @DataBoundConstructor
-    public BlazemeterCredentialImpl(String apiKey, String description) {
-        this.apiKey = apiKey;
-        this.description = description;
+    public BlazemeterCredentialImpl(String apiKey,String description) {
+        super(CredentialsScope.GLOBAL);
+        this.apiKey=apiKey;
+        this.description=description;
+    }
+
+    public String getId() {
+        return StringUtils.left(apiKey,4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 
     public String getDescription() {
         return description;
     }
 
-
-    public String getApiKey() {
-        return apiKey;
-    }
 
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {

@@ -100,13 +100,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return items;
     }
 
-    public List<BlazemeterCredential> getCredentials(Object scope) {
-        List<BlazemeterCredential> result = new ArrayList<BlazemeterCredential>();
+    public List<BlazemeterCredentialImpl> getCredentials(Object scope) {
+        List<BlazemeterCredentialImpl> result = new ArrayList<BlazemeterCredentialImpl>();
         Set<String> apiKeys = new HashSet<String>();
 
         Item item = scope instanceof Item ? (Item) scope : null;
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+        for (BlazemeterCredentialImpl c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
                 result.add(c);
@@ -127,8 +127,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Set<String> apiKeys = new HashSet<String>();
 
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredential c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredential.class, item, ACL.SYSTEM)) {
+        for (BlazemeterCredentialImpl c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
