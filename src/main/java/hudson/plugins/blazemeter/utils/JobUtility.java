@@ -180,22 +180,36 @@ public class JobUtility {
         return userKey;
     }
 
-    public static void downloadJtlReport(Api api, String sessionId, FilePath filePath, StdErrLog bzmLog) {
+    public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog){
+        HashMap<String,String> jtlUrls=new HashMap<String, String>();
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        for (String s : sessionsIds) {
+            StringBuilder dataUrl=new StringBuilder();
+            JSONObject jo = api.retrieveJtlZip(s);
+            try {
+                JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
+                for (int i = 0; i < data.length(); i++) {
+                    String title = data.getJSONObject(i).getString("title");
+                    if (title.equals("Zip")) {
+                        dataUrl.append(data.getJSONObject(i).getString(JsonConsts.DATA_URL));
+                        jtlUrls.put(s,dataUrl.toString());
+                        bzmLog.warn("SessionId="+s+", jtlUrl="+dataUrl.toString());
+                        dataUrl.setLength(0);
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                bzmLog.warn("Failed to get url for JTL report, sessionId="+s,e);
+            }
 
-        JSONObject jo = api.retrieveJtlZip(sessionId);
-        String dataUrl = null;
+        }
+        return jtlUrls;
+    }
+
+    public static void downloadJtlReport(String sessionId, String jtlUrl, FilePath filePath, StdErrLog bzmLog) {
         URL url = null;
         try {
-            JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
-            for (int i = 0; i < data.length(); i++) {
-                String title = data.getJSONObject(i).getString("title");
-                if (title.equals("Zip")) {
-                    dataUrl = data.getJSONObject(i).getString(JsonConsts.DATA_URL);
-                    break;
-                }
-            }
-            url = new URL(dataUrl);
-            bzmLog.info("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            url = new URL(jtlUrl);
             int i = 1;
             boolean jtl = false;
             while (!jtl && i < 4) {
@@ -210,9 +224,9 @@ public class JobUtility {
                     jtl = true;
                 } catch (MalformedURLException e) {
                     bzmLog.warn("It seems like test was terminated on server side...");
-                    bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts");
+                    bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts");
                 } catch (Exception e) {
-                    bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts" + e);
+                    bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts" + e);
                 } finally {
                     i++;
                 }
@@ -223,11 +237,9 @@ public class JobUtility {
             if (sample_jtl.exists()) {
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
-        } catch (JSONException e) {
-            bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts "+e);
         } catch (MalformedURLException e) {
             bzmLog.warn("It seems like test was terminated on server side...");
-            bzmLog.warn("Unable to get JTLZIP for sessionId="+sessionId+":check server for test artifacts "+e);
+            bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts " + e);
         } catch (IOException e) {
             bzmLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (InterruptedException e) {
@@ -235,11 +247,11 @@ public class JobUtility {
         }
     }
 
-    public static void downloadJtlReports(Api api, String masterId, FilePath filePath, StdErrLog bzmBuildLog) {
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+    public static void downloadJtlReports(HashMap<String,String> jtlUrls, FilePath filePath, StdErrLog bzmBuildLog) {
+        Set<String> sessionsIds=jtlUrls.keySet();
         for (String s : sessionsIds) {
             FilePath jtl = new FilePath(filePath, s + Constants.BM_ARTEFACTS);
-            downloadJtlReport(api, s, jtl, bzmBuildLog);
+            downloadJtlReport(s, jtlUrls.get(s),jtl, bzmBuildLog);
         }
     }
 
@@ -295,14 +307,14 @@ public class JobUtility {
         }
         Thread.sleep(30000);
         FilePath jtlPath = null;
+        HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog);
         if (isJtl) {
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
             } else {
                 try {
                     jtlPath = Utils.resolvePath(dfp, jtlPathStr, envVars);
-                    bzmLog.info("Will use the following path for JTL: " +
-                            jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    bzmLog.info("Will use the following path for JTL: " +  jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 } catch (Exception e) {
                     bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                     bzmLog.warn("JTL report will be saved to workspace");
@@ -311,7 +323,7 @@ public class JobUtility {
                 bzmLog.info("Will use the following path for JTL: " +
                         jtlPath.getParent().getName() + "/" + jtlPath.getName());
             }
-            JobUtility.downloadJtlReports(api, masterId, jtlPath, bzmLog);
+            JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog);
         } else {
             bzmLog.info("JTL report won't be requested: check-box is unchecked.");
         }
