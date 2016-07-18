@@ -55,14 +55,7 @@ public class PerformanceBuilder extends Builder {
 
     private boolean getJunit = false;
 
-    /**
-     * @deprecated as of 1.3. for compatibility
-     */
     private transient String filename;
-
-    /**
-     * Configured report parsers.
-     */
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
