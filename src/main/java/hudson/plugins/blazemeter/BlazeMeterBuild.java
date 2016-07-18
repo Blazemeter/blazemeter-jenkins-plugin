@@ -247,6 +247,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             lentry.setLength(0);
             return Result.NOT_BUILT;
         } finally {
+            ((EnvVars) EnvVars.masterEnvVars).remove(this.jobName+"-"+this.buildId);
             TestStatus testStatus = api.getTestStatus(masterId);
 
             if (testStatus.equals(TestStatus.Running)) {
