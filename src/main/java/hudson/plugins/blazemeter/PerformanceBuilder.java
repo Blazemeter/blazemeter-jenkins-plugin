@@ -107,7 +107,7 @@ public class PerformanceBuilder extends Builder {
             String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            EnvVars ev=EnvVars.getRemote(c);
+            EnvVars ev=build.getEnvironment(listener);
             b.setEv(ev);
             ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
             FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
