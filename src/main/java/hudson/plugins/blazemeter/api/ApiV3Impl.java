@@ -165,8 +165,8 @@ public class ApiV3Impl implements Api {
         }catch (Exception e){
             if (logger.isDebugEnabled())
                 logger.debug("Error while starting test: ",e);
-            throw new JSONException("Faild to get 'result' node "+e.getMessage());
-
+            String error = jo.get(JsonConsts.ERROR).toString();
+            return error;
         }
         return result.getString(JsonConsts.ID);
     }

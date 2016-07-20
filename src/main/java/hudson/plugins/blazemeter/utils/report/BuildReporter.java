@@ -29,7 +29,7 @@ public class BuildReporter {
             urlTask = exec.scheduleAtFixedRate(g, 120, 120, TimeUnit.SECONDS);
         }
         if ((logTask == null || logTask.isDone())) {
-            logTask = exec.scheduleAtFixedRate(l, 120, 10, TimeUnit.SECONDS);
+            logTask = exec.scheduleAtFixedRate(l, 0, 10, TimeUnit.SECONDS);
         }
     }
 

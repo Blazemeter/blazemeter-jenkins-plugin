@@ -118,7 +118,7 @@ public class PerformanceBuilder extends Builder {
             listener.getLogger().print(LogEntries.JOB_WAS_STOPPED_BY_USER);
             r=Result.ABORTED;
         } catch (Exception e) {
-            listener.getLogger().print("Failed to run blazemeter test: " + e);
+            listener.getLogger().println("Failed to run blazemeter test: " + e.getMessage());
             r = Result.FAILURE;
         } finally {
             BuildReporter.stop();
