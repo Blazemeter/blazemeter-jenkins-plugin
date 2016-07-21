@@ -89,6 +89,7 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         Result r = null;
+        LoggerTask logTask=null;
         try {
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
@@ -111,11 +112,10 @@ public class PerformanceBuilder extends Builder {
             b.setEv(ev);
             ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
             FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
-            LoggerTask logTask=new LoggerTask(listener.getLogger(),lp);
+            logTask=new LoggerTask(listener.getLogger(),lp);
             BuildReporter.run(rugt,logTask);
             r = c.call(b);
         } catch (InterruptedException e) {
-            listener.getLogger().print(LogEntries.JOB_WAS_STOPPED_BY_USER);
             r=Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().println("Failed to run blazemeter test: " + e.getMessage());
