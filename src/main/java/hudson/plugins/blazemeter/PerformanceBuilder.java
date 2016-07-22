@@ -84,7 +84,7 @@ public class PerformanceBuilder extends Builder {
         try {
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
-            b.setServerUrl(this.serverUrl);
+            b.setServerUrl(this.serverUrl!=null?this.serverUrl:Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
