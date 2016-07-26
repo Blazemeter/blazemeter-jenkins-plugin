@@ -470,6 +470,8 @@ public class JobUtility {
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
             if (u != null) {
+                logger.warn("Received user information:");
+                logger.warn(u.toString());
                 user = net.sf.json.JSONObject.fromObject(u.toString());
                 if (user.has(JsonConsts.ERROR) && !user.get(JsonConsts.ERROR).equals(null)) {
                     logger.warn("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
