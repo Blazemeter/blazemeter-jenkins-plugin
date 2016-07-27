@@ -55,14 +55,7 @@ public class PerformanceBuilder extends Builder {
 
     private boolean getJunit = false;
 
-    /**
-     * @deprecated as of 1.3. for compatibility
-     */
     private transient String filename;
-
-    /**
-     * Configured report parsers.
-     */
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
@@ -96,10 +89,11 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         Result r = null;
+        LoggerTask logTask=null;
         try {
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
-            b.setServerUrl(this.serverUrl);
+            b.setServerUrl(this.serverUrl!=null?this.serverUrl:Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
@@ -114,18 +108,17 @@ public class PerformanceBuilder extends Builder {
             String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            EnvVars ev=EnvVars.getRemote(c);
+            EnvVars ev=build.getEnvironment(listener);
             b.setEv(ev);
             ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
             FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
-            LoggerTask logTask=new LoggerTask(listener.getLogger(),lp);
+            logTask=new LoggerTask(listener.getLogger(),lp);
             BuildReporter.run(rugt,logTask);
             r = c.call(b);
         } catch (InterruptedException e) {
-            listener.getLogger().print(LogEntries.JOB_WAS_STOPPED_BY_USER);
             r=Result.ABORTED;
         } catch (Exception e) {
-            listener.getLogger().print("Failed to run blazemeter test: " + e);
+            listener.getLogger().println("Failed to run blazemeter test: " + e.getMessage());
             r = Result.FAILURE;
         } finally {
             BuildReporter.stop();

@@ -24,12 +24,13 @@ public class BuildReporter {
     private static final ScheduledExecutorService exec = Executors.newScheduledThreadPool(2);
     private static ScheduledFuture<?> urlTask;
     private static ScheduledFuture<?> logTask;
+    private static int LOG_INTERVAL=10;
     public static void run(ReportUrlTask g,LoggerTask l) {
         if ((urlTask == null || urlTask.isDone())) {
             urlTask = exec.scheduleAtFixedRate(g, 120, 120, TimeUnit.SECONDS);
         }
         if ((logTask == null || logTask.isDone())) {
-            logTask = exec.scheduleAtFixedRate(l, 120, 10, TimeUnit.SECONDS);
+            logTask = exec.scheduleAtFixedRate(l, 5, LOG_INTERVAL, TimeUnit.SECONDS);
         }
     }
 
@@ -38,7 +39,13 @@ public class BuildReporter {
             urlTask.cancel(false);
         }
         if ((logTask != null || !logTask.isDone())) {
-            logTask.cancel(false);
+            try {
+                Thread.sleep(LOG_INTERVAL*2*1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+                logTask.cancel(false);
+            }
         }
     }
 }

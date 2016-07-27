@@ -22,16 +22,8 @@ import hudson.model.TaskListener;
 
 public class PerformanceReportMap implements ModelObject {
 
-    /**
-     * The {@link PerformanceBuildAction} that this report belongs to.
-     */
     private transient PerformanceBuildAction buildAction;
 
-    /**
-     * Parses the reports and build a {@link PerformanceReportMap}.
-     *
-     * @throws IOException If a report fails to parse.
-     */
     PerformanceReportMap(final PerformanceBuildAction buildAction, TaskListener listener)
             throws IOException {
         this.buildAction = buildAction;

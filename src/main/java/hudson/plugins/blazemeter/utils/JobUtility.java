@@ -73,8 +73,8 @@ public class JobUtility {
             }
 
             if (Thread.interrupted()) {
-                bzmLog.info("Job was stopped by user");
-                throw new InterruptedException("Job was stopped by user");
+                bzmLog.info(LogEntries.JOB_WAS_STOPPED_BY_USER);
+                throw new InterruptedException(LogEntries.JOB_WAS_STOPPED_BY_USER);
             }
         }
     }
