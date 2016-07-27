@@ -22,7 +22,6 @@ import hudson.model.Result;
 import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.LogEntries;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.LoggerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
@@ -120,7 +119,6 @@ public class PerformanceBuilder extends Builder {
         } catch (InterruptedException e) {
             r=Result.ABORTED;
         } catch (Exception e) {
-            listener.getLogger().println("Failed to run blazemeter test: " + e.getMessage());
             r = Result.FAILURE;
         } finally {
             br.stop();

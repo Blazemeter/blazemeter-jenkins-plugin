@@ -45,7 +45,7 @@ public class BuildReporter {
         }
         if ((logTask != null || !logTask.isDone())) {
             try {
-                Thread.sleep(LOG_INTERVAL*2*1000);
+                Thread.sleep(LOG_INTERVAL*4*1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }finally {

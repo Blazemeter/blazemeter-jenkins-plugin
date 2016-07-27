@@ -163,8 +163,6 @@ public class ApiV3Impl implements Api {
         try{
             result = (JSONObject) jo.get(JsonConsts.RESULT);
         }catch (Exception e){
-            if (logger.isDebugEnabled())
-                logger.debug("Error while starting test: ",e);
             String error = jo.get(JsonConsts.ERROR).toString();
             return error;
         }
