@@ -124,8 +124,8 @@
 
     <distributionManagement>
         <repository>
-            <id>repo.jenkins-ci.org</id>
-            <url>http://repo.jenkins-ci.org:8081/content/repositories/releases/</url>
+            <id>maven.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/releases</url>
         </repository>
     </distributionManagement>
 
