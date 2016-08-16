@@ -24,7 +24,7 @@ import java.util.List;
 
 
 public class LoggerTask implements Runnable {
-    private static String SPLIT_REG_EX="(channel:)|(#[0-9]{1,}:)";
+    private static String SPLIT_REG_EX="(channel:)|(#[0-9]{1,4}:)";
     private FilePath l = null;
     private PrintStream ps = null;
     private int logged=0;

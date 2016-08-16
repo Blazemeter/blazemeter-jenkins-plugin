@@ -193,11 +193,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             lentry.setLength(0);
             return Result.FAILURE;
         }catch (NumberFormatException e) {
-            lentry.append("Error while starting BlazeMeter Test: "+masterId);
-            bls.warn(lentry.toString()+e.getMessage());
-            bzmLog.warn(lentry.toString(), e);
+            lentry.append("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
+            bls.warn(lentry.toString());
+            bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            throw new Exception(e.getMessage());
+            throw new Exception("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
         }
         catch (Exception e) {
             lentry.append("Unable to start test: check userKey, testId, server url.");
