@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BuildReporter {
     private static int LOG_INTERVAL=10;
+    private static int URL_INTERVAL=30;
 
     private final ScheduledExecutorService exec = Executors.newScheduledThreadPool(100);
     private ScheduledFuture<?> urlTask;
@@ -32,7 +33,7 @@ public class BuildReporter {
 
     public void run(ReportUrlTask g,LoggerTask l) {
         if ((urlTask == null || urlTask.isDone())) {
-            urlTask = exec.scheduleAtFixedRate(g, 120, 120, TimeUnit.SECONDS);
+            urlTask = exec.scheduleAtFixedRate(g, URL_INTERVAL, URL_INTERVAL, TimeUnit.SECONDS);
         }
         if ((logTask == null || logTask.isDone())) {
             logTask = exec.scheduleAtFixedRate(l, 5, LOG_INTERVAL, TimeUnit.SECONDS);
@@ -40,17 +41,18 @@ public class BuildReporter {
     }
 
     public void stop() {
-        if ((this.urlTask != null || !this.urlTask.isDone())) {
-            this.urlTask.cancel(false);
-        }
-        if ((logTask != null || !logTask.isDone())) {
-            try {
-                Thread.sleep(LOG_INTERVAL*4*1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }finally {
+        try {
+            Thread.sleep(LOG_INTERVAL * 4 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if ((this.urlTask != null || !this.urlTask.isDone())) {
+                this.urlTask.cancel(false);
+            }
+            if ((logTask != null || !logTask.isDone())) {
                 logTask.cancel(false);
             }
         }
+
     }
 }
