@@ -91,13 +91,20 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     Set set = testList.entries();
                     for (Object test : set) {
                         Map.Entry me = (Map.Entry) test;
-                        items.add(new ListBoxModel.Option(String.valueOf(me.getValue())+"->"+me.getKey(), String.valueOf(me.getValue())));
+                        items.add(new ListBoxModel.Option(String.valueOf(me.getKey()+"("+me.getValue()+")"), String.valueOf(me.getValue())));
                     }
                 }
             } catch (Exception e) {
                 throw FormValidation.error(e.getMessage(), e);
             }
         }
+        Comparator c=new Comparator<ListBoxModel.Option>() {
+            @Override
+            public int compare(ListBoxModel.Option o1, ListBoxModel.Option o2) {
+                return o1.name.compareToIgnoreCase(o2.name);
+            }
+        };
+        Collections.sort(items,c);
         return items;
     }
 
