@@ -142,7 +142,7 @@ public class JobUtility {
         JSONObject jo;
         JSONArray failures = new JSONArray();
         JSONArray errors = new JSONArray();
-        StringBuilder lentry=new StringBuilder();
+        StringBuilder lentry = new StringBuilder();
         lentry.append("No thresholds on server: setting 'success' for CIStatus ");
         try {
             jo = api.getCIStatus(session);
@@ -156,21 +156,22 @@ public class JobUtility {
         } finally {
             lentry.setLength(0);
             lentry.append(" while test status validation...");
+            if (failures.length() > 0) {
+                jenBuildLog.info("Having failures " + lentry.toString());
+                jenBuildLog.info("Failures: " + failures.toString());
+                ciStatus = CIStatus.failures;
+                jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
+            }
             if (errors.length() > 0) {
-                jenBuildLog.info("Having errors "+lentry.toString());
+                jenBuildLog.info("Having errors " + lentry.toString());
                 jenBuildLog.info("Errors: " + errors.toString());
                 ciStatus = CIStatus.errors;
                 jenBuildLog.info("Setting CIStatus=" + CIStatus.errors.name());
                 return ciStatus;
             }
-            if (failures.length() > 0) {
-                jenBuildLog.info("Having failures "+lentry.toString());
-                jenBuildLog.info("Failures: " + failures.toString());
-                ciStatus = CIStatus.failures;
-                jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
-                return ciStatus;
+            if (ciStatus.equals(CIStatus.success)) {
+                jenBuildLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
             }
-            jenBuildLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
         }
         return ciStatus;
     }
@@ -299,7 +300,7 @@ public class JobUtility {
         Result result;
         CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog);
         if (ciStatus.equals(CIStatus.errors)) {
-            result = Result.FAILURE;
+            result = Result.UNSTABLE;
             return result;
         }
         result = ciStatus.equals(CIStatus.failures) ? Result.FAILURE : Result.SUCCESS;
