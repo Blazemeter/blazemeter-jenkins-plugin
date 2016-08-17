@@ -156,17 +156,17 @@ public class JobUtility {
         } finally {
             lentry.setLength(0);
             lentry.append(" while test status validation...");
+            if (errors.length() > 0) {
+                jenBuildLog.info("Having errors " + lentry.toString());
+                jenBuildLog.info("Errors: " + errors.toString());
+                ciStatus = errorsFailed(errors) ? CIStatus.failures : CIStatus.errors;
+                jenBuildLog.info("Setting CIStatus=" + ciStatus.name());
+            }
             if (failures.length() > 0) {
                 jenBuildLog.info("Having failures " + lentry.toString());
                 jenBuildLog.info("Failures: " + failures.toString());
                 ciStatus = CIStatus.failures;
                 jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
-            }
-            if (errors.length() > 0) {
-                jenBuildLog.info("Having errors " + lentry.toString());
-                jenBuildLog.info("Errors: " + errors.toString());
-                ciStatus = CIStatus.errors;
-                jenBuildLog.info("Setting CIStatus=" + CIStatus.errors.name());
                 return ciStatus;
             }
             if (ciStatus.equals(CIStatus.success)) {
@@ -174,6 +174,22 @@ public class JobUtility {
             }
         }
         return ciStatus;
+    }
+
+    public static boolean errorsFailed(JSONArray errors) {
+        int l = errors.length();
+        for (int i = 0; i < l; i++) {
+            try {
+                if (errors.getJSONObject(i).getInt(JsonConsts.CODE) == 0 | errors.getJSONObject(i).getInt(JsonConsts.CODE) == 70404) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (JSONException je) {
+                return false;
+            }
+        }
+        return false;
     }
 
     public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,

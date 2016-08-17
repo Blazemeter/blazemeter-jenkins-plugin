@@ -29,4 +29,5 @@ public interface JsonConsts {
     String ID="id";
     String NOTE="note";
     String MAIL="mail";
+    String CODE="code";
 }

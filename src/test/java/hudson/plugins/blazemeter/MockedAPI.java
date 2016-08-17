@@ -544,12 +544,44 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(returnStr));
 
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error.json");
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_61700.json");
         returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR +"/ci-status")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_61700 +"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_0.json");
+        returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_0 +"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_70404.json");
+        returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_70404 +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)

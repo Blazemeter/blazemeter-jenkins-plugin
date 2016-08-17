@@ -15,5 +15,5 @@ package hudson.plugins.blazemeter.entities;
  */
 
 public enum CIStatus {
-    success,errors, failures
+    success,errors,failures
 }
