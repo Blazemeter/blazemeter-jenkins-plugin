@@ -30,4 +30,5 @@ public interface JsonConsts {
     String NOTE="note";
     String MAIL="mail";
     String CODE="code";
+    String STATUS="status";
 }

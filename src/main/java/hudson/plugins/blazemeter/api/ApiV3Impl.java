@@ -96,11 +96,11 @@ public class ApiV3Impl implements Api {
             if (result.has(JsonConsts.DATA_URL) && result.get(JsonConsts.DATA_URL) == null) {
                 testStatus = TestStatus.NotFound;
             } else {
-                if (result.has("status") && !result.getString("status").equals("ENDED")) {
+                if (result.has(JsonConsts.STATUS) && !result.getString(JsonConsts.STATUS).equals("ENDED")) {
                     testStatus = TestStatus.Running;
                 } else {
-                    if (result.has("errors") && !result.get("errors").equals(JSONObject.NULL)) {
-                        logger.debug("Error received from server: " + result.get("errors").toString());
+                    if (result.has(JsonConsts.ERRORS) && !result.get(JsonConsts.ERRORS).equals(JSONObject.NULL)) {
+                        logger.debug("Error received from server: " + result.get(JsonConsts.ERRORS).toString());
                         testStatus = TestStatus.Error;
                     } else {
                         testStatus = TestStatus.NotRunning;
@@ -191,11 +191,6 @@ public class ApiV3Impl implements Api {
         }
     }
 
-    /**
-     * @param testId - test id
-     *               //     * @throws IOException
-     *               //     * @throws ClientProtocolException
-     */
     @Override
     public JSONObject stopTest(String testId) {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
@@ -214,12 +209,7 @@ public class ApiV3Impl implements Api {
     }
 
 
-    /**
-     * @param reportId - report Id same as Session Id, can be obtained from start stop status.
-     *                 //     * @throws IOException
-     *                 //     * @throws ClientProtocolException
-     */
-    @Override
+   @Override
     public JSONObject testReport(String reportId) {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(reportId)) return null;
 
