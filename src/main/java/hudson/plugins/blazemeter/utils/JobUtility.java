@@ -25,6 +25,7 @@ import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -464,7 +465,7 @@ public class JobUtility {
         }
     }
 
-    public static String getVersion() {
+    public static String version() {
         Properties props = new Properties();
         try {
             props.load(JobUtility.class.getResourceAsStream("version.properties"));
@@ -472,6 +473,17 @@ public class JobUtility {
             props.setProperty(Constants.VERSION, "N/A");
         }
         return props.getProperty(Constants.VERSION);
+    }
+
+    public static String emptyBodyJson() {
+        String eb = "";
+        try {
+            InputStream is = JobUtility.class.getResourceAsStream("emptyBody.json");
+            eb = IOUtils.toString(is);
+        } catch (IOException ex) {
+        } finally {
+            return eb;
+        }
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {

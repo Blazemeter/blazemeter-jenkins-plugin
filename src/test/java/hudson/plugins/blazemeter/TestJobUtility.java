@@ -107,7 +107,7 @@ public class TestJobUtility {
 
     @Test
     public void getVersion() throws IOException,JSONException{
-        String version= JobUtility.getVersion();
+        String version= JobUtility.version();
         Assert.assertTrue(version.matches("^(\\d{1,}\\.+\\d{1,2}\\S*)$"));
     }
 

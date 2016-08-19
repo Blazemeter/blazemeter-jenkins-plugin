@@ -20,7 +20,7 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 public interface UrlManager {
 
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
-            + JobUtility.getVersion();
+            + JobUtility.version();
 
     String LATEST="/api/latest";
     String TESTS="/tests";

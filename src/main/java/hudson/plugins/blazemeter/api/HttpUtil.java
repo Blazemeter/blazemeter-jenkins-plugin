@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter.api;
 
 import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -145,18 +146,12 @@ public class HttpUtil {
                 response = responseHTTP(url, data, method);
                 if (response != null) {
                     output = EntityUtils.toString(response.getEntity());
-                    if (logger.isDebugEnabled())
-                        logger.debug("Received object from server: " + output);
-
                 }
             if (output.isEmpty()) {
-                throw new IOException();
+                output= JobUtility.emptyBodyJson();
             }
+            logger.debug("Received object from server: " + output);
             jo = new JSONObject(output);
-        } catch (IOException ioe) {
-            if (logger.isDebugEnabled())
-                logger.debug("Received empty response from server: ", ioe);
-            return null;
         } catch (JSONException e) {
             if (logger.isDebugEnabled())
                 logger.debug("ERROR decoding Json: ", e);
@@ -164,7 +159,7 @@ public class HttpUtil {
             return returnType.cast(output);
         } catch (Exception e) {
             if (logger.isDebugEnabled())
-                logger.debug("Failed to do request:", e);
+                logger.debug("Problems with executing request: ", e);
 
         }
         try {

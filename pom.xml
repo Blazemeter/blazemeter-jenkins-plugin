@@ -185,6 +185,7 @@
                                         <filtering>true</filtering>
                                         <includes>
                                             <include>version.properties</include>
+                                            <include>emptyBody.json</include>
                                         </includes>
                                     </resource>
                                 </resources>

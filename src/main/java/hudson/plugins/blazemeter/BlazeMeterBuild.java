@@ -131,7 +131,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             return Result.FAILURE;
         }
 
-        lentry.append("BlazeMeter plugin version =" + JobUtility.getVersion());
+        lentry.append("BlazeMeter plugin version =" + JobUtility.version());
         bzmLog.warn(lentry.toString());
         bls.warn(lentry.toString());
         lentry.setLength(0);

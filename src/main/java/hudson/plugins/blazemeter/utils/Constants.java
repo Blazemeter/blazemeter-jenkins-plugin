@@ -28,5 +28,4 @@ public interface Constants {
     String API_KEY_EMPTY ="API key is empty: please, enter valid API key";
     String A_BLAZEMETER_COM="https://a.blazemeter.com";
     String API_KEY_VALID="API key is valid: user e-mail=";
-    String EMPTY_RESPONSE="Received empty response from server, check test status";
 }
