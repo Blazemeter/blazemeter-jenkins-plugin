@@ -139,6 +139,18 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return result;
     }
 
+    public boolean validateCredentials(String userKey, Object scope) {
+        List<BlazemeterCredentialImpl> cred = getCredentials(scope);
+        boolean valid = false;
+        for (BlazemeterCredentialImpl c : cred) {
+            if (c.getApiKey().equals(userKey)) {
+                valid = true;
+            }
+        }
+        return valid;
+    }
+
+
     // Used by global.jelly to authenticate User key
     public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
             throws MessagingException, IOException, JSONException, ServletException {

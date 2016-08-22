@@ -14,6 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.*;
 import java.io.File;
 import hudson.model.AbstractBuild;
@@ -91,6 +92,12 @@ public class PerformanceBuilder extends Builder {
         LoggerTask logTask=null;
         BuildReporter br=new BuildReporter();
         try {
+            boolean valid = DESCRIPTOR.validateCredentials(this.jobApiKey, CredentialsScope.GLOBAL);
+            if (!valid) {
+                listener.error("Can not start build: userKey=" + this.jobApiKey + " is absent in credentials store.");
+                r=Result.NOT_BUILT;
+                return true;
+            }
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
             b.setServerUrl(this.serverUrl!=null?this.serverUrl:Constants.A_BLAZEMETER_COM);

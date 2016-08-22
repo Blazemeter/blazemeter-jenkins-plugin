@@ -41,15 +41,21 @@ public class BuildReporter {
     }
 
     public void stop() {
+        if (this.urlTask == null) {
+            return;
+        }
+        if (this.logTask == null) {
+            return;
+        }
         try {
             Thread.sleep(LOG_INTERVAL * 4 * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            if ((this.urlTask != null || !this.urlTask.isDone())) {
+            if (!this.urlTask.isDone()) {
                 this.urlTask.cancel(false);
             }
-            if ((logTask != null || !logTask.isDone())) {
+            if (!logTask.isDone()) {
                 logTask.cancel(false);
             }
         }
