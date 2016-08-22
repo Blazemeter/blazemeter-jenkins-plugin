@@ -21,22 +21,17 @@ import java.util.concurrent.TimeUnit;
 
 
 public class BuildReporter {
-    private static int LOG_INTERVAL=10;
     private static int URL_INTERVAL=30;
 
     private final ScheduledExecutorService exec = Executors.newScheduledThreadPool(100);
     private ScheduledFuture<?> urlTask;
-    private ScheduledFuture<?> logTask;
 
     public BuildReporter(){
     }
 
-    public void run(ReportUrlTask g,LoggerTask l) {
+    public void run(ReportUrlTask g) {
         if ((urlTask == null || urlTask.isDone())) {
             urlTask = exec.scheduleAtFixedRate(g, URL_INTERVAL, URL_INTERVAL, TimeUnit.SECONDS);
-        }
-        if ((logTask == null || logTask.isDone())) {
-            logTask = exec.scheduleAtFixedRate(l, 5, LOG_INTERVAL, TimeUnit.SECONDS);
         }
     }
 
@@ -44,21 +39,8 @@ public class BuildReporter {
         if (this.urlTask == null) {
             return;
         }
-        if (this.logTask == null) {
-            return;
+        if (!this.urlTask.isDone()) {
+            this.urlTask.cancel(false);
         }
-        try {
-            Thread.sleep(LOG_INTERVAL * 4 * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            if (!this.urlTask.isDone()) {
-                this.urlTask.cancel(false);
-            }
-            if (!logTask.isDone()) {
-                logTask.cancel(false);
-            }
-        }
-
     }
 }

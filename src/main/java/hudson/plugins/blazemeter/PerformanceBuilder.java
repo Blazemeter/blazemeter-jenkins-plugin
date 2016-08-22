@@ -24,7 +24,6 @@ import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
-import hudson.plugins.blazemeter.utils.report.LoggerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
@@ -89,7 +88,6 @@ public class PerformanceBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
                            BuildListener listener) throws InterruptedException, IOException {
         Result r = null;
-        LoggerTask logTask=null;
         BuildReporter br=new BuildReporter();
         try {
             boolean valid = DESCRIPTOR.validateCredentials(this.jobApiKey, CredentialsScope.GLOBAL);
@@ -108,6 +106,7 @@ public class PerformanceBuilder extends Builder {
             b.setJunitPath(this.junitPath);
             b.setGetJtl(this.getJtl);
             b.setGetJunit(this.getJunit);
+            b.setListener(listener);
             FilePath ws = build.getWorkspace();
             b.setWs(ws);
             String buildId=build.getId();
@@ -119,9 +118,8 @@ public class PerformanceBuilder extends Builder {
             b.setEv(ev);
             ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
             FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
-            logTask=new LoggerTask(listener.getLogger(),lp);
             br=new BuildReporter();
-            br.run(rugt,logTask);
+            br.run(rugt);
             r = c.call(b);
         } catch (InterruptedException e) {
             r=Result.ABORTED;
