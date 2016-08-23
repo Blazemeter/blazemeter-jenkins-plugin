@@ -24,10 +24,10 @@ public class Utils {
     private Utils(){}
 
     public static TestType getTestType(String testId) throws Exception{
-        int dotPos=testId.indexOf(".");
+        int dotPos=testId.lastIndexOf(".");
         TestType testType=null;
         try{
-            testType=TestType.valueOf(testId.substring(dotPos+1));
+            testType=TestType.valueOf(testId.substring(dotPos+1,testId.lastIndexOf(")")));
         }catch (Exception e){
             throw e;
         }
@@ -36,7 +36,7 @@ public class Utils {
 
     public static String getTestId(String testId){
         try{
-            return testId.substring(0,testId.indexOf("."));
+            return testId.substring(testId.lastIndexOf("(")+1,testId.lastIndexOf("."));
         }catch (Exception e){
             return testId;
         }

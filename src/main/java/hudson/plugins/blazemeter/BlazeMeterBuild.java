@@ -46,6 +46,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private String testId = "";
 
+    private String testName = "";
+
     private String notes = "";
 
     private String sessionProperties = "";
@@ -104,60 +106,60 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         if (userEmail.isEmpty()) {
             ProxyConfiguration proxy = ProxyConfiguration.load();
             lentry.append("Please, check that settings are valid.");
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("UserKey=" + apiKeyTrimmed + ", serverUrl=" + this.serverUrl);
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            lentry.append("UserKey = " + apiKeyTrimmed + ", serverUrl = " + this.serverUrl);
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("ProxyHost=" + proxy.name);
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            lentry.append("ProxyHost = " + proxy.name);
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("ProxyPort=" + proxy.port);
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            lentry.append("ProxyPort = " + proxy.port);
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("ProxyUser=" + proxy.getUserName());
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            lentry.append("ProxyUser = " + proxy.getUserName());
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
             String proxyPass = proxy.getPassword();
 
-            lentry.append("ProxyPass=" + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, 3)) + "...");
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
+            lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, 3)) + "...");
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
             lentry.setLength(0);
 
             return Result.FAILURE;
         }
 
-        lentry.append("BlazeMeter plugin version =" + JobUtility.version());
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        lentry.append("BlazeMeter plugin version = " + JobUtility.version());
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
-        lentry.append("User key =" + apiKeyTrimmed + " is valid with " + this.serverUrl);
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        lentry.append("User key = " + apiKeyTrimmed + " is valid with " + this.serverUrl);
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
-        lentry.append("User's e-mail=" + userEmail);
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        lentry.append("User's e-mail = " + userEmail);
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
         TestType testType = null;
         try {
             testType = Utils.getTestType(this.testId);
         } catch (Exception e) {
-            lentry.append("Failed to detect testType for starting test=" + e);
+            lentry.append("Failed to detect testType for starting test = " + e);
             bzmLog.warn(lentry.toString());
             consLog.warn(lentry.toString());
             lentry.setLength(0);
@@ -165,26 +167,21 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
         String testId_num = Utils.getTestId(this.testId);
 
-        lentry.append("TestId=" + this.testId);
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
-        lentry.setLength(0);
-
-        lentry.append("Test type=" + testType.toString());
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        lentry.append("Test = " + this.testId);
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
         String masterId = "";
 
         lentry.append("### About to start BlazeMeter test # " + testId_num);
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
         lentry.append("Timestamp: " + Calendar.getInstance().getTime());
-        bzmLog.warn(lentry.toString());
-        consLog.warn(lentry.toString());
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
         lentry.setLength(0);
 
         try {
@@ -215,12 +212,12 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
         String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
         lentry.append("BlazeMeter test report will be available at " + reportUrl);
-        consLog.warn(lentry.toString());
-        bzmLog.warn(lentry.toString());
+        consLog.info(lentry.toString());
+        bzmLog.info(lentry.toString());
         lentry.setLength(0);
 
-        consLog.warn("For more detailed logs, please, refer to " + bzmLog_f.getCanonicalPath());
-        consLog.warn("Communication with BZM server is logged at " + httpLog_f.getCanonicalPath());
+        consLog.info("For more detailed logs, please, refer to " + bzmLog_f.getCanonicalPath());
+        consLog.info("Communication with BZM server is logged at " + httpLog_f.getCanonicalPath());
 
         ((EnvVars) EnvVars.masterEnvVars).put(this.jobName+"-"+this.buildId,reportUrl);
         JobUtility.notes(api, masterId, this.notes, bzmLog);
@@ -232,8 +229,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             JobUtility.waitForFinish(api, testId_num, bzmLog, masterId);
 
             lentry.append("BlazeMeter test# " + testId_num + " ended at " + Calendar.getInstance().getTime());
-            consLog.warn(lentry.toString());
-            bzmLog.warn(lentry.toString());
+            consLog.info(lentry.toString());
+            bzmLog.info(lentry.toString());
             lentry.setLength(0);
 
             result = JobUtility.postProcess(this.ws,
@@ -245,7 +242,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     this.junitPath,
                     this.getJtl,
                     this.jtlPath,
-                    bzmLog);
+                    bzmLog,
+                    consLog);
             Thread.sleep(15000);//let master pull logs to browser
             return result;
         } catch (InterruptedException e) {
@@ -266,21 +264,21 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
             if (testStatus.equals(TestStatus.Running)) {
                 lentry.append("Shutting down test");
-                consLog.warn(lentry.toString());
-                bzmLog.warn(lentry.toString());
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
                 lentry.setLength(0);
                 JobUtility.stopTestSession(api, masterId, bzmLog);
                 return Result.ABORTED;
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 lentry.append("Test not found error");
-                consLog.warn(lentry.toString());
-                bzmLog.warn(lentry.toString());
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
                 lentry.setLength(0);
                 return Result.FAILURE;
             } else if (testStatus.equals(TestStatus.Error)) {
                 lentry.append("Test is not running on server. Check http-log & bzm-log for detailed errors");
-                consLog.warn(lentry.toString());
-                bzmLog.warn(lentry.toString());
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
                 lentry.setLength(0);
                 return Result.FAILURE;
             }

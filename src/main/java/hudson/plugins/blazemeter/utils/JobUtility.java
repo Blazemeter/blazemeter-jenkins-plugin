@@ -118,7 +118,8 @@ public class JobUtility {
     public static void saveReport(String reportName,
                                   String report,
                                   FilePath filePath,
-                                  StdErrLog jenBuildLog) {
+                                  StdErrLog bzmLog,
+                                  StdErrLog consLog) {
         FilePath junit = null;
         StringBuilder letnry=new StringBuilder();
         letnry.append("ERROR: Failed to save XML report to filepath=");
@@ -130,15 +131,18 @@ public class JobUtility {
             }
             junit.write(report, System.getProperty("file.encoding"));
         } catch (FileNotFoundException e) {
-            jenBuildLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
+            bzmLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
+            consLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
         } catch (IOException e) {
-            jenBuildLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            bzmLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            consLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         } catch (InterruptedException e) {
-            jenBuildLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            bzmLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
+            consLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
         }
     }
 
-    public static CIStatus validateCIStatus(Api api, String session, StdErrLog jenBuildLog) {
+    public static CIStatus validateCIStatus(Api api, String session, StdErrLog bzmLog, StdErrLog consLog) {
         CIStatus ciStatus = CIStatus.success;
         JSONObject jo;
         JSONArray failures = new JSONArray();
@@ -147,31 +151,41 @@ public class JobUtility {
         lentry.append("No thresholds on server: setting 'success' for CIStatus ");
         try {
             jo = api.getCIStatus(session);
-            jenBuildLog.info("Test status object = " + jo.toString());
+            bzmLog.info("Test status object = " + jo.toString());
+            consLog.info("Test status object = " + jo.toString());
             failures = jo.getJSONArray(JsonConsts.FAILURES);
             errors = jo.getJSONArray(JsonConsts.ERRORS);
         } catch (JSONException je) {
-            jenBuildLog.warn(lentry.toString());
+            bzmLog.warn(lentry.toString());
+            consLog.warn(lentry.toString());
         } catch (Exception e) {
-            jenBuildLog.warn(lentry.toString());
+            bzmLog.warn(lentry.toString());
+            consLog.warn(lentry.toString());
         } finally {
             lentry.setLength(0);
             lentry.append(" while test status validation...");
             if (errors.length() > 0) {
-                jenBuildLog.info("Having errors " + lentry.toString());
-                jenBuildLog.info("Errors: " + errors.toString());
+                bzmLog.info("Having errors " + lentry.toString());
+                consLog.info("Having errors " + lentry.toString());
+                bzmLog.info("Errors: " + errors.toString());
+                consLog.info("Errors: " + errors.toString());
                 ciStatus = errorsFailed(errors) ? CIStatus.failures : CIStatus.errors;
-                jenBuildLog.info("Setting CIStatus=" + ciStatus.name());
+                bzmLog.info("Setting CIStatus=" + ciStatus.name());
+                consLog.info("Setting CIStatus=" + ciStatus.name());
             }
             if (failures.length() > 0) {
-                jenBuildLog.info("Having failures " + lentry.toString());
-                jenBuildLog.info("Failures: " + failures.toString());
+                bzmLog.info("Having failures " + lentry.toString());
+                consLog.info("Having failures " + lentry.toString());
+                bzmLog.info("Failures: " + failures.toString());
+                consLog.info("Failures: " + failures.toString());
                 ciStatus = CIStatus.failures;
-                jenBuildLog.info("Setting CIStatus=" + CIStatus.failures.name());
+                bzmLog.info("Setting CIStatus=" + CIStatus.failures.name());
+                consLog.info("Setting CIStatus=" + CIStatus.failures.name());
                 return ciStatus;
             }
             if (ciStatus.equals(CIStatus.success)) {
-                jenBuildLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
+                bzmLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
+                consLog.info("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
             }
         }
         return ciStatus;
@@ -210,7 +224,7 @@ public class JobUtility {
         return userKey;
     }
 
-    public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog){
+    public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog){
         HashMap<String,String> jtlUrls=new HashMap<String, String>();
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         for (String s : sessionsIds) {
@@ -223,20 +237,22 @@ public class JobUtility {
                     if (title.equals("Zip")) {
                         dataUrl.append(data.getJSONObject(i).getString(JsonConsts.DATA_URL));
                         jtlUrls.put(s,dataUrl.toString());
-                        bzmLog.warn("SessionId="+s+", jtlUrl="+dataUrl.toString());
+                        bzmLog.info("SessionId="+s+", jtlUrl="+dataUrl.toString());
+                        consLog.info("SessionId="+s+", jtlUrl="+dataUrl.toString());
                         dataUrl.setLength(0);
                         break;
                     }
                 }
             } catch (JSONException e) {
-                bzmLog.warn("Failed to get url for JTL report, sessionId="+s,e);
+                bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
+                consLog.info("Failed to get url for JTL report, sessionId="+s,e);
             }
 
         }
         return jtlUrls;
     }
 
-    public static void downloadJtlReport(String sessionId, String jtlUrl, FilePath filePath, StdErrLog bzmLog) {
+    public static void downloadJtlReport(String sessionId, String jtlUrl, FilePath filePath, StdErrLog bzmLog,StdErrLog consLog) {
         URL url = null;
         try {
             url = new URL(jtlUrl);
@@ -245,6 +261,7 @@ public class JobUtility {
             while (!jtl && i < 4) {
                 try {
                     bzmLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
+                    consLog.info("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
                     int conTo = (int) (10000 * Math.pow(3, i - 1));
                     URLConnection connection = url.openConnection();
                     connection.setConnectTimeout(conTo);
@@ -254,9 +271,12 @@ public class JobUtility {
                     jtl = true;
                 } catch (MalformedURLException e) {
                     bzmLog.warn("It seems like test was terminated on server side...");
+                    consLog.warn("It seems like test was terminated on server side...");
                     bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts");
+                    consLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts");
                 } catch (Exception e) {
                     bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts" + e);
+                    consLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts" + e);
                 } finally {
                     i++;
                 }
@@ -269,35 +289,44 @@ public class JobUtility {
             }
         } catch (MalformedURLException e) {
             bzmLog.warn("It seems like test was terminated on server side...");
+            consLog.warn("It seems like test was terminated on server side...");
             bzmLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts " + e);
+            consLog.warn("Unable to get JTLZIP for sessionId=" + sessionId + ":check server for test artifacts " + e);
         } catch (IOException e) {
             bzmLog.warn("Unable to get JTLZIP from " + url, e);
+            consLog.warn("Unable to get JTLZIP from " + url, e);
         } catch (InterruptedException e) {
             bzmLog.warn("Unable to get JTLZIP from " + url, e);
+            consLog.warn("Unable to get JTLZIP from " + url, e);
         }
     }
 
-    public static void downloadJtlReports(HashMap<String,String> jtlUrls, FilePath filePath, StdErrLog bzmBuildLog) {
+    public static void downloadJtlReports(HashMap<String,String> jtlUrls, FilePath filePath,
+                                          StdErrLog bzmBuildLog,StdErrLog consLog) {
         Set<String> sessionsIds=jtlUrls.keySet();
         for (String s : sessionsIds) {
             FilePath jtl = new FilePath(filePath, s + Constants.BM_ARTEFACTS);
-            downloadJtlReport(s, jtlUrls.get(s),jtl, bzmBuildLog);
+            downloadJtlReport(s, jtlUrls.get(s),jtl, bzmBuildLog,consLog);
         }
     }
 
 
     public static void retrieveJUNITXMLreport(Api api, String masterId,
-                                              FilePath junitPath, StdErrLog jenBuildLog) {
+                                              FilePath junitPath, StdErrLog bzmLog,StdErrLog consLog) {
         String junitReport = "";
-        jenBuildLog.info("Requesting JUNIT report from server, masterId=" + masterId);
+        bzmLog.info("Requesting JUNIT report from server, masterId=" + masterId);
+        consLog.info("Requesting JUNIT report from server, masterId=" + masterId);
         try {
             junitReport = api.retrieveJUNITXML(masterId);
             String junitName = masterId + "-" + Constants.BM_TRESHOLDS;
-            jenBuildLog.info("Received Junit report from server.... masterId=" + masterId);
-            jenBuildLog.info("Saving it to " + junitPath + " with name=" + junitName);
-            saveReport(junitName, junitReport, junitPath, jenBuildLog);
+            bzmLog.info("Received Junit report from server.... masterId=" + masterId);
+            consLog.info("Received Junit report from server.... masterId=" + masterId);
+            bzmLog.info("Saving it to " + junitPath + " with name=" + junitName);
+            consLog.info("Saving it to " + junitPath + " with name=" + junitName);
+            saveReport(junitName, junitReport, junitPath, bzmLog, consLog);
         } catch (Exception e) {
-            jenBuildLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
+            bzmLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
+            consLog.warn("Problems with receiving JUNIT report from server, masterId=" + masterId + ": " + e.getMessage());
         }
     }
 
@@ -311,11 +340,12 @@ public class JobUtility {
             String junitPathStr,
             boolean isJtl,
             String jtlPathStr,
-            StdErrLog bzmLog) throws InterruptedException {
+            StdErrLog bzmLog,
+            StdErrLog consLog) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog);
+        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog,consLog);
         if (ciStatus.equals(CIStatus.errors)) {
             result = Result.UNSTABLE;
             return result;
@@ -328,16 +358,19 @@ public class JobUtility {
                 junitPath = Utils.resolvePath(dfp, junitPathStr, envVars);
             } catch (Exception e) {
                 bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
+                consLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                 bzmLog.warn("JTL report will be saved to workspace");
+                consLog.warn("JTL report will be saved to workspace");
                 junitPath = dfp;
             }
-            retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog);
+            retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog,consLog);
         } else {
             bzmLog.info("JUNIT report won't be requested: check-box is unchecked.");
+            consLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
         Thread.sleep(30000);
         FilePath jtlPath = null;
-        HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog);
+        HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
         if (isJtl) {
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
@@ -345,38 +378,50 @@ public class JobUtility {
                 try {
                     jtlPath = Utils.resolvePath(dfp, jtlPathStr, envVars);
                     bzmLog.info("Will use the following path for JTL: " +  jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    consLog.info("Will use the following path for JTL: " +  jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 } catch (Exception e) {
                     bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
+                    consLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                     bzmLog.warn("JTL report will be saved to workspace");
+                    consLog.warn("JTL report will be saved to workspace");
                     jtlPath = dfp;
                 }
                 bzmLog.info("Will use the following path for JTL: " +
                         jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                consLog.info("Will use the following path for JTL: " +
+                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
             }
-            JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog);
+            JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog,consLog);
         } else {
             bzmLog.info("JTL report won't be requested: check-box is unchecked.");
+            consLog.info("JTL report won't be requested: check-box is unchecked.");
         }
 
 
         //get testGetArchive information
-        JSONObject testReport = requestAggregateReport(api, bzmLog, masterId);
+        JSONObject testReport = requestAggregateReport(api,masterId,bzmLog,consLog);
 
 
         if (testReport == null || testReport.equals("null")) {
-            bzmLog.warn("Aggregate report is not available after 4 attempts.");
+            bzmLog.info("Aggregate report is not available after 4 attempts.");
+            consLog.info("Aggregate report is not available after 4 attempts.");
             return result;
         }
         TestResult testResult = null;
         try {
             testResult = new TestResult(testReport);
             bzmLog.info(testResult.toString());
+            consLog.info(testResult.toString());
         } catch (IOException ioe) {
             bzmLog.info("Failed to get test result. Try to check server for it");
+            consLog.info("Failed to get test result. Try to check server for it");
             bzmLog.info("ERROR: Failed to generate TestResult: " + ioe);
+            consLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
             bzmLog.info("Failed to get test result. Try to check server for it");
+            consLog.info("Failed to get test result. Try to check server for it");
             bzmLog.info("ERROR: Failed to generate TestResult: " + je);
+            consLog.info("ERROR: Failed to generate TestResult: " + je);
         } finally {
             return result;
         }
@@ -384,12 +429,13 @@ public class JobUtility {
     }
 
 
-    public static JSONObject requestAggregateReport(Api api, StdErrLog jenBuildLog, String masterId) {
+    public static JSONObject requestAggregateReport(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog) {
         JSONObject testReport = null;
         int retries = 1;
         try {
             while (retries < 5 && testReport == null) {
-                jenBuildLog.info("Trying to get aggregate test report from server, attempt# " + retries);
+                bzmLog.info("Trying to get aggregate test report from server, attempt# " + retries);
+                consLog.info("Trying to get aggregate test report from server, attempt# " + retries);
                 testReport = api.testReport(masterId);
                 if (testReport != null) {
                     return testReport;
@@ -398,7 +444,8 @@ public class JobUtility {
                 retries++;
             }
         } catch (Exception e) {
-            jenBuildLog.info("Failed to get test report from server.");
+            bzmLog.info("Failed to get test report from server.");
+            consLog.info("Failed to get test report from server.");
         }
         return testReport;
     }

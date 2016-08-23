@@ -20,12 +20,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestUtils {
-    public String testId_http="429381.http";
-    public String testId_jmeter="429381.jmeter";
-    public String testId_followme="429381.followme";
-    public String testId_multi="429381.multi";
-    public String testId_webdriver="429381.webdriver";
-    public String testId_taurus="429381.taurus";
+    public String testId_http="a - tut.gyt - positive(429381.http)";
+    public String testId_jmeter="a - tut.gyt - positive(429381.jmeter)";
+    public String testId_followme="a - tut.gyt - positive(429381.followme)";
+    public String testId_multi="a - tut.gyt - positive(429381.multi)";
+    public String testId_webdriver="a - tut.gyt - positive(429381.webdriver)";
+    public String testId_taurus="a - tut.gyt - positive(429381.taurus)";
 
     @Test
     public void getTestType() throws Exception{
@@ -40,7 +40,8 @@ public class TestUtils {
 
     @Test
     public void getTestId(){
-        Assert.assertEquals("12345", Utils.getTestId("12345.2345"));
+        Assert.assertEquals("12345", Utils.getTestId("asdfg(12345.2345)"));
+        Assert.assertEquals("5166480", Utils.getTestId("a - tut.gyt - positive(5166480.http)"));
         Assert.assertEquals("123452345", Utils.getTestId("123452345"));
 
     }
