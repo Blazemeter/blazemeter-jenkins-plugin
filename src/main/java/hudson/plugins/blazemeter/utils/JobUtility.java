@@ -215,7 +215,7 @@ public class JobUtility {
             userKey = credentialList.get(0).getApiKey();
         } else {
             for (BlazemeterCredentialImpl c : credentialList) {
-                if (c.getId().equals(id)) {
+                if (c.getId()!=null&&c.getId().equals(id)) {
                     userKey = c.getApiKey();
                     break;
                 }

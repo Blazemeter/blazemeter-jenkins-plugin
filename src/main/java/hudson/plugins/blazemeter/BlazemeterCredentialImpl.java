@@ -14,10 +14,9 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.BaseCredentials;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
 import hudson.Extension;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -32,38 +31,34 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials {
+public class BlazemeterCredentialImpl extends BaseStandardCredentials{
     private static final long serialVersionUID = 1L;
 
     private String apiKey =null;
-    private String description=null;
 
     @DataBoundConstructor
-    public BlazemeterCredentialImpl(String apiKey,String description) {
-        super(CredentialsScope.GLOBAL);
+    public BlazemeterCredentialImpl(String id, String apiKey,String description) {
+        super(CredentialsScope.GLOBAL,id,description);
         this.apiKey=apiKey;
-        this.description=description;
     }
 
     public String getId() {
-        return StringUtils.left(apiKey,4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
+        if (super.getId() == null) {
+            return StringUtils.left(apiKey, 4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
+        } else {
+            return super.getId();
+        }
     }
 
     public String getApiKey() {
         return apiKey;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
 
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getDisplayName() {
             return Messages.BlazemeterCredential_DisplayName();
