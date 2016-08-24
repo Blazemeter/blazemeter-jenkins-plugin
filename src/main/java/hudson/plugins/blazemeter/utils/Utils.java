@@ -28,6 +28,8 @@ public class Utils {
         TestType testType=null;
         try{
             testType=TestType.valueOf(testId.substring(dotPos+1,testId.lastIndexOf(")")));
+        }catch (StringIndexOutOfBoundsException e){
+            testType=TestType.valueOf(testId.substring(dotPos+1));;
         }catch (Exception e){
             throw e;
         }
