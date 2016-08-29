@@ -20,28 +20,53 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestUtils {
-    public String testId_http="a - tut.gyt - positive(429381.http)";
-    public String testId_jmeter="a - tut.gyt - positive(429381.jmeter)";
-    public String testId_followme="a - tut.gyt - positive(429381.followme)";
-    public String testId_multi="a - tut.gyt - positive(429381.multi)";
-    public String testId_webdriver="a - tut.gyt - positive(429381.webdriver)";
-    public String testId_taurus="a - tut.gyt - positive(429381.taurus)";
+    public String testId_http_new ="a - tut.gyt - positive(429381.http)";
+    public String testId_jmeter_new ="a - tut.gyt - positive(429381.jmeter)";
+    public String testId_followme_new ="a - tut.gyt - positive(429381.followme)";
+    public String testId_multi_new ="a - tut.gyt - positive(429381.multi)";
+    public String testId_webdriver_new ="a - tut.gyt - positive(429381.webdriver)";
+    public String testId_taurus_new ="a - tut.gyt - positive(429381.taurus)";
+    public String testId_http_old ="429381.http";
+    public String testId_jmeter_old ="429381.jmeter";
+    public String testId_followme_old ="429381.followme";
+    public String testId_multi_old ="429381.multi";
+    public String testId_webdriver_old ="429381.webdriver";
+    public String testId_taurus_old ="429381.taurus";
 
     @Test
-    public void getTestType() throws Exception{
-        Assert.assertEquals(TestType.http, Utils.getTestType(testId_http));
-        Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter));
-        Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme));
-        Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi));
-        Assert.assertEquals(TestType.webdriver, Utils.getTestType(testId_webdriver));
-        Assert.assertEquals(TestType.taurus, Utils.getTestType(testId_taurus));
+    public void getTestType_new() throws Exception{
+        Assert.assertEquals(TestType.http, Utils.getTestType(testId_http_new));
+        Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter_new));
+        Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme_new));
+        Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi_new));
+        Assert.assertEquals(TestType.webdriver, Utils.getTestType(testId_webdriver_new));
+        Assert.assertEquals(TestType.taurus, Utils.getTestType(testId_taurus_new));
 
     }
 
     @Test
-    public void getTestId(){
+    public void getTestType_old() throws Exception{
+        Assert.assertEquals(TestType.http, Utils.getTestType(testId_http_old));
+        Assert.assertEquals(TestType.jmeter, Utils.getTestType(testId_jmeter_old));
+        Assert.assertEquals(TestType.followme, Utils.getTestType(testId_followme_old));
+        Assert.assertEquals(TestType.multi, Utils.getTestType(testId_multi_old));
+        Assert.assertEquals(TestType.webdriver, Utils.getTestType(testId_webdriver_old));
+        Assert.assertEquals(TestType.taurus, Utils.getTestType(testId_taurus_old));
+
+    }
+
+    @Test
+    public void getTestId_new(){
         Assert.assertEquals("12345", Utils.getTestId("asdfg(12345.2345)"));
         Assert.assertEquals("5166480", Utils.getTestId("a - tut.gyt - positive(5166480.http)"));
+        Assert.assertEquals("123452345", Utils.getTestId("123452345"));
+
+    }
+
+    @Test
+    public void getTestId_old(){
+        Assert.assertEquals("12345", Utils.getTestId("12345.2345"));
+        Assert.assertEquals("5166480", Utils.getTestId("5166480.http"));
         Assert.assertEquals("123452345", Utils.getTestId("123452345"));
 
     }
