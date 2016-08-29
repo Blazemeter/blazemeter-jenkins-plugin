@@ -67,7 +67,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter String apiVersion) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter("testId")String savedTestId)
+            throws FormValidation {
         if(apiKey.isEmpty()){
             ListBoxModel keys=getKeys();
             apiKey=keys.get(0).value;
@@ -92,7 +93,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     for (Object test : set) {
                         Map.Entry me = (Map.Entry) test;
                         String testId=String.valueOf(me.getKey()+"("+me.getValue()+")");
-                        items.add(new ListBoxModel.Option(testId,testId));
+                        items.add(new ListBoxModel.Option(testId,testId,testId.contains(savedTestId)));
                     }
                 }
             } catch (Exception e) {
