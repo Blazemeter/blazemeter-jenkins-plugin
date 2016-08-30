@@ -50,7 +50,7 @@ public class HttpUtil {
         this.headers.put("Accept", "application/json");
         this.headers.put("Content-type", "application/json; charset=UTF-8");
         this.httpClient = HttpClients.createDefault();
-        this.logger.setDebugEnabled(false);
+        this.logger.setDebugEnabled(true);
         try {
             proxy = proxy == null ? ProxyConfiguration.load() : proxy;
         } catch (IOException ie) {
@@ -81,7 +81,6 @@ public class HttpUtil {
 
     public <V> HttpResponse responseHTTP(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
-        if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0, url.indexOf("?") + 14));
         HttpResponse response = null;
         HttpRequestBase request = null;
@@ -125,17 +124,46 @@ public class HttpUtil {
 
 
             if (response == null || response.getStatusLine() == null) {
-                if (logger.isDebugEnabled())
                     logger.debug("Erroneous response (Probably null) for url: \n", url);
                 response = null;
             }
         } catch (Exception e) {
-            if (logger.isDebugEnabled())
                 logger.debug("Problems with creating and sending request: \n", e);
         }
         return response;
     }
 
+    /*
+    If emptyBody response was received from server - do 3 retries, 10,20,30 sec.
+    See JEN-159
+     */
+    public <V> String retry(String url, V data, Method method) {
+        String output = null;
+        int retries = 1;
+        HttpResponse response = null;
+        logger.debug("Received empty response from server - will do 3 retries - see JEN-159.");
+        while (retries < 4) {
+            try {
+                logger.debug("Trying to repeat request: " + retries + " retry.");
+                logger.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
+                Thread.sleep(10000 * retries);
+                response = responseHTTP(url, data, method);
+                if (response != null) {
+                    output = EntityUtils.toString(response.getEntity());
+                    if (!StringUtils.isBlank(output)) {
+                        return output;
+                    }
+                }
+            } catch (InterruptedException ie) {
+                logger.debug("Request was interrupted at pause during " + retries + " request retry.");
+            } catch (Exception ex) {
+                logger.debug("Received bad response from server while doing " + retries + " retry.");
+            } finally {
+                retries++;
+            }
+        }
+        return output;
+    }
 
     public <T, V> T response(String url, V data, Method method, Class<T> returnType, Class<V> dataType) {
         T returnObj = null;
@@ -147,18 +175,16 @@ public class HttpUtil {
                 if (response != null) {
                     output = EntityUtils.toString(response.getEntity());
                 }
-            if (output.isEmpty()) {
-                output= JobUtility.emptyBodyJson();
+            if (StringUtils.isBlank(output)) {
+                output= retry(url,data,method);
             }
             logger.debug("Received object from server: " + output);
             jo = new JSONObject(output);
         } catch (JSONException e) {
-            if (logger.isDebugEnabled())
                 logger.debug("ERROR decoding Json: ", e);
             returnType = (Class<T>) String.class;
             return returnType.cast(output);
         } catch (Exception e) {
-            if (logger.isDebugEnabled())
                 logger.debug("Problems with executing request: ", e);
 
         }
@@ -166,7 +192,6 @@ public class HttpUtil {
             returnObj = returnType.cast(jo);
 
         } catch (ClassCastException cce) {
-            if (logger.isDebugEnabled())
                 logger.debug("Failed to parse response from server: ", cce);
             throw new RuntimeException(jo.toString());
 

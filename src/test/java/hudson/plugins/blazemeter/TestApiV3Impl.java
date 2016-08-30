@@ -48,20 +48,6 @@ public class TestApiV3Impl {
     }
 
 
-    @Test
-    public void retrieveJUNITXML_null() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.retrieveJUNITXML(null), null);
-    }
-
-
-    @Test
-    public void getTestInfo_null() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.getTestConfig(null), null);
-    }
 
     @Test
     public void getTestStatus_Running() {
@@ -98,13 +84,6 @@ public class TestApiV3Impl {
 
 
     @Test
-    public void getUser_null() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.getUser(), null);
-    }
-
-    @Test
     public void getTestCount_zero() {
         try {
             blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
@@ -119,26 +98,6 @@ public class TestApiV3Impl {
         }
     }
 
-
-    @Test
-    public void testReport_null() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.testReport(null), null);
-    }
-
-    @Test
-    public void stopTest_null() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.stopTest(null), null);
-    }
-
-    @Test
-    public void startTest_null() throws JSONException {
-        blazemeterApiV3 = new ApiV3Impl(null, null,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(null,null), null);
-    }
 
     @Test
     public void startTest_http() throws JSONException {
@@ -166,25 +125,6 @@ public class TestApiV3Impl {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi), "15105877");
-    }
-
-    @Ignore
-    @Test
-    public void startTest_Retries() throws JSONException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_RETRIES,
-                TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Api spyApi = Mockito.spy(blazemeterApiV3);
-        HttpUtil spyWrapper = Mockito.spy(blazemeterApiV3.getHttp());
-        spyApi.setHttpUtil(spyWrapper);
-        try {
-            spyApi.startTest(TestConstants.TEST_MASTER_ID, TestType.http);
-        } catch (JSONException je) {
-            Mockito.verify(spyApi, Mockito.times(1)).active(TestConstants.TEST_MASTER_ID);
-            String url = "http://127.0.0.1:1234/api/latest/tests/testMasterId/start?" +
-                    "api_key=mockedAPIKeyRetries&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.2.-SNAPSHOT&​";
-            Mockito.verify(spyWrapper, Mockito.times(6)).response(url, null, Method.POST, JSONObject.class,null);
-
-        }
     }
 
 
@@ -225,15 +165,6 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void getTestList_null() throws IOException, JSONException, ServletException, MessagingException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        LinkedHashMultimap<String, String> testList = blazemeterApiV3.getTestsMultiMap();
-        Assert.assertTrue(testList == null);
-
-    }
-
-    @Test
     public void getTestsCount_10() throws IOException, JSONException, ServletException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl,
                 MockedAPI.proxyConfig);
@@ -257,15 +188,6 @@ public class TestApiV3Impl {
                 MockedAPI.proxyConfig);
         int count = blazemeterApiV3.getTestCount();
         Assert.assertTrue(count == 0);
-
-    }
-
-    @Test
-    public void getTestsCount_null() throws IOException, JSONException, ServletException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl,
-                MockedAPI.proxyConfig);
-        int count = blazemeterApiV3.getTestCount();
-        Assert.assertTrue(count == -1);
 
     }
 
