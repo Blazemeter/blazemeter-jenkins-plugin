@@ -57,7 +57,7 @@ public class JobUtility {
             TestStatus testStatus = api.getTestStatus(masterId);
 
             if (!testStatus.equals(TestStatus.Running)) {
-                bzmLog.info("BlazeMeter TestStatus for masterId" +
+                bzmLog.info("BlazeMeter TestStatus for masterId " +
                         masterId
                         + " is not 'Running': finishing build.... ");
                 bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());

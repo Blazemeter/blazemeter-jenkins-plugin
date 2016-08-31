@@ -17,6 +17,7 @@ package hudson.plugins.blazemeter;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.*;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.utils.JsonConsts;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
@@ -103,28 +104,32 @@ public class TestApiV3Impl {
     public void startTest_http() throws JSONException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http), "15102806");
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http).get(JsonConsts.ID)
+                , "15102806");
     }
 
     @Test
     public void startTest_jmeter() throws JSONException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter), "15102806");
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter).get(JsonConsts.ID),
+                "15102806");
     }
 
     @Test
     public void startTest_followme() throws JSONException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme), "15102806");
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme).get(JsonConsts.ID),
+                "15102806");
     }
 
     @Test
     public void startTest_multi() throws JSONException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl,MockedAPI.proxyConfig);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi), "15105877");
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi).get(JsonConsts.ID),
+                "15105877");
     }
 
 

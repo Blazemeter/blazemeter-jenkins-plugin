@@ -32,6 +32,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -116,9 +117,10 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public synchronized String startTest(String testId, TestType testType) throws JSONException {
+    public synchronized HashMap<String, String> startTest(String testId, TestType testType) throws JSONException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
+        HashMap<String, String> startResp = new HashMap<String, String>();
         switch (testType) {
             case multi:
                 url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
@@ -126,22 +128,22 @@ public class ApiV3Impl implements Api {
             default:
                 url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
-        JSONObject jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class,null);
+        JSONObject jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class, null);
 
-        if (jo==null) {
+        if (jo == null) {
             if (logger.isDebugEnabled())
                 logger.debug("Received NULL from server while start operation: will do 5 retries");
-            boolean isActive=this.active(testId);
-            if(!isActive){
+            boolean isActive = this.active(testId);
+            if (!isActive) {
                 int retries = 1;
                 while (retries < 6) {
                     try {
                         if (logger.isDebugEnabled())
                             logger.debug("Trying to repeat start request: " + retries + " retry.");
-                        logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
-                        Thread.sleep(10000*retries);
-                        jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class,null);
-                        if (jo!=null) {
+                        logger.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
+                        Thread.sleep(10000 * retries);
+                        jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class, null);
+                        if (jo != null) {
                             break;
                         }
                     } catch (InterruptedException ie) {
@@ -150,8 +152,7 @@ public class ApiV3Impl implements Api {
                     } catch (Exception ex) {
                         if (logger.isDebugEnabled())
                             logger.debug("Received bad response from server while starting test: " + retries + " retry.");
-                    }
-                    finally {
+                    } finally {
                         retries++;
                     }
                 }
@@ -159,14 +160,17 @@ public class ApiV3Impl implements Api {
 
             }
         }
-        JSONObject result=null;
-        try{
+        JSONObject result = null;
+        try {
             result = (JSONObject) jo.get(JsonConsts.RESULT);
-        }catch (Exception e){
-            String error = jo.get(JsonConsts.ERROR).toString();
-            return error;
+            startResp.put(JsonConsts.ID, result.getString(JsonConsts.ID));
+            startResp.put(JsonConsts.TEST_ID, result.getString(JsonConsts.TEST_ID));
+            startResp.put(JsonConsts.NAME, result.getString(JsonConsts.NAME));
+        } catch (Exception e) {
+            startResp.put(JsonConsts.ERROR, jo.get(JsonConsts.ERROR).toString());
+        } finally {
+            return startResp;
         }
-        return result.getString(JsonConsts.ID);
     }
 
     @Override
@@ -292,15 +296,6 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public JSONObject getTestConfig(String testId) {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.getTestConfig(APP_KEY, apiKey, testId);
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
-        return jo;
-    }
-
-    @Override
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
@@ -376,14 +371,6 @@ public class ApiV3Impl implements Api {
     @Override
     public HttpUtil getHttp() {
         return this.bzmhc;
-    }
-
-    @Override
-    public JSONObject getTestsJSON() {
-        String url = this.urlManager.tests(APP_KEY, apiKey);
-        logger.info("Getting testList with URL=" + url.substring(0, url.indexOf("?") + 14));
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
-        return jo;
     }
 
     @Override
