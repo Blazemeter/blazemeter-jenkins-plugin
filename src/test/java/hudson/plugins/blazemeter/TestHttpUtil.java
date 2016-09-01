@@ -51,23 +51,4 @@ public class TestHttpUtil {
         JSONObject response = httpUtil.response(url, null, Method.GET, JSONObject.class,null);
         Assert.assertTrue(response.length() == 25);
     }
-
-    @Test
-    public void response_null() throws IOException, RuntimeException {
-        try {
-            httpUtil.response(null, null, Method.GET, JSONObject.class,null);
-        } catch (RuntimeException re) {
-
-        }
-    }
-
-
-    @Test
-    public void responseString_null() throws IOException, RuntimeException {
-        try {
-            httpUtil.response(null, null, Method.GET, String.class,null);
-        } catch (RuntimeException re) {
-
-        }
-    }
 }

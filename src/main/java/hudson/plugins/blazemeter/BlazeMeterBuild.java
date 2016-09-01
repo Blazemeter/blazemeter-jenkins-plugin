@@ -23,10 +23,7 @@ import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.LogEntries;
-import hudson.plugins.blazemeter.utils.Utils;
+import hudson.plugins.blazemeter.utils.*;
 import hudson.remoting.Callable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +34,7 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Calendar;
+import java.util.HashMap;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
@@ -45,8 +43,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
     private String serverUrl = "";
 
     private String testId = "";
-
-    private String testName = "";
 
     private String notes = "";
 
@@ -167,11 +163,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
         String testId_num = Utils.getTestId(this.testId);
 
-        lentry.append("Test = " + this.testId);
-        bzmLog.info(lentry.toString());
-        consLog.info(lentry.toString());
-        lentry.setLength(0);
-
+        HashMap<String,String> startTestResp=new HashMap<String, String>();
         String masterId = "";
 
         lentry.append("### About to start BlazeMeter test # " + testId_num);
@@ -185,10 +177,14 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         try {
-            masterId = api.startTest(testId_num, testType);
-            if (masterId.isEmpty()) {
+            startTestResp = api.startTest(testId_num, testType);
+            if (startTestResp.size()==0) {
                 return Result.FAILURE;
             }
+            if(startTestResp.containsKey(JsonConsts.ERROR)){
+                throw new NumberFormatException(startTestResp.get(JsonConsts.ERROR));
+            }
+            masterId=startTestResp.get(JsonConsts.ID);
             Integer.parseInt(masterId);
         } catch (JSONException e) {
             lentry.append("Unable to start test: check userKey, testId, server url.");
@@ -210,6 +206,19 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             lentry.setLength(0);
             return Result.FAILURE;
         }
+
+
+        lentry.append("Test ID = " + startTestResp.get(JsonConsts.TEST_ID));
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
+        lentry.setLength(0);
+
+        lentry.append("Test name = " + startTestResp.get(JsonConsts.NAME));
+        bzmLog.info(lentry.toString());
+        consLog.info(lentry.toString());
+        lentry.setLength(0);
+
+
         String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
         lentry.append("BlazeMeter test report will be available at " + reportUrl);
         consLog.info(lentry.toString());

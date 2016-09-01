@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -36,7 +37,7 @@ public interface Api {
 
     int getTestMasterStatusCode(String id);
 
-    String startTest(String testId, TestType testType) throws JSONException;
+    HashMap<String,String> startTest(String testId, TestType testType) throws JSONException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 
@@ -48,13 +49,13 @@ public interface Api {
 
     LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException;
 
-    JSONObject getTestsJSON();
+//    JSONObject getTestsJSON();
 
     JSONObject getUser();
 
     JSONObject getCIStatus(String sessionId) throws JSONException;
 
-    JSONObject getTestConfig(String testId);
+//    JSONObject getTestConfig(String testId);
 
     boolean active(String testId);
 

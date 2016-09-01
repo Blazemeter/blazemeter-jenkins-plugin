@@ -27,6 +27,7 @@ public interface JsonConsts {
     String TESTS="tests";
     String COLLECTIONS="collections";
     String ID="id";
+    String TEST_ID="testId";
     String NOTE="note";
     String MAIL="mail";
     String CODE="code";
