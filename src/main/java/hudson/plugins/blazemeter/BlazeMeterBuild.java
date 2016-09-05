@@ -28,6 +28,7 @@ import hudson.remoting.Callable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.jenkinsci.remoting.RoleChecker;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -294,6 +295,10 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
     }
 
+    @Override
+    public void checkRoles(RoleChecker roleChecker) throws SecurityException {
+        
+    }
 
     public void setEv(EnvVars ev) {
         this.ev = ev;

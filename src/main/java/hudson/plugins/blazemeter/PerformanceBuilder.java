@@ -54,7 +54,6 @@ public class PerformanceBuilder extends Builder {
 
     private boolean getJunit = false;
 
-    private transient String filename;
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
@@ -153,14 +152,6 @@ public class PerformanceBuilder extends Builder {
 
     public void setTestId(String testId) {
         this.testId = testId;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
 
     public boolean isGetJtl() {
