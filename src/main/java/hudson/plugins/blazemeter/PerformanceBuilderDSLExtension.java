@@ -26,7 +26,8 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint{
     public Object blazeMeterTest(Runnable closure){
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure,c);
-        return new PerformanceBuilder(c.jobApiKey,c.serverUrl,c.testId,c.notes,c.sessionProperties,
-                c.jtlPath,c.junitPath,c.getJtl,c.getJunit);
+        return new PerformanceBuilder(c.jobApiKey, BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL()
+                , c.testId, c.notes, c.sessionProperties,
+                c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
     }
 }

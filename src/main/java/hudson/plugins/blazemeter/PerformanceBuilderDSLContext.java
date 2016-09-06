@@ -18,8 +18,6 @@ import javaposse.jobdsl.dsl.Context;
 public class PerformanceBuilderDSLContext implements Context {
     String jobApiKey = "";
 
-    String serverUrl = "";
-
     String testId = "";
 
     String notes = "";
@@ -37,10 +35,6 @@ public class PerformanceBuilderDSLContext implements Context {
 
     public void jobApiKey(String jobApiKey) {
         this.jobApiKey = jobApiKey;
-    }
-
-    public void serverUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
     }
 
     public void testId(String testId) {
