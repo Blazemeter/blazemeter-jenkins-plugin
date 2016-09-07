@@ -474,7 +474,7 @@ public class MockedAPI {
 
 
     public static void getTestConfig()  throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/getTestConfig.json");
+        File jsonFile = new File(TestConstants.RESOURCES + "/testConfig.json");
         String getTestConfig= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
@@ -489,7 +489,24 @@ public class MockedAPI {
                 .respond(
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getTestConfig));
-}
+
+        jsonFile = new File(TestConstants.RESOURCES + "/testConfig_negative.json");
+        getTestConfig= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ERROR_0)
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getTestConfig));
+
+    }
 
     public static void putTestInfo()  throws IOException{
         File returnFile=new File(TestConstants.RESOURCES+"/updateTestDurationResult.json");

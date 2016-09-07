@@ -55,7 +55,7 @@ public interface Api {
 
     JSONObject getCIStatus(String sessionId) throws JSONException;
 
-//    JSONObject getTestConfig(String testId);
+    JSONObject testConfig(String testId);
 
     boolean active(String testId);
 

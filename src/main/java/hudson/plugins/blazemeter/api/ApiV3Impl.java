@@ -474,4 +474,12 @@ public class ApiV3Impl implements Api {
         }
         return true;
     }
+
+    @Override
+    public JSONObject testConfig(String testId) {
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
+        String url = this.urlManager.testConfig(APP_KEY, apiKey, testId);
+        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+        return jo;
+    }
 }
