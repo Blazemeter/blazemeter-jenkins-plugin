@@ -16,13 +16,17 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.JsonConsts;
 import hudson.util.FormValidation;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONObject;
 
 
 @Extension(optional = true)
@@ -46,11 +50,16 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             logger.info("Checking that " + c.jobApiKey + " valid with " + serverUrl);
             jobApiKey = JobUtility.validateUserKey(c.jobApiKey, serverUrl).kind.equals(FormValidation.Kind.OK);
             logger.info("Checking that " + c.testId + " is valid for " + c.jobApiKey + " and " + serverUrl);
-            testId = JobUtility.testIdExists(c.testId, c.jobApiKey, serverUrl);
+            Api api = new ApiV3Impl(c.jobApiKey,serverUrl);
+            JSONObject jo = api.testConfig(c.testId);
+            testId=!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL);
             if (jobApiKeyPresent && jobApiKey && testId) {
+                JSONObject result=jo.getJSONObject(JsonConsts.RESULT);
+                String testId_full=result.getString(JsonConsts.NAME)+"("+c.testId+"."+
+                        result.getJSONObject(JsonConsts.CONFIGURATION).get(JsonConsts.TYPE)+")";
                 pb = new PerformanceBuilder(c.jobApiKey,
                         BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL(),
-                        c.testId, c.notes, c.sessionProperties,
+                        testId_full, c.notes, c.sessionProperties,
                         c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
 
             }
