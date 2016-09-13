@@ -16,7 +16,6 @@ package hudson.plugins.blazemeter.api;
 
 import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -149,9 +148,17 @@ public class HttpUtil {
                 Thread.sleep(10000 * retries);
                 response = responseHTTP(url, data, method);
                 if (response != null) {
-                    output = EntityUtils.toString(response.getEntity());
-                    if (!StringUtils.isBlank(output)) {
-                        return output;
+                    int sc = response.getStatusLine().getStatusCode();
+                    logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
+                            + "/" + response.getStatusLine().getStatusCode() + "/" +
+                            response.getStatusLine().getReasonPhrase());
+                    if (sc < 400) {
+                        output = EntityUtils.toString(response.getEntity());
+                        if (!StringUtils.isBlank(output)) {
+                            return output;
+                        }
+                    } else {
+                        logger.info("Received " + sc + " status code from server: won't read body. Check logs on server.");
                     }
                 }
             } catch (InterruptedException ie) {
@@ -171,10 +178,18 @@ public class HttpUtil {
         String output = null;
         HttpResponse response = null;
         try {
-                response = responseHTTP(url, data, method);
-                if (response != null) {
+            response = responseHTTP(url, data, method);
+            if (response != null) {
+                int sc = response.getStatusLine().getStatusCode();
+                logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
+                        + "/" + response.getStatusLine().getStatusCode() + "/" +
+                        response.getStatusLine().getReasonPhrase());
+                if (sc < 400) {
                     output = EntityUtils.toString(response.getEntity());
+                } else {
+                    logger.info("Received " + sc + " status code from server: won't read body. Check logs on server.");
                 }
+            }
             if (StringUtils.isBlank(output)) {
                 output= retry(url,data,method);
             }
