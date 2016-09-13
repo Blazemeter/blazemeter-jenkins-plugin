@@ -538,7 +538,7 @@ public class JobUtility {
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
         }
-        String encryptedKey = userKey.substring(0, 4) + "..." + userKey.substring(17);
+        String encryptedKey = userKey.substring(0, 4) + "...";
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
             Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
