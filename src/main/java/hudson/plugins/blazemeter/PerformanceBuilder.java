@@ -92,7 +92,7 @@ public class PerformanceBuilder extends Builder {
         try {
             boolean valid = DESCRIPTOR.validateCredentials(this.jobApiKey, CredentialsScope.GLOBAL);
             if (!valid) {
-                listener.error("Can not start build: userKey=" + this.jobApiKey + " is absent in credentials store.");
+                listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0,3) + "... is absent in credentials store.");
                 r=Result.NOT_BUILT;
                 return true;
             }

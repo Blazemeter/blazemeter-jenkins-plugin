@@ -30,4 +30,5 @@ public interface Constants {
     String API_KEY_VALID="API key is valid: user e-mail=";
     String API_KEY_IS_NOT_VALID="API key is not valid";
     String NO_TESTS_FOR_API_KEY="No tests for api key";
+    int ENCRYPT_CHARS_NUM=3;
 }
