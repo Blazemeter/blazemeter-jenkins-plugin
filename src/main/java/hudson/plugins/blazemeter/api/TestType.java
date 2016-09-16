@@ -16,5 +16,5 @@ package hudson.plugins.blazemeter.api;
 
 
 public enum TestType {
-    http, followme, multi, jmeter, webdriver, taurus
+    http, followme, multi, jmeter, webdriver, taurus, external
 }

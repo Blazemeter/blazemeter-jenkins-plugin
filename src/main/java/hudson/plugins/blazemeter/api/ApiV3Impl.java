@@ -247,33 +247,44 @@ public class ApiV3Impl implements Api {
             String url = this.urlManager.tests(APP_KEY, apiKey);
             logger.info("Getting testList with URL=" + url.substring(0, url.indexOf("?") + 14));
             try {
-                JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
+                JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class, null);
                 JSONArray result = null;
+
+                if (jo.has(JsonConsts.ERROR) && (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) &&
+                        (((JSONObject) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401)) {
+                    return testListOrdered;
+                }
                 if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
                     result = (JSONArray) jo.get(JsonConsts.RESULT);
                 }
-                if (result != null && result.length() > 0) {
-                    testListOrdered = LinkedHashMultimap.create(result.length(), result.length());
-                    for (int i = 0; i < result.length(); i++) {
-                        JSONObject en = null;
-                        try {
-                            en = result.getJSONObject(i);
-                        } catch (JSONException e) {
-                            logger.warn("Error with the JSON while populating test list, " + e);
-                        }
-                        String id;
-                        String name;
-                        try {
-                            if (en != null) {
-                                id = en.getString(JsonConsts.ID);
-                                name = en.has(JsonConsts.NAME) ? en.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
-                                String testType = en.has(JsonConsts.TYPE) ? en.getString(JsonConsts.TYPE) : Constants.UNKNOWN_TYPE;
-                                testListOrdered.put(name, id + "." + testType);
+                if (result != null) {
+                    if (result.length() > 0) {
 
+                        testListOrdered = LinkedHashMultimap.create(result.length(), result.length());
+                        for (int i = 0; i < result.length(); i++) {
+                            JSONObject en = null;
+                            try {
+                                en = result.getJSONObject(i);
+                            } catch (JSONException e) {
+                                logger.warn("Error with the JSON while populating test list, " + e);
                             }
-                        } catch (JSONException ie) {
-                            logger.warn("Error with the JSON while populating test list, ", ie);
+                            String id;
+                            String name;
+                            try {
+                                if (en != null) {
+                                    id = en.getString(JsonConsts.ID);
+                                    name = en.has(JsonConsts.NAME) ? en.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
+                                    String testType = en.has(JsonConsts.TYPE) ? en.getString(JsonConsts.TYPE) : Constants.UNKNOWN_TYPE;
+                                    testListOrdered.put(name, id + "." + testType);
+
+                                }
+                            } catch (JSONException ie) {
+                                logger.warn("Error with the JSON while populating test list, ", ie);
+                            }
                         }
+
+                    } else {
+                        testListOrdered = LinkedHashMultimap.create(0, 0);
                     }
                 }
             } catch (NullPointerException npe) {

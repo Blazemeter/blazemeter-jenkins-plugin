@@ -16,7 +16,6 @@ package hudson.plugins.blazemeter.api;
 
 import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import org.apache.http.HttpHost;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -140,20 +139,30 @@ public class HttpUtil {
     public <V> String retry(String url, V data, Method method) {
         String output = null;
         int retries = 1;
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
         logger.debug("Received empty response from server - will do 3 retries - see JEN-159.");
         while (retries < 4) {
             try {
                 logger.debug("Trying to repeat request: " + retries + " retry.");
                 logger.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
                 Thread.sleep(10000 * retries);
-                response = responseHTTP(url, data, method);
+                response = (CloseableHttpResponse) responseHTTP(url, data, method);
                 if (response != null) {
-                    output = EntityUtils.toString(response.getEntity());
-                    if (!StringUtils.isBlank(output)) {
-                        return output;
+                    int sc = response.getStatusLine().getStatusCode();
+                    logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
+                            + "/" + response.getStatusLine().getStatusCode() + "/" +
+                            response.getStatusLine().getReasonPhrase());
+                    if (sc <= 404) {
+                        output = EntityUtils.toString(response.getEntity());
+                        if (!StringUtils.isBlank(output)) {
+                            response.close();
+                            return output;
+                        }
+                    } else {
+                        logger.info("Received " + sc + " status code from server: won't read body. Check logs on server.");
                     }
                 }
+                response.close();
             } catch (InterruptedException ie) {
                 logger.debug("Request was interrupted at pause during " + retries + " request retry.");
             } catch (Exception ex) {
@@ -169,15 +178,24 @@ public class HttpUtil {
         T returnObj = null;
         JSONObject jo = null;
         String output = null;
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
         try {
-                response = responseHTTP(url, data, method);
-                if (response != null) {
+            response = (CloseableHttpResponse) responseHTTP(url, data, method);
+            if (response != null) {
+                int sc = response.getStatusLine().getStatusCode();
+                logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
+                        + "/" + response.getStatusLine().getStatusCode() + "/" +
+                        response.getStatusLine().getReasonPhrase());
+                if (sc <=404) {
                     output = EntityUtils.toString(response.getEntity());
+                } else {
+                    logger.info("Received " + sc + " status code from server: won't read body. Check logs on server.");
                 }
+            }
             if (StringUtils.isBlank(output)) {
                 output= retry(url,data,method);
             }
+            response.close();
             logger.debug("Received object from server: " + output);
             jo = new JSONObject(output);
         } catch (JSONException e) {

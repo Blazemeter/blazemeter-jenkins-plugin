@@ -95,7 +95,7 @@ public class TestJobUtility {
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
-                "API key is not valid: API key=mock...tion blazemeterUrl="+TestConstants.mockedApiUrl+". Please, check proxy settings, serverUrl and userKey.");
+                "API key is not valid: API key=moc... blazemeterUrl="+TestConstants.mockedApiUrl+". Please, check proxy settings, serverUrl and userKey.");
     }
 
     @Test

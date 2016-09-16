@@ -40,6 +40,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
 
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
+
 
 public class JobUtility {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
@@ -538,7 +540,7 @@ public class JobUtility {
             logger.warn(Constants.API_KEY_EMPTY);
             return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
         }
-        String encryptedKey = userKey.substring(0, 4) + "..." + userKey.substring(17);
+        String encryptedKey = userKey.substring(0, ENCRYPT_CHARS_NUM) + "...";
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
             Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
