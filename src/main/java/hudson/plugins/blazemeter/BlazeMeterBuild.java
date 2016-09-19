@@ -95,7 +95,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
         Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
         api.setLogger(bzmLog);
-        api.getHttp().setLogger(httpLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, 4)+"...";

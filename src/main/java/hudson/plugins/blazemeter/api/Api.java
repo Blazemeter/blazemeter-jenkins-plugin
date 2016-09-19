@@ -17,6 +17,7 @@ package hudson.plugins.blazemeter.api;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import okhttp3.MediaType;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,49 +32,47 @@ import java.util.List;
 
 public interface Api {
 
+    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    String ACCEPT="Accept";
+    String CONTENT_TYPE="Content-type";
+    String APP_JSON="application/json";
+    String APP_JSON_UTF_8="application/json; charset=UTF-8";
+
     String APP_KEY = "jnk100x987c06f4e10c4";
 
     TestStatus getTestStatus(String id);
 
     int getTestMasterStatusCode(String id);
 
-    HashMap<String,String> startTest(String testId, TestType testType) throws JSONException;
+    HashMap<String,String> startTest(String testId, TestType testType) throws JSONException,IOException;
 
     int getTestCount() throws JSONException, IOException, ServletException;
 
-    JSONObject stopTest(String testId);
+    JSONObject stopTest(String testId) throws IOException, JSONException;
 
-    void terminateTest(String testId);
+    void terminateTest(String testId) throws IOException;
 
     JSONObject testReport(String reportId);
 
     LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException;
 
-//    JSONObject getTestsJSON();
+    JSONObject getUser() throws IOException,JSONException;
 
-    JSONObject getUser();
-
-    JSONObject getCIStatus(String sessionId) throws JSONException;
-
-//    JSONObject getTestConfig(String testId);
+    JSONObject getCIStatus(String sessionId) throws JSONException, IOException;
 
     boolean active(String testId);
 
-    String retrieveJUNITXML(String sessionId);
+    String retrieveJUNITXML(String sessionId) throws IOException;
 
-    JSONObject retrieveJtlZip(String sessionId);
+    JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException;
 
-    List<String> getListOfSessionIds(String masterId);
-
-    void setHttpUtil(HttpUtil bzmhc);
-
-    HttpUtil getHttp();
+    List<String> getListOfSessionIds(String masterId) throws IOException,JSONException;
 
     StdErrLog getLogger();
 
     void setLogger(StdErrLog logger);
 
-    JSONObject generatePublicToken(String sessionId);
+    JSONObject generatePublicToken(String sessionId)throws IOException,JSONException;
 
     String getApiKey();
 

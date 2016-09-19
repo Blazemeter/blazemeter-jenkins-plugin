@@ -226,11 +226,17 @@ public class JobUtility {
 
     public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog){
         HashMap<String,String> jtlUrls=new HashMap<String, String>();
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        List<String> sessionsIds=null;
+        try{
+            sessionsIds = api.getListOfSessionIds(masterId);
+        }catch (Exception e){
+            bzmLog.info("Failed to get list of sessions for masterId="+masterId,e);
+            consLog.info("Failed to get list of sessions for masterId="+masterId,e);
+        }
         for (String s : sessionsIds) {
             StringBuilder dataUrl=new StringBuilder();
-            JSONObject jo = api.retrieveJtlZip(s);
             try {
+                JSONObject jo = api.retrieveJtlZip(s);
                 JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
                 for (int i = 0; i < data.length(); i++) {
                     String title = data.getJSONObject(i).getString("title");
@@ -244,6 +250,9 @@ public class JobUtility {
                     }
                 }
             } catch (JSONException e) {
+                bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
+                consLog.info("Failed to get url for JTL report, sessionId="+s,e);
+            } catch (IOException e) {
                 bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
                 consLog.info("Failed to get url for JTL report, sessionId="+s,e);
             }
@@ -592,7 +601,13 @@ public class JobUtility {
 
 
     public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        List<String> sessionsIds = null;
+        try{
+            sessionsIds=api.getListOfSessionIds(masterId);
+        }catch (Exception e){
+            jenBuildLog.info("Failed to get list of sessions for masterId = "+masterId,e);
+
+        }
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {
             jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
