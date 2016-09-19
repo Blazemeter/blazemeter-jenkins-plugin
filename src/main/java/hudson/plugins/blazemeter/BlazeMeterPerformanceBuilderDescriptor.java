@@ -67,7 +67,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter String apiVersion) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
         if(apiKey.isEmpty()){
             ListBoxModel keys=getKeys();
             apiKey=keys.get(0).value;
