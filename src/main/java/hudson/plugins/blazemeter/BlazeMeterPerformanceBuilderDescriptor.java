@@ -28,6 +28,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
@@ -68,18 +69,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by config.jelly to display the test list.
     public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey) throws FormValidation {
-        if(apiKey.isEmpty()){
-            ListBoxModel keys=getKeys();
-            apiKey=keys.get(0).value;
-
-        }
         ListBoxModel items = new ListBoxModel();
-        if (apiKey == null) {
+        if (StringUtils.isBlank(apiKey)) {
             items.add(Constants.NO_API_KEY, "-1");
         } else {
-            if(apiKey.contains(Constants.CREDENTIALS_KEY)){
-                apiKey= JobUtility.selectUserKeyOnId(this,apiKey);
-            }
             Api api = new ApiV3Impl(apiKey,this.blazeMeterURL);
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
@@ -165,12 +158,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
+            String k = c.getApiKey();
+            if (!apiKeys.contains(k)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
-                        c.getId(),
+                        c.getApiKey(),
                         false));
-                apiKeys.add(id);
+                apiKeys.add(k);
             }
         }
         return items;
