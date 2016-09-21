@@ -24,6 +24,7 @@ import hudson.plugins.blazemeter.utils.JsonConsts;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -56,7 +57,9 @@ public class ApiV3Impl implements Api {
         this.apiKey = apiKey;
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
-            okhttp=new OkHttpClient();
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            okhttp=new OkHttpClient.Builder().addInterceptor(logging).build();
 
         } catch (Exception ex) {
             logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
