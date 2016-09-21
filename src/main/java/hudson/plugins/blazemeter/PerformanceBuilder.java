@@ -67,7 +67,7 @@ public class PerformanceBuilder extends Builder {
                               boolean getJtl,
                               boolean getJunit
     ) {
-        this.jobApiKey = JobUtility.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
+        this.jobApiKey = jobApiKey;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;

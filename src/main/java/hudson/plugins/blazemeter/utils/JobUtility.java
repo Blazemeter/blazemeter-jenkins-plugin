@@ -207,23 +207,6 @@ public class JobUtility {
         return false;
     }
 
-    public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
-                                           String id) {
-        String userKey = null;
-        List<BlazemeterCredentialImpl> credentialList = descriptor.getCredentials("Global");
-        if (credentialList.size() == 1) {
-            userKey = credentialList.get(0).getApiKey();
-        } else {
-            for (BlazemeterCredentialImpl c : credentialList) {
-                if (c.getId()!=null&&c.getId().equals(id)) {
-                    userKey = c.getApiKey();
-                    break;
-                }
-            }
-        }
-        return userKey;
-    }
-
     public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog){
         HashMap<String,String> jtlUrls=new HashMap<String, String>();
         List<String> sessionsIds=null;
