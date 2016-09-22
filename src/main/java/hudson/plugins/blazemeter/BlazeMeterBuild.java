@@ -21,10 +21,12 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.*;
 import hudson.remoting.Callable;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -35,6 +37,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
@@ -83,18 +87,16 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         bzmLog.setStdErrStream(bzmLog_str);
         bzmLog.setDebugEnabled(true);
 
-        PrintStream httpLog_str = new PrintStream(httpLog_f);
-        StdErrLog httpLog = new StdErrLog(Constants.BZM_JEN);
-        httpLog.setStdErrStream(httpLog_str);
-        httpLog.setDebugEnabled(true);
-
         PrintStream console_logger=this.listener.getLogger();
         StdErrLog consLog=new StdErrLog(Constants.BZM_JEN);
         consLog.setStdErrStream(console_logger);
         consLog.setDebugEnabled(true);
 
-        Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
-        api.setLogger(bzmLog);
+        HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(httpLogger);
+
+        Api api = new ApiV3Impl(this.jobApiKey,this.serverUrl,logging);
+        api.setBzmLog(bzmLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, 4)+"...";
