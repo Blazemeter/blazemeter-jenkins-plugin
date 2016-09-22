@@ -342,6 +342,7 @@ public class ApiV3Impl implements Api {
     @Override
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException, IOException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
+        bzmLog.info("Trying to get JTLZIP url for the sessionId = " + sessionId);
         String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
         Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
@@ -374,7 +375,7 @@ public class ApiV3Impl implements Api {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         bzmLog.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
         String url = this.urlManager.retrieveJTLZIP(APP_KEY, apiKey, sessionId);
-        bzmLog.info("Trying to retrieve JTLZIP json for the sessionId=" + sessionId);
+        bzmLog.info("Trying to retrieve JTLZIP json for the sessionId = " + sessionId);
         Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jtlzip = new JSONObject(okhttp.newCall(r).execute().body().string());
@@ -481,7 +482,7 @@ public class ApiV3Impl implements Api {
                 return false;
             }
         } catch (Exception e) {
-            throw new Exception("Failed to submit report notest to masterId=" + masterId, e);
+            throw new Exception("Failed to submit report notest to masterId = " + masterId, e);
         }
         return true;
     }
@@ -498,7 +499,7 @@ public class ApiV3Impl implements Api {
                 return false;
             }
         } catch (Exception e) {
-            throw new Exception("Failed to submit report properties to sessionId=" + sessionId, e);
+            throw new Exception("Failed to submit report properties to sessionId = " + sessionId, e);
         }
         return true;
     }
