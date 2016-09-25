@@ -129,37 +129,6 @@ public class ApiV3Impl implements Api {
                 url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
         JSONObject jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class, null);
-
-        if (jo == null) {
-            if (logger.isDebugEnabled())
-                logger.debug("Received NULL from server while start operation: will do 5 retries");
-            boolean isActive = this.active(testId);
-            if (!isActive) {
-                int retries = 1;
-                while (retries < 6) {
-                    try {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Trying to repeat start request: " + retries + " retry.");
-                        logger.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
-                        Thread.sleep(10000 * retries);
-                        jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class, null);
-                        if (jo != null) {
-                            break;
-                        }
-                    } catch (InterruptedException ie) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Start operation was interrupted at pause during " + retries + " request retry.");
-                    } catch (Exception ex) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Received bad response from server while starting test: " + retries + " retry.");
-                    } finally {
-                        retries++;
-                    }
-                }
-
-
-            }
-        }
         JSONObject result = null;
         try {
             result = (JSONObject) jo.get(JsonConsts.RESULT);
