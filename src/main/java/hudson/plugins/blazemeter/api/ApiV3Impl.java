@@ -21,9 +21,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConsts;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +33,8 @@ import org.json.JSONObject;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,8 @@ import java.util.List;
 public class ApiV3Impl implements Api {
 
     private StdErrLog bzmLog = new StdErrLog(Constants.BZM_JEN);
-
+    private Proxy proxy = null;
+    private Authenticator auth = null;
     private final String apiKey;
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
@@ -61,12 +62,33 @@ public class ApiV3Impl implements Api {
     }
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog,ProxyConfiguration proxy) {
+                     HttpLoggingInterceptor httpLog, ProxyConfiguration proxyConf) {
         this.apiKey = apiKey;
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
-            okhttp=new OkHttpClient.Builder().addInterceptor(httpLog).build();
+            this.proxy = Proxy.NO_PROXY;
+            this.auth = Authenticator.NONE;
+            okhttp = new OkHttpClient.Builder().addInterceptor(httpLog).proxy(this.proxy).
+                    proxyAuthenticator(this.auth).build();
+            if (proxyConf != null) {
+                if (!StringUtils.isBlank(proxyConf.name)) {
+                    this.proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyConf.name, proxyConf.port));
+                }
+                if (!StringUtils.isBlank(proxyConf.getUserName()) && !StringUtils.isBlank(proxyConf.getPassword())) {
+                    final String proxyUser = proxyConf.getUserName();
+                    final String proxyPass = proxyConf.getPassword();
+                    this.auth = new Authenticator() {
+                        @Override
+                        public Request authenticate(Route route, Response response) throws IOException {
+                            String credential = Credentials.basic(proxyUser, proxyPass);
+                            return response.request().newBuilder()
+                                    .header("Proxy-Authorization", credential)
+                                    .build();
+                        }
+                    };
+                }
+            }
         } catch (Exception ex) {
             bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
