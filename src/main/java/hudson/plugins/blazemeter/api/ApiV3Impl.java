@@ -38,6 +38,7 @@ import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class ApiV3Impl implements Api {
@@ -49,28 +50,25 @@ public class ApiV3Impl implements Api {
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog){
-        this(apiKey, blazeMeterUrl,httpLog,null);
-    }
-
     public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor(),null);
-    }
-    public ApiV3Impl(String apiKey, String blazeMeterUrl,ProxyConfiguration proxy){
-        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor(),proxy);
+        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor());
     }
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog, ProxyConfiguration proxyConf) {
+                     HttpLoggingInterceptor httpLog) {
         this.apiKey = apiKey;
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.proxy = Proxy.NO_PROXY;
             this.auth = Authenticator.NONE;
-            okhttp = new OkHttpClient.Builder().addInterceptor(httpLog).proxy(this.proxy).
-                    proxyAuthenticator(this.auth).build();
+            ProxyConfiguration proxyConf=null;
+            try{
+                proxyConf=ProxyConfiguration.load();
+
+            }catch (NullPointerException e){
+                bzmLog.info("Failed to load proxy configuration");
+            }
             if (proxyConf != null) {
                 if (!StringUtils.isBlank(proxyConf.name)) {
                     this.proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyConf.name, proxyConf.port));
@@ -89,6 +87,11 @@ public class ApiV3Impl implements Api {
                     };
                 }
             }
+            okhttp = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(httpLog).proxy(this.proxy)
+                    .proxyAuthenticator(this.auth).build();
         } catch (Exception ex) {
             bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
