@@ -152,7 +152,7 @@ public class HttpUtil {
                     logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
                             + "/" + response.getStatusLine().getStatusCode() + "/" +
                             response.getStatusLine().getReasonPhrase());
-                    if (sc <= 404) {
+                    if (sc <= 406) {
                         output = EntityUtils.toString(response.getEntity());
                         if (!StringUtils.isBlank(output)) {
                             response.close();
@@ -186,7 +186,7 @@ public class HttpUtil {
                 logger.info("Received status: " + response.getStatusLine().getProtocolVersion()
                         + "/" + response.getStatusLine().getStatusCode() + "/" +
                         response.getStatusLine().getReasonPhrase());
-                if (sc <=404) {
+                if (sc <=406) {
                     output = EntityUtils.toString(response.getEntity());
                 } else {
                     logger.info("Received " + sc + " status code from server: won't read body. Check logs on server.");
