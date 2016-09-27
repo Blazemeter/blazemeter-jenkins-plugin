@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ApiV3Impl implements Api {
 
-    private StdErrLog bzmLog = new StdErrLog(Constants.BZM_JEN);
+    private StdErrLog bzmLog = null;
     private Proxy proxy = null;
     private Authenticator auth = null;
     private final String apiKey;
@@ -51,12 +51,13 @@ public class ApiV3Impl implements Api {
     private OkHttpClient okhttp = null;
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor());
+        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor(),null);
     }
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog) {
+                     HttpLoggingInterceptor httpLog,StdErrLog bzmLog) {
         this.apiKey = apiKey;
+        this.bzmLog = (bzmLog!=null?bzmLog:new StdErrLog(Constants.BZM_JEN));
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -67,7 +68,7 @@ public class ApiV3Impl implements Api {
                 proxyConf=ProxyConfiguration.load();
 
             }catch (NullPointerException e){
-                bzmLog.info("Failed to load proxy configuration");
+                this.bzmLog.info("Failed to load proxy configuration");
             }
             if (proxyConf != null) {
                 if (!StringUtils.isBlank(proxyConf.name)) {
@@ -91,9 +92,10 @@ public class ApiV3Impl implements Api {
             .connectTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(httpLog).proxy(this.proxy)
+                    .addInterceptor(new RetryInterceptor(bzmLog))
                     .proxyAuthenticator(this.auth).build();
         } catch (Exception ex) {
-            bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
+            this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
     }
 
@@ -526,14 +528,6 @@ public class ApiV3Impl implements Api {
             throw new Exception("Failed to submit report properties to sessionId = " + sessionId, e);
         }
         return true;
-    }
-
-    public StdErrLog getBzmLog() {
-        return bzmLog;
-    }
-
-    public void setBzmLog(StdErrLog bzmLog) {
-        this.bzmLog = bzmLog;
     }
 
     @Override

@@ -68,10 +68,6 @@ public interface Api {
 
     List<String> getListOfSessionIds(String masterId) throws IOException,JSONException;
 
-    StdErrLog getBzmLog();
-
-    void setBzmLog(StdErrLog bzmLog);
-
     JSONObject generatePublicToken(String sessionId)throws IOException,JSONException;
 
     String getApiKey();
