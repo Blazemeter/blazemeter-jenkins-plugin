@@ -26,6 +26,7 @@ public interface UrlManager {
     String TESTS="/tests";
     String MASTERS="/masters";
     String WEB="/web";
+    String CI_STATUS="/ci-status";
     String getServerUrl();
 
     void setServerUrl(String serverUrl);

@@ -15,7 +15,9 @@
 package hudson.plugins.blazemeter;
 
 import hudson.ProxyConfiguration;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import org.apache.commons.io.FileUtils;
+import org.jvnet.hudson.test.Url;
 import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Parameter;
@@ -47,7 +49,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/web/version")
+                        .withPath(UrlManager.LATEST+"/web/version")
                         .withHeader("Accept", "application/json"),
                 unlimited()
         )
@@ -67,7 +69,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/user")
+                        .withPath(UrlManager.LATEST+"/user")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -85,7 +87,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/user")
+                        .withPath(UrlManager.LATEST+"/user")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_INVALID)
@@ -103,7 +105,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/user")
+                        .withPath(UrlManager.LATEST+"/user")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_EXCEPTION)
@@ -117,7 +119,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/user")
+                        .withPath(UrlManager.LATEST+"/user")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
@@ -139,7 +141,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_25 +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_25 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -155,7 +157,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_70 +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_70 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -171,7 +173,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_0 +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_0 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_EXCEPTION)
@@ -187,7 +189,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_100 +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_100 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -204,7 +206,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_140 +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_140 +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -220,7 +222,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_NOT_FOUND +"/status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_NOT_FOUND +"/status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -241,7 +243,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_25 +"/terminate")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_25 +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -254,7 +256,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_70 +"/terminate")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_70 +"/terminate")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -271,7 +273,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_100 +"/stop")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_100 +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -284,7 +286,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_140 +"/stop")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_140 +"/stop")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -304,7 +306,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withPath(UrlManager.LATEST+"/tests/"+TestConstants.TEST_MASTER_ID +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -320,7 +322,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/collections/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withPath(UrlManager.LATEST+"/collections/"+TestConstants.TEST_MASTER_ID +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -333,7 +335,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withPath(UrlManager.LATEST+"/tests/"+TestConstants.TEST_MASTER_ID +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_RETRIES)
@@ -439,7 +441,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/"+TestConstants.TEST_MASTER_ID +"/reports/main/summary")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_ID +"/reports/main/summary")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -460,7 +462,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/user")
+                        .withPath(UrlManager.LATEST+"/user")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_V2)
@@ -479,7 +481,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID)
+                        .withPath(UrlManager.LATEST+"/tests/"+TestConstants.TEST_MASTER_ID)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -497,7 +499,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("PUT")
-                        .withPath("/api/latest/tests/" + TestConstants.TEST_MASTER_ID)
+                        .withPath(UrlManager.LATEST+"/tests/" + TestConstants.TEST_MASTER_ID)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -516,7 +518,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_FAILURE +"/ci-status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/" + TestConstants.TEST_MASTER_FAILURE + UrlManager.CI_STATUS)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -532,7 +534,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_SUCCESS +"/ci-status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/" + TestConstants.TEST_MASTER_SUCCESS +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -549,7 +551,8 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_61700 +"/ci-status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/" + TestConstants.TEST_MASTER_ERROR_61700
+                                +UrlManager.CI_STATUS)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -565,7 +568,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_0 +"/ci-status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/" + TestConstants.TEST_MASTER_ERROR_0 +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -581,7 +584,8 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_70404 +"/ci-status")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/" + TestConstants.TEST_MASTER_ERROR_70404 +
+                                UrlManager.CI_STATUS)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -596,7 +600,7 @@ public class MockedAPI {
 
 
     public static void getReportUrl() throws IOException{
-        String expectedPath="/api/latest/masters/"+TestConstants.TEST_MASTER_ID +"/publicToken";
+        String expectedPath=UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_ID +"/publicToken";
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
         String getReportUrl= FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -634,7 +638,7 @@ public class MockedAPI {
 
 
     public static void active() throws IOException{
-        String expectedPath="/api/latest/web/active";
+        String expectedPath= UrlManager.LATEST+"/web/active";
         File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
         String active= FileUtils.readFileToString(jsonFile);
         mockServer.when(

@@ -15,32 +15,21 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import okhttp3.logging.HttpLoggingInterceptor;
+import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
-public class HttpLogger implements HttpLoggingInterceptor.Logger {
-
-    private Logger httpLog=Logger.getLogger(Constants.HTTP_LOG);
-
-    public  HttpLogger(String httpLog_f){
-        FileHandler http_lfh= null;
-        try {
-            http_lfh = new FileHandler(httpLog_f);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        http_lfh.setFormatter(new CutUserKeyFormatter());
-        httpLog.addHandler(http_lfh);
-        httpLog.setUseParentHandlers(false);
-
-    }
+public class CutUserKeyFormatter extends SimpleFormatter {
 
     @Override
-    public void log(String message) {
-         httpLog.info(message);
+    public synchronized String format(LogRecord record) {
+        String logEntry=super.format(record);
+        int apiKey=logEntry.lastIndexOf("api_key");
+        if(apiKey>0){
+            String keyToReplace=logEntry.substring(apiKey+13,apiKey+28);
+            return StringUtils.replace(logEntry,keyToReplace, Constants.THREE_DOTS);
+        }
+        return logEntry;
     }
 }

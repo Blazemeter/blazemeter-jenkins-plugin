@@ -44,7 +44,7 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials{
 
     public String getId() {
         if (super.getId() == null) {
-            return StringUtils.left(apiKey, 4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
+            return StringUtils.left(apiKey, 4) + Constants.THREE_DOTS + StringUtils.right(apiKey, 4);
         } else {
             return super.getId();
         }

@@ -22,7 +22,7 @@ public interface Constants {
     String BM_KPIS="bm-kpis.jtl";
     String BM_ARTEFACTS="-bm-artefacts";
     String VERSION="version";
-    String CREDENTIALS_KEY="...";
+    String THREE_DOTS ="...";
     String NO_API_KEY="No API Key";
     String UNKNOWN_TYPE="unknown_type";
     String API_KEY_EMPTY ="API key is empty: please, enter valid API key";
