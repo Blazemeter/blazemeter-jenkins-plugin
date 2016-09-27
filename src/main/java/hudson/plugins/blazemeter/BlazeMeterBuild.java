@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
+
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
     private String jobApiKey = "";
@@ -99,7 +101,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         api.setBzmLog(bzmLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
-        String apiKeyTrimmed = this.jobApiKey.substring(0, 4)+"...";
+        String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
         if (userEmail.isEmpty()) {
             ProxyConfiguration proxy = ProxyConfiguration.load();
             lentry.append("Please, check that settings are valid.");
@@ -129,7 +131,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
             String proxyPass = proxy.getPassword();
 
-            lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, 3)) + "...");
+            lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, ENCRYPT_CHARS_NUM)) + "...");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);

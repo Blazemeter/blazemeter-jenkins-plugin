@@ -77,9 +77,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             try {
                 LinkedHashMultimap<String, String> testList = api.getTestsMultiMap();
                 if (testList == null){
-                    items.add("Invalid API key ", "-1");
+                    items.add(Constants.API_KEY_IS_NOT_VALID, "-1");
                 } else if (testList.isEmpty()){
-                    items.add("No tests", "-1");
+                    items.add(Constants.NO_TESTS_FOR_API_KEY, "-1");
                 } else {
                     Set set = testList.entries();
                     for (Object test : set) {
