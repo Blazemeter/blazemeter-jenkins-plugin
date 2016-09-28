@@ -36,6 +36,7 @@ public class TestApiV3Impl {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.getMasterStatus();
+        MockedAPI.getTestConfig();
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
@@ -222,6 +223,19 @@ public class TestApiV3Impl {
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status == 0);
     }
+
+    @Test
+    public void getTestConfig() {
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        JSONObject jo = blazemeterApiV3.testConfig(TestConstants.TEST_MASTER_ID);
+        try {
+            Assert.assertTrue(jo.get(JsonConsts.ERROR).equals(JSONObject.NULL));
+            Assert.assertFalse(jo.get(JsonConsts.RESULT).equals(JSONObject.NULL));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Test
     public void active() {

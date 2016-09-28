@@ -153,7 +153,7 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String getTestConfig(String appKey, String userKey, String testId){
+    public String testConfig(String appKey, String userKey, String testId){
         String getTestInfo=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");

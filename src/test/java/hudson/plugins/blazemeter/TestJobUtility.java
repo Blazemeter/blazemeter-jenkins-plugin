@@ -218,4 +218,22 @@ public class TestJobUtility {
         Assert.assertFalse(JobUtility.errorsFailed(error_json));
     }
 
+    @Test
+    public void testIdExists(){
+        try {
+            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_MASTER_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testIdExists_negative(){
+        try {
+            Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

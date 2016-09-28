@@ -139,7 +139,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return result;
     }
 
-    public boolean validateCredentials(String userKey, Object scope) {
+    public boolean credPresent(String userKey, Object scope) {
         List<BlazemeterCredentialImpl> cred = getCredentials(scope);
         boolean valid = false;
         for (BlazemeterCredentialImpl c : cred) {

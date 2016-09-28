@@ -105,7 +105,7 @@ public class TestUrlManagerV3 {
     public void getTestInfo(){
         String expGetTestInfo=bmUrlManager.getServerUrl()+UrlManager.LATEST+"/tests/"+testId+"?api_key="+userKey+"&app_key="+appKey
                 + UrlManager.CLIENT_IDENTIFICATION;
-        String actGetTestInfo=bmUrlManager.getTestConfig(appKey, userKey, testId);
+        String actGetTestInfo=bmUrlManager.testConfig(appKey, userKey, testId);
         Assert.assertEquals(expGetTestInfo,actGetTestInfo);
     }
 
