@@ -227,11 +227,13 @@ public class TestApiV3Impl {
     @Test
     public void getTestConfig() {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        JSONObject jo = blazemeterApiV3.testConfig(TestConstants.TEST_MASTER_ID);
         try {
+            JSONObject jo = blazemeterApiV3.testConfig(TestConstants.TEST_MASTER_ID);
             Assert.assertTrue(jo.get(JsonConsts.ERROR).equals(JSONObject.NULL));
             Assert.assertFalse(jo.get(JsonConsts.RESULT).equals(JSONObject.NULL));
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

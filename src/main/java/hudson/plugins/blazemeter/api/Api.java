@@ -70,15 +70,13 @@ public interface Api {
 
     JSONObject generatePublicToken(String sessionId)throws IOException,JSONException;
 
-    String getApiKey();
-
     String getBlazeMeterURL();
-
-    UrlManager getUrlManager();
 
     boolean ping() throws Exception;
 
     boolean notes(String note,String masterId)throws Exception;
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;
+
+    public JSONObject testConfig(String testId) throws IOException, JSONException;
 }

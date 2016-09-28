@@ -531,12 +531,11 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public String getApiKey() {
-        return apiKey;
+    public JSONObject testConfig(String testId) throws IOException, JSONException {
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
+        String url = this.urlManager.testConfig(APP_KEY, apiKey, testId);
+        Request r = new Request.Builder().url(url).get().build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        return jo;
     }
-
-    public UrlManager getUrlManager() {
-        return urlManager;
-    }
-
 }

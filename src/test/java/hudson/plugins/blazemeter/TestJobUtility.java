@@ -224,6 +224,8 @@ public class TestJobUtility {
             Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_MASTER_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
         } catch (JSONException e) {
             e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -232,6 +234,8 @@ public class TestJobUtility {
         try {
             Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
         } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
             e.printStackTrace();
         }
     }
