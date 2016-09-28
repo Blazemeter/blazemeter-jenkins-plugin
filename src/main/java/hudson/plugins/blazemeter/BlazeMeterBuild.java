@@ -38,8 +38,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 
 import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 
@@ -165,6 +163,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
 
         String testId_num = Utils.getTestId(this.testId);
+
+//        boolean collection=JobUtility.collection(testId_num,this.jobApiKey,this.serverUrl);
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
         String masterId = "";

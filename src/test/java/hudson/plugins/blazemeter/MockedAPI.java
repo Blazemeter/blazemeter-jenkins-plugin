@@ -15,9 +15,9 @@
 package hudson.plugins.blazemeter;
 
 import hudson.ProxyConfiguration;
+import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import org.apache.commons.io.FileUtils;
-import org.jvnet.hudson.test.Url;
 import org.mockserver.integration.ClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Parameter;
@@ -355,7 +355,8 @@ public class MockedAPI {
                 request()
                         .withMethod("GET")
                         .withPath(expectedPath)
-                        .withHeader("Accept", "application/json")
+                        .withHeader(Api.ACCEPT, Api.APP_JSON)
+                        .withHeader(Api.CONTENT_TYPE,Api.APP_JSON_UTF_8)
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
                         ),

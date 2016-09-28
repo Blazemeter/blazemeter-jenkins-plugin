@@ -14,10 +14,10 @@
 
 package hudson.plugins.blazemeter.utils;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.mail.MessagingException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -613,9 +614,38 @@ public class JobUtility {
             }
         }
     }
-    public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException {
+    public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
+            MessagingException {
+        boolean testIdExists=false;
         Api api = new ApiV3Impl(apiKey,serverUrl);
-        JSONObject jo = api.testConfig(testId);
-        return !jo.get(JsonConsts.RESULT).equals(JSONObject.NULL);
+        LinkedHashMultimap tests = api.testsMultiMap();
+        Set<Map.Entry> entries=tests.entries();
+        for(Map.Entry e:entries){
+            int point=((String)e.getValue()).indexOf(".");
+            testIdExists=testId.equals(((String)e.getValue()).substring(0,point));
+            if(testIdExists){
+                break;
+            }
+        }
+        return testIdExists;
     }
+
+
+    public static boolean collection(String testId,String apiKey,String serverUrl) throws Exception{
+        boolean collection=false;
+        Api api = new ApiV3Impl(apiKey,serverUrl);
+        LinkedHashMultimap tests = api.testsMultiMap();
+        Set<Map.Entry> entries = tests.entries();
+        for (Map.Entry e : entries) {
+            int point = ((String) e.getValue()).indexOf(".");
+            if (testId.equals(((String) e.getValue()).substring(0, point))) {
+                collection = "multi".equals(((String) e.getValue()).substring(point));
+            }
+            if (collection) {
+                break;
+            }
+        }
+        return collection;
+    }
+
 }

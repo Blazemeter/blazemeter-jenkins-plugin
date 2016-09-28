@@ -54,7 +54,7 @@ public interface Api {
 
     JSONObject testReport(String reportId);
 
-    LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException;
+    LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException;
 
     JSONObject getUser() throws IOException,JSONException;
 

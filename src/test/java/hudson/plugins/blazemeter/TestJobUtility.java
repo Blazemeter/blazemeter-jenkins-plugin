@@ -28,6 +28,7 @@ import org.junit.*;
 import org.json.JSONException;
 import org.mockito.Mockito;
 
+import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 
@@ -45,7 +46,7 @@ public class TestJobUtility {
         MockedAPI.getCIStatus();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
-        MockedAPI.getTestConfig();
+        MockedAPI.getTests();
         MockedAPI.putTestInfo();
     }
 
@@ -221,10 +222,12 @@ public class TestJobUtility {
     @Test
     public void testIdExists(){
         try {
-            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_MASTER_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
             e.printStackTrace();
         }
     }
@@ -236,6 +239,8 @@ public class TestJobUtility {
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
             e.printStackTrace();
         }
     }

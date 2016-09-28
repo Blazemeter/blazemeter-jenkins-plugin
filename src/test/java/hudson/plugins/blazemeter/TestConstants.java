@@ -34,6 +34,7 @@ public interface TestConstants {
     String mockedApiUrl=mockedApiHost+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
+    String TEST_5039530_ID ="5039530";
     String TEST_MASTER_NOT_FOUND ="testMaster-not-found";
     String TEST_MASTER_0 ="testMaster-0";
     String TEST_MASTER_25 ="testMaster-25";

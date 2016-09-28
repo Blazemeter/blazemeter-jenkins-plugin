@@ -294,7 +294,7 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException {
+    public LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
         if (StringUtils.isBlank(apiKey)) {

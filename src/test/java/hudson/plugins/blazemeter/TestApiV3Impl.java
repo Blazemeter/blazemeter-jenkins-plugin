@@ -21,7 +21,6 @@ import hudson.plugins.blazemeter.utils.JsonConsts;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.*;
-import org.mockito.Mockito;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -141,7 +140,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestList_6_10() throws IOException, JSONException, ServletException, MessagingException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String, String> testList = blazemeterApiV3.getTestsMultiMap();
+        LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 6);
         Assert.assertTrue(testList.size() == 10);
 
@@ -150,7 +149,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestList_6_6() throws IOException, JSONException, ServletException, MessagingException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_6_TESTS, TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String, String> testList = blazemeterApiV3.getTestsMultiMap();
+        LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 6);
         Assert.assertTrue(testList.size() == 6);
 
