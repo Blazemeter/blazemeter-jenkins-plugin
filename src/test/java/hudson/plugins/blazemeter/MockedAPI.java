@@ -399,7 +399,7 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getTests));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/getTests_6.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/getTests_5.json");
         getTests= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
@@ -407,7 +407,7 @@ public class MockedAPI {
                         .withPath(expectedPath)
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_6_TESTS)
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_5_TESTS)
                         ),
                 unlimited()
         )

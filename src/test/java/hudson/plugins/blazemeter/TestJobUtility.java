@@ -245,4 +245,34 @@ public class TestJobUtility {
         }
     }
 
+    @Test
+    public void collection_true(){
+        try {
+            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void collection_false(){
+        try {
+            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

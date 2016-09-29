@@ -161,17 +161,15 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public synchronized HashMap<String, String> startTest(String testId, TestType testType) throws JSONException,
+    public synchronized HashMap<String, String> startTest(String testId, boolean collection) throws JSONException,
             IOException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         HashMap<String, String> startResp = new HashMap<String, String>();
-        switch (testType) {
-            case multi:
-                url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
-                break;
-            default:
-                url = this.urlManager.testStart(APP_KEY, apiKey, testId);
+        if(collection){
+            url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
+        }else {
+            url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
@@ -332,6 +330,7 @@ public class ApiV3Impl implements Api {
                                 if (en != null) {
                                     id = en.getString(JsonConsts.ID);
                                     name = en.has(JsonConsts.NAME) ? en.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
+
                                     String testType = en.has(JsonConsts.TYPE) ? en.getString(JsonConsts.TYPE) : Constants.UNKNOWN_TYPE;
                                     testListOrdered.put(name, id + "." + testType);
 

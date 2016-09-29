@@ -22,7 +22,6 @@ import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.HttpLogger;
-import hudson.plugins.blazemeter.api.TestType;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.*;
 import hudson.remoting.Callable;
@@ -152,19 +151,16 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         consLog.info(lentry.toString());
         lentry.setLength(0);
 
-        TestType testType = null;
+        String testId_num = Utils.getTestId(this.testId);
+        boolean collection = false;
         try {
-            testType = Utils.getTestType(this.testId);
+            collection = JobUtility.collection(testId_num, this.jobApiKey, this.serverUrl);
         } catch (Exception e) {
-            lentry.append("Failed to detect testType for starting test = " + e);
+            lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
             consLog.warn(lentry.toString());
             lentry.setLength(0);
         }
-
-        String testId_num = Utils.getTestId(this.testId);
-
-//        boolean collection=JobUtility.collection(testId_num,this.jobApiKey,this.serverUrl);
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
         String masterId = "";
@@ -180,7 +176,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         try {
-            startTestResp = api.startTest(testId_num, testType);
+            startTestResp = api.startTest(testId_num, collection);
             if (startTestResp.size()==0) {
                 return Result.FAILURE;
             }

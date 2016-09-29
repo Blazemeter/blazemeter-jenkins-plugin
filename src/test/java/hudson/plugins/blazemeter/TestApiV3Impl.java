@@ -102,7 +102,7 @@ public class TestApiV3Impl {
     public void startTest_http() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http).get(JsonConsts.ID)
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID)
                 , "15102806");
     }
 
@@ -110,7 +110,7 @@ public class TestApiV3Impl {
     public void startTest_jmeter() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter).get(JsonConsts.ID),
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
                 "15102806");
     }
 
@@ -118,7 +118,7 @@ public class TestApiV3Impl {
     public void startTest_followme() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme).get(JsonConsts.ID),
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
                 "15102806");
     }
 
@@ -126,7 +126,7 @@ public class TestApiV3Impl {
     public void startTest_multi() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi).get(JsonConsts.ID),
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
                 "15105877");
     }
 
@@ -138,20 +138,11 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void getTestList_6_10() throws IOException, JSONException, ServletException, MessagingException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+    public void getTestList_4_5() throws IOException, JSONException, ServletException, MessagingException {
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_5_TESTS, TestConstants.mockedApiUrl);
         LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
-        Assert.assertTrue(testList.asMap().size() == 6);
-        Assert.assertTrue(testList.size() == 10);
-
-    }
-
-    @Test
-    public void getTestList_6_6() throws IOException, JSONException, ServletException, MessagingException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_6_TESTS, TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
-        Assert.assertTrue(testList.asMap().size() == 6);
-        Assert.assertTrue(testList.size() == 6);
+        Assert.assertTrue(testList.asMap().size() == 4);
+        Assert.assertTrue(testList.size() == 5);
 
     }
 
@@ -165,10 +156,10 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void getTestsCount_10() throws IOException, JSONException, ServletException {
+    public void getTestsCount_4() throws IOException, JSONException, ServletException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         int count = blazemeterApiV3.getTestCount();
-        Assert.assertTrue(count == 10);
+        Assert.assertTrue(count == 4);
 
     }
 
