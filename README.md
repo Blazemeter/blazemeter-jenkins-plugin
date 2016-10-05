@@ -1,9 +1,9 @@
 
-**
 BlazeMeter Job DSL Example:
-**
+---------------------------
 
 before v.2.7
+------------
 
     job('bza-from-dsl'){
        configure{project-> project/'builders'<< builder(class:'hudson.plugins.blazemeter.PerformanceBuilder'){
@@ -21,6 +21,7 @@ before v.2.7
     }
 
 v.2.7
+-----
 
     job('bza-from-dsl'){
        steps{
