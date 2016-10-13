@@ -500,7 +500,8 @@ public class ApiV3Impl implements Api {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
         String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
         String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
-        RequestBody body = RequestBody.create(TEXT,noteEsc);
+        JSONObject noteJson = new JSONObject(noteEsc);
+        RequestBody body = RequestBody.create(TEXT,noteJson.toString());
         Request r = new Request.Builder().url(url).patch(body).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
