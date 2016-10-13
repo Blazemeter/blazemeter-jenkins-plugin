@@ -641,7 +641,7 @@ public class JobUtility {
         for (Map.Entry e : entries) {
             int point = ((String) e.getValue()).indexOf(".");
             if (testId.equals(((String) e.getValue()).substring(0,point))) {
-                collection = "multi".equals(((String) e.getValue()).substring(point+1));
+                collection = (((String) e.getValue()).substring(point+1)).contains("multi");
                 exists=true;
             }
             if (collection) {
