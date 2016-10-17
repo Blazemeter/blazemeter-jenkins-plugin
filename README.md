@@ -10,7 +10,13 @@ before v.2.7
            jobApiKey 'your-key-that-is-present-in-credentials'
            serverUrl 'https://a.blazemeter.com'
            testId 'your-key-that-is-present-in-credentials'
-           notes ''
+           notes 'x\nc\nu\ni'
+           /** this note is equal to 
+           x
+           c
+           u
+           i
+           **/
            sessionProperties ''
            jtlPath ''
            junitPath ''
@@ -28,7 +34,13 @@ v.2.7
          blazeMeterTest{
            jobApiKey 'your-key-that-is-present-in-credentials'
            testId 'testId-existing-on-server'
-           notes ''
+           notes 'x\nc\nu\ni'
+            /** this note is equal to 
+            x
+            c
+            u
+            i
+            **/
            sessionProperties '' 
            jtlPath '' 
            junitPath '' 
