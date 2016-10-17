@@ -15,18 +15,16 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.JsonConsts;
-import hudson.util.FormValidation;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import org.eclipse.jetty.util.log.StdErrLog;
-import org.json.JSONObject;
+import java.util.Collection;
 
 
 @Extension(optional = true)
@@ -39,28 +37,33 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure, c);
         boolean jobApiKeyPresent = false;
-        boolean jobApiKey = false;
-        boolean testId = false;
         PerformanceBuilder pb = null;
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            logger.info("Checking that " + c.jobApiKey + " is present in credentials");
             jobApiKeyPresent = desc.credPresent(c.jobApiKey, CredentialsScope.GLOBAL);
-            logger.info("Checking that " + c.jobApiKey + " valid with " + serverUrl);
-            jobApiKey = JobUtility.validateUserKey(c.jobApiKey, serverUrl).kind.equals(FormValidation.Kind.OK);
-            logger.info("Checking that " + c.testId + " is valid for " + c.jobApiKey + " and " + serverUrl);
-            Api api = new ApiV3Impl(c.jobApiKey,serverUrl);
-            JSONObject jo = api.testConfig(c.testId);
-            testId=!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL);
-            if (jobApiKeyPresent && jobApiKey && testId) {
-                JSONObject result=jo.getJSONObject(JsonConsts.RESULT);
-                String testId_full=result.getString(JsonConsts.NAME)+"("+c.testId+"."+
-                        result.getJSONObject(JsonConsts.CONFIGURATION).get(JsonConsts.TYPE)+")";
-                pb = new PerformanceBuilder(c.jobApiKey,
-                        BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL(),
-                        testId_full, c.notes, c.sessionProperties,
-                        c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
+            logger.info(c.jobApiKey + " is " + (jobApiKeyPresent ? "" : "not") + " present in credentials");
+            if (!jobApiKeyPresent) {
+                return pb;
+            }
+            Api api = new ApiV3Impl(c.jobApiKey, serverUrl);
+            if (jobApiKeyPresent) {
+                LinkedHashMultimap<String, String> tests = api.testsMultiMap();
+                Collection<String> values = tests.values();
+                logger.info(c.jobApiKey + " is " + (values.size() > 0 ? "" : "not") + " valid for " + BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+                if (values.size() > 0) {
+                    for (String v : values) {
+                        if (v.contains(c.testId)) {
+                            logger.info("Test with " + c.testId + " exists on server.");
+                            pb = new PerformanceBuilder(c.jobApiKey,
+                                    BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL(),
+                                    v, c.notes, c.sessionProperties,
+                                    c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
+
+                            break;
+                        }
+                    }
+                }
 
             }
         } catch (Exception e) {
