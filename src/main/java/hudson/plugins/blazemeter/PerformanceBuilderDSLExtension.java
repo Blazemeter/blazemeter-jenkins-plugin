@@ -43,20 +43,17 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         try {
             jobApiKeyPresent = desc.credPresent(c.jobApiKey, CredentialsScope.GLOBAL);
             logger.info(c.jobApiKey + " is " + (jobApiKeyPresent ? "" : "not") + " present in credentials");
-            if (!jobApiKeyPresent) {
-                return pb;
-            }
-            Api api = new ApiV3Impl(c.jobApiKey, serverUrl);
             if (jobApiKeyPresent) {
+                Api api = new ApiV3Impl(c.jobApiKey, serverUrl);
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
-                logger.info(c.jobApiKey + " is " + (values.size() > 0 ? "" : "not") + " valid for " + BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+                logger.info(c.jobApiKey + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
+                        BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
                 if (values.size() > 0) {
                     for (String v : values) {
                         if (v.contains(c.testId)) {
                             logger.info("Test with " + c.testId + " exists on server.");
-                            pb = new PerformanceBuilder(c.jobApiKey,
-                                    BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL(),
+                            pb = new PerformanceBuilder(c.jobApiKey,serverUrl,
                                     v, c.notes, c.sessionProperties,
                                     c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
 
@@ -64,17 +61,13 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                         }
                     }
                 }
-
             }
+
         } catch (Exception e) {
             logger.warn("Failed to create PerformanceBuilder object from Job DSL description: jobApiKey=" + c.jobApiKey +
                     ", testId =" + c.testId + ", serverUrl=" + serverUrl);
         } finally {
             return pb;
-
         }
-
     }
-
-
 }
