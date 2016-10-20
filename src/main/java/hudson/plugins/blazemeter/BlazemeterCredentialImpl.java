@@ -17,6 +17,7 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.BaseCredentials;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -30,7 +31,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-public class BlazemeterCredentialImpl extends BaseCredentials {
+public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials {
     private static final long serialVersionUID = 1L;
 
     private String apiKey =null;
