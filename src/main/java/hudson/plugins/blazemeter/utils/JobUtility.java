@@ -492,16 +492,19 @@ public class JobUtility {
         boolean terminate = false;
         try {
             int statusCode = api.getTestMasterStatusCode(masterId);
-            if (statusCode < 100 & statusCode != 0) {
+            if (statusCode < 100) {
                 api.terminateTest(masterId);
                 terminate = true;
             }
-            if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
+            if (statusCode >= 100) {
                 api.stopTest(masterId);
                 terminate = false;
             }
         } catch (Exception e) {
-            jenBuildLog.warn("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
+            jenBuildLog.warn("Error while trying to stop/terminate test with testId = " + masterId + ", " + e.getMessage());
+            jenBuildLog.warn("Test will be terminated.");
+            api.terminateTest(masterId);
+            terminate=true;
         } finally {
             return terminate;
         }
