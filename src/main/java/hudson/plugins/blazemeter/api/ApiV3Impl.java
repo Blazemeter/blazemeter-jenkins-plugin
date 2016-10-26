@@ -114,7 +114,7 @@ public class ApiV3Impl implements Api {
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             statusCode = result.getInt("progress");
         } catch (Exception e) {
-            bzmLog.warn("Error while getting status: "+e.getMessage());
+            bzmLog.warn("Error getting status ", e);
         } finally {
             {
                 return statusCode;
