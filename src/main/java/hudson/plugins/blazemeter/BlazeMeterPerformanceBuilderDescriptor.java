@@ -68,37 +68,42 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey,@QueryParameter("testId")String savedTestId) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey, @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         if (StringUtils.isBlank(apiKey)) {
-            items.add(Constants.NO_API_KEY, "-1");
-        } else {
-            Api api = new ApiV3Impl(apiKey,this.blazeMeterURL);
-            try {
-                LinkedHashMultimap<String, String> testList = api.testsMultiMap();
-                if (testList == null){
-                    items.add(Constants.API_KEY_IS_NOT_VALID, "-1");
-                } else if (testList.isEmpty()){
-                    items.add(Constants.NO_TESTS_FOR_API_KEY, "-1");
-                } else {
-                    Set set = testList.entries();
-                    for (Object test : set) {
-                        Map.Entry me = (Map.Entry) test;
-                        String testId=String.valueOf(me.getKey()+"("+me.getValue()+")");
-                        items.add(new ListBoxModel.Option(testId,testId,testId.contains(savedTestId)));
-                    }
-                }
-            } catch (Exception e) {
-                throw FormValidation.error(e.getMessage(), e);
+            List<String> keys = getKeys();
+            if (keys.size() > 0) {
+                apiKey = keys.get(0);
+            } else {
+                items.add(Constants.NO_API_KEY, "-1");
+                return items;
             }
         }
-        Comparator c=new Comparator<ListBoxModel.Option>() {
+        Api api = new ApiV3Impl(apiKey, this.blazeMeterURL);
+        try {
+            LinkedHashMultimap<String, String> testList = api.testsMultiMap();
+            if (testList == null) {
+                items.add(Constants.API_KEY_IS_NOT_VALID, "-1");
+            } else if (testList.isEmpty()) {
+                items.add(Constants.NO_TESTS_FOR_API_KEY, "-1");
+            } else {
+                Set set = testList.entries();
+                for (Object test : set) {
+                    Map.Entry me = (Map.Entry) test;
+                    String testId = String.valueOf(me.getKey() + "(" + me.getValue() + ")");
+                    items.add(new ListBoxModel.Option(testId, testId, testId.contains(savedTestId)));
+                }
+            }
+        } catch (Exception e) {
+            throw FormValidation.error(e.getMessage(), e);
+        }
+        Comparator c = new Comparator<ListBoxModel.Option>() {
             @Override
             public int compare(ListBoxModel.Option o1, ListBoxModel.Option o2) {
                 return o1.name.compareToIgnoreCase(o2.name);
             }
         };
-        Collections.sort(items,c);
+        Collections.sort(items, c);
         return items;
     }
 
@@ -165,6 +170,18 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
+    public List<String> getKeys(){
+        List<String> apiKeys = new ArrayList<String>();
+        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+        for (BlazemeterCredentialImpl c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+            String key = c.getApiKey();
+            if (!apiKeys.contains(key)) {
+                apiKeys.add(key);
+            }
+        }
+        return apiKeys;
+    }
 
     public String getName() {
         return name;
