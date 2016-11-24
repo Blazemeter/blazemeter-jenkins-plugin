@@ -20,14 +20,13 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 public class HttpLogger implements HttpLoggingInterceptor.Logger {
 
-    private Logger httpLog=Logger.getLogger(Constants.HTTP_LOG);
+    private Logger httpLog = Logger.getLogger(Constants.HTTP_LOG);
+    private FileHandler http_lfh;
 
-    public  HttpLogger(String httpLog_f){
-        FileHandler http_lfh= null;
+    public HttpLogger(String httpLog_f) {
         try {
             http_lfh = new FileHandler(httpLog_f);
         } catch (IOException e) {
@@ -41,6 +40,10 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
 
     @Override
     public void log(String message) {
-         httpLog.info(message);
+        httpLog.info(message);
+    }
+
+    public void close() {
+        http_lfh.close();
     }
 }
