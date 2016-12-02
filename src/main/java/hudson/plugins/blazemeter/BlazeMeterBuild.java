@@ -21,13 +21,15 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
-import hudson.plugins.blazemeter.api.TestType;
+import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.*;
 import hudson.remoting.Callable;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.jenkinsci.remoting.RoleChecker;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -85,19 +87,15 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         bzmLog.setStdErrStream(bzmLog_str);
         bzmLog.setDebugEnabled(true);
 
-        PrintStream httpLog_str = new PrintStream(httpLog_f);
-        StdErrLog httpLog = new StdErrLog(Constants.BZM_JEN);
-        httpLog.setStdErrStream(httpLog_str);
-        httpLog.setDebugEnabled(true);
-
         PrintStream console_logger=this.listener.getLogger();
         StdErrLog consLog=new StdErrLog(Constants.BZM_JEN);
         consLog.setStdErrStream(console_logger);
         consLog.setDebugEnabled(true);
 
-        Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
-        api.setLogger(bzmLog);
-        api.getHttp().setLogger(httpLog);
+        HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
+        HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
+
+        Api api = new ApiV3Impl(this.jobApiKey,this.serverUrl,httpLog,bzmLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
@@ -153,17 +151,16 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         consLog.info(lentry.toString());
         lentry.setLength(0);
 
-        TestType testType = null;
+        String testId_num = Utils.getTestId(this.testId);
+        boolean collection = false;
         try {
-            testType = Utils.getTestType(this.testId);
+            collection = JobUtility.collection(testId_num, this.jobApiKey, this.serverUrl);
         } catch (Exception e) {
-            lentry.append("Failed to detect testType for starting test = " + e);
+            lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
             consLog.warn(lentry.toString());
             lentry.setLength(0);
         }
-
-        String testId_num = Utils.getTestId(this.testId);
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
         String masterId = "";
@@ -179,7 +176,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         try {
-            startTestResp = api.startTest(testId_num, testType);
+            startTestResp = api.startTest(testId_num, collection);
             if (startTestResp.size()==0) {
                 return Result.FAILURE;
             }
@@ -270,6 +267,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             lentry.setLength(0);
             return Result.NOT_BUILT;
         } finally {
+            ((HttpLogger)httpLogger).close();
             ((EnvVars) EnvVars.masterEnvVars).remove(this.jobName+"-"+this.buildId);
             TestStatus testStatus = api.getTestStatus(masterId);
 
@@ -296,6 +294,10 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         }
     }
 
+    @Override
+    public void checkRoles(RoleChecker roleChecker) throws SecurityException {
+        
+    }
 
     public void setEv(EnvVars ev) {
         this.ev = ev;

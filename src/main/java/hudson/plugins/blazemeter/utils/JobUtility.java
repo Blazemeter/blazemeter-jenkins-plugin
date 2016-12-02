@@ -14,10 +14,10 @@
 
 package hudson.plugins.blazemeter.utils;
 
+import com.google.common.collect.LinkedHashMultimap;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.*;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.mail.MessagingException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -209,30 +210,19 @@ public class JobUtility {
         return false;
     }
 
-    public static String selectUserKeyOnId(BlazeMeterPerformanceBuilderDescriptor descriptor,
-                                           String id) {
-        String userKey = null;
-        List<BlazemeterCredentialImpl> credentialList = descriptor.getCredentials("Global");
-        if (credentialList.size() == 1) {
-            userKey = credentialList.get(0).getApiKey();
-        } else {
-            for (BlazemeterCredentialImpl c : credentialList) {
-                if (c.getId().equals(id)) {
-                    userKey = c.getApiKey();
-                    break;
-                }
-            }
-        }
-        return userKey;
-    }
-
     public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog){
         HashMap<String,String> jtlUrls=new HashMap<String, String>();
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        List<String> sessionsIds=null;
+        try{
+            sessionsIds = api.getListOfSessionIds(masterId);
+        }catch (Exception e){
+            bzmLog.info("Failed to get list of sessions for masterId="+masterId,e);
+            consLog.info("Failed to get list of sessions for masterId="+masterId,e);
+        }
         for (String s : sessionsIds) {
             StringBuilder dataUrl=new StringBuilder();
-            JSONObject jo = api.retrieveJtlZip(s);
             try {
+                JSONObject jo = api.retrieveJtlZip(s);
                 JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
                 for (int i = 0; i < data.length(); i++) {
                     String title = data.getJSONObject(i).getString("title");
@@ -246,6 +236,9 @@ public class JobUtility {
                     }
                 }
             } catch (JSONException e) {
+                bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
+                consLog.info("Failed to get url for JTL report, sessionId="+s,e);
+            } catch (IOException e) {
                 bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
                 consLog.info("Failed to get url for JTL report, sessionId="+s,e);
             }
@@ -594,7 +587,13 @@ public class JobUtility {
 
 
     public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        List<String> sessionsIds = null;
+        try{
+            sessionsIds=api.getListOfSessionIds(masterId);
+        }catch (Exception e){
+            jenBuildLog.info("Failed to get list of sessions for masterId = "+masterId,e);
+
+        }
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {
             jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
@@ -615,4 +614,44 @@ public class JobUtility {
             }
         }
     }
+    public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
+            MessagingException {
+        boolean testIdExists=false;
+        Api api = new ApiV3Impl(apiKey,serverUrl);
+        LinkedHashMultimap tests = api.testsMultiMap();
+        Set<Map.Entry> entries=tests.entries();
+        for(Map.Entry e:entries){
+            int point=((String)e.getValue()).indexOf(".");
+            testIdExists=testId.equals(((String)e.getValue()).substring(0,point));
+            if(testIdExists){
+                break;
+            }
+        }
+        return testIdExists;
+    }
+
+
+    public static boolean collection(String testId,String apiKey,String serverUrl) throws Exception{
+        boolean exists=false;
+        boolean collection=false;
+
+        Api api = new ApiV3Impl(apiKey,serverUrl);
+        LinkedHashMultimap tests = api.testsMultiMap();
+        Set<Map.Entry> entries = tests.entries();
+        for (Map.Entry e : entries) {
+            int point = ((String) e.getValue()).indexOf(".");
+            if (testId.equals(((String) e.getValue()).substring(0,point))) {
+                collection = (((String) e.getValue()).substring(point+1)).contains("multi");
+                exists=true;
+            }
+            if (collection) {
+                break;
+            }
+        }
+        if(!exists){
+            throw new Exception("Test with test id = "+testId+" is not present on server");
+        }
+        return collection;
+    }
+
 }

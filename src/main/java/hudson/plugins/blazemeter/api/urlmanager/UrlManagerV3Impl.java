@@ -40,7 +40,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStatus= serverUrl +LATEST+"/masters/"+masterId+"/status?events=false&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        testStatus= serverUrl +LATEST+UrlManager.MASTERS+"/"+masterId+"/status?events=false&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
          return testStatus;
     }
 
@@ -100,7 +100,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testStop= serverUrl +LATEST+"/masters/"
+        testStop= serverUrl +LATEST+UrlManager.MASTERS+"/"
                 +masterId+"/stop?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testStop;
@@ -116,7 +116,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testTerminate= serverUrl +LATEST+"/masters/"
+        testTerminate= serverUrl +LATEST+UrlManager.MASTERS+"/"
                 +masterId+"/terminate?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testTerminate;
@@ -132,7 +132,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        testAggregateReport= serverUrl +LATEST+"/masters/"
+        testAggregateReport= serverUrl +LATEST+UrlManager.MASTERS+"/"
                 +masterId+"/reports/main/summary?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return testAggregateReport;
@@ -153,7 +153,7 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String getTestConfig(String appKey, String userKey, String testId){
+    public String testConfig(String appKey, String userKey, String testId){
         String getTestInfo=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
@@ -190,7 +190,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        getTresholds= serverUrl +LATEST+MASTERS+"/"+masterId+"/ci-status?api_key="
+        getTresholds= serverUrl +LATEST+MASTERS+"/"+masterId+UrlManager.CI_STATUS+"?api_key="
                 +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return getTresholds;
@@ -313,7 +313,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return masterIdUrl= serverUrl +LATEST+"/masters/"+masterId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return masterIdUrl= serverUrl +LATEST+UrlManager.MASTERS+"/"+masterId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 
     @Override

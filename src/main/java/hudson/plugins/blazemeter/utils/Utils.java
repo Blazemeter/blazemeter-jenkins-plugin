@@ -15,26 +15,12 @@
 package hudson.plugins.blazemeter.utils;
 import hudson.EnvVars;
 import hudson.FilePath;
-import hudson.plugins.blazemeter.api.TestType;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 
 public class Utils {
 
     private Utils(){}
-
-    public static TestType getTestType(String testId) throws Exception{
-        int dotPos=testId.lastIndexOf(".");
-        TestType testType=null;
-        try{
-            testType=TestType.valueOf(testId.substring(dotPos+1,testId.lastIndexOf(")")));
-        }catch (StringIndexOutOfBoundsException e){
-            testType=TestType.valueOf(testId.substring(dotPos+1));;
-        }catch (Exception e){
-            throw e;
-        }
-        return testType;
-    }
 
     public static String getTestId(String testId){
         try{
@@ -62,6 +48,4 @@ public class Utils {
         }
         return fp;
     }
-
-
 }

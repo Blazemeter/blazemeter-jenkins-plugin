@@ -26,6 +26,7 @@ public interface UrlManager {
     String TESTS="/tests";
     String MASTERS="/masters";
     String WEB="/web";
+    String CI_STATUS="/ci-status";
     String getServerUrl();
 
     void setServerUrl(String serverUrl);
@@ -52,7 +53,7 @@ public interface UrlManager {
 
     String getCIStatus(String appKey, String userKey, String sessionId);
 
-    String getTestConfig(String appKey, String userKey, String testId);
+    String testConfig(String appKey, String userKey, String testId);
 
     String postJsonConfig(String appKey, String userKey, String testId);
 

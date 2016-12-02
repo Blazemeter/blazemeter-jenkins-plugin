@@ -21,6 +21,8 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConsts;
+import okhttp3.*;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -31,32 +33,69 @@ import org.json.JSONObject;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.concurrent.TimeUnit;
 
 
 public class ApiV3Impl implements Api {
 
-    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-
+    private StdErrLog bzmLog = null;
+    private Proxy proxy = null;
+    private Authenticator auth = null;
     private final String apiKey;
     UrlManager urlManager;
-    private HttpUtil bzmhc = null;
+    private OkHttpClient okhttp = null;
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,null);
+        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor(),null);
     }
 
     public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     ProxyConfiguration proxy) {
+                     HttpLoggingInterceptor httpLog,StdErrLog bzmLog) {
         this.apiKey = apiKey;
+        this.bzmLog = (bzmLog!=null?bzmLog:new StdErrLog(Constants.BZM_JEN));
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
-            bzmhc = new HttpUtil(proxy);
+            httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
+            this.proxy = Proxy.NO_PROXY;
+            this.auth = Authenticator.NONE;
+            ProxyConfiguration proxyConf=null;
+            try{
+                proxyConf=ProxyConfiguration.load();
+
+            }catch (NullPointerException e){
+                this.bzmLog.info("Failed to load proxy configuration");
+            }
+            if (proxyConf != null) {
+                if (!StringUtils.isBlank(proxyConf.name)) {
+                    this.proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyConf.name, proxyConf.port));
+                }
+                if (!StringUtils.isBlank(proxyConf.getUserName()) && !StringUtils.isBlank(proxyConf.getPassword())) {
+                    final String proxyUser = proxyConf.getUserName();
+                    final String proxyPass = proxyConf.getPassword();
+                    this.auth = new Authenticator() {
+                        @Override
+                        public Request authenticate(Route route, Response response) throws IOException {
+                            String credential = Credentials.basic(proxyUser, proxyPass);
+                            return response.request().newBuilder()
+                                    .header("Proxy-Authorization", credential)
+                                    .build();
+                        }
+                    };
+                }
+            }
+            okhttp = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(httpLog).proxy(this.proxy)
+                    .addInterceptor(new RetryInterceptor(bzmLog))
+                    .proxyAuthenticator(this.auth).build();
         } catch (Exception ex) {
-            logger.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
+            this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
     }
 
@@ -69,11 +108,13 @@ public class ApiV3Impl implements Api {
         }
         try {
             String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
-            JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             statusCode = result.getInt("progress");
         } catch (Exception e) {
-            logger.warn("Error getting status ", e);
+            bzmLog.warn("Error getting status ", e);
         } finally {
             {
                 return statusCode;
@@ -92,7 +133,10 @@ public class ApiV3Impl implements Api {
 
         try {
             String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
-            JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
+            Request r = new Request.Builder().url(url).get()
+            .addHeader(ACCEPT, APP_JSON).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             if (result.has(JsonConsts.DATA_URL) && result.get(JsonConsts.DATA_URL) == null) {
                 testStatus = TestStatus.NotFound;
@@ -101,39 +145,72 @@ public class ApiV3Impl implements Api {
                     testStatus = TestStatus.Running;
                 } else {
                     if (result.has(JsonConsts.ERRORS) && !result.get(JsonConsts.ERRORS).equals(JSONObject.NULL)) {
-                        logger.debug("Error received from server: " + result.get(JsonConsts.ERRORS).toString());
+                        bzmLog.debug("Error received from server: " + result.get(JsonConsts.ERRORS).toString());
                         testStatus = TestStatus.Error;
                     } else {
                         testStatus = TestStatus.NotRunning;
-                        logger.info("Master with id="+id+" has status = "+TestStatus.NotRunning.name());
+                        bzmLog.info("Master with id="+id+" has status = "+TestStatus.NotRunning.name());
                     }
                 }
             }
         } catch (Exception e) {
-            logger.warn("Error getting status ", e);
+            bzmLog.warn("Error getting status ", e);
             testStatus = TestStatus.Error;
         }
         return testStatus;
     }
 
     @Override
-    public synchronized HashMap<String, String> startTest(String testId, TestType testType) throws JSONException {
+    public synchronized HashMap<String, String> startTest(String testId, boolean collection) throws JSONException,
+            IOException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         HashMap<String, String> startResp = new HashMap<String, String>();
-        switch (testType) {
-            case multi:
-                url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
-                break;
-            default:
-                url = this.urlManager.testStart(APP_KEY, apiKey, testId);
+        if(collection){
+            url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
+        }else {
+            url = this.urlManager.testStart(APP_KEY, apiKey, testId);
         }
-        JSONObject jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class, null);
+        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        if (jo == null) {
+            if (bzmLog.isDebugEnabled())
+                bzmLog.debug("Received NULL from server while start operation: will do 5 retries");
+            boolean isActive = this.active(testId);
+            if (!isActive) {
+                int retries = 1;
+                while (retries < 6) {
+                    try {
+                        if (bzmLog.isDebugEnabled())
+                            bzmLog.debug("Trying to repeat start request: " + retries + " retry.");
+                        bzmLog.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
+                        Thread.sleep(10000 * retries);
+                        jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+                        if (jo != null) {
+                            break;
+                        }
+                    } catch (InterruptedException ie) {
+                        if (bzmLog.isDebugEnabled())
+                            bzmLog.debug("Start operation was interrupted at pause during " + retries + " request retry.");
+                    } catch (Exception ex) {
+                        if (bzmLog.isDebugEnabled())
+                            bzmLog.debug("Received bad response from server while starting test: " + retries + " retry.");
+                    } finally {
+                        retries++;
+                    }
+                }
+
+
+            }
+        }
         JSONObject result = null;
         try {
             result = (JSONObject) jo.get(JsonConsts.RESULT);
             startResp.put(JsonConsts.ID, result.getString(JsonConsts.ID));
-            startResp.put(JsonConsts.TEST_ID, result.getString(JsonConsts.TEST_ID));
+            startResp.put(JsonConsts.TEST_ID, collection ? result.getString(JsonConsts.TEST_COLLECTION_ID) :
+                    result.getString(JsonConsts.TEST_ID));
             startResp.put(JsonConsts.NAME, result.getString(JsonConsts.NAME));
         } catch (Exception e) {
             startResp.put(JsonConsts.ERROR, jo.get(JsonConsts.ERROR).toString());
@@ -148,7 +225,9 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.tests(APP_KEY, apiKey);
 
         try {
-            JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             if (jo == null) {
                 return -1;
             } else {
@@ -156,28 +235,33 @@ public class ApiV3Impl implements Api {
                 return result.length();
             }
         } catch (JSONException e) {
-            logger.warn("Error getting response from server: ", e);
+            bzmLog.warn("Error getting response from server: ", e);
             return -1;
         } catch (RuntimeException e) {
-            logger.warn("Error getting response from server: ", e);
+            bzmLog.warn("Error getting response from server: ", e);
             return -1;
         }
     }
 
     @Override
-    public JSONObject stopTest(String testId) {
+    public JSONObject stopTest(String testId) throws IOException, JSONException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = this.urlManager.testStop(APP_KEY, apiKey, testId);
-        JSONObject stopJSON = this.bzmhc.response(url, null, Method.POST, JSONObject.class,null);
-        return stopJSON;
+        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        return jo;
     }
 
     @Override
-    public void terminateTest(String testId) {
+    public void terminateTest(String testId) throws IOException{
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return;
-
         String url = this.urlManager.testTerminate(APP_KEY, apiKey, testId);
-        this.bzmhc.response(url, null, Method.POST, JSONObject.class,null);
+        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        okhttp.newCall(r).execute();
         return;
     }
 
@@ -190,16 +274,18 @@ public class ApiV3Impl implements Api {
         JSONObject summary = null;
         JSONObject result = null;
         try {
-            result = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConsts.RESULT);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
             summary = (JSONObject) result.getJSONArray("summary")
                     .get(0);
         } catch (JSONException je) {
-            logger.warn("Aggregate report(result object): " + result);
-            logger.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
+            bzmLog.warn("Aggregate report(result object): " + result);
+            bzmLog.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
                     "is valid/not empty.", je);
         } catch (Exception e) {
-            logger.warn("Aggregate report(result object): " + result);
-            logger.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
+            bzmLog.warn("Aggregate report(result object): " + result);
+            bzmLog.warn("Error while parsing aggregate report summary: check common jenkins log and make sure that aggregate report" +
                     "is valid/not empty.", e);
         } finally {
             return summary;
@@ -207,16 +293,18 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public LinkedHashMultimap<String, String> getTestsMultiMap() throws IOException, MessagingException {
+    public LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
         if (StringUtils.isBlank(apiKey)) {
             return null;
         } else {
             String url = this.urlManager.tests(APP_KEY, apiKey);
-            logger.info("Getting testList with URL=" + url.substring(0, url.indexOf("?") + 14));
+            bzmLog.info("Getting testList with URL=" + url.substring(0, url.indexOf("?") + 14));
             try {
-                JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class, null);
+                Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                        addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+                JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 JSONArray result = null;
 
                 if (jo.has(JsonConsts.ERROR) && (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) &&
@@ -235,7 +323,7 @@ public class ApiV3Impl implements Api {
                             try {
                                 en = result.getJSONObject(i);
                             } catch (JSONException e) {
-                                logger.warn("Error with the JSON while populating test list, " + e);
+                                bzmLog.warn("Error with the JSON while populating test list, " + e);
                             }
                             String id;
                             String name;
@@ -243,12 +331,13 @@ public class ApiV3Impl implements Api {
                                 if (en != null) {
                                     id = en.getString(JsonConsts.ID);
                                     name = en.has(JsonConsts.NAME) ? en.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
+
                                     String testType = en.has(JsonConsts.TYPE) ? en.getString(JsonConsts.TYPE) : Constants.UNKNOWN_TYPE;
                                     testListOrdered.put(name, id + "." + testType);
 
                                 }
                             } catch (JSONException ie) {
-                                logger.warn("Error with the JSON while populating test list, ", ie);
+                                bzmLog.warn("Error with the JSON while populating test list, ", ie);
                             }
                         }
 
@@ -257,9 +346,9 @@ public class ApiV3Impl implements Api {
                     }
                 }
             } catch (NullPointerException npe) {
-                logger.warn("Error while receiving answer from server - check connection/proxy settings ", npe);
+                bzmLog.warn("Error while receiving answer from server - check connection/proxy settings ", npe);
             } catch (Exception e) {
-                logger.warn("Error while populating test list, ", e);
+                bzmLog.warn("Error while populating test list, ", e);
             } finally {
                 return testListOrdered;
             }
@@ -268,18 +357,22 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public JSONObject getUser() throws ClassCastException {
+    public JSONObject getUser() throws IOException,JSONException {
         if (StringUtils.isBlank(apiKey)) return null;
         String url = this.urlManager.getUser(APP_KEY, apiKey);
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
 
     @Override
-    public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException {
+    public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException, IOException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
+        bzmLog.info("Trying to get JTLZIP url for the sessionId = " + sessionId);
         String url = this.urlManager.getCIStatus(APP_KEY, apiKey, sessionId);
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,null).getJSONObject(JsonConsts.RESULT);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
         return jo;
     }
 
@@ -294,70 +387,46 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public String retrieveJUNITXML(String sessionId) {
+    public String retrieveJUNITXML(String sessionId) throws IOException{
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, sessionId);
-        String xmlJunit = this.bzmhc.response(url, null,Method.GET, String.class,null);
-
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        String xmlJunit = okhttp.newCall(r).execute().body().string();
         return xmlJunit;
     }
 
     @Override
-    public JSONObject retrieveJtlZip(String sessionId) {
+    public JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
-        logger.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
+        bzmLog.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
         String url = this.urlManager.retrieveJTLZIP(APP_KEY, apiKey, sessionId);
-        logger.info("Trying to retrieve JTLZIP json for the sessionId=" + sessionId);
-        JSONObject jtlzip = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+        bzmLog.info("Trying to retrieve JTLZIP json for the sessionId = " + sessionId);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jtlzip = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jtlzip;
     }
 
     @Override
-    public StdErrLog getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void setLogger(StdErrLog logger) {
-        this.logger = logger;
-    }
-
-    @Override
-    public String getApiKey() {
-        return apiKey;
-    }
-
-
-    @Override
-    public void setHttpUtil(HttpUtil bzmhc) {
-        this.bzmhc = bzmhc;
-    }
-
-    public UrlManager getUrlManager() {
-        return urlManager;
-    }
-
-    @Override
-    public JSONObject generatePublicToken(String sessionId) {
+    public JSONObject generatePublicToken(String sessionId) throws IOException,JSONException{
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
 
         String url = this.urlManager.generatePublicToken(APP_KEY, apiKey, sessionId);
-        JSONObject jo = this.bzmhc.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
-
-
+        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jo=new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
 
     @Override
-    public HttpUtil getHttp() {
-        return this.bzmhc;
-    }
-
-    @Override
-    public List<String> getListOfSessionIds(String masterId) {
+    public List<String> getListOfSessionIds(String masterId) throws IOException,JSONException{
         List<String> sessionsIds = new ArrayList<String>();
         String url = this.urlManager.listOfSessionIds(APP_KEY, apiKey, masterId);
-        JSONObject jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             JSONArray sessions = jo.getJSONObject(JsonConsts.RESULT).getJSONArray("sessions");
             int sessionsLength = sessions.length();
@@ -365,9 +434,9 @@ public class ApiV3Impl implements Api {
                 sessionsIds.add(sessions.getJSONObject(i).getString(JsonConsts.ID));
             }
         } catch (JSONException je) {
-            logger.info("Failed to get list of sessions from JSONObject " + jo, je);
+            bzmLog.info("Failed to get list of sessions from JSONObject " + jo, je);
         } catch (Exception e) {
-            logger.info("Failed to get list of sessions from JSONObject " + jo, e);
+            bzmLog.info("Failed to get list of sessions from JSONObject " + jo, e);
         } finally {
             return sessionsIds;
         }
@@ -379,7 +448,9 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.activeTests(APP_KEY, apiKey);
         JSONObject jo = null;
         try {
-            jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = null;
             if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
                 result = (JSONObject) jo.get(JsonConsts.RESULT);
@@ -400,10 +471,10 @@ public class ApiV3Impl implements Api {
             }
             return isActive;
         } catch (JSONException je) {
-            logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
+            bzmLog.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
             return false;
         } catch (Exception e) {
-            logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
+            bzmLog.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
             return false;
         }
     }
@@ -414,10 +485,11 @@ public class ApiV3Impl implements Api {
         JSONObject jo=null;
         boolean ping=false;
         try{
-            jo = this.bzmhc.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).build();
+            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             ping=jo.isNull(JsonConsts.ERROR);
         }catch (Exception e){
-            logger.info("Failed to ping server: "+jo,e);
+            bzmLog.info("Failed to ping server: "+jo,e);
             throw e;
         }
         return ping;
@@ -427,15 +499,17 @@ public class ApiV3Impl implements Api {
     public boolean notes(String note, String masterId) throws Exception {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
         String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
-        JSONObject noteJson = new JSONObject(noteEsc);
         String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
-        JSONObject jo = this.bzmhc.response(url, noteJson, Method.PATCH, JSONObject.class, JSONObject.class);
+        JSONObject noteJson = new JSONObject(noteEsc);
+        RequestBody body = RequestBody.create(TEXT,noteJson.toString());
+        Request r = new Request.Builder().url(url).patch(body).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             if (!jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
                 return false;
             }
         } catch (Exception e) {
-            throw new Exception("Failed to submit report notest to masterId=" + masterId, e);
+            throw new Exception("Failed to submit report notest to masterId = " + masterId, e);
         }
         return true;
     }
@@ -444,14 +518,25 @@ public class ApiV3Impl implements Api {
     public boolean properties(JSONArray properties, String sessionId) throws Exception {
         if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return false;
         String url = this.urlManager.properties(APP_KEY, apiKey, sessionId);
-        JSONObject jo = this.bzmhc.response(url, properties, Method.POST, JSONObject.class,JSONArray.class);
+        RequestBody body = RequestBody.create(JSON,properties.toString());
+        Request r = new Request.Builder().url(url).post(body).build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             if (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) {
                 return false;
             }
         } catch (Exception e) {
-            throw new Exception("Failed to submit report properties to sessionId=" + sessionId, e);
+            throw new Exception("Failed to submit report properties to sessionId = " + sessionId, e);
         }
         return true;
+    }
+
+    @Override
+    public JSONObject testConfig(String testId) throws IOException, JSONException {
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
+        String url = this.urlManager.testConfig(APP_KEY, apiKey, testId);
+        Request r = new Request.Builder().url(url).get().build();
+        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        return jo;
     }
 }

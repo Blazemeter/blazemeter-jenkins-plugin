@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class BlazemeterCredentialImpl extends BaseCredentials implements Standar
     }
 
     public String getId() {
-        return StringUtils.left(apiKey,4) + Constants.CREDENTIALS_KEY + StringUtils.right(apiKey, 4);
+        return StringUtils.left(apiKey,4) + Constants.THREE_DOTS + StringUtils.right(apiKey, 4);
     }
 
     public String getApiKey() {
@@ -61,9 +60,6 @@ public class BlazemeterCredentialImpl extends BaseCredentials implements Standar
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getDisplayName() {
             return Messages.BlazemeterCredential_DisplayName();

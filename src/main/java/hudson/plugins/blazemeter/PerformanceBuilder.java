@@ -54,7 +54,6 @@ public class PerformanceBuilder extends Builder {
 
     private boolean getJunit = false;
 
-    private transient String filename;
 
     @DataBoundConstructor
     public PerformanceBuilder(String jobApiKey,
@@ -67,7 +66,7 @@ public class PerformanceBuilder extends Builder {
                               boolean getJtl,
                               boolean getJunit
     ) {
-        this.jobApiKey = JobUtility.selectUserKeyOnId(DESCRIPTOR, jobApiKey);
+        this.jobApiKey = jobApiKey;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
@@ -90,7 +89,7 @@ public class PerformanceBuilder extends Builder {
         Result r = null;
         BuildReporter br=new BuildReporter();
         try {
-            boolean valid = DESCRIPTOR.validateCredentials(this.jobApiKey, CredentialsScope.GLOBAL);
+            boolean valid = DESCRIPTOR.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
             if (!valid) {
                 listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0,3) + "... is absent in credentials store.");
                 r=Result.NOT_BUILT;
@@ -153,14 +152,6 @@ public class PerformanceBuilder extends Builder {
 
     public void setTestId(String testId) {
         this.testId = testId;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
 
     public boolean isGetJtl() {

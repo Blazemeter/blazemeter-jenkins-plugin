@@ -28,6 +28,7 @@ import org.junit.*;
 import org.json.JSONException;
 import org.mockito.Mockito;
 
+import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 
@@ -45,7 +46,7 @@ public class TestJobUtility {
         MockedAPI.getCIStatus();
         MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
-        MockedAPI.getTestConfig();
+        MockedAPI.getTests();
         MockedAPI.putTestInfo();
     }
 
@@ -95,7 +96,7 @@ public class TestJobUtility {
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
-                "API key is not valid: API key=moc... blazemeterUrl="+TestConstants.mockedApiUrl+". Please, check proxy settings, serverUrl and userKey.");
+                "API key is not valid: unexpected exception=A JSONObject text must begin with '{' at character 1");
     }
 
     @Test
@@ -216,6 +217,62 @@ public class TestJobUtility {
         String error_str=FileUtils.readFileToString(error);
         JSONArray error_json=new JSONArray(error_str);
         Assert.assertFalse(JobUtility.errorsFailed(error_json));
+    }
+
+    @Test
+    public void testIdExists(){
+        try {
+            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testIdExists_negative(){
+        try {
+            Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void collection_true(){
+        try {
+            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void collection_false(){
+        try {
+            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
