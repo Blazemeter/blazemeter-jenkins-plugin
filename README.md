@@ -1,52 +1,20 @@
+#### 1. What's this?
 
-BlazeMeter Job DSL Example:
----------------------------
+This is [jenkins](http://jenkins.io) plugin for running performance test at [load testing platform](http://blazemeter.com).
+It allows to include cloud testing into CD pipeline. 
+It supports jenkins [Job DSL](https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin), hence it's configuration can be
+saved in CVS as a part of configuration.
 
-before v.2.7
-------------
+#### 2. Installation & usage
 
-    job('bza-from-dsl'){
-       configure{project-> project/'builders'<< builder(class:'hudson.plugins.blazemeter.PerformanceBuilder'){
-           jobApiKey 'value-of-your-key-that-is-present-in-credentials'
-           serverUrl 'https://a.blazemeter.com'
-           testId 'testId-existing-on-server'
-           notes 'x\nc\nu\ni'
-           /** this note is equal to 
-           x
-           c
-           u
-           i
-           **/
-           sessionProperties ''
-           jtlPath ''
-           junitPath ''
-           getJtl true
-           getJunit true
-           }
-       }
-    }
+Please, refer to [plugin's page](wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin) for the installation
+instructures. Also there you'll find Job DSL snippets for using plugin as a step of job configuration "as code".
 
-v.2.7
------
+#### 3. Tests
 
-    job('bza-from-dsl'){
-       steps{
-         blazeMeterTest{
-           jobApiKey 'value-of-your-key-that-is-present-in-credentials'
-           testId 'testId-existing-on-server'
-           notes 'x\nc\nu\ni'
-            /** this note is equal to 
-            x
-            c
-            u
-            i
-            **/
-           sessionProperties '' 
-           jtlPath '' 
-           junitPath '' 
-           getJtl false 
-           getJunit false 
-      
-         }
-       }
-    }
+    mvn test
+
+#### 4. License
+ 
+    Apache License, Version 2.0
+
