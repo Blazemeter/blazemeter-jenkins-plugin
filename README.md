@@ -7,8 +7,7 @@ saved in CVS as a part of configuration.
 
 #### 2. Installation & usage
 
-Please, refer to [plugin's page](wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin) for the installation
-instructures. Also there you'll find Job DSL snippets for using plugin as a step of job configuration "as code".
+Please, refer to [plugin's wiki](https://github.com/jenkinsci/blazemeter-plugin/wiki) for further instructions. 
 
 #### 3. Tests
 
