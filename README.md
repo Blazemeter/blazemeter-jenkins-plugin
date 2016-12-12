@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Blazemeter/blazemeter-jenkins-plugin/badge.svg?branch=master)](https://coveralls.io/github/Blazemeter/blazemeter-jenkins-plugin?branch=master)
+
 #### 1. What's this?
 
 This is [jenkins](http://jenkins.io) plugin for running performance test at [load testing platform](http://blazemeter.com).
