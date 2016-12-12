@@ -97,17 +97,8 @@ public class TestApiV3Impl {
         }
     }
 
-
     @Test
-    public void startTest_http() throws JSONException,IOException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID)
-                , "15102806");
-    }
-
-    @Test
-    public void startTest_jmeter() throws JSONException,IOException {
+    public void startTest_single() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
@@ -115,15 +106,7 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void startTest_followme() throws JSONException,IOException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
-                "15102806");
-    }
-
-    @Test
-    public void startTest_multi() throws JSONException,IOException {
+    public void startTest_collection() throws JSONException,IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
