@@ -581,6 +581,27 @@ public class MockedAPI {
     }
 
 
+    public static void jtl() throws IOException {
+        String expectedPath = UrlManager.LATEST + "/" +
+            "sessions/" + TestConstants.MOCKED_JTL_SESSION + "/reports/logs";
+
+        File jsonFile = new File(TestConstants.RESOURCES + "/jtl.json");
+        String jtl = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jtl));
+    }
+
     public static void active() throws IOException{
         String expectedPath= UrlManager.LATEST+"/web/active";
         File jsonFile = new File(TestConstants.RESOURCES + "/active.json");

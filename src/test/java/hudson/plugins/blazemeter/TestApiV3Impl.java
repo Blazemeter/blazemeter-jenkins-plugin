@@ -40,6 +40,7 @@ public class TestApiV3Impl {
         MockedAPI.startTest();
         MockedAPI.active();
         MockedAPI.ping();
+        MockedAPI.jtl();
     }
 
     @AfterClass
@@ -133,6 +134,16 @@ public class TestApiV3Impl {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         JSONObject testReport = blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(testReport.length() == 33);
+
+
+    }
+
+    @Test
+    public void getJtl() throws JSONException,IOException{
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        JSONObject jtl = blazemeterApiV3.retrieveJtlZip(TestConstants.MOCKED_JTL_SESSION);
+        Assert.assertTrue(jtl.length() == 3);
+        Assert.assertTrue(((JSONObject)jtl.get(JsonConsts.RESULT)).has(JsonConsts.DATA_URL));
 
 
     }
