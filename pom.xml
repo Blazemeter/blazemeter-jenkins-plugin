@@ -155,7 +155,21 @@
                         <additionalparam>-Xdoclint:none</additionalparam>
                     </configuration>
                 </plugin>
-
+                <plugin>
+                    <groupId>com.qulice</groupId>
+                    <artifactId>qulice-maven-plugin</artifactId>
+                    <version>0.17</version>
+                    <configuration>
+                        <license>file:${basedir}/LICENSE</license>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.eluder.coveralls</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
@@ -263,6 +277,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-</project>  
-  
+</project>
+
 
