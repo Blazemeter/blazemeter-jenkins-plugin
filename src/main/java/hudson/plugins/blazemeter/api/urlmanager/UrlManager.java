@@ -29,8 +29,6 @@ public interface UrlManager {
     String CI_STATUS="/ci-status";
     String getServerUrl();
 
-    void setServerUrl(String serverUrl);
-
     String masterStatus(String appKey, String userKey, String testId);
 
     String tests(String appKey, String userKey);
@@ -52,12 +50,6 @@ public interface UrlManager {
     String getUser(String appKey, String userKey);
 
     String getCIStatus(String appKey, String userKey, String sessionId);
-
-    String testConfig(String appKey, String userKey, String testId);
-
-    String postJsonConfig(String appKey, String userKey, String testId);
-
-    String createTest(String appKey, String userKey);
 
     String retrieveJUNITXML(String appKey, String userKey, String sessionId);
 

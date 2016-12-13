@@ -44,10 +44,8 @@ public class TestJobUtility {
         MockedAPI.stopTestSession();
         MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
-        MockedAPI.autoDetectVersion();
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
-        MockedAPI.putTestInfo();
     }
 
     @AfterClass

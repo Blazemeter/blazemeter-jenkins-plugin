@@ -34,12 +34,6 @@ public class TestUrlManagerV3 {
     }
 
     @Test
-    public void setServerUrl(){
-        bmUrlManager.setServerUrl(TestConstants.mockedApiUrl);
-        Assert.assertTrue(bmUrlManager.getServerUrl().equals(TestConstants.mockedApiUrl));
-    }
-
-    @Test
     public void testStatus(){
         String expTestGetStatus=bmUrlManager.getServerUrl()+UrlManager.LATEST+UrlManager.MASTERS+"/"
                 + masterId +"/status?events=false&api_key="+userKey+"&app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
@@ -99,30 +93,6 @@ public class TestUrlManagerV3 {
                 +userKey+"&app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
         String actCIStatus=bmUrlManager.getCIStatus(appKey, userKey, masterId);
         Assert.assertEquals(expCIStatus,actCIStatus);
-    }
-
-    @Test
-    public void getTestInfo(){
-        String expGetTestInfo=bmUrlManager.getServerUrl()+UrlManager.LATEST+"/tests/"+testId+"?api_key="+userKey+"&app_key="+appKey
-                + UrlManager.CLIENT_IDENTIFICATION;
-        String actGetTestInfo=bmUrlManager.testConfig(appKey, userKey, testId);
-        Assert.assertEquals(expGetTestInfo,actGetTestInfo);
-    }
-
-    @Test
-    public void postJsonConfig(){
-        String expPutTestInfo=bmUrlManager.getServerUrl()+UrlManager.LATEST+"/tests/"+testId+
-                "/custom?custom_test_type=yahoo&api_key="+userKey+"&app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
-        String actPutTestInfo=bmUrlManager.postJsonConfig(appKey, userKey, testId);
-        Assert.assertEquals(expPutTestInfo,actPutTestInfo);
-    }
-
-    @Test
-    public void createTest(){
-        String expCreateTest=bmUrlManager.getServerUrl()+UrlManager.LATEST+"/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey+"&app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
-        String actCreateTest=bmUrlManager.createTest(appKey, userKey);
-        Assert.assertEquals(expCreateTest,actCreateTest);
     }
 
     @Test

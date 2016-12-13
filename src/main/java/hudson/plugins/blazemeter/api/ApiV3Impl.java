@@ -377,10 +377,6 @@ public class ApiV3Impl implements Api {
     }
 
 
-    void setBlazeMeterURL(String blazeMeterURL) {
-        this.urlManager.setServerUrl(blazeMeterURL);
-    }
-
     @Override
     public String getBlazeMeterURL() {
         return this.urlManager.getServerUrl();
@@ -531,12 +527,4 @@ public class ApiV3Impl implements Api {
         return true;
     }
 
-    @Override
-    public JSONObject testConfig(String testId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-        String url = this.urlManager.testConfig(APP_KEY, apiKey, testId);
-        Request r = new Request.Builder().url(url).get().build();
-        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-        return jo;
-    }
 }
