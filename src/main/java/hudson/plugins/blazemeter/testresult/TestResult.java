@@ -1,9 +1,8 @@
 package hudson.plugins.blazemeter.testresult;
 
+import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 /**
  Copyright 2016 BlazeMeter Inc.

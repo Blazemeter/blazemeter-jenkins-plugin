@@ -17,20 +17,22 @@ package hudson.plugins.blazemeter;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
+import java.io.File;
+import java.io.IOException;
+import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.*;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mockito.Mockito;
-
-import javax.mail.MessagingException;
-import java.io.File;
-import java.io.IOException;
 
 public class TestJobUtility {
 

@@ -17,15 +17,13 @@ package hudson.plugins.blazemeter;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
 
 
 public class TestUI_settings {

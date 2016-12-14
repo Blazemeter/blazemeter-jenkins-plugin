@@ -17,14 +17,11 @@ package hudson.plugins.blazemeter;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.util.StreamTaskListener;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.kohsuke.stapler.StaplerProxy;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.kohsuke.stapler.StaplerProxy;
 
 
 

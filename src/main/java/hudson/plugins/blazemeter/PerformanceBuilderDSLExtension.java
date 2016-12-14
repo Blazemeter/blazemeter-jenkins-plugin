@@ -20,11 +20,11 @@ import hudson.Extension;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
+import java.util.Collection;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import org.eclipse.jetty.util.log.StdErrLog;
-import java.util.Collection;
 
 
 @Extension(optional = true)

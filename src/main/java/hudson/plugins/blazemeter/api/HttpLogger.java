@@ -15,11 +15,10 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import okhttp3.logging.HttpLoggingInterceptor;
-
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class HttpLogger implements HttpLoggingInterceptor.Logger {
 

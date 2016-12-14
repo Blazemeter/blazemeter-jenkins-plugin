@@ -23,8 +23,17 @@ import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.*;
+import hudson.plugins.blazemeter.utils.Constants;
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
+import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.JsonConsts;
+import hudson.plugins.blazemeter.utils.LogEntries;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.remoting.Callable;
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Calendar;
+import java.util.HashMap;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,13 +41,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.jenkinsci.remoting.RoleChecker;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Calendar;
-import java.util.HashMap;
-
-import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
@@ -72,7 +74,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     @Override
     public Result call() throws Exception {
-        
+
         Result result=Result.SUCCESS;
         StringBuilder lentry=new StringBuilder();
         File ld = new File(this.ws.getRemote()+
@@ -296,7 +298,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     @Override
     public void checkRoles(RoleChecker roleChecker) throws SecurityException {
-        
+
     }
 
     public void setEv(EnvVars ev) {

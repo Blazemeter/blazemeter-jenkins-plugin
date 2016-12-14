@@ -16,9 +16,8 @@ package hudson.plugins.blazemeter;
 
 import hudson.model.AbstractBuild;
 import hudson.model.ModelObject;
-import java.io.IOException;
-
 import hudson.model.TaskListener;
+import java.io.IOException;
 
 public class PerformanceReportMap implements ModelObject {
 

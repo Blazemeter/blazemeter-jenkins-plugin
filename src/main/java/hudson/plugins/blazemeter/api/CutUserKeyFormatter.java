@@ -15,10 +15,9 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
+import org.apache.commons.lang.StringUtils;
 
 public class CutUserKeyFormatter extends SimpleFormatter {
 

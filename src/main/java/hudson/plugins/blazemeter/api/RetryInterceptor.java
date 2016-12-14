@@ -14,12 +14,11 @@
 
 package hudson.plugins.blazemeter.api;
 
+import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jetty.util.log.StdErrLog;
-
-import java.io.IOException;
 
 public class RetryInterceptor implements Interceptor {
 

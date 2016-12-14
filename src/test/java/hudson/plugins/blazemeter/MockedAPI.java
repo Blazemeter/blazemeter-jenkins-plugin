@@ -17,19 +17,17 @@ package hudson.plugins.blazemeter;
 import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
-import org.apache.commons.io.FileUtils;
-import org.mockserver.integration.ClientAndProxy;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.Parameter;
-
 import java.io.File;
 import java.io.IOException;
-
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import org.apache.commons.io.FileUtils;
+import org.mockserver.integration.ClientAndProxy;
 import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
+import org.mockserver.integration.ClientAndServer;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import org.mockserver.model.Parameter;
 
 public class MockedAPI {
     public static ProxyConfiguration proxyConfig=null;
