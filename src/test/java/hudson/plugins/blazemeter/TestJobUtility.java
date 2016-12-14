@@ -14,6 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
+import hudson.EnvVars;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -273,6 +274,13 @@ public class TestJobUtility {
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void prepareProps() throws JSONException {
+        String prps = "v=r,v=i";
+        JSONArray arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
+        Assert.assertTrue(arr.length()==2);
     }
 
 }

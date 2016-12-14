@@ -283,8 +283,8 @@ public class TestApiV3Impl {
 
     @Test
     public void properties(){
-    /*    blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean notes = blazemeterApiV3.properties(TestConstants.MOCKED_NOTE,TestConstants.TEST_MASTER_ID);
-        Assert.assertTrue(notes);
-    */}
+        /*
+        TODO
+         */
+    }
 }
