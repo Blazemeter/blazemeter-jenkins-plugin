@@ -19,6 +19,7 @@ import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.JsonConsts;
 import java.io.IOException;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import org.json.JSONException;
@@ -45,6 +46,7 @@ public class TestApiV3Impl {
         MockedAPI.jtl();
         MockedAPI.junit();
         MockedAPI.publicToken();
+        MockedAPI.getListOfSessionIds();
     }
 
     @AfterClass
@@ -265,10 +267,10 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void getListOfSessionIds(){
-        /*
-        TODO
-         */
+    public void getListOfSessionIds() throws IOException, JSONException {
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        List<String> ls = blazemeterApiV3.getListOfSessionIds(TestConstants.TEST_MASTER_ID);
+        Assert.assertTrue(ls.size()==1);
     }
 
     @Test

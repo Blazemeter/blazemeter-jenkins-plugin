@@ -422,6 +422,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.listOfSessionIds(APP_KEY, apiKey, masterId);
         Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             JSONArray sessions = jo.getJSONObject(JsonConsts.RESULT).getJSONArray("sessions");
