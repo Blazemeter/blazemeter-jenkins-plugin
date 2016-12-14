@@ -47,6 +47,7 @@ public class TestApiV3Impl {
         MockedAPI.junit();
         MockedAPI.publicToken();
         MockedAPI.getListOfSessionIds();
+        MockedAPI.notes();
     }
 
     @AfterClass
@@ -274,10 +275,10 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void notes(){
-        /*
-        TODO
-         */
+    public void notes() throws Exception{
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        boolean notes = blazemeterApiV3.notes(TestConstants.MOCKED_NOTE,TestConstants.TEST_MASTER_ID);
+        Assert.assertTrue(notes);
     }
 
     @Test

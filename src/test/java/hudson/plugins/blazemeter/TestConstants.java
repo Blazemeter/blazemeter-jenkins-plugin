@@ -48,5 +48,5 @@ public interface TestConstants {
     String TEST_MASTER_ERROR_70404 ="testMasterError_70404";
 
     String MOCKED_SESSION ="r-v3-584fe711c017f";
-
+    String MOCKED_NOTE = "bbbbbbbbbbbbbbbbbbbbb";
 }
