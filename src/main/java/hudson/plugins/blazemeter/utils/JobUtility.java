@@ -23,9 +23,24 @@ import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestResult;
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import org.apache.commons.io.IOUtils;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import javax.mail.MessagingException;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -33,15 +48,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.mail.MessagingException;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-
-import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 
 
 public class JobUtility {
@@ -515,17 +521,6 @@ public class JobUtility {
             props.setProperty(Constants.VERSION, "N/A");
         }
         return props.getProperty(Constants.VERSION);
-    }
-
-    public static String emptyBodyJson() {
-        String eb = "";
-        try {
-            InputStream is = JobUtility.class.getResourceAsStream("emptyBody.json");
-            eb = IOUtils.toString(is);
-        } catch (IOException ex) {
-        } finally {
-            return eb;
-        }
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
