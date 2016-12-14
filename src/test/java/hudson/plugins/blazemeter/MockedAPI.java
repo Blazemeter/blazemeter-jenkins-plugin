@@ -623,6 +623,27 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(xml));
     }
 
+    public static void publicToken() throws IOException {
+        String expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_ID + "/publicToken";
+
+        File jf = new File(TestConstants.RESOURCES + "/publicToken.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+    }
+
     public static void active() throws IOException{
         String expectedPath= UrlManager.LATEST+"/web/active";
         File jsonFile = new File(TestConstants.RESOURCES + "/active.json");

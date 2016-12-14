@@ -34,4 +34,5 @@ public interface JsonConsts {
     String CODE="code";
     String STATUS="status";
     String CONFIGURATION="configuration";
+    String PUBLIC_TOKEN="publicToken";
 }

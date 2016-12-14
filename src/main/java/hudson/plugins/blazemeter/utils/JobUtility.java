@@ -93,7 +93,7 @@ public class JobUtility {
             jo = api.generatePublicToken(masterId);
             if (jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
                 JSONObject result = jo.getJSONObject(JsonConsts.RESULT);
-                publicToken = result.getString("publicToken");
+                publicToken = result.getString(JsonConsts.PUBLIC_TOKEN);
                 reportUrl = api.getBlazeMeterURL() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
             } else {
                 bzmLog.warn(letnry.toString() + jo.get(JsonConsts.ERROR).toString());

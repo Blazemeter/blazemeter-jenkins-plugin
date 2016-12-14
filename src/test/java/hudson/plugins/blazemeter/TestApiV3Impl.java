@@ -15,16 +15,18 @@
 package hudson.plugins.blazemeter;
 
 import com.google.common.collect.LinkedHashMultimap;
-import hudson.plugins.blazemeter.api.*;
+import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.JsonConsts;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.*;
-
+import java.io.IOException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
-import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class TestApiV3Impl {
     private ApiV3Impl blazemeterApiV3 = null;
@@ -42,6 +44,7 @@ public class TestApiV3Impl {
         MockedAPI.ping();
         MockedAPI.jtl();
         MockedAPI.junit();
+        MockedAPI.publicToken();
     }
 
     @AfterClass
@@ -254,10 +257,11 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void publicToken(){
-        /*
-        TODO
-         */
+    public void publicToken() throws IOException, JSONException {
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        JSONObject jo = blazemeterApiV3.generatePublicToken(TestConstants.TEST_MASTER_ID);
+        Assert.assertTrue(jo.length() == 3);
+        Assert.assertTrue(jo.getJSONObject(JsonConsts.RESULT).has(JsonConsts.PUBLIC_TOKEN));
     }
 
     @Test
