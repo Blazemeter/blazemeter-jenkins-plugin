@@ -41,6 +41,7 @@ public class TestApiV3Impl {
         MockedAPI.active();
         MockedAPI.ping();
         MockedAPI.jtl();
+        MockedAPI.junit();
     }
 
     @AfterClass
@@ -141,7 +142,7 @@ public class TestApiV3Impl {
     @Test
     public void getJtl() throws JSONException,IOException{
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        JSONObject jtl = blazemeterApiV3.retrieveJtlZip(TestConstants.MOCKED_JTL_SESSION);
+        JSONObject jtl = blazemeterApiV3.retrieveJtlZip(TestConstants.MOCKED_SESSION);
         Assert.assertTrue(jtl.length() == 3);
         Assert.assertTrue(((JSONObject)jtl.get(JsonConsts.RESULT)).has(JsonConsts.DATA_URL));
 
@@ -243,5 +244,40 @@ public class TestApiV3Impl {
         } catch (Exception e) {
             Assert.assertFalse(ping);
         }
+    }
+
+    @Test
+    public void junit() throws IOException{
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String xml = blazemeterApiV3.retrieveJUNITXML(TestConstants.TEST_MASTER_ID);
+        Assert.assertTrue(xml.length() == 784);
+    }
+
+    @Test
+    public void publicToken(){
+        /*
+        TODO
+         */
+    }
+
+    @Test
+    public void getListOfSessionIds(){
+        /*
+        TODO
+         */
+    }
+
+    @Test
+    public void notes(){
+        /*
+        TODO
+         */
+    }
+
+    @Test
+    public void properties(){
+        /*
+        TODO
+         */
     }
 }

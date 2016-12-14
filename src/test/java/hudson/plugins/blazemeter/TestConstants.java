@@ -22,7 +22,6 @@ public interface TestConstants {
     String MOCKED_USER_KEY_VALID ="mockedAPIKeyValid";
     String MOCKED_USER_KEY_RETRIES ="mockedAPIKeyRetries";
     String MOCKED_USER_KEY_TEST_TYPE ="mockedAPIKeyTestType";
-    String MOCKED_JTL_SESSION ="r-v3-584fe711c017f";
     String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
     String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
     String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
@@ -47,5 +46,7 @@ public interface TestConstants {
     String TEST_MASTER_ERROR_61700 ="testMasterError_61700";
     String TEST_MASTER_ERROR_0 ="testMasterError_0";
     String TEST_MASTER_ERROR_70404 ="testMasterError_70404";
+
+    String MOCKED_SESSION ="r-v3-584fe711c017f";
 
 }

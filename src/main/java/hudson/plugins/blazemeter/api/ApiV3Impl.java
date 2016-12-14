@@ -383,9 +383,9 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public String retrieveJUNITXML(String sessionId) throws IOException{
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
-        String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, sessionId);
+    public String retrieveJUNITXML(String masterId) throws IOException{
+        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return null;
+        String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, masterId);
         Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         String xmlJunit = okhttp.newCall(r).execute().body().string();

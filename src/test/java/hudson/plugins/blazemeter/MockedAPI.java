@@ -583,7 +583,7 @@ public class MockedAPI {
 
     public static void jtl() throws IOException {
         String expectedPath = UrlManager.LATEST + "/" +
-            "sessions/" + TestConstants.MOCKED_JTL_SESSION + "/reports/logs";
+            "sessions/" + TestConstants.MOCKED_SESSION + "/reports/logs";
 
         File jsonFile = new File(TestConstants.RESOURCES + "/jtl.json");
         String jtl = FileUtils.readFileToString(jsonFile);
@@ -600,6 +600,27 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jtl));
+    }
+
+    public static void junit() throws IOException {
+        String expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_ID + "/reports/thresholds";
+
+        File xmlFile = new File(TestConstants.RESOURCES + "/junit.xml");
+        String xml = FileUtils.readFileToString(xmlFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(xml));
     }
 
     public static void active() throws IOException{
