@@ -16,11 +16,6 @@ package hudson.plugins.blazemeter;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
-import hudson.util.StreamTaskListener;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.kohsuke.stapler.StaplerProxy;
 
 
@@ -28,10 +23,8 @@ import org.kohsuke.stapler.StaplerProxy;
 public class PerformanceBuildAction implements Action, StaplerProxy {
     private final AbstractBuild<?, ?> build;
 
-    private transient WeakReference<PerformanceReportMap> performanceReportMap;
-
-    private static final Logger logger = Logger.getLogger(PerformanceBuildAction.class.getName());
     private String reportUrl;
+    private PerformanceReportMap m = null;
 
     public PerformanceBuildAction(AbstractBuild<?, ?> pBuild) {
         build = pBuild;
@@ -52,31 +45,14 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
     }
 
     public PerformanceReportMap getTarget() {
-        return getPerformanceReportMap();
+        if (this.m == null) {
+            this.m = new PerformanceReportMap(this);
+        }
+        return m;
     }
 
     public AbstractBuild<?, ?> getBuild() {
         return build;
-    }
-
-    public PerformanceReportMap getPerformanceReportMap() {
-        PerformanceReportMap reportMap = null;
-        WeakReference<PerformanceReportMap> wr = this.performanceReportMap;
-        if (wr != null) {
-            reportMap = wr.get();
-            if (reportMap != null)
-                return reportMap;
-        }
-
-        try {
-            reportMap = new PerformanceReportMap(this, new StreamTaskListener(
-                    System.err));
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error creating new PerformanceReportMap()", e);
-        }
-        this.performanceReportMap = new WeakReference<PerformanceReportMap>(
-                reportMap);
-        return reportMap;
     }
 
     public String getReportUrl() {
