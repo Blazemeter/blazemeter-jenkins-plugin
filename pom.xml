@@ -188,13 +188,13 @@
                         <aggregate>true</aggregate>
                         <instrumentation>
                             <excludes>
-                                <exclude>hudson.plugins.blazemeter.PerformanceBuilder*.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/PerformanceBuilder*.class</exclude>
                             </excludes>
                         </instrumentation>
                     </configuration>
                     <executions>
                         <execution>
-                            <phase>package</phase>
+                            <phase>test</phase>
                             <goals>
                                 <goal>cobertura</goal>
                             </goals>
