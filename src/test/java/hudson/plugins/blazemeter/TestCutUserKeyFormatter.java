@@ -1,3 +1,17 @@
+/**
+ Copyright 2016 BlazeMeter Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.CutUserKeyFormatter;
@@ -17,7 +31,7 @@ public class TestCutUserKeyFormatter {
         CutUserKeyFormatter cuk = new CutUserKeyFormatter();
         TestLogRecord lr = new TestLogRecord(Level.INFO,
             "https://a.blazemeter.com/api/latest/tests/5283127/start?api_key=12345678901234566567");
-        Assert.assertTrue(cuk.format(lr).indexOf(Constants.THREE_DOTS)==105);
+        Assert.assertEquals(cuk.format(lr).indexOf(Constants.THREE_DOTS),105);
     }
 
     @Test
