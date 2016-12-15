@@ -186,6 +186,12 @@
                         <format>xml</format>
                         <maxmem>256m</maxmem>
                         <aggregate>true</aggregate>
+                        <instrumentation>
+                            <ignores>
+                                <ignore>hudson.plugins.blazemeter.PerformanceBuilder</ignore>
+                                <ignore>hudson.plugins.blazemeter.PerformanceBuilderDSLContext</ignore>
+                            </ignores>
+                        </instrumentation>
                     </configuration>
                     <executions>
                         <execution>
