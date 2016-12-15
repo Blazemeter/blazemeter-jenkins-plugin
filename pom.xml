@@ -189,6 +189,7 @@
                         <instrumentation>
                             <excludes>
                                 <exclude>hudson/plugins/blazemeter/PerformanceBuilder*.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/BlazeMeterBuild.class</exclude>
                             </excludes>
                         </instrumentation>
                     </configuration>
