@@ -189,8 +189,12 @@
                         <instrumentation>
                             <excludes>
                                 <exclude>hudson/plugins/blazemeter/PerformanceBuilder*.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/PerformanceBuilAction.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/PerformanceReportMap.class</exclude>
                                 <exclude>hudson/plugins/blazemeter/BlazeMeterBuild.class</exclude>
                                 <exclude>hudson/plugins/blazemeter/utils/report/ReportUrlTask.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/utils/report/BuildReporter.class</exclude>
+                                <exclude>hudson/plugins/blazemeter/utils/BuildResult.class</exclude>
                                 <exclude>hudson/plugins/blazemeter/api/HttpLogger.class</exclude>
                                 <exclude>hudson/plugins/blazemeter/Messages.class</exclude>
                             </excludes>
