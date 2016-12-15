@@ -644,7 +644,7 @@ public class MockedAPI {
 
     public static void getListOfSessionIds() throws IOException {
         String expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
-            TestConstants.TEST_MASTER_ID + "/sessions";
+            TestConstants.TEST_MASTER_ID + UrlManager.SESSIONS;
 
         File jf = new File(TestConstants.RESOURCES + "/listOfsessionIds.json");
         String jo = FileUtils.readFileToString(jf);
@@ -675,6 +675,27 @@ public class MockedAPI {
                 .withPath(expectedPath)
                 .withQueryStringParameters(
                     new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+    }
+
+    public static void properties() throws IOException {
+        String expectedPath = UrlManager.LATEST + UrlManager.SESSIONS + "/" +
+            TestConstants.MOCKED_SESSION + "/properties";
+
+        File jf = new File(TestConstants.RESOURCES + "/properties.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(expectedPath)
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID),
+                    new Parameter("target", "all")
                 ),
             unlimited()
         )

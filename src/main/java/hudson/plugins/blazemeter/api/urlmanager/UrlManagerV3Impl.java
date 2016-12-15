@@ -196,7 +196,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             return NO_URL;
         }
-        retrieveJTLZIP= serverUrl +LATEST+"/sessions/"+sessionId+
+        retrieveJTLZIP= serverUrl +LATEST+UrlManager.SESSIONS+"/"+sessionId+
                 "/reports/logs?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return retrieveJTLZIP;
@@ -228,7 +228,7 @@ public class UrlManagerV3Impl implements UrlManager {
             return NO_URL;
         }
         listOfSessionIds= serverUrl +LATEST+MASTERS+"/"+masterId+
-                "/sessions?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+                UrlManager.SESSIONS+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return listOfSessionIds;
     }
@@ -276,7 +276,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             return NO_URL;
         }
-        return properties= serverUrl +LATEST+"/sessions/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return properties= serverUrl +LATEST+UrlManager.SESSIONS+"/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 }
 

@@ -25,6 +25,7 @@ public interface UrlManager {
     String LATEST="/api/latest";
     String TESTS="/tests";
     String MASTERS="/masters";
+    String SESSIONS="/sessions";
     String WEB="/web";
     String CI_STATUS="/ci-status";
     String getServerUrl();

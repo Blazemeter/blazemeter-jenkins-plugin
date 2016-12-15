@@ -15,23 +15,29 @@
 package hudson.plugins.blazemeter;
 
 import com.google.common.collect.LinkedHashMultimap;
+import hudson.EnvVars;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.JsonConsts;
 import java.io.IOException;
 import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
+import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class TestApiV3Impl {
     private ApiV3Impl blazemeterApiV3 = null;
-
+    private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -48,6 +54,7 @@ public class TestApiV3Impl {
         MockedAPI.publicToken();
         MockedAPI.getListOfSessionIds();
         MockedAPI.notes();
+        MockedAPI.properties();
     }
 
     @AfterClass
@@ -282,9 +289,11 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void properties(){
-        /*
-        TODO
-         */
+    @Ignore
+    public void properties_true() throws Exception {
+        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String prps = "v=r,v=i";
+        JSONArray arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
+        boolean properties = blazemeterApiV3.properties(arr, TestConstants.MOCKED_SESSION);
     }
 }
