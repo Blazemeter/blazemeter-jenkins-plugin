@@ -187,9 +187,9 @@
                         <maxmem>256m</maxmem>
                         <aggregate>true</aggregate>
                         <instrumentation>
-                            <ignores>
-                                <ignore>hudson.plugins.blazemeter.PerformanceBuilder*.**</ignore>
-                            </ignores>
+                            <excludes>
+                                <exclude>hudson.plugins.blazemeter.PerformanceBuilder*.class</exclude>
+                            </excludes>
                         </instrumentation>
                     </configuration>
                     <executions>
