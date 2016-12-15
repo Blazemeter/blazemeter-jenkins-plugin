@@ -24,5 +24,7 @@ public class TestAgrReport {
         Assert.assertTrue(r.max==172);
         Assert.assertTrue(r.hits==96);
         Assert.assertTrue(r.errorPercentage==100);
+        String arStr="AggregateTestResult -> hits=96.0, errors percentage=100.0, average=6.0520833333333, min=0.0, max=172.0";
+        Assert.assertEquals(arStr,r.toString());
     }
 }
