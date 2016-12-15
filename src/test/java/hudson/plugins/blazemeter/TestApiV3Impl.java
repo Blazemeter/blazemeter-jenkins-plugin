@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -289,7 +288,6 @@ public class TestApiV3Impl {
     }
 
     @Test
-    @Ignore
     public void properties_true() throws Exception {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         String prps = "v=r,v=i";
