@@ -188,8 +188,7 @@
                         <aggregate>true</aggregate>
                         <instrumentation>
                             <ignores>
-                                <ignore>hudson.plugins.blazemeter.PerformanceBuilder</ignore>
-                                <ignore>hudson.plugins.blazemeter.PerformanceBuilderDSLContext</ignore>
+                                <ignore>hudson.plugins.blazemeter.PerformanceBuilder*.**</ignore>
                             </ignores>
                         </instrumentation>
                     </configuration>
