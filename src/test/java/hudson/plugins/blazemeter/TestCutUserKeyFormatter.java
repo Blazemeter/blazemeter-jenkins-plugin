@@ -30,15 +30,17 @@ public class TestCutUserKeyFormatter {
     public void format_true() {
         CutUserKeyFormatter cuk = new CutUserKeyFormatter();
         TestLogRecord lr = new TestLogRecord(Level.INFO,
-            "https://a.blazemeter.com/api/latest/tests/5283127/start?api_key=12345678901234566567");
-        Assert.assertEquals(cuk.format(lr).indexOf(Constants.THREE_DOTS),105);
+            "?api_key=12345678901234566567");
+        String formatted=cuk.format(lr);
+        int dots=formatted.length()-4;
+        Assert.assertEquals(cuk.format(lr).indexOf(Constants.THREE_DOTS),dots);
     }
 
     @Test
     public void format_false() {
         CutUserKeyFormatter cuk = new CutUserKeyFormatter();
         TestLogRecord lr = new TestLogRecord(Level.INFO,
-            "https://a.blazemeter.com/api/latest/tests/5283127/start?");
+            "?");
         Assert.assertFalse(cuk.format(lr).contains(Constants.THREE_DOTS));
     }
 
