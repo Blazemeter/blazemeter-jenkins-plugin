@@ -22,7 +22,7 @@ import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.plugins.blazemeter.testresult.AgrReport;
 import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
@@ -408,16 +408,11 @@ public class JobUtility {
             consLog.info("Aggregate report is not available after 4 attempts.");
             return result;
         }
-        TestResult testResult = null;
+        AgrReport testResult = null;
         try {
-            testResult = new TestResult(testReport);
+            testResult = new AgrReport(testReport);
             bzmLog.info(testResult.toString());
             consLog.info(testResult.toString());
-        } catch (IOException ioe) {
-            bzmLog.info("Failed to get test result. Try to check server for it");
-            consLog.info("Failed to get test result. Try to check server for it");
-            bzmLog.info("ERROR: Failed to generate TestResult: " + ioe);
-            consLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
             bzmLog.info("Failed to get test result. Try to check server for it");
             consLog.info("Failed to get test result. Try to check server for it");
