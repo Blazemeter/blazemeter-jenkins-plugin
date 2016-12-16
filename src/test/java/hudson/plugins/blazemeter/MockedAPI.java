@@ -215,6 +215,23 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100_notes.json");
+        testStatus= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_100_notes +"/status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(testStatus));
+
+
         jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -673,7 +690,7 @@ public class MockedAPI {
             request()
                 .withMethod("PATCH")
                 .withPath(expectedPath)
-                .withQueryStringParameters(
+                .withQueryStringParameter(
                     new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
                 ),
             unlimited()
@@ -681,6 +698,23 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_100_notes;
+        mockServer.when(
+            request()
+                .withMethod("PATCH")
+                .withPath(expectedPath)
+                .withQueryStringParameter(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+
     }
 
     public static void properties() throws IOException {

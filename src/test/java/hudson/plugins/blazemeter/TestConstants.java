@@ -41,6 +41,7 @@ public interface TestConstants {
     String TEST_MASTER_70 ="testMaster-70";
     String TEST_MASTER_100 ="testMaster-100";
     String TEST_MASTER_140 ="testMaster-140";
+    String TEST_MASTER_100_notes ="testMaster-100_notes";
     String TEST_MASTER_SUCCESS ="testMasterSuccess";
     String TEST_MASTER_FAILURE ="testMasterFailure";
     String TEST_MASTER_ERROR_61700 ="testMasterError_61700";

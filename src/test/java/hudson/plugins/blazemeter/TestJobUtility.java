@@ -49,6 +49,7 @@ public class TestJobUtility {
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
+        MockedAPI.notes();
     }
 
     @AfterClass
@@ -283,4 +284,10 @@ public class TestJobUtility {
         Assert.assertTrue(arr.length()==2);
     }
 
+    @Test
+    public void notes(){
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
+        Assert.assertTrue(notes);
+    }
 }
