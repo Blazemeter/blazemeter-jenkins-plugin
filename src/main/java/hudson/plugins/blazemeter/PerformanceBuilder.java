@@ -22,7 +22,6 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
@@ -127,14 +126,8 @@ public class PerformanceBuilder extends Builder {
             r = Result.FAILURE;
         } finally {
             br.stop();
-            BuildResult rstr = BuildResult.valueOf(r.toString());
             build.setResult(r);
-            switch (rstr) {
-                case FAILURE:
-                    return false;
-                default:
-                    return true;
-            }
+            return !r.equals(Result.FAILURE);
         }
     }
 
