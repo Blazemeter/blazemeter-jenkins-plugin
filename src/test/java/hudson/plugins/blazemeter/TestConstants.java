@@ -48,6 +48,8 @@ public interface TestConstants {
     String TEST_MASTER_ERROR_0 ="testMasterError_0";
     String TEST_MASTER_ERROR_70404 ="testMasterError_70404";
 
-    String MOCKED_SESSION ="r-v3-584fe711c017f";
+    String MOCKED_SESSION ="r-v3-585114ca535ed";
     String MOCKED_NOTE = "bbbbbbbbbbbbbbbbbbbbb";
+    String JTL_URL = "https://blazemeter.s3.amazonaws.com/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?" +
+        "AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D";
 }

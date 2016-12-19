@@ -23,6 +23,7 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -51,6 +52,8 @@ public class TestJobUtility {
         MockedAPI.getTests();
         MockedAPI.notes();
         MockedAPI.getTestReport();
+        MockedAPI.getListOfSessionIds();
+        MockedAPI.jtl();
     }
 
     @AfterClass
@@ -295,7 +298,15 @@ public class TestJobUtility {
     @Test
     public void agReport(){
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        JSONObject ar = JobUtility.requestAggregateReport(api,TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
+        JSONObject ar = JobUtility.requestAggregateReport(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(ar.length()==33);
+    }
+
+    @Test
+    public void jtlUrls(){
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
+        Assert.assertTrue(sessions.size()==1);
+        Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION),TestConstants.JTL_URL);
     }
 }
