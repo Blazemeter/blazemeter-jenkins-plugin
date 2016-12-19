@@ -186,18 +186,6 @@
                         <format>xml</format>
                         <maxmem>256m</maxmem>
                         <aggregate>true</aggregate>
-                        <instrumentation>
-                            <excludes>
-                                <exclude>hudson/plugins/blazemeter/PerformanceBuilder*.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/PerformanceBuildAction.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/PerformanceReportMap.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/BlazeMeterBuild.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/utils/report/ReportUrlTask.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/utils/report/BuildReporter.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/api/HttpLogger.class</exclude>
-                                <exclude>hudson/plugins/blazemeter/Messages.class</exclude>
-                            </excludes>
-                        </instrumentation>
                     </configuration>
                     <executions>
                         <execution>
