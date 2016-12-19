@@ -50,6 +50,7 @@ public class TestJobUtility {
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
         MockedAPI.notes();
+        MockedAPI.getTestReport();
     }
 
     @AfterClass
@@ -289,5 +290,12 @@ public class TestJobUtility {
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
         Assert.assertTrue(notes);
+    }
+
+    @Test
+    public void agReport(){
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        JSONObject ar = JobUtility.requestAggregateReport(api,TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
+        Assert.assertTrue(ar.length()==33);
     }
 }

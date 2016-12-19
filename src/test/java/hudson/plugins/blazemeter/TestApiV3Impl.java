@@ -293,5 +293,6 @@ public class TestApiV3Impl {
         String prps = "v=r,v=i";
         JSONArray arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
         boolean properties = blazemeterApiV3.properties(arr, TestConstants.MOCKED_SESSION);
+        Assert.assertTrue(properties);
     }
 }
