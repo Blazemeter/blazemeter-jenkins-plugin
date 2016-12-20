@@ -42,12 +42,14 @@ public class ReportUrlTask implements Runnable {
             }
             EnvVars ev = EnvVars.getRemote(c);
             String ruId = this.jobName + "-" + build.getId();
-            if (ev.containsKey(ruId)) {
+            if (ev != null && ev.containsKey(ruId)) {
                 PerformanceBuildAction a = new PerformanceBuildAction(build);
                 a.setReportUrl(ev.get(ruId, ""));
                 build.addAction(a);
                 this.reportUrl = true;
             }
+        } catch (NullPointerException e) {
+            return;
         } catch (InterruptedException e) {
             return;
         } catch (IOException e) {
