@@ -209,6 +209,10 @@
                     <version>2.17</version>
                     <configuration>
                         <skipTests>false</skipTests>
+                        <forkMode>never</forkMode>
+                        <excludes>
+                            <exclude>InjectedTest.java</exclude>
+                        </excludes>
                     </configuration>
                 </plugin>
                 <plugin>
