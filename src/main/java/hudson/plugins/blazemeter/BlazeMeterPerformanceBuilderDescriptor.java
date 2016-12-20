@@ -59,6 +59,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         descriptor=this;
     }
 
+    public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
+        super(PerformanceBuilder.class);
+        load();
+        this.blazeMeterURL=blazeMeterURL;
+        descriptor=this;
+    }
+
     public static BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
         return descriptor;
     }
@@ -176,17 +183,21 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public List<String> getKeys(){
+    public List<String> getKeys() {
         List<String> apiKeys = new ArrayList<String>();
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredentialImpl c : CredentialsProvider
+        try {
+            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            String key = c.getApiKey();
-            if (!apiKeys.contains(key)) {
-                apiKeys.add(key);
+                String key = c.getApiKey();
+                if (!apiKeys.contains(key)) {
+                    apiKeys.add(key);
+                }
             }
+        } catch (Exception e) {
+        } finally {
+            return apiKeys;
         }
-        return apiKeys;
     }
 
     public String getName() {
