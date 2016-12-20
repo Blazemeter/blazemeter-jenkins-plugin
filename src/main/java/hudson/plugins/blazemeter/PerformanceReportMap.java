@@ -41,4 +41,8 @@ public class PerformanceReportMap implements ModelObject {
     public void setReportUrl(String reportUrl){
         this.buildAction.setReportUrl(reportUrl);
     }
+
+    public PerformanceBuildAction getBuildAction() {
+        return this.buildAction;
+    }
 }
