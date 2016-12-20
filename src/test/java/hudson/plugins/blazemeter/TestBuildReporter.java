@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class TestBuildReporter {
+public class TestBuildReporter extends BuildReporter{
 
     @Test
     public void start() {
@@ -32,13 +32,9 @@ public class TestBuildReporter {
         AbstractBuild b = Mockito.mock(AbstractBuild.class);
         VirtualChannel c = Mockito.mock(VirtualChannel.class);
         ReportUrlTask t = new ReportUrlTask(b, "name", c);
-        br.run(t);
-        Mockito.verify(exec).scheduleAtFixedRate(t, BuildReporter.URL_INTERVAL,
+        ReportUrlTask st = Mockito.spy(t);
+        br.run(st);
+        Mockito.verify(exec).scheduleAtFixedRate(st, BuildReporter.URL_INTERVAL,
             BuildReporter.URL_INTERVAL, TimeUnit.SECONDS);
-    }
-
-    @Test
-    public void stop() {
-
     }
 }

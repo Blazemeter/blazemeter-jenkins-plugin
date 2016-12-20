@@ -48,4 +48,8 @@ public class BuildReporter {
             this.urlTask.cancel(false);
         }
     }
+
+    public ScheduledFuture<?> getUrlTask() {
+        return this.urlTask;
+    }
 }
