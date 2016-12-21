@@ -17,6 +17,10 @@ package hudson.plugins.blazemeter;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import java.io.IOException;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,13 +30,14 @@ public class TestPerformanceBuilderDescriptor {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+    public BlazeMeterPerformanceBuilderDescriptor bd=null;
 
     @Test
     public void constructor() {
-       BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-       Assert.assertEquals(Constants.A_BLAZEMETER_COM,bd.getBlazeMeterURL());
-       bd = new BlazeMeterPerformanceBuilderDescriptor(Constants.A_BLAZEMETER_COM+123);
-       Assert.assertEquals(Constants.A_BLAZEMETER_COM+123,bd.getBlazeMeterURL());
+        bd = new BlazeMeterPerformanceBuilderDescriptor();
+        Assert.assertEquals(Constants.A_BLAZEMETER_COM, bd.getBlazeMeterURL());
+        bd = new BlazeMeterPerformanceBuilderDescriptor(Constants.A_BLAZEMETER_COM + 123);
+        Assert.assertEquals(Constants.A_BLAZEMETER_COM + 123, bd.getBlazeMeterURL());
 
     }
 
@@ -48,4 +53,21 @@ public class TestPerformanceBuilderDescriptor {
         }
     }
 
+    @Test
+    public void do_test_connection() {
+        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
+        try {
+            bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
+            FormValidation fv = bd.doTestConnection(TestConstants.MOCKED_USER_KEY_VALID);
+            Assert.assertEquals(fv.kind,FormValidation.Kind.ERROR);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
+    }
 }
