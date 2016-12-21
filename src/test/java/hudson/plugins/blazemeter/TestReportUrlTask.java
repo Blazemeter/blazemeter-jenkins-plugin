@@ -37,6 +37,7 @@ public class TestReportUrlTask {
             VirtualChannel c = j.getInstance().getChannel();
             ReportUrlTask t = new ReportUrlTask(b, "name", c);
             t.run();
+            Assert.assertEquals(b.getAllActions().size(),0);
         } catch (Exception e) {
             Assert.fail();
         }
