@@ -59,7 +59,7 @@ public class TestPerformanceBuilderDescriptor {
         try {
             bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
             FormValidation fv = bd.doTestConnection(TestConstants.MOCKED_USER_KEY_VALID);
-            Assert.assertEquals(fv.kind,FormValidation.Kind.ERROR);
+            Assert.assertEquals(fv.kind, FormValidation.Kind.ERROR);
         } catch (MessagingException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -70,4 +70,18 @@ public class TestPerformanceBuilderDescriptor {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void do_fill_api_key_items() {
+        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
+        try {
+            bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
+            ListBoxModel itemds=bd.doFillJobApiKeyItems(TestConstants.MOCKED_USER_KEY_VALID);
+            Assert.assertEquals(0,itemds.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

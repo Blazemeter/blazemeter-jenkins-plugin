@@ -122,6 +122,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
         ListBoxModel items = new ListBoxModel();
+        try{
+
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
@@ -138,7 +140,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 option.selected=false;
             }
         }
-        return items;
+        }catch (NullPointerException npe){
+
+        }finally {
+            return items;
+        }
     }
 
     public List<BlazemeterCredentialImpl> getCredentials(Object scope) {
