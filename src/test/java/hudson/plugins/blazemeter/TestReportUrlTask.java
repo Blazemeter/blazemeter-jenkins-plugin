@@ -14,21 +14,27 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.jvnet.hudson.test.JenkinsRule;
 
 public class TestReportUrlTask {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
     @Test
     public void run() {
         try {
 
-            AbstractBuild b = Mockito.mock(AbstractBuild.class);
-            VirtualChannel c = Mockito.mock(VirtualChannel.class);
+            FreeStyleProject project = j.createFreeStyleProject();
+            FreeStyleBuild b = new FreeStyleBuild(project);
+            VirtualChannel c = j.getInstance().getChannel();
             ReportUrlTask t = new ReportUrlTask(b, "name", c);
             t.run();
         } catch (Exception e) {
