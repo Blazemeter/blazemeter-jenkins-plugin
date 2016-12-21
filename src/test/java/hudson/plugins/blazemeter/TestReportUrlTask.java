@@ -22,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.times;
 
 public class TestReportUrlTask {
 
@@ -34,10 +36,12 @@ public class TestReportUrlTask {
 
             FreeStyleProject project = j.createFreeStyleProject();
             FreeStyleBuild b = new FreeStyleBuild(project);
+            FreeStyleBuild bm= Mockito.spy(b);
             VirtualChannel c = j.getInstance().getChannel();
-            ReportUrlTask t = new ReportUrlTask(b, "name", c);
+            ReportUrlTask t = new ReportUrlTask(bm, "name", c);
             t.run();
-            Assert.assertEquals(b.getAllActions().size(),0);
+            Mockito.verify(bm, times(1)).getId();
+            Assert.assertEquals(bm.getAllActions().size(),0);
         } catch (Exception e) {
             Assert.fail();
         }
