@@ -20,6 +20,7 @@ import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -36,5 +37,18 @@ public class TestBuildReporter extends BuildReporter{
         br.run(st);
         Mockito.verify(exec).scheduleAtFixedRate(st, BuildReporter.URL_INTERVAL,
             BuildReporter.URL_INTERVAL, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void stop() {
+        BuildReporter br = new BuildReporter();
+        AbstractBuild b = Mockito.mock(AbstractBuild.class);
+        VirtualChannel c = Mockito.mock(VirtualChannel.class);
+        ReportUrlTask t = new ReportUrlTask(b, "name", c);
+        ReportUrlTask st = Mockito.spy(t);
+        br.run(st);
+        Assert.assertFalse(br.getUrlTask().isCancelled());
+        br.stop();
+        Assert.assertTrue(br.getUrlTask().isCancelled());
     }
 }
