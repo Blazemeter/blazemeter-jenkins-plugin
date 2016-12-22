@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.ProxyConfiguration;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import java.io.File;
@@ -30,7 +29,6 @@ import static org.mockserver.model.HttpResponse.response;
 import org.mockserver.model.Parameter;
 
 public class MockedAPI {
-    public static ProxyConfiguration proxyConfig=null;
     private static ClientAndServer mockServer;
     private static ClientAndProxy proxy;
     private MockedAPI(){}

@@ -15,12 +15,8 @@
 package hudson.plugins.blazemeter;
 
 import hudson.model.AbstractBuild;
-import java.io.IOException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.Mockito;
 
 public class TestPerformanceReportMap {

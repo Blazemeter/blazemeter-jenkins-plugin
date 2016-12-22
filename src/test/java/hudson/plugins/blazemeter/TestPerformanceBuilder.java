@@ -24,9 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-/**
- * Created by zmicer on 21.12.16.
- */
 public class TestPerformanceBuilder {
     @Rule
     public JenkinsRule j = new JenkinsRule();
@@ -41,13 +38,13 @@ public class TestPerformanceBuilder {
         boolean getJunit=false;
         boolean getJtl=false;
         String notes="a";
-        String sessionProperties="f";
-        PerformanceBuilder pb = new PerformanceBuilder(apiKey,serverUrl,testId,notes,sessionProperties,jtlPath,junitPath,getJtl,getJunit);
+        String sessionProperties = "f";
+        PerformanceBuilder pb = new PerformanceBuilder(apiKey, serverUrl, testId, notes, sessionProperties, jtlPath, junitPath, getJtl, getJunit);
         try {
             FreeStyleProject project = j.createFreeStyleProject();
             project.getBuildersList().add(pb);
             FreeStyleBuild b = project.scheduleBuild2(0).get();
-            Assert.assertEquals(Result.FAILURE,b.getResult());
+            Assert.assertEquals(Result.FAILURE, b.getResult());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

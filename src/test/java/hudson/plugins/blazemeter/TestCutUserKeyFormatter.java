@@ -21,9 +21,6 @@ import java.util.logging.LogRecord;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Created by zmicer on 15.12.16.
- */
 public class TestCutUserKeyFormatter {
 
     @Test
