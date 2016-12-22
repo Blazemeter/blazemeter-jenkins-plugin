@@ -17,10 +17,6 @@ package hudson.plugins.blazemeter;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import java.io.IOException;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,24 +46,6 @@ public class TestPerformanceBuilderDescriptor {
             Assert.assertEquals(lbm.get(0).name,Constants.NO_API_KEY);
         } catch (FormValidation formValidation) {
             formValidation.printStackTrace();
-        }
-    }
-
-    @Test
-    public void do_test_connection() {
-        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-        try {
-            bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
-            FormValidation fv = bd.doTestConnection(TestConstants.MOCKED_USER_KEY_VALID);
-            Assert.assertEquals(fv.kind, FormValidation.Kind.ERROR);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ServletException e) {
-            e.printStackTrace();
         }
     }
 
