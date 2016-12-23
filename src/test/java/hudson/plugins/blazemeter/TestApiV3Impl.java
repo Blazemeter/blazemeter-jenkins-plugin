@@ -259,7 +259,7 @@ public class TestApiV3Impl {
     }
 
     @Test
-    public void junit() throws IOException{
+    public void junit() throws IOException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         String xml = blazemeterApiV3.retrieveJUNITXML(TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(xml.length() == 784);

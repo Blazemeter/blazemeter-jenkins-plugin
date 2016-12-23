@@ -369,10 +369,9 @@ public class JobUtility {
             bzmLog.info("JUNIT report won't be requested: check-box is unchecked.");
             consLog.info("JUNIT report won't be requested: check-box is unchecked.");
         }
-        Thread.sleep(30000);
         FilePath jtlPath = null;
-        HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
         if (isJtl) {
+            HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
             } else {

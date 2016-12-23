@@ -24,15 +24,18 @@ public class TestHttpLogger {
 
     @Test
     public void constructor() {
+        HttpLogger l=null;
         try {
             String lfn="logger";
-            HttpLogger l = new HttpLogger(lfn);
+            l = new HttpLogger(lfn);
             File lf=new File(lfn);
             if(lf.exists()){
                 lf.delete();
             }
         } catch (IOException e) {
             Assert.fail();
+        }finally {
+            l.close();
         }
     }
 }

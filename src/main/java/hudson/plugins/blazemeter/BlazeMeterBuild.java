@@ -237,12 +237,10 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 JobUtility.properties(api, props, masterId, bzmLog);
             }
             JobUtility.waitForFinish(api, testId_num, bzmLog, masterId);
-
             lentry.append("BlazeMeter test# " + testId_num + " ended at " + Calendar.getInstance().getTime());
             consLog.info(lentry.toString());
             bzmLog.info(lentry.toString());
             lentry.setLength(0);
-
             result = JobUtility.postProcess(this.ws,
                     buildId,
                     api,
@@ -253,7 +251,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     this.getJtl,
                     this.jtlPath,
                     bzmLog,
-                    consLog);
+                consLog);
             Thread.sleep(15000);//let master pull logs to browser
             return result;
         } catch (InterruptedException e) {
@@ -269,7 +267,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             lentry.setLength(0);
             return Result.NOT_BUILT;
         } finally {
-            ((HttpLogger)httpLogger).close();
             ((EnvVars) EnvVars.masterEnvVars).remove(this.jobName+"-"+this.buildId);
             TestStatus testStatus = api.getTestStatus(masterId);
 
@@ -293,6 +290,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 lentry.setLength(0);
                 return Result.FAILURE;
             }
+             console_logger.close();
+            ((HttpLogger) httpLogger).close();
+
         }
     }
 

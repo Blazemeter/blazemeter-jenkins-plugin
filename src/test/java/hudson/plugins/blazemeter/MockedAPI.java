@@ -19,10 +19,9 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
-import org.mockserver.integration.ClientAndProxy;
-import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
 import org.mockserver.integration.ClientAndServer;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -30,12 +29,10 @@ import org.mockserver.model.Parameter;
 
 public class MockedAPI {
     private static ClientAndServer mockServer;
-    private static ClientAndProxy proxy;
     private MockedAPI(){}
 
     public static void startAPI(){
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
-        proxy = startClientAndProxy(Integer.parseInt(TestConstants.proxyPort));
     }
 
     public static void ping() throws IOException{
@@ -143,6 +140,19 @@ public class MockedAPI {
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
                         ),
                 unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(testStatus));
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_15102806 +"/status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                exactly(1)
         )
                 .respond(
                         response().withHeader("application/json")
@@ -466,6 +476,20 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getTestReport));
 
+    mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_15102806 +"/reports/main/summary")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getTestReport));
+
     }
 
 
@@ -655,6 +679,24 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_15102806 + "/publicToken";
+
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
     }
 
     public static void getListOfSessionIds() throws IOException {
@@ -712,6 +754,20 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jo));
 
+        expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_15102806;
+        mockServer.when(
+            request()
+                .withMethod("PATCH")
+                .withPath(expectedPath)
+                .withQueryStringParameter(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
 
     }
 
@@ -759,6 +815,5 @@ public class MockedAPI {
     public static void stopAPI(){
         mockServer.reset();
         mockServer.stop();
-        proxy.stop();
     }
 }
