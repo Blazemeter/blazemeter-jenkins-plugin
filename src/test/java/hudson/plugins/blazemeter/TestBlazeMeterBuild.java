@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -49,6 +50,7 @@ public class TestBlazeMeterBuild {
 
 
     @Test
+    @Ignore
     public void call() {
         try {
             BuildListener l = Mockito.mock(BuildListener.class);
