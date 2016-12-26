@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -54,6 +55,7 @@ public class TestJobUtility {
         MockedAPI.getTestReport();
         MockedAPI.getListOfSessionIds();
         MockedAPI.jtl();
+        MockedAPI.junit();
     }
 
     @AfterClass
@@ -308,5 +310,23 @@ public class TestJobUtility {
         HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(sessions.size()==1);
         Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION),TestConstants.JTL_URL);
+    }
+
+    @Test
+    public void retrieveJUNITXMLreport() {
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/junit"));
+        try {
+            fp.mkdirs();
+            JobUtility.retrieveJUNITXMLreport(api, TestConstants.TEST_MASTER_ID, fp, stdErrLog, stdErrLog);
+            Assert.assertTrue(fp.exists());
+            Assert.assertTrue(fp.list().size()==1);
+            fp.deleteRecursive();
+            Assert.assertFalse(fp.exists());
+        } catch (IOException e) {
+            Assert.fail();
+        } catch (InterruptedException e) {
+            Assert.fail();
+        }
     }
 }
