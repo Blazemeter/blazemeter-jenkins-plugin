@@ -391,4 +391,22 @@ public class TestJobUtility {
             Assert.fail();
         }
     }
+
+    @Test
+    public void postProcess_failure_junit(){
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        try {
+            Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_FAILURE,new EnvVars(),true,"junit",false,"",stdErrLog,stdErrLog);
+            Assert.assertEquals(Result.FAILURE,r);
+            Assert.assertTrue(fp.list().size() == 1);
+            Assert.assertTrue(fp.list().get(0).getName().equals("1"));
+            fp.deleteRecursive();
+            Assert.assertFalse(fp.exists());
+        } catch (InterruptedException e) {
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.fail();
+        }
+    }
 }

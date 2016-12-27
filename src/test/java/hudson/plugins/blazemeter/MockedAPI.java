@@ -479,6 +479,20 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getTestReport));
 
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_FAILURE +"/reports/main/summary")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(getTestReport));
+
     mockServer.when(
                 request()
                         .withMethod("GET")
@@ -664,6 +678,23 @@ public class MockedAPI {
 
         File xmlFile = new File(TestConstants.RESOURCES + "/junit.xml");
         String xml = FileUtils.readFileToString(xmlFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(xml));
+
+        expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_FAILURE + "/reports/thresholds";
+
         mockServer.when(
             request()
                 .withMethod("GET")
