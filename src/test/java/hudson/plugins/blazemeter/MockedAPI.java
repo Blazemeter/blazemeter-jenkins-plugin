@@ -17,8 +17,11 @@ package hudson.plugins.blazemeter;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.mockserver.integration.ClientAndServer;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.exactly;
@@ -637,6 +640,22 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jtl));
+    }
+
+    public static void jtl_zip() throws IOException {
+        String expectedPath = UrlManager.LATEST +"/"+
+            "sessions/" + TestConstants.MOCKED_SESSION + "/reports/logs/data";
+
+        File jtlBody = new File(TestConstants.RESOURCES + "/jtl.zip");
+        InputStream bs = new FileInputStream(jtlBody);
+        byte[] bas = IOUtils.toByteArray(bs);
+        mockServer.when(
+            request()
+                .withPath(expectedPath),
+            unlimited()
+        )
+            .respond(
+                response().withStatusCode(200).withBody(bas));
     }
 
     public static void junit() throws IOException {

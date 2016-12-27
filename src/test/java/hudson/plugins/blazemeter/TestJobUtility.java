@@ -18,6 +18,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -56,6 +57,7 @@ public class TestJobUtility {
         MockedAPI.getListOfSessionIds();
         MockedAPI.jtl();
         MockedAPI.junit();
+        MockedAPI.jtl_zip();
     }
 
     @AfterClass
@@ -328,5 +330,24 @@ public class TestJobUtility {
         } catch (InterruptedException e) {
             Assert.fail();
         }
+    }
+
+    @Test
+    public void downloadJtlReport() {
+        String dataUrl = TestConstants.mockedApiUrl + UrlManager.LATEST + UrlManager.SESSIONS + "/" +
+            TestConstants.MOCKED_SESSION + "/reports/logs/data";
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
+        try {
+            fp.mkdirs();
+            JobUtility.downloadJtlReport(TestConstants.MOCKED_SESSION, dataUrl, fp, stdErrLog, stdErrLog);
+            Assert.assertTrue(fp.list().size() == 1);
+            Assert.assertTrue(fp.list().get(0).getName().equals("jtl"));
+            fp.deleteRecursive();
+        } catch (IOException ioe) {
+            Assert.fail();
+        } catch (InterruptedException ie) {
+            Assert.fail();
+        }
+
     }
 }
