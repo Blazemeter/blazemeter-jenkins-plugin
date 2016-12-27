@@ -275,6 +275,18 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 consLog.info(lentry.toString());
                 bzmLog.info(lentry.toString());
                 lentry.setLength(0);
+
+                lentry.append(masterId+" is still running after finishing job post-process");
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+
+                lentry.append(masterId+" will be aborted");
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+
+
                 JobUtility.stopTestSession(api, masterId, bzmLog);
                 return Result.ABORTED;
             } else if (testStatus.equals(TestStatus.NotFound)) {
