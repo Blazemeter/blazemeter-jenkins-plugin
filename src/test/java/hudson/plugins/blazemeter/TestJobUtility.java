@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter;
 
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
@@ -365,5 +366,29 @@ public class TestJobUtility {
         }
 
 
+    }
+
+    @Test
+    public void postProcess_success(){
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        try {
+            Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_SUCCESS,new EnvVars(),false,"",false,"",stdErrLog,stdErrLog);
+            Assert.assertEquals(Result.SUCCESS,r);
+        } catch (InterruptedException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void postProcess_failure(){
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        try {
+            Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_FAILURE,new EnvVars(),false,"",false,"",stdErrLog,stdErrLog);
+            Assert.assertEquals(Result.FAILURE,r);
+        } catch (InterruptedException e) {
+            Assert.fail();
+        }
     }
 }
