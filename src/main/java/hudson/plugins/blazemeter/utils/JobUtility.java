@@ -575,7 +575,7 @@ public class JobUtility {
     }
 
 
-    public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+    public static boolean properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = null;
         try{
             sessionsIds=api.getListOfSessionIds(masterId);
@@ -584,10 +584,10 @@ public class JobUtility {
 
         }
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
+        boolean submit = false;
         for (String s : sessionsIds) {
             jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
             int n = 1;
-            boolean submit = false;
             while (!submit && n < 6) {
                 try {
                     submit = api.properties(properties, s);
@@ -602,6 +602,7 @@ public class JobUtility {
                 }
             }
         }
+        return submit;
     }
 
     public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,

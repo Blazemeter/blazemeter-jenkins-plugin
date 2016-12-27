@@ -42,9 +42,8 @@ public class TestJobUtility {
 
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
 
-
     @BeforeClass
-    public static void setUp()throws IOException{
+    public static void setUp() throws IOException {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
         MockedAPI.stopTestSession();
@@ -58,6 +57,7 @@ public class TestJobUtility {
         MockedAPI.jtl();
         MockedAPI.junit();
         MockedAPI.jtl_zip();
+        MockedAPI.properties();
     }
 
     @AfterClass
@@ -348,6 +348,22 @@ public class TestJobUtility {
         } catch (InterruptedException ie) {
             Assert.fail();
         }
+
+    }
+
+    @Test
+    public void properties() {
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String prps = "v=r,v=i";
+        JSONArray arr=null;
+        try {
+            arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
+            boolean submit=JobUtility.properties(api,arr,TestConstants.TEST_MASTER_ID,stdErrLog);
+            Assert.assertTrue(submit);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }
