@@ -209,6 +209,22 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(testStatus));
 
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
+        testStatus= FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath(UrlManager.LATEST+UrlManager.MASTERS+"/"+TestConstants.TEST_MASTER_WAIT_FOR_FINISH +"/status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),exactly(1)
+
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(testStatus));
+
 
         jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
         testStatus= FileUtils.readFileToString(jsonFile);

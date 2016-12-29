@@ -26,6 +26,8 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
@@ -406,6 +408,21 @@ public class TestJobUtility {
         } catch (InterruptedException e) {
             Assert.fail();
         } catch (IOException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void waitForFinish() {
+        Date start = Calendar.getInstance().getTime();
+        try {
+            Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+            JobUtility.waitForFinish(api, "1", stdErrLog, TestConstants.TEST_MASTER_WAIT_FOR_FINISH);
+            long after = Calendar.getInstance().getTime().getTime();
+            long diffInSec = (after - start.getTime()) / 1000;
+            Assert.assertTrue(diffInSec>25);
+            Assert.assertTrue(diffInSec<35);
+        } catch (InterruptedException e) {
             Assert.fail();
         }
     }

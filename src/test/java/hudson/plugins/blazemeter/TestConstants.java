@@ -33,6 +33,7 @@ public interface TestConstants {
     String mockedApiUrl=mockedApiHost+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
+    String TEST_MASTER_WAIT_FOR_FINISH ="testMasterIdWaitForFinish";
     String TEST_MASTER_15102806 ="15102806";
     String TEST_5039530_ID ="5039530";
     String TEST_5075679_ID ="5075679";
