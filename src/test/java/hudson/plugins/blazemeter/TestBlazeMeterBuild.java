@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter;
 
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.ProxyConfiguration;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.FreeStyleProject;
@@ -61,6 +62,56 @@ public class TestBlazeMeterBuild {
             BuildListener l = Mockito.mock(BuildListener.class);
             BlazeMeterBuild bb = new BlazeMeterBuild();
             bb.setJobApiKey(TestConstants.MOCKED_USER_KEY_VALID);
+            bb.setServerUrl(TestConstants.mockedApiUrl);
+            bb.setTestId(testId);
+            bb.setNotes(notes);
+            bb.setSessionProperties(sessionProperties);
+            bb.setJtlPath(jtlPath);
+            bb.setJunitPath(junitPath);
+            bb.setGetJtl(getJtl);
+            bb.setGetJunit(getJunit);
+            FilePath ws = b.getWorkspace();
+            bb.setWs(ws);
+            String buildId = b.getId();
+            bb.setBuildId(buildId);
+            String jobName = b.getLogFile().getParentFile().getParentFile().getParentFile().getName();
+            bb.setJobName(jobName);
+            VirtualChannel c = j.getInstance().getChannel();
+            EnvVars ev = EnvVars.getRemote(c);
+            bb.setEv(ev);
+            bb.setListener(l);
+            Result r = bb.call();
+            Assert.assertEquals(Result.FAILURE,r);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            Assert.fail();
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void call_invalid_user() {
+        String testId="11234";
+        String jtlPath="12345";
+        String junitPath="12345";
+        boolean getJunit=false;
+        boolean getJtl=false;
+        String notes="a";
+        String sessionProperties="f";
+        try {
+            j.getInstance().proxy=new ProxyConfiguration("",0);
+            j.getInstance().proxy.save();
+            FreeStyleProject project = j.createFreeStyleProject();
+            AbstractBuild b = project.scheduleBuild2(0).get();
+            BuildListener l = Mockito.mock(BuildListener.class);
+            BlazeMeterBuild bb = new BlazeMeterBuild();
+            bb.setJobApiKey(TestConstants.MOCKED_USER_KEY_INVALID);
             bb.setServerUrl(TestConstants.mockedApiUrl);
             bb.setTestId(testId);
             bb.setNotes(notes);
