@@ -19,7 +19,6 @@ import hudson.FilePath;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -64,7 +63,7 @@ public class TestJobUtility {
     }
 
     @AfterClass
-    public static void tearDown()throws IOException{
+    public static void tearDown(){
         MockedAPI.stopAPI();
     }
 
@@ -337,8 +336,7 @@ public class TestJobUtility {
 
     @Test
     public void downloadJtlReport() {
-        String dataUrl = TestConstants.mockedApiUrl + UrlManager.LATEST + UrlManager.SESSIONS + "/" +
-            TestConstants.MOCKED_SESSION + "/reports/logs/data";
+        String dataUrl = TestConstants.mockedApiUrl + "/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip";
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
         try {
             fp.mkdirs();
@@ -403,6 +401,25 @@ public class TestJobUtility {
             Assert.assertEquals(Result.FAILURE,r);
             Assert.assertTrue(fp.list().size() == 1);
             Assert.assertTrue(fp.list().get(0).getName().equals("1"));
+            fp.deleteRecursive();
+            Assert.assertFalse(fp.exists());
+        } catch (InterruptedException e) {
+            Assert.fail();
+        } catch (IOException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void postProcess_success_jtl() {
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
+        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        try {
+            Result r = JobUtility.postProcess(fp, "1", api, TestConstants.TEST_MASTER_SUCCESS, new EnvVars(), false, "", true, "jtl", stdErrLog, stdErrLog);
+            Assert.assertEquals(Result.SUCCESS, r);
+            Assert.assertTrue(fp.list().size() == 1);
+            Assert.assertTrue(fp.list().get(0).getName().equals("1"));
+            Assert.assertTrue(fp.list().get(0).list().get(0).list().size() == 1);
             fp.deleteRecursive();
             Assert.assertFalse(fp.exists());
         } catch (InterruptedException e) {

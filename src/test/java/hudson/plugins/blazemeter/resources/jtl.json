@@ -21,7 +21,7 @@
         ]
       },
       {
-        "dataUrl":"https://blazemeter.s3.amazonaws.com/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D",
+        "dataUrl":"http://127.0.0.1:1234/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D",
         "filename":"jtls_and_more.zip",
         "tailDataUrl":false,
         "title":"Zip"

@@ -673,8 +673,7 @@ public class MockedAPI {
     }
 
     public static void jtl_zip() throws IOException {
-        String expectedPath = UrlManager.LATEST +"/"+
-            "sessions/" + TestConstants.MOCKED_SESSION + "/reports/logs/data";
+        String expectedPath = "/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip";
 
         File jtlBody = new File(TestConstants.RESOURCES + "/jtl.zip");
         InputStream bs = new FileInputStream(jtlBody);
@@ -771,6 +770,23 @@ public class MockedAPI {
 
         File jf = new File(TestConstants.RESOURCES + "/listOfsessionIds.json");
         String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withQueryStringParameters(
+                    new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                ),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.LATEST + UrlManager.MASTERS+"/" +
+            TestConstants.TEST_MASTER_SUCCESS + UrlManager.SESSIONS;
+
         mockServer.when(
             request()
                 .withMethod("GET")
