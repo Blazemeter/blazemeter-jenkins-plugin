@@ -14,7 +14,7 @@
 package hudson.plugins.blazemeter.utils.report;
 
 import hudson.EnvVars;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.plugins.blazemeter.PerformanceBuildAction;
 import hudson.remoting.VirtualChannel;
 import java.io.IOException;
@@ -23,13 +23,13 @@ import java.io.IOException;
 
 public class ReportUrlTask implements Runnable {
     private VirtualChannel c = null;
-    private AbstractBuild build = null;
+    private Run run = null;
     public boolean reportUrl = false;
     public String jobName = null;
 
 
-    public ReportUrlTask(AbstractBuild build, String jobName, VirtualChannel c) {
-        this.build = build;
+    public ReportUrlTask(Run run, String jobName, VirtualChannel c) {
+        this.run = run;
         this.jobName=jobName;
         this.c = c;
     }
@@ -41,11 +41,11 @@ public class ReportUrlTask implements Runnable {
                 return;
             }
             EnvVars ev = EnvVars.getRemote(c);
-            String ruId = this.jobName + "-" + build.getId();
+            String ruId = this.jobName + "-" + run.getId();
             if (ev != null && ev.containsKey(ruId)) {
-                PerformanceBuildAction a = new PerformanceBuildAction(build);
+                PerformanceBuildAction a = new PerformanceBuildAction(run);
                 a.setReportUrl(ev.get(ruId, ""));
-                build.addAction(a);
+                run.addAction(a);
                 this.reportUrl = true;
             }
         } catch (NullPointerException e) {

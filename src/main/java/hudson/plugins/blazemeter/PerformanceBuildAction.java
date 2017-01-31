@@ -14,20 +14,20 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import hudson.model.Run;
 import org.kohsuke.stapler.StaplerProxy;
 
 
 
 public class PerformanceBuildAction implements Action, StaplerProxy {
-    private final AbstractBuild<?, ?> build;
+    private final Run run;
 
     private String reportUrl;
     private PerformanceReportMap m = null;
 
-    public PerformanceBuildAction(AbstractBuild<?, ?> pBuild) {
-        build = pBuild;
+    public PerformanceBuildAction(Run run) {
+        this.run = run;
     }
 
 
@@ -51,8 +51,8 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
         return m;
     }
 
-    public AbstractBuild<?, ?> getBuild() {
-        return build;
+    public Run getRun() {
+        return run;
     }
 
     public String getReportUrl() {

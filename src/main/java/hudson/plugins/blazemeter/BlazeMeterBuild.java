@@ -17,8 +17,8 @@ package hudson.plugins.blazemeter;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.ProxyConfiguration;
-import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.HttpLogger;
@@ -70,7 +70,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private EnvVars ev = null;
 
-    private BuildListener listener=null;
+    private TaskListener listener=null;
 
     @Override
     public Result call() throws Exception {
@@ -376,7 +376,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         this.jobName = jobName;
     }
 
-    public void setListener(BuildListener listener) {
+    public void setListener(TaskListener listener) {
         this.listener = listener;
     }
 }

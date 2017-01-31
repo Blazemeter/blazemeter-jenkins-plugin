@@ -14,8 +14,8 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
 import hudson.model.ModelObject;
+import hudson.model.Run;
 
 public class PerformanceReportMap implements ModelObject {
 
@@ -26,8 +26,8 @@ public class PerformanceReportMap implements ModelObject {
     }
 
 
-    public AbstractBuild<?, ?> getBuild() {
-        return buildAction.getBuild();
+    public Run getRun() {
+        return buildAction.getRun();
     }
 
     public String getDisplayName() {

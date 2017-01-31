@@ -40,6 +40,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.Symbol;
 import org.json.JSONException;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
@@ -47,6 +48,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 
 
+@Symbol("blazeMeterTest")
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
