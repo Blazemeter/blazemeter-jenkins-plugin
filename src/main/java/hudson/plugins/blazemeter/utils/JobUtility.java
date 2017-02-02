@@ -360,8 +360,8 @@ public class JobUtility {
             } catch (Exception e) {
                 bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                 consLog.warn("Failed to resolve jtlPath: " + e.getMessage());
-                bzmLog.warn("JTL report will be saved to workspace");
-                consLog.warn("JTL report will be saved to workspace");
+                bzmLog.warn("Junit report will be saved to workspace");
+                consLog.warn("Junit report will be saved to workspace");
                 junitPath = dfp;
             }
             retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog,consLog);
