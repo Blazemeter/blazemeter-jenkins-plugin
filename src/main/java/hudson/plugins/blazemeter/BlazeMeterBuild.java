@@ -269,7 +269,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             result = Result.NOT_BUILT;
             return result;
         } finally {
-            lentry.append("BlazeMeter test was finished with result = "+result.toString());
+            lentry.append("BlazeMeter test set result = "+result.toString());
             consLog.info(lentry.toString());
             bzmLog.info(lentry.toString());
             lentry.setLength(0);
