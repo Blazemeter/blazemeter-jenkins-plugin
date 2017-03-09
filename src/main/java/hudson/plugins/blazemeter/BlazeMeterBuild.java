@@ -259,14 +259,21 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.ABORTED;
+            result = Result.ABORTED;
+            return result;
         } catch (Exception e) {
             lentry.append("Job was stopped due to unknown reason");
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.NOT_BUILT;
+            result = Result.NOT_BUILT;
+            return result;
         } finally {
+            lentry.append("BlazeMeter test was finished with result = "+result.toString());
+            consLog.info(lentry.toString());
+            bzmLog.info(lentry.toString());
+            lentry.setLength(0);
+
             ((EnvVars) EnvVars.masterEnvVars).remove(this.jobName+"-"+this.buildId);
             TestStatus testStatus = api.getTestStatus(masterId);
 
