@@ -179,7 +179,13 @@ public class ApiV3Impl implements Api {
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
-        JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        Response rp = okhttp.newCall(r).execute();
+        if (rp.code() == 500) {
+            bzmLog.info("Server returned status = 500 while trying to start test.");
+            bzmLog.info("Make sure that you're not trying to start test with non-existent OPL");
+            return startResp;
+        }
+        JSONObject jo = new JSONObject(rp.body().string());
         if (jo == null) {
             if (bzmLog.isDebugEnabled())
                 bzmLog.debug("Received NULL from server while start operation: will do 5 retries");
