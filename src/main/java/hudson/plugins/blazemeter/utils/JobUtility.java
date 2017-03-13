@@ -574,26 +574,27 @@ public class JobUtility {
         return getUserEmail(userKey, blazemeterUrl, null);
     }
 
-
     public static boolean properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = null;
-        try{
-            sessionsIds=api.getListOfSessionIds(masterId);
-        }catch (Exception e){
-            jenBuildLog.info("Failed to get list of sessions for masterId = "+masterId,e);
+        try {
+            sessionsIds = api.getListOfSessionIds(masterId);
+        } catch (Exception e) {
+            jenBuildLog.info("Failed to get list of sessions for masterId = " + masterId, e);
 
         }
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
-        boolean submit = false;
+        boolean p = true;
         for (String s : sessionsIds) {
+            boolean sp = false;
             jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
             int n = 1;
-            while (!submit && n < 6) {
+            while (!sp && n < 6) {
                 try {
-                    submit = api.properties(properties, s);
-                    if (!submit) {
+                    sp = api.properties(properties, s);
+                    if (!sp) {
                         jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s + " retry # " + n);
                         Thread.sleep(DELAY);
+                        p = sp;
                     }
                 } catch (Exception e) {
                     jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s, e);
@@ -602,7 +603,7 @@ public class JobUtility {
                 }
             }
         }
-        return submit;
+        return p;
     }
 
     public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
