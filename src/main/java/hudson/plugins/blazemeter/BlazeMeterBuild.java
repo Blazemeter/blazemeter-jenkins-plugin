@@ -102,7 +102,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
         if (userEmail.isEmpty()) {
-            ProxyConfiguration proxy = ProxyConfiguration.load();
             lentry.append("Please, check that settings are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
@@ -113,28 +112,31 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("ProxyHost = " + proxy.name);
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+            ProxyConfiguration proxy = ProxyConfiguration.load();
+            if (proxy != null) {
+                lentry.append("ProxyHost = " + proxy.name);
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            lentry.append("ProxyPort = " + proxy.port);
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+                lentry.append("ProxyPort = " + proxy.port);
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            lentry.append("ProxyUser = " + proxy.getUserName());
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+                lentry.append("ProxyUser = " + proxy.getUserName());
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            String proxyPass = proxy.getPassword();
+                String proxyPass = proxy.getPassword();
 
-            lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, ENCRYPT_CHARS_NUM)) + "...");
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
-
+                lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, ENCRYPT_CHARS_NUM)) + "...");
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
+            }
+            ((HttpLogger) httpLogger).close();
             return Result.FAILURE;
         }
 
@@ -209,6 +211,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
             return Result.FAILURE;
+        }finally {
+            ((HttpLogger) httpLogger).close();
         }
 
 
