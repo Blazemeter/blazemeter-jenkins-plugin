@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.google.common.collect.LinkedHashMultimap;
+import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
@@ -49,6 +50,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 
 @Symbol("blazeMeterTest")
+@Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL=Constants.A_BLAZEMETER_COM;

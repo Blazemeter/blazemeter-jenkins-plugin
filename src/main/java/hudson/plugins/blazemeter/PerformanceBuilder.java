@@ -16,7 +16,6 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
-import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -25,6 +24,7 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
@@ -90,7 +90,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep{
         Result r = null;
         BuildReporter br = new BuildReporter();
         try {
-            boolean valid = DESCRIPTOR.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
+            boolean valid = Utils.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
             if (!valid) {
                 listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0, 3) + "... is absent in credentials store.");
                 r = Result.NOT_BUILT;
@@ -193,14 +193,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep{
     public void setSessionProperties(String sessionProperties) {
         this.sessionProperties = sessionProperties;
     }
-
-    @Override
-    public BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
-        return DESCRIPTOR;
-    }
-
-    @Extension
-    public static final BlazeMeterPerformanceBuilderDescriptor DESCRIPTOR = new BlazeMeterPerformanceBuilderDescriptor();
 
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
