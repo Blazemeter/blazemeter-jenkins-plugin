@@ -361,6 +361,10 @@ public class ApiV3Impl implements Api {
                 }
             } catch (NullPointerException npe) {
                 bzmLog.warn("Error while receiving answer from server - check connection/proxy settings ", npe);
+            } catch (IOException e) {
+                bzmLog.warn("Error while populating test list, ", e);
+                testListOrdered = LinkedHashMultimap.create(1, 1);
+                testListOrdered.put("Please, check proxy settings - ",e.getMessage());
             } catch (Exception e) {
                 bzmLog.warn("Error while populating test list, ", e);
             } finally {
