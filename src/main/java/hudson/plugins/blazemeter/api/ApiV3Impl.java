@@ -86,6 +86,9 @@ public class ApiV3Impl implements Api {
                         @Override
                         public Request authenticate(Route route, Response response) throws IOException {
                             String credential = Credentials.basic(proxyUser, proxyPass);
+                            if (response.request().header("Proxy-Authorization") != null) {
+                                return null; // Give up, we've already attempted to authenticate.
+                            }
                             return response.request().newBuilder()
                                     .header("Proxy-Authorization", credential)
                                     .build();
