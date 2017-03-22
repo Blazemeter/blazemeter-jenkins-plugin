@@ -32,12 +32,11 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
 import javax.annotation.Nonnull;
-import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 
-public class PerformanceBuilder extends Builder implements SimpleBuildStep{
+public class PerformanceBuilder extends Builder{
 
     private String jobApiKey = "";
 
@@ -85,7 +84,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep{
         return BuildStepMonitor.BUILD;
     }
 
-    @Override
     public void perform(@Nonnull final Run<?, ?> run, @Nonnull final FilePath workspace, @Nonnull final Launcher launcher, @Nonnull final TaskListener listener) throws InterruptedException, IOException {
         Result r = null;
         BuildReporter br = new BuildReporter();
