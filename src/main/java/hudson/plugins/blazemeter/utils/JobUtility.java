@@ -366,8 +366,8 @@ public class JobUtility {
             }
             retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog,consLog);
         } else {
-            bzmLog.info("JUNIT report won't be requested: check-box is unchecked.");
-            consLog.info("JUNIT report won't be requested: check-box is unchecked.");
+            bzmLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
+            consLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
         }
         FilePath jtlPath = null;
         if (isJtl) {
@@ -393,8 +393,8 @@ public class JobUtility {
             }
             JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog,consLog);
         } else {
-            bzmLog.info("JTL report won't be requested: check-box is unchecked.");
-            consLog.info("JTL report won't be requested: check-box is unchecked.");
+            bzmLog.info("JTL report won't be requested: isJtl = " + isJtl);
+            consLog.info("JTL report won't be requested: isJtl = " + isJtl);
         }
 
 
