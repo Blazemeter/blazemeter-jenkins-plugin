@@ -13,7 +13,6 @@
  */
 package hudson.plugins.blazemeter;
 
-import com.google.inject.Inject;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -75,71 +74,76 @@ public class BlazeMeterTestStep extends Step {
 
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {
-        return new BlazeMeterTestExecution(stepContext,this);
-    }
-
-    public String getJobApiKey() {
-        return this.jobApiKey;
-    }
-
-    public String getServerUrl() {
-        return this.serverUrl;
-    }
-
-    public String getTestId() {
-        return this.testId;
-    }
-
-    public String getNotes() {
-        return this.notes;
-    }
-
-    public String getSessionProperties() {
-        return this.sessionProperties;
-    }
-
-    public String getJtlPath() {
-        return this.jtlPath;
-    }
-
-    public String getJunitPath() {
-        return this.junitPath;
-    }
-
-    public boolean isGetJtl() {
-        return this.getJtl;
-    }
-
-    public boolean isGetJunit() {
-        return this.getJunit;
+        return new BlazeMeterTestExecution(stepContext, this.jobApiKey,
+            this.serverUrl,
+            this.testId,
+            this.notes,
+            this.sessionProperties,
+            this.jtlPath,
+            this.junitPath,
+            this.getJtl,
+            this.getJunit);
     }
 
     public static class BlazeMeterTestExecution extends SynchronousNonBlockingStepExecution<Void> {
 
         private static final long serialVersionUID = 1L;
 
-        @Inject(optional = true)
-        private transient BlazeMeterTestStep step;
+        private String jobApiKey = "";
+
+        private String serverUrl = "";
+
+        private String testId = "";
+
+        private String notes = "";
+
+        private String sessionProperties = "";
+
+        private String jtlPath = "";
+
+        private String junitPath = "";
+
+        private boolean getJtl = false;
+
+        private boolean getJunit = false;
+
         @SuppressWarnings("rawtypes")
         private transient StepContext context;
 
-        protected BlazeMeterTestExecution(@Nonnull final StepContext context,@Nonnull final BlazeMeterTestStep step) {
+        protected BlazeMeterTestExecution(@Nonnull final StepContext context,
+            @Nonnull final String jobApiKey,
+            @Nonnull final String serverUrl,
+            @Nonnull final String testId,
+            @Nonnull final String notes,
+            @Nonnull final String sessionProperties,
+            @Nonnull final String jtlPath,
+            @Nonnull final String junitPath,
+            @Nonnull final boolean getJtl,
+            @Nonnull final boolean getJunit) {
             super(context);
             this.context = context;
-            this.step = step;
+            this.jobApiKey = jobApiKey;
+            this.serverUrl = serverUrl;
+            this.testId = testId;
+            this.notes = notes;
+            this.sessionProperties = sessionProperties;
+            this.jtlPath = jtlPath;
+            this.junitPath = junitPath;
+            this.getJtl = getJtl;
+            this.getJunit = getJunit;
         }
 
         @Override
         protected Void run() throws Exception {
-            PerformanceBuilder pb = new PerformanceBuilder(step.getJobApiKey(),
-                step.getServerUrl(),
-                step.getTestId(),
-                step.getNotes(),
-                step.getSessionProperties(),
-                step.getJtlPath(),
-                step.getJunitPath(),
-                step.isGetJtl(),
-                step.isGetJunit()
+            PerformanceBuilder pb = new PerformanceBuilder(this.jobApiKey,
+                this.serverUrl,
+                this.testId,
+                this.notes,
+                this.sessionProperties,
+                this.jtlPath,
+                this.junitPath,
+                this.getJtl,
+                this.getJunit
             );
             Run r = this.context.get(Run.class);
             FilePath fp = this.context.get(FilePath.class);
