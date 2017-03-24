@@ -13,6 +13,7 @@
  */
 package hudson.plugins.blazemeter;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -149,7 +150,8 @@ public class BlazeMeterTestStep extends Step {
             FilePath fp = this.context.get(FilePath.class);
             Launcher l = this.context.get(Launcher.class);
             TaskListener tl = this.context.get(TaskListener.class);
-            pb.perform(r, fp, l, tl);
+            EnvVars v = this.context.get(EnvVars.class);
+            pb.perform(r, fp, l, tl, v);
             return null;
         }
     }

@@ -84,7 +84,11 @@ public class PerformanceBuilder extends Builder{
         return BuildStepMonitor.BUILD;
     }
 
-    public void perform(@Nonnull final Run<?, ?> run, @Nonnull final FilePath workspace, @Nonnull final Launcher launcher, @Nonnull final TaskListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull final Run<?, ?> run,
+        @Nonnull final FilePath workspace,
+        @Nonnull final Launcher launcher,
+        @Nonnull final TaskListener listener,
+        EnvVars v) throws InterruptedException, IOException {
         Result r = null;
         BuildReporter br = new BuildReporter();
         try {
@@ -112,7 +116,7 @@ public class PerformanceBuilder extends Builder{
             String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            EnvVars ev = run.getEnvironment(listener);
+            EnvVars ev = v == null ? run.getEnvironment(listener) : v;
             b.setEv(ev);
             ReportUrlTask rugt = new ReportUrlTask(run, jobName, c);
             br = new BuildReporter();
@@ -131,7 +135,7 @@ public class PerformanceBuilder extends Builder{
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
         BuildListener listener) throws InterruptedException, IOException {
-        this.perform(build, build.getWorkspace(), launcher, listener);
+        this.perform(build, build.getWorkspace(), launcher, listener,null);
         return !build.getResult().equals(Result.FAILURE);
     }
 
