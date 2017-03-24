@@ -86,6 +86,42 @@ public class BlazeMeterTestStep extends Step {
             this.getJunit);
     }
 
+    public String getJobApiKey() {
+        return this.jobApiKey;
+    }
+
+    public String getServerUrl() {
+        return this.serverUrl;
+    }
+
+    public String getTestId() {
+        return this.testId;
+    }
+
+    public String getNotes() {
+        return this.notes;
+    }
+
+    public String getSessionProperties() {
+        return this.sessionProperties;
+    }
+
+    public String getJtlPath() {
+        return this.jtlPath;
+    }
+
+    public String getJunitPath() {
+        return this.junitPath;
+    }
+
+    public boolean isGetJtl() {
+        return this.getJtl;
+    }
+
+    public boolean isGetJunit() {
+        return this.getJunit;
+    }
+
     public static class BlazeMeterTestExecution extends SynchronousNonBlockingStepExecution<Void> {
 
         private static final long serialVersionUID = 1L;
