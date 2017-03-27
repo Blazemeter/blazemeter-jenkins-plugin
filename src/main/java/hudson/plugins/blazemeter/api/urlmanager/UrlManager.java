@@ -30,38 +30,38 @@ public interface UrlManager {
     String CI_STATUS="/ci-status";
     String getServerUrl();
 
-    String masterStatus(String appKey, String userKey, String testId);
+    String masterStatus(String appKey, String testId);
 
-    String tests(String appKey, String userKey);
+    String tests(String appKey);
 
-    String activeTests(String appKey, String userKey);
+    String activeTests(String appKey);
 
-    String masterId(String appKey,String userKey, String masterId);
+    String masterId(String appKey, String masterId);
 
-    String testStart(String appKey, String userKey, String testId);
+    String testStart(String appKey, String testId);
 
-    String collectionStart(String appKey, String userKey, String collectionId);
+    String collectionStart(String appKey, String collectionId);
 
-    String testStop(String appKey, String userKey, String testId);
+    String testStop(String appKey, String testId);
 
-    String testTerminate(String appKey, String userKey, String testId);
+    String testTerminate(String appKey, String testId);
 
-    String testReport(String appKey, String userKey, String reportId);
+    String testReport(String appKey, String reportId);
 
-    String getUser(String appKey, String userKey);
+    String getUser(String appKey);
 
-    String getCIStatus(String appKey, String userKey, String sessionId);
+    String getCIStatus(String appKey, String sessionId);
 
-    String retrieveJUNITXML(String appKey, String userKey, String sessionId);
+    String retrieveJUNITXML(String appKey, String sessionId);
 
-    String retrieveJTLZIP(String appKey, String userKey, String sessionId);
+    String retrieveJTLZIP(String appKey, String sessionId);
 
-    String generatePublicToken(String appKey, String userKey, String sessionId);
+    String generatePublicToken(String appKey, String sessionId);
 
-    String listOfSessionIds(String appKey, String userKey, String masterId);
+    String listOfSessionIds(String appKey, String masterId);
 
     String version(String appKey);
 
-    String properties(String appKey, String userKey, String sessionId);
+    String properties(String appKey, String sessionId);
 }
 

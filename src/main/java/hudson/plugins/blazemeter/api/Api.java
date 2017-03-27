@@ -32,6 +32,7 @@ public interface Api {
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     MediaType TEXT = MediaType.parse("text/plain; charset=ISO-8859-1");
     String ACCEPT="Accept";
+    String X_API_KEY = "X-Api-Key";
     String CONTENT_TYPE="Content-type";
     String APP_JSON="application/json";
     String APP_JSON_UTF_8="application/json; charset=UTF-8";
