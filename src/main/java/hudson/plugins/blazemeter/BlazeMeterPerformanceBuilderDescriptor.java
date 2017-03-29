@@ -130,7 +130,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             items.add(new ListBoxModel.Option(c.getDescription(),
-                    c.getApiKey(),
+                    c.getUsername(),
                     false));
         }
         Iterator<ListBoxModel.Option> iterator=items.iterator();
@@ -165,11 +165,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return result;
     }
 
-    public boolean credPresent(String userKey, Object scope) {
+    public boolean credPresent(String username, Object scope) {
         List<BlazemeterCredentialImpl> cred = getCredentials(scope);
         boolean valid = false;
         for (BlazemeterCredentialImpl c : cred) {
-            if (c.getApiKey().equals(userKey)) {
+            if (c.getUsername().equals(username)) {
                 valid = true;
             }
         }
@@ -197,7 +197,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
             for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-                String key = c.getApiKey();
+                String key = c.getUsername();
                 if (!apiKeys.contains(key)) {
                     apiKeys.add(key);
                 }

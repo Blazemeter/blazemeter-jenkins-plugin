@@ -78,7 +78,7 @@ public class Utils {
 
         boolean valid = false;
         for (BlazemeterCredentialImpl c : cred) {
-            if (c.getApiKey().equals(userKey)) {
+            if (c.getUsername().equals(userKey)) {
                 valid = true;
             }
         }

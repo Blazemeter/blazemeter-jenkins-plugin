@@ -14,69 +14,88 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.BaseCredentials;
-import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import java.io.IOException;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
+import hudson.Util;
+import hudson.util.Secret;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
-public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials {
-    private static final long serialVersionUID = 1L;
+@SuppressWarnings("unused") // read resolved by extension plugins
+public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
+    StandardUsernamePasswordCredentials {
 
-    private String apiKey =null;
-    private String description=null;
+    /**
+     * The username.
+     */
+    @NonNull
+    private final String username;
 
+    /**
+     * The password.
+     */
+    @NonNull
+    private final Secret password;
+
+    /**
+     * Constructor.
+     *
+     * @param scope       the credentials scope
+     * @param id          the ID or {@code null} to generate a new one.
+     * @param description the description.
+     * @param username    the username.
+     * @param password    the password.
+     */
     @DataBoundConstructor
-    public BlazemeterCredentialImpl(String apiKey,String description) {
-        super(CredentialsScope.GLOBAL);
-        this.apiKey=apiKey;
-        this.description=description;
+    @SuppressWarnings("unused") // by stapler
+    public BlazemeterCredentialImpl(@CheckForNull CredentialsScope scope,
+        @CheckForNull String id, @CheckForNull String description,
+        @CheckForNull String username, @CheckForNull String password) {
+        super(scope, id, description);
+        this.username = Util.fixNull(username);
+        this.password = Secret.fromString(password);
     }
 
-    public String getId() {
-        return StringUtils.left(apiKey,4) + Constants.THREE_DOTS + StringUtils.right(apiKey, 4);
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    public Secret getPassword() {
+        return password;
     }
 
-    public String getApiKey() {
-        return apiKey;
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    public String getUsername() {
+        return username;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @Extension(ordinal = 1)
+    public static class DescriptorImpl extends BaseStandardCredentialsDescriptor {
 
-
-    @Extension
-    public static class DescriptorImpl extends CredentialsDescriptor {
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getDisplayName() {
             return Messages.BlazemeterCredential_DisplayName();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public ListBoxModel doFillScopeItems() {
-            ListBoxModel m = new ListBoxModel();
-            m.add(CredentialsScope.GLOBAL.getDisplayName(), CredentialsScope.GLOBAL.toString());
-            return m;
+        public String getIconClassName() {
+            return "icon-credentials-userpass";
         }
-
-        // Used by global.jelly to authenticate User key
-        public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey) throws MessagingException, IOException, JSONException, ServletException {
-            BlazeMeterPerformanceBuilderDescriptor descriptor=BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
-            return  JobUtility.validateUserKey(userKey,descriptor.getBlazeMeterURL());
-        }
-
     }
 }
+
