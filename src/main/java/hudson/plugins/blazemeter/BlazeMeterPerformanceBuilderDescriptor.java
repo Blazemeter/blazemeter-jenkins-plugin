@@ -15,12 +15,9 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.security.ACL;
@@ -30,17 +27,13 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
@@ -82,7 +75,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
-    // Used by config.jelly to display the test list.
+
+    /*
+    TODO
     public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey, @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         List<String> keys = getKeys();
@@ -121,7 +116,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Collections.sort(items, c);
         return items;
     }
-
+*/
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
         ListBoxModel items = new ListBoxModel();
         try{

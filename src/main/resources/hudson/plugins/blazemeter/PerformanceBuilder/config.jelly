@@ -17,10 +17,13 @@
     <f:entry title="${%API Key:}">
         <f:select style="width:32em;" field="jobApiKey"/>
     </f:entry>
+<!--
+TODO
     <f:entry title="${%BlazeMeter Test}:">
         <f:select style="width:32em;" field="testId">
         </f:select>
     </f:entry>
+-->
     <f:entry title="${%Server url:}">
         <f:textbox  disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>

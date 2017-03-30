@@ -15,7 +15,6 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -36,7 +35,8 @@ public class TestPerformanceBuilderDescriptor {
         Assert.assertEquals(Constants.A_BLAZEMETER_COM + 123, bd.getBlazeMeterURL());
 
     }
-
+/*
+    TODO
     @Test
     public void no_api_key() {
        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
@@ -48,6 +48,7 @@ public class TestPerformanceBuilderDescriptor {
             formValidation.printStackTrace();
         }
     }
+*/
 
     @Test
     public void do_fill_api_key_items() {
