@@ -182,6 +182,7 @@ public class BlazeMeterTestStep extends Step {
                 this.getJtl,
                 this.getJunit
             );
+
             Run r = this.context.get(Run.class);
             FilePath fp = this.context.get(FilePath.class);
             Launcher l = this.context.get(Launcher.class);
@@ -190,6 +191,12 @@ public class BlazeMeterTestStep extends Step {
             pb.perform(r, fp, l, tl, v);
             return null;
         }
+
+        @Override
+        public void stop(Throwable cause) throws Exception {
+            this.context.onFailure(cause);
+        }
+
     }
 
     @Extension
