@@ -337,7 +337,7 @@ public class ApiV3Impl implements Api {
                 JSONArray result = null;
 
                 if (jo.has(JsonConsts.ERROR) && (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) &&
-                        (((JSONObject) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401)) {
+                        (((JSONObject   ) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401)) {
                     return testListOrdered;
                 }
                 if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
