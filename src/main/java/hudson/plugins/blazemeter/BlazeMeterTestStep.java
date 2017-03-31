@@ -26,6 +26,7 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -206,7 +207,9 @@ public class BlazeMeterTestStep extends Step {
                 String jobName = this.v.get("JOB_NAME");
                 String buildId = this.v.get("BUILD_ID");
                 String masterId = this.v.get(jobName + "-" + buildId + "-" + Constants.MASTER_ID);
-                JobUtility.stopMaster(api, masterId);
+                if (!StringUtils.isBlank(masterId)) {
+                    JobUtility.stopMaster(api, masterId);
+                }
             }
         }
 
