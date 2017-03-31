@@ -227,6 +227,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
 
+        ev.put(this.jobName+"-"+this.buildId+"-"+Constants.MASTER_ID,masterId);
         String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
         lentry.append("BlazeMeter test report will be available at " + reportUrl);
         consLog.info(lentry.toString());
@@ -236,7 +237,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         consLog.info("For more detailed logs, please, refer to " + bzmLog_f.getCanonicalPath());
         consLog.info("Communication with BZM server is logged at " + httpLog_f.getCanonicalPath());
 
-        ((EnvVars) EnvVars.masterEnvVars).put(this.jobName+"-"+this.buildId,reportUrl);
+        ev.put(this.jobName+"-"+this.buildId,reportUrl);
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {
             if (!StringUtils.isBlank(this.sessionProperties)) {
@@ -301,7 +302,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 lentry.setLength(0);
 
 
-                JobUtility.stopTestSession(api, masterId, bzmLog);
+                JobUtility.stopMaster(api, masterId);
                 return Result.ABORTED;
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 lentry.append("Test not found error");

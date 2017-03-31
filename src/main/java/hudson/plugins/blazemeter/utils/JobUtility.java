@@ -488,9 +488,8 @@ public class JobUtility {
     }
 
 
-    public static boolean stopTestSession(Api api, String masterId, StdErrLog jenBuildLog) {
+    public static boolean stopMaster(Api api, String masterId) throws Exception{
         boolean terminate = false;
-        try {
             int statusCode = api.getTestMasterStatusCode(masterId);
             if (statusCode < 100 & statusCode != 0) {
                 api.terminateTest(masterId);
@@ -500,11 +499,7 @@ public class JobUtility {
                 api.stopTest(masterId);
                 terminate = false;
             }
-        } catch (Exception e) {
-            jenBuildLog.warn("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
-        } finally {
             return terminate;
-        }
     }
 
     public static String version() {
