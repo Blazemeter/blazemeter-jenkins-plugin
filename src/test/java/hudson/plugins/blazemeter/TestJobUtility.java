@@ -18,7 +18,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -126,7 +126,7 @@ public class TestJobUtility {
 
     @Test
     public void stopMaster(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         boolean terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
         Assert.assertEquals(terminate, true);
         terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_70, stdErrLog);
@@ -140,7 +140,7 @@ public class TestJobUtility {
     @Test
     public void getReportUrl_pos(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         String actReportUrl= null;
         try {
             actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
@@ -153,7 +153,7 @@ public class TestJobUtility {
     @Test
     public void getReportUrl_neg(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
         String actReportUrl= null;
         try {
             actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
@@ -174,35 +174,35 @@ public class TestJobUtility {
 
     @Test
     public void getCIStatus_success(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.success,ciStatus);
     }
 
     @Test
     public void getCIStatus_failure(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
     @Test
     public void getCIStatus_error_61700(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_61700, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.errors,ciStatus);
     }
 
     @Test
     public void getCIStatus_error_0(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_0, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
     @Test
     public void getCIStatus_error_70404(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_70404, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
@@ -296,21 +296,21 @@ public class TestJobUtility {
 
     @Test
     public void notes(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
         Assert.assertTrue(notes);
     }
 
     @Test
     public void agReport(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         JSONObject ar = JobUtility.requestAggregateReport(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(ar.length()==33);
     }
 
     @Test
     public void jtlUrls(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(sessions.size()==1);
         Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION),TestConstants.JTL_URL);
@@ -318,7 +318,7 @@ public class TestJobUtility {
 
     @Test
     public void retrieveJUNITXMLreport() {
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/junit"));
         try {
             fp.mkdirs();
@@ -354,7 +354,7 @@ public class TestJobUtility {
 
     @Test
     public void properties() {
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         String prps = "v=r,v=i";
         JSONArray arr=null;
         try {
@@ -371,7 +371,7 @@ public class TestJobUtility {
     @Test
     public void postProcess_success(){
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         try {
             Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_SUCCESS,new EnvVars(),false,"",false,"",stdErrLog,stdErrLog);
             Assert.assertEquals(Result.SUCCESS,r);
@@ -383,7 +383,7 @@ public class TestJobUtility {
     @Test
     public void postProcess_failure(){
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         try {
             Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_FAILURE,new EnvVars(),false,"",false,"",stdErrLog,stdErrLog);
             Assert.assertEquals(Result.FAILURE,r);
@@ -395,7 +395,7 @@ public class TestJobUtility {
     @Test
     public void postProcess_failure_junit(){
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         try {
             Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_FAILURE,new EnvVars(),true,"junit",false,"",stdErrLog,stdErrLog);
             Assert.assertEquals(Result.FAILURE,r);
@@ -413,7 +413,7 @@ public class TestJobUtility {
     @Test
     public void postProcess_success_jtl() {
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         try {
             Result r = JobUtility.postProcess(fp, "1", api, TestConstants.TEST_MASTER_SUCCESS, new EnvVars(), false, "", true, "jtl", stdErrLog, stdErrLog);
             Assert.assertEquals(Result.SUCCESS, r);
@@ -433,7 +433,7 @@ public class TestJobUtility {
     public void waitForFinish() {
         Date start = Calendar.getInstance().getTime();
         try {
-            Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+            Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
             JobUtility.waitForFinish(api, "1", stdErrLog, TestConstants.TEST_MASTER_WAIT_FOR_FINISH);
             long after = Calendar.getInstance().getTime().getTime();
             long diffInSec = (after - start.getTime()) / 1000;

@@ -19,7 +19,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.AgrReport;
@@ -525,7 +525,7 @@ public class JobUtility {
         String encryptedKey = userKey.substring(0, ENCRYPT_CHARS_NUM) + "...";
         try {
             logger.info("Validating API key started: API key=" + encryptedKey);
-            Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
+            Api bzm = new ApiImpl(userKey, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
             JSONObject u = bzm.getUser();
             net.sf.json.JSONObject user = null;
@@ -557,7 +557,7 @@ public class JobUtility {
     }
 
     public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c) {
-        Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
+        Api bzm = new ApiImpl(userKey, blazemeterUrl);
         try {
             net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
             if (user.has(JsonConsts.MAIL)) {
@@ -609,7 +609,7 @@ public class JobUtility {
     public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
             MessagingException {
         boolean testIdExists=false;
-        Api api = new ApiV3Impl(apiKey,serverUrl);
+        Api api = new ApiImpl(apiKey,serverUrl);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries=tests.entries();
         for(Map.Entry e:entries){
@@ -627,7 +627,7 @@ public class JobUtility {
         boolean exists=false;
         boolean collection=false;
 
-        Api api = new ApiV3Impl(apiKey,serverUrl);
+        Api api = new ApiImpl(apiKey,serverUrl);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {

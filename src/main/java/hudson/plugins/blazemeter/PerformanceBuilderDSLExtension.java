@@ -18,7 +18,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
 import java.util.Collection;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
@@ -44,7 +44,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             jobApiKeyPresent = desc.credPresent(c.jobApiKey, CredentialsScope.GLOBAL);
             logger.info(c.jobApiKey + " is " + (jobApiKeyPresent ? "" : "not") + " present in credentials");
             if (jobApiKeyPresent) {
-                Api api = new ApiV3Impl(c.jobApiKey, serverUrl);
+                Api api = new ApiImpl(c.jobApiKey, serverUrl);
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
                 logger.info(c.jobApiKey + " is " + (values.size() > 0 ? "" : "not") + " valid for " +

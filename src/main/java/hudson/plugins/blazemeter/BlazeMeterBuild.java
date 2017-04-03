@@ -20,7 +20,7 @@ import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -97,7 +97,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
-        Api api = new ApiV3Impl(this.jobApiKey,this.serverUrl,httpLog,bzmLog);
+        Api api = new ApiImpl(this.jobApiKey,this.serverUrl,httpLog,bzmLog);
 
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
