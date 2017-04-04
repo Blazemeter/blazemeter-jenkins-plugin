@@ -43,7 +43,7 @@ public class TestPerformanceBuilderDescriptor {
         try {
             ListBoxModel lbm = bd.doFillTestIdItems(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.TEST_5039530_ID);
             Assert.assertTrue(lbm.size()==1);
-            Assert.assertEquals(lbm.get(0).name,Constants.NO_API_KEY);
+            Assert.assertEquals(lbm.get(0).name,Constants.NO_CREDENTIALS);
         } catch (FormValidation formValidation) {
             formValidation.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class TestPerformanceBuilderDescriptor {
         BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
         try {
             bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
-            ListBoxModel itemds=bd.doFillJobApiKeyItems(TestConstants.MOCKED_USER_KEY_VALID);
+            ListBoxModel itemds=bd.doFillCredentialsIdItems(TestConstants.MOCKED_USER_KEY_VALID);
             Assert.assertEquals(0,itemds.size());
         } catch (Exception e) {
             e.printStackTrace();

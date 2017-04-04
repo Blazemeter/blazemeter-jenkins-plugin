@@ -28,6 +28,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
     StandardUsernamePasswordCredentials {
 
+     public static BlazemeterCredentialImpl EMPTY = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,"","","","");
     /**
      * The username.
      */
@@ -51,7 +52,7 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
      */
     @DataBoundConstructor
     @SuppressWarnings("unused") // by stapler
-    public BlazemeterCredentialImpl(@CheckForNull CredentialsScope scope,
+    public   BlazemeterCredentialImpl(@CheckForNull CredentialsScope scope,
         @CheckForNull String id, @CheckForNull String description,
         @CheckForNull String username, @CheckForNull String password) {
         super(scope, id, description);

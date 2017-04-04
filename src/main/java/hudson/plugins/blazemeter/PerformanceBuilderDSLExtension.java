@@ -20,10 +20,12 @@ import hudson.Extension;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.Utils;
 import java.util.Collection;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 
 
@@ -36,26 +38,27 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         logger.info("Running 'blazeMeterTest' method from JOB DSL plugin...");
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure, c);
-        boolean jobApiKeyPresent = false;
+        boolean credentialsPresent = false;
         PerformanceBuilder pb = null;
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            jobApiKeyPresent = desc.credPresent(c.jobApiKey, CredentialsScope.GLOBAL);
-            logger.info(c.jobApiKey + " is " + (jobApiKeyPresent ? "" : "not") + " present in credentials");
-            if (jobApiKeyPresent) {
-                Api api = new ApiImpl(c.jobApiKey, serverUrl);
+            BlazemeterCredentialImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
+            credentialsPresent = !StringUtils.isBlank(credential.getId());
+            logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
+            if (credentialsPresent) {
+                Api api = new ApiImpl(credential, serverUrl);
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
-                logger.info(c.jobApiKey + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
-                        BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+                logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
+                    BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
                 if (values.size() > 0) {
                     for (String v : values) {
                         if (v.contains(c.testId)) {
                             logger.info("Test with " + c.testId + " exists on server.");
-                            pb = new PerformanceBuilder(c.jobApiKey,serverUrl,
-                                    v, c.notes, c.sessionProperties,
-                                    c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
+                            pb = new PerformanceBuilder(c.credentialsId, serverUrl,
+                                v, c.notes, c.sessionProperties,
+                                c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
 
                             break;
                         }
@@ -64,8 +67,8 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             }
 
         } catch (Exception e) {
-            logger.warn("Failed to create PerformanceBuilder object from Job DSL description: jobApiKey=" + c.jobApiKey +
-                    ", testId =" + c.testId + ", serverUrl=" + serverUrl);
+            logger.warn("Failed to create PerformanceBuilder object from Job DSL description: credentialsId=" + c.credentialsId +
+                ", testId =" + c.testId + ", serverUrl=" + serverUrl);
         } finally {
             return pb;
         }

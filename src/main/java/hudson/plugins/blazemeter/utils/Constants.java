@@ -23,12 +23,12 @@ public interface Constants {
     String BM_ARTEFACTS="-bm-artefacts";
     String VERSION="version";
     String THREE_DOTS ="...";
-    String NO_API_KEY="No API Key";
+    String NO_CREDENTIALS ="No Credentials";
     String UNKNOWN_TYPE="unknown_type";
-    String API_KEY_EMPTY ="API key is empty: please, enter valid API key";
+    String CRED_PASS_EMPTY ="Credentials password is empty: please, fix credentials";
     String A_BLAZEMETER_COM="https://a.blazemeter.com";
-    String API_KEY_VALID="API key is valid: user e-mail=";
-    String API_KEY_IS_NOT_VALID="API key is not valid";
-    String NO_TESTS_FOR_API_KEY="No tests for api key";
+    String CRED_VALID ="API key is valid: user e-mail=";
+    String CREDENTIALS_ARE_NOT_VALID="Credentials are not valid";
+    String NO_TESTS_FOR_CREDENTIALS ="No tests for credentials";
     int ENCRYPT_CHARS_NUM=3;
 }
