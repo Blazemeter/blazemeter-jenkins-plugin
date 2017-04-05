@@ -181,23 +181,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public List<String> getKeys() {
-        List<String> apiKeys = new ArrayList<String>();
-        try {
-            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-            for (BlazemeterCredentialImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-                String key = c.getUsername();
-                if (!apiKeys.contains(key)) {
-                    apiKeys.add(key);
-                }
-            }
-        } catch (Exception e) {
-        } finally {
-            return apiKeys;
-        }
-    }
-
     public String getName() {
         return name;
     }
