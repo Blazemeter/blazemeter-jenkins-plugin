@@ -15,15 +15,19 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.ApiImpl;
-import java.io.IOException;
 import org.eclipse.jetty.util.log.StdErrLog;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.mockito.Mockito;
 
 public class TestApiImpl {
     private ApiImpl blazemeterApiV3 = null;
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
+
+/*
+    TODO
+
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -48,7 +52,6 @@ public class TestApiImpl {
         MockedAPI.stopAPI();
     }
 
-/* TODO
 
     @Test
     public void getTestStatus_Running() {

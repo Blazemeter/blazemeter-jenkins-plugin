@@ -14,23 +14,15 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.mockserver.integration.ClientAndServer;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.matchers.Times.exactly;
-import static org.mockserver.matchers.Times.unlimited;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
-import org.mockserver.model.Parameter;
-
 public class MockedAPI {
+    /*
+
+    TODO
+
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
+
     private static ClientAndServer mockServer;
 
     private MockedAPI() {
@@ -788,4 +780,5 @@ public class MockedAPI {
         mockServer.reset();
         mockServer.stop();
     }
+*/
 }

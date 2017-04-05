@@ -14,13 +14,15 @@
 
 package hudson.plugins.blazemeter;
 
-import java.io.IOException;
-import org.eclipse.jetty.util.log.StdErrLog;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.mockito.Mockito;
-
 public class TestJobUtility {
+
+/*
+
+    TODO
+
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
 
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
 
@@ -46,27 +48,28 @@ public class TestJobUtility {
     public static void tearDown(){
         MockedAPI.stopAPI();
     }
-/* TODO
-
     @Test
     public void getUserEmail_positive() throws IOException,JSONException{
         String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
-
-    @Test
+  @Test
     public void getUserEmail_negative() throws IOException,JSONException{
         String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
         Assert.assertEquals(email,"");
     }
 
-    @Test
+
+
+  @Test
     public void getUserEmail_exception() throws IOException,JSONException{
         String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
         Assert.assertEquals(email,"");
     }
 
-    @Test
+
+
+  @Test
     public void validateUserKey_positive() throws IOException,JSONException{
         FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_VALID,
                 TestConstants.mockedApiUrl);
@@ -74,7 +77,9 @@ public class TestJobUtility {
         Assert.assertEquals(validation.getMessage(), Constants.CRED_VALID+"dzmitry.kashlach@blazemeter.com");
     }
 
-    @Test
+
+
+  @Test
     public void validateUserKey_negative() throws IOException,JSONException{
         FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_INVALID,
                 TestConstants.mockedApiUrl);
@@ -83,7 +88,9 @@ public class TestJobUtility {
                 "API key is not valid: unexpected exception=JSONObject[\"mail\"] not found.");
     }
 
-    @Test
+
+
+  @Test
     public void validateUserKey_exception() throws IOException,JSONException{
         FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_EXCEPTION,
                 TestConstants.mockedApiUrl);
@@ -92,7 +99,9 @@ public class TestJobUtility {
                 "API key is not valid: unexpected exception=A JSONObject text must begin with '{' at character 1");
     }
 
-    @Test
+
+
+  @Test
     public void validateUserKey_empty() throws IOException,JSONException{
         FormValidation validation= JobUtility.validateCredentials("", TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
@@ -100,12 +109,14 @@ public class TestJobUtility {
     }
 
     @Test
-    public void getVersion() throws IOException,JSONException{
+    public void getVersion() throws IOException,JSONException {
         String version= JobUtility.version();
         Assert.assertTrue(version.matches("^(\\d{1,}\\.+\\d{1,2}\\S*)$"));
     }
 
-    @Test
+
+
+  @Test
     public void stopMaster(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         boolean terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
@@ -118,7 +129,9 @@ public class TestJobUtility {
         Assert.assertEquals(terminate, false);
     }
 
-    @Test
+
+
+  @Test
     public void getReportUrl_pos(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
@@ -131,7 +144,9 @@ public class TestJobUtility {
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
-    @Test
+
+
+@Test
     public void getReportUrl_neg(){
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
@@ -147,41 +162,51 @@ public class TestJobUtility {
     @Test
     public void getSessionId() throws JSONException, IOException {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
-        String getSessionId_v3_str=FileUtils.readFileToString(getSessionId_v3);
+        String getSessionId_v3_str= FileUtils.readFileToString(getSessionId_v3);
         JSONObject getSession_json=new JSONObject(getSessionId_v3_str);
         String session= JobUtility.getSessionId(getSession_json, stdErrLog);
         Assert.assertEquals(session,"r-v3-55a6136b314bd");
     }
 
-    @Test
+
+
+  @Test
     public void getCIStatus_success(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.success,ciStatus);
     }
 
-    @Test
+
+
+  @Test
     public void getCIStatus_failure(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
-    @Test
+
+
+  @Test
     public void getCIStatus_error_61700(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_61700, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.errors,ciStatus);
     }
 
-    @Test
+
+
+  @Test
     public void getCIStatus_error_0(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_0, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
-    @Test
+
+
+  @Test
     public void getCIStatus_error_70404(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_70404, stdErrLog, stdErrLog);
@@ -212,7 +237,9 @@ public class TestJobUtility {
         Assert.assertFalse(JobUtility.errorsFailed(error_json));
     }
 
-    @Test
+
+
+  @Test
     public void testIdExists(){
         try {
             Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
@@ -225,7 +252,9 @@ public class TestJobUtility {
         }
     }
 
-    @Test
+
+
+  @Test
     public void testIdExists_negative(){
         try {
             Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
@@ -238,7 +267,9 @@ public class TestJobUtility {
         }
     }
 
-    @Test
+
+
+  @Test
     public void collection_true(){
         try {
             Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
@@ -253,7 +284,9 @@ public class TestJobUtility {
         }
     }
 
-    @Test
+
+
+  @Test
     public void collection_false(){
         try {
             Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
@@ -275,21 +308,27 @@ public class TestJobUtility {
         Assert.assertTrue(arr.length()==2);
     }
 
-    @Test
+
+
+  @Test
     public void notes(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
         Assert.assertTrue(notes);
     }
 
-    @Test
+
+
+  @Test
     public void agReport(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         JSONObject ar = JobUtility.requestAggregateReport(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(ar.length()==33);
     }
 
-    @Test
+
+
+  @Test
     public void jtlUrls(){
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
@@ -297,7 +336,9 @@ public class TestJobUtility {
         Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION),TestConstants.JTL_URL);
     }
 
-    @Test
+
+
+  @Test
     public void retrieveJUNITXMLreport() {
         Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/junit"));
@@ -360,7 +401,6 @@ public class TestJobUtility {
             Assert.fail();
         }
     }
-
     @Test
     public void postProcess_failure(){
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
@@ -372,7 +412,6 @@ public class TestJobUtility {
             Assert.fail();
         }
     }
-
     @Test
     public void postProcess_failure_junit(){
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
@@ -390,7 +429,6 @@ public class TestJobUtility {
             Assert.fail();
         }
     }
-
     @Test
     public void postProcess_success_jtl() {
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
@@ -409,8 +447,7 @@ public class TestJobUtility {
             Assert.fail();
         }
     }
-
-    @Test
+  @Test
     public void waitForFinish() {
         Date start = Calendar.getInstance().getTime();
         try {
@@ -425,4 +462,5 @@ public class TestJobUtility {
         }
     }
 */
+
 }

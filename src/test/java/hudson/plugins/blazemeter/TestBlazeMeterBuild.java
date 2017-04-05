@@ -14,13 +14,13 @@
 
 package hudson.plugins.blazemeter;
 
-import java.io.IOException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.jvnet.hudson.test.JenkinsRule;
-
 public class TestBlazeMeterBuild {
+/*
+    TODO
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
+
     @BeforeClass
     public static void setUp() throws IOException {
         MockedAPI.startAPI();
@@ -35,10 +35,10 @@ public class TestBlazeMeterBuild {
     @Rule
     public JenkinsRule j = new JenkinsRule();
 
-//    @Test
-/*
-    TODO
-    public void call() {
+
+    @Test
+
+        public void call() {
         String testId="11234";
         String jtlPath="12345";
         String junitPath="12345";
@@ -83,10 +83,7 @@ public class TestBlazeMeterBuild {
             e.printStackTrace();
         }
     }
-*/
 
-/*
-TODO
     @Test
     public void call_invalid_user() {
         String testId="11234";
@@ -134,5 +131,7 @@ TODO
             Assert.fail();
             e.printStackTrace();
         }
-    }*/
+    }
+*/
+
 }
