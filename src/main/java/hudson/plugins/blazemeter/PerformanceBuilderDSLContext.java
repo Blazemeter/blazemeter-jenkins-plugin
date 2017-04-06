@@ -33,8 +33,8 @@ public class PerformanceBuilderDSLContext implements Context {
     boolean getJunit = false;
 
 
-    public void jobApiKey(String jobApiKey) {
-        this.credentialsId = jobApiKey;
+    public void credentialsId(String credentialsId) {
+        this.credentialsId = credentialsId;
     }
 
     public void testId(String testId) {
