@@ -22,7 +22,7 @@ public interface Constants {
     String BM_KPIS="bm-kpis.jtl";
     String BM_ARTEFACTS="-bm-artefacts";
     String VERSION="version";
-    String THREE_DOTS ="...";
+    String SPACE_THREE_DOTS =" ...";
     String NO_CREDENTIALS ="No Credentials";
     String UNKNOWN_TYPE="unknown_type";
     String CRED_PASS_EMPTY ="Credentials password is empty: please, fix credentials";

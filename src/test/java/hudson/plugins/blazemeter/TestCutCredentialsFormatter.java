@@ -15,30 +15,30 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.CutUserKeyFormatter;
+import hudson.plugins.blazemeter.api.CutCredentialsFormatter;
 import hudson.plugins.blazemeter.utils.Constants;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestCutUserKeyFormatter {
+public class TestCutCredentialsFormatter {
 
     @Test
     public void format_true() {
-        CutUserKeyFormatter cuk = new CutUserKeyFormatter();
+        CutCredentialsFormatter cuk = new CutCredentialsFormatter();
         TestLogRecord lr = new TestLogRecord(Level.INFO,
-            Api.X_API_KEY + ": 12345678901234566567");
+            Api.AUTHORIZATION + ": 12345678901234566567sssssssssssssssssssssssssssssssssssssssssssssssssss");
         String formatted = cuk.format(lr);
-        int dots = formatted.length() - 6;
-        Assert.assertEquals(cuk.format(lr).indexOf(Constants.THREE_DOTS), dots);
+        int dots = formatted.length() - 14;
+        Assert.assertEquals(cuk.format(lr).indexOf(Constants.SPACE_THREE_DOTS), dots);
     }
 
     @Test
     public void format_false() {
-        CutUserKeyFormatter cuk = new CutUserKeyFormatter();
+        CutCredentialsFormatter cuk = new CutCredentialsFormatter();
         TestLogRecord lr = new TestLogRecord(Level.INFO,"");
-        Assert.assertFalse(cuk.format(lr).contains(Constants.THREE_DOTS));
+        Assert.assertFalse(cuk.format(lr).contains(Constants.SPACE_THREE_DOTS));
     }
 
     private class TestLogRecord extends LogRecord {

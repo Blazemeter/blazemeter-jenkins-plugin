@@ -19,13 +19,11 @@ public interface TestConstants {
 
 
     // Mocked API constants
-    String MOCKED_USER_KEY_VALID ="mockedAPIKeyValid";
     String MOCKED_USER_KEY_RETRIES ="mockedAPIKeyRetries";
     String MOCKED_USER_KEY_TEST_TYPE ="mockedAPIKeyTestType";
     String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
     String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
     String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
-    String MOCKED_USER_KEY_INVALID ="mockedAPIKeyInValid";
     String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
     int mockedApiPort=1234;
     String proxyPort="2345";
@@ -54,4 +52,11 @@ public interface TestConstants {
     String MOCKED_NOTE = "bbbbbbbbbbbbbbbbbbbbb";
     String JTL_URL = mockedApiUrl+"/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?" +
         "AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D";
+
+    String MOCK_INVALID_USER="invalidUser";
+    String MOCK_INVALID_PASSWORD="invalidPassword";
+    String MOCK_VALID_ID="validId";
+    String MOCK_VALID_USER="validUser";
+    String MOCK_VALID_PASSWORD="validPassword";
+
 }

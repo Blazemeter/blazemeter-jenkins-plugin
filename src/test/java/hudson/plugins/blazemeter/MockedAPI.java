@@ -14,15 +14,19 @@
 
 package hudson.plugins.blazemeter;
 
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
+import java.io.File;
+import java.io.IOException;
+import okhttp3.Credentials;
+import org.apache.commons.io.FileUtils;
+import org.mockserver.integration.ClientAndServer;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.unlimited;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+
 public class MockedAPI {
-    /*
-
-    TODO
-
-    mock-server.com does not support expectations with basic authentication.
-    Due to JEN-232 all expectations should be changed or need to select another
-    mocking framework.
-
     private static ClientAndServer mockServer;
 
     private MockedAPI() {
@@ -31,6 +35,15 @@ public class MockedAPI {
     public static void startAPI() {
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
     }
+
+    /*
+
+    TODO
+
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
+
 
     public static void ping() throws IOException {
         File jsonFile = new File(TestConstants.RESOURCES + "/ping_true.json");
@@ -48,9 +61,10 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(ping_true));
 
     }
-
+*/
     public static void userProfile() throws IOException {
 
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         File jsonFile = new File(TestConstants.RESOURCES + "/getUserEmail_positive.json");
         String userProfile = FileUtils.readFileToString(jsonFile);
 
@@ -59,13 +73,14 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
 
+        credential = Credentials.basic(TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
         jsonFile = new File(TestConstants.RESOURCES + "/getUserEmail_negative.json");
         userProfile = FileUtils.readFileToString(jsonFile);
 
@@ -74,12 +89,13 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_INVALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
+/*
 
         jsonFile = new File(TestConstants.RESOURCES + "/getUserEmail_jexception.txt");
         userProfile = FileUtils.readFileToString(jsonFile);
@@ -107,9 +123,10 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(""));
+*/
 
     }
-
+/*
     public static void getMasterStatus() throws IOException {
 
         File jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_25.json");
@@ -775,10 +792,11 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(active));
     }
+*/
 
     public static void stopAPI() {
         mockServer.reset();
         mockServer.stop();
     }
-*/
+
 }

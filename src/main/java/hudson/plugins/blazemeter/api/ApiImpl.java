@@ -52,7 +52,7 @@ public class ApiImpl implements Api {
     private StdErrLog bzmLog = null;
     private Proxy proxy = null;
     private Authenticator auth = null;
-    private final BlazemeterCredentialImpl c;
+    private final String credential;
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
 
@@ -62,7 +62,8 @@ public class ApiImpl implements Api {
 
     public ApiImpl(BlazemeterCredentialImpl c, String blazeMeterUrl,
                      HttpLoggingInterceptor httpLog,StdErrLog bzmLog) {
-        this.c = c;
+        this.credential = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+
         this.bzmLog = (bzmLog!=null?bzmLog:new StdErrLog(Constants.BZM_JEN));
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
@@ -102,7 +103,7 @@ public class ApiImpl implements Api {
                 .addInterceptor(httpLog).proxy(this.proxy)
                 .addInterceptor(new RetryInterceptor(bzmLog))
                 .proxyAuthenticator(this.auth)
-                .authenticator(new BasicAuthenticator(this.c))
+//                .authenticator(new BasicAuthenticator(this.c))
                 .build();
         } catch (Exception ex) {
             this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
@@ -117,6 +118,7 @@ public class ApiImpl implements Api {
             String url = this.urlManager.masterStatus(APP_KEY, id);
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
@@ -138,7 +140,8 @@ public class ApiImpl implements Api {
             String url = this.urlManager.masterStatus(APP_KEY, id);
             Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+                .addHeader(Api.AUTHORIZATION,this.credential)
+                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             if (result.has(JsonConsts.DATA_URL) && result.get(JsonConsts.DATA_URL) == null) {
@@ -176,7 +179,8 @@ public class ApiImpl implements Api {
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
-                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            .addHeader(Api.AUTHORIZATION,this.credential)
+            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         Response rp = okhttp.newCall(r).execute();
         if (rp.code() == 500) {
             bzmLog.info("Server returned status = 500 while trying to start test.");
@@ -235,6 +239,7 @@ public class ApiImpl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             if (jo == null) {
@@ -258,6 +263,7 @@ public class ApiImpl implements Api {
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -269,6 +275,7 @@ public class ApiImpl implements Api {
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         okhttp.newCall(r).execute();
         return;
@@ -284,6 +291,7 @@ public class ApiImpl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
             summary = (JSONObject) result.getJSONArray("summary")
@@ -310,6 +318,7 @@ public class ApiImpl implements Api {
             try {
                 Request r = new Request.Builder().url(url).get()
                     .addHeader(ACCEPT, APP_JSON)
+                    .addHeader(Api.AUTHORIZATION,this.credential)
                     .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 JSONArray result = null;
@@ -370,7 +379,9 @@ public class ApiImpl implements Api {
         String url = this.urlManager.getUser(APP_KEY);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .build();
+
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
@@ -381,6 +392,7 @@ public class ApiImpl implements Api {
         String url = this.urlManager.getCIStatus(APP_KEY, sessionId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
         return jo;
@@ -397,6 +409,7 @@ public class ApiImpl implements Api {
         String url = this.urlManager.retrieveJUNITXML(APP_KEY, masterId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         String xmlJunit = okhttp.newCall(r).execute().body().string();
         return xmlJunit;
@@ -409,6 +422,7 @@ public class ApiImpl implements Api {
         bzmLog.info("Trying to retrieve JTLZIP json for the sessionId = " + sessionId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jtlzip = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jtlzip;
@@ -420,6 +434,7 @@ public class ApiImpl implements Api {
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo=new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -431,7 +446,8 @@ public class ApiImpl implements Api {
         String url = this.urlManager.listOfSessionIds(APP_KEY, masterId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-        .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            .addHeader(Api.AUTHORIZATION,this.credential)
+            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
 
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -457,6 +473,7 @@ public class ApiImpl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = null;
@@ -494,6 +511,7 @@ public class ApiImpl implements Api {
         boolean ping=false;
         try{
             Request r = new Request.Builder().url(url).get()
+                .addHeader(Api.AUTHORIZATION,this.credential)
                 .addHeader(ACCEPT, APP_JSON).build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             ping=jo.isNull(JsonConsts.ERROR);
@@ -511,6 +529,7 @@ public class ApiImpl implements Api {
         JSONObject noteJson = new JSONObject(noteEsc);
         RequestBody body = RequestBody.create(TEXT,noteJson.toString());
         Request r = new Request.Builder().url(url).patch(body)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -528,6 +547,7 @@ public class ApiImpl implements Api {
         String url = this.urlManager.properties(APP_KEY, sessionId);
         RequestBody body = RequestBody.create(JSON,properties.toString());
         Request r = new Request.Builder().url(url).post(body)
+            .addHeader(Api.AUTHORIZATION,this.credential)
             .build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {

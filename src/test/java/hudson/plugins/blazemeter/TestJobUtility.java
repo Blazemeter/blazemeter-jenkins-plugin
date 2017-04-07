@@ -14,22 +14,31 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.util.FormValidation;
+import java.io.IOException;
+import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.Mockito;
+
 public class TestJobUtility {
-
-/*
-
-    TODO
-
-    mock-server.com does not support expectations with basic authentication.
-    Due to JEN-232 all expectations should be changed or need to select another
-    mocking framework.
-
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
+
 
     @BeforeClass
     public static void setUp() throws IOException {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
+/*
         MockedAPI.stopTestSession();
         MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
@@ -42,12 +51,23 @@ public class TestJobUtility {
         MockedAPI.junit();
         MockedAPI.jtl_zip();
         MockedAPI.properties();
+*/
     }
 
     @AfterClass
     public static void tearDown(){
         MockedAPI.stopAPI();
     }
+
+
+/*
+
+    TODO
+
+    mock-server.com does not support expectations with basic authentication.
+    Due to JEN-232 all expectations should be changed or need to select another
+    mocking framework.
+
     @Test
     public void getUserEmail_positive() throws IOException,JSONException{
         String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
@@ -77,19 +97,21 @@ public class TestJobUtility {
         Assert.assertEquals(validation.getMessage(), Constants.CRED_VALID+"dzmitry.kashlach@blazemeter.com");
     }
 
-
+*/
 
   @Test
-    public void validateUserKey_negative() throws IOException,JSONException{
-        FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_INVALID,
+  public void validateUserKey_negative() throws IOException, JSONException {
+      BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
+          "invalidDescription", "invalidUser", "invalidPassword");
+
+      FormValidation validation= JobUtility.validateCredentials(invalidCred,
                 TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
-        Assert.assertEquals(validation.getMessage(),
-                "API key is not valid: unexpected exception=JSONObject[\"mail\"] not found.");
+        Assert.assertEquals("Credentials are not valid: unexpected exception = JSONObject[\"mail\"] not found.",validation.getMessage());
     }
 
 
-
+/*
   @Test
     public void validateUserKey_exception() throws IOException,JSONException{
         FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_EXCEPTION,

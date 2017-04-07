@@ -15,7 +15,6 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.util.ListBoxModel;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,18 +48,5 @@ public class TestPerformanceBuilderDescriptor {
         }
     }
 */
-
-    @Test
-    public void do_fill_api_key_items() {
-        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-        try {
-            bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
-            ListBoxModel itemds=bd.doFillCredentialsIdItems(TestConstants.MOCKED_USER_KEY_VALID);
-            Assert.assertEquals(0,itemds.size());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
 }
