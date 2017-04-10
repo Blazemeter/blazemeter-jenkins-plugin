@@ -44,9 +44,9 @@ public class TestJobUtility {
         MockedAPI.stopMaster();
         MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
+        MockedAPI.getReportUrl();
 
         /*TODO
-        MockedAPI.getReportUrl();
         MockedAPI.getTests();
         MockedAPI.notes();
         MockedAPI.getTestReport();
@@ -217,37 +217,45 @@ public class TestJobUtility {
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
+    @Test
+    public void getReportUrl_pos(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        String actReportUrl= null;
+        try {
+            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        Assert.assertEquals(expectedReportUrl,actReportUrl);
+    }
+
+
+
+    @Test
+    public void getReportUrl_neg(){
+        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
+            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
+
+        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
+        Api api = new ApiImpl(invalidCred, TestConstants.mockedApiUrl);
+        String actReportUrl= null;
+        try {
+            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        Assert.assertEquals(expectedReportUrl,actReportUrl);
+    }
+
+
 /*
 TODO
 
 
-  @Test
-    public void getReportUrl_pos(){
-        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        String actReportUrl= null;
-        try {
-            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        Assert.assertEquals(expectedReportUrl,actReportUrl);
-    }
-
-
-
-@Test
-    public void getReportUrl_neg(){
-        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
-        String actReportUrl= null;
-        try {
-            actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        Assert.assertEquals(expectedReportUrl,actReportUrl);
-    }
 
     @Test
     public void getSessionId() throws JSONException, IOException {

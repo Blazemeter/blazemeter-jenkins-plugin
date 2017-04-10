@@ -479,6 +479,42 @@ public class MockedAPI {
     }
 
 
+
+    public static void getReportUrl() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ID + "/publicToken";
+        File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
+        String getReportUrl = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(getReportUrl));
+
+        credential = Credentials.basic(TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
+        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
+        getReportUrl = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(getReportUrl));
+
+    }
+
+
 /* TODO
 
     public static void getTests() throws IOException {
@@ -553,39 +589,6 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(returnStr));
-
-    }
-
-
-    public static void getReportUrl() throws IOException {
-        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ID + "/publicToken";
-        File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
-        String getReportUrl = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(getReportUrl));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
-        getReportUrl = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_INVALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(getReportUrl));
 
     }
 
