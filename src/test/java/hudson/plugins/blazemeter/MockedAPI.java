@@ -37,15 +37,6 @@ public class MockedAPI {
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
     }
 
-    /*
-
-    TODO
-
-    mock-server.com does not support expectations with basic authentication.
-    Due to JEN-232 all expectations should be changed or need to select another
-    mocking framework.
-
-
     public static void ping() throws IOException {
         File jsonFile = new File(TestConstants.RESOURCES + "/ping_true.json");
         String ping_true = FileUtils.readFileToString(jsonFile);
@@ -62,8 +53,6 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(ping_true));
 
     }
-*/
-
 
     public static void stopMaster() throws IOException {
 
@@ -256,6 +245,52 @@ public class MockedAPI {
     }
 
 
+    public static void startTest() throws IOException {
+
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        File jsonFile = new File(TestConstants.RESOURCES + "/startTest.json");
+        String startTest = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(startTest));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/startCollection.json");
+        String startCollection = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + "/collections/" + TestConstants.TEST_MASTER_ID + "/start")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(startCollection));
+
+        /*TODO
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, TestConstants.MOCKED_USER_KEY_RETRIES),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(""));
+    */}
+
+
     public static void userProfile() throws IOException {
 
         String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -323,48 +358,6 @@ public class MockedAPI {
 
     }
 /* TODO
-
-    public static void startTest() throws IOException {
-
-        File jsonFile = new File(TestConstants.RESOURCES + "/startTest.json");
-        String startTest = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(startTest));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/startCollection.json");
-        String startCollection = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + "/collections/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(startCollection));
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_RETRIES),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(""));
-    }
 
     public static void getTests() throws IOException {
         String expectedPath = UrlManager.V4+"/web/tests";
@@ -792,7 +785,12 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(jo));
     }
 
+*/
+
+
     public static void active() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
         String expectedPath = UrlManager.V4 + "/web/active";
         File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
         String active = FileUtils.readFileToString(jsonFile);
@@ -801,15 +799,13 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(active));
     }
-*/
-
     public static void stopAPI() {
         mockServer.reset();
         mockServer.stop();

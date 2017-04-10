@@ -14,13 +14,129 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.plugins.blazemeter.api.ApiImpl;
+import hudson.plugins.blazemeter.utils.JsonConsts;
+import java.io.IOException;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.Mockito;
 
 public class TestApiImpl {
     private ApiImpl blazemeterApiV3 = null;
     private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
+
+    @BeforeClass
+    public static void setUp() throws IOException {
+        MockedAPI.startAPI();
+        MockedAPI.userProfile();
+        MockedAPI.getMasterStatus();
+        MockedAPI.startTest();
+        MockedAPI.active();
+        MockedAPI.ping();
+        /*TODO
+        MockedAPI.getTests();
+        MockedAPI.getTestReport();
+        */
+
+        /* TODO
+        MockedAPI.jtl();
+        MockedAPI.junit();
+        MockedAPI.publicToken();
+        MockedAPI.getListOfSessionIds();
+        MockedAPI.notes();
+        MockedAPI.properties();
+        */
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        MockedAPI.stopAPI();
+    }
+
+    @Test
+    public void startTest_single() throws JSONException, IOException {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred,
+            TestConstants.mockedApiUrl);
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
+            "15102806");
+    }
+
+    @Test
+    public void startTest_collection() throws JSONException, IOException {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred,
+            TestConstants.mockedApiUrl);
+        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
+            "15105877");
+    }
+
+
+
+    @Test
+    public void active() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        boolean active = blazemeterApiV3.active("5133848");
+        Assert.assertTrue(active);
+    }
+
+    @Test
+    public void activeNot() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        boolean active = blazemeterApiV3.active("51338483");
+        Assert.assertFalse(active);
+    }
+
+
+    @Test
+    public void ping_true() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        boolean ping = false;
+        try {
+            ping = blazemeterApiV3.ping();
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        Assert.assertTrue(ping);
+    }
+
+    @Test
+    public void ping_false() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        boolean ping = false;
+        try {
+            ping = blazemeterApiV3.ping();
+        } catch (Exception e) {
+            Assert.assertFalse(ping);
+        }
+    }
+
 
 /*
     TODO
@@ -28,30 +144,6 @@ public class TestApiImpl {
     mock-server.com does not support expectations with basic authentication.
     Due to JEN-232 all expectations should be changed or need to select another
     mocking framework.
-
-    @BeforeClass
-    public static void setUp() throws IOException {
-        MockedAPI.startAPI();
-        MockedAPI.userProfile();
-        MockedAPI.getMasterStatus();
-        MockedAPI.getTests();
-        MockedAPI.getTestReport();
-        MockedAPI.startTest();
-        MockedAPI.active();
-        MockedAPI.ping();
-        MockedAPI.jtl();
-        MockedAPI.junit();
-        MockedAPI.publicToken();
-        MockedAPI.getListOfSessionIds();
-        MockedAPI.notes();
-        MockedAPI.properties();
-    }
-
-    @AfterClass
-    public static void tearDown() throws IOException {
-        MockedAPI.stopAPI();
-    }
-
 
     @Test
     public void getTestStatus_Running() {
@@ -98,22 +190,6 @@ public class TestApiImpl {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void startTest_single() throws JSONException,IOException {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
-                "15102806");
-    }
-
-    @Test
-    public void startTest_collection() throws JSONException,IOException {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
-                "15105877");
     }
 
 
@@ -208,44 +284,6 @@ public class TestApiImpl {
         blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status == 0);
-    }
-
-    @Test
-    public void active() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean active = blazemeterApiV3.active("5133848");
-        Assert.assertTrue(active);
-    }
-
-    @Test
-    public void activeNot() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean active = blazemeterApiV3.active("51338483");
-        Assert.assertFalse(active);
-    }
-
-
-    @Test
-    public void ping_true() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        Assert.assertTrue(ping);
-    }
-
-    @Test
-    public void ping_false() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.assertFalse(ping);
-        }
     }
 
     @Test
