@@ -1,20 +1,21 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.IOException;
@@ -29,10 +30,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.Mockito;
 
 public class TestJobUtility {
-    private static StdErrLog stdErrLog= Mockito.mock(StdErrLog.class);
+    private static StdErrLog stdErrLog = Mockito.mock(StdErrLog.class);
     @Rule
     public JenkinsRule j = new JenkinsRule();
-
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -55,72 +55,76 @@ public class TestJobUtility {
     }
 
     @AfterClass
-    public static void tearDown(){
+    public static void tearDown() {
         MockedAPI.stopAPI();
     }
 
-
-/*
-
-    TODO
-
-    mock-server.com does not support expectations with basic authentication.
-    Due to JEN-232 all expectations should be changed or need to select another
-    mocking framework.
-
     @Test
-    public void getUserEmail_positive() throws IOException,JSONException{
-        String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+    public void getUserEmail_positive() throws IOException, JSONException {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "validId",
+            "validDescription", TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        String email = JobUtility.getUserEmail(validCred, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
-  @Test
-    public void getUserEmail_negative() throws IOException,JSONException{
-        String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(email,"");
+
+    @Test
+    public void getUserEmail_negative() throws IOException, JSONException {
+        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
+            "invalidDescription", "invalidUser", "invalidPassword");
+
+        String email = JobUtility.getUserEmail(invalidCred, TestConstants.mockedApiUrl);
+        Assert.assertEquals(email, "");
     }
 
+    @Test
+    public void getUserEmail_exception() throws IOException, JSONException {
+        BlazemeterCredentialImpl exceptionCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+            "exceptionId",
+            "exceptionDescription", TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
 
-
-  @Test
-    public void getUserEmail_exception() throws IOException,JSONException{
-        String email= JobUtility.getUserEmail(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
-        Assert.assertEquals(email,"");
+        String email = JobUtility.getUserEmail(exceptionCred, TestConstants.mockedApiUrl);
+        Assert.assertEquals(email, "");
     }
 
+    @Test
+    public void validateUserKey_positive() throws IOException, JSONException {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "validId",
+            "validDescription", TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
-
-  @Test
-    public void validateUserKey_positive() throws IOException,JSONException{
-        FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
+        FormValidation validation = JobUtility.validateCredentials(validCred,
+            TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.OK);
-        Assert.assertEquals(validation.getMessage(), Constants.CRED_VALID+"dzmitry.kashlach@blazemeter.com");
+        Assert.assertEquals(validation.getMessage(), Constants.CRED_ARE_VALID + "dzmitry.kashlach@blazemeter.com");
     }
 
-*/
+    @Test
+    public void validateUserKey_negative() throws IOException, JSONException {
+        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
+            "invalidDescription", "invalidUser", "invalidPassword");
 
-  @Test
-  public void validateUserKey_negative() throws IOException, JSONException {
-      BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
-          "invalidDescription", "invalidUser", "invalidPassword");
-
-      FormValidation validation= JobUtility.validateCredentials(invalidCred,
-                TestConstants.mockedApiUrl);
+        FormValidation validation = JobUtility.validateCredentials(invalidCred,
+            TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
-        Assert.assertEquals("Credentials are not valid: unexpected exception = JSONObject[\"mail\"] not found.",validation.getMessage());
+        Assert.assertEquals(Constants.CRED_ARE_NOT_VALID+": username = "+TestConstants.MOCK_INVALID_USER+
+            ", password = "+TestConstants.MOCK_INVALID_PASSWORD+" blazemeterUrl = "+TestConstants.mockedApiUrl+"." +
+            " Please, check proxy settings, serverUrl and credentials.", validation.getMessage());
     }
 
+    @Test
+    public void validateUserKey_exception() throws IOException, JSONException {
+        BlazemeterCredentialImpl exceptionCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+            "exceptionId",
+            "exceptionDescription", TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
 
-/*
-  @Test
-    public void validateUserKey_exception() throws IOException,JSONException{
-        FormValidation validation= JobUtility.validateCredentials(TestConstants.MOCKED_USER_KEY_EXCEPTION,
-                TestConstants.mockedApiUrl);
+        FormValidation validation = JobUtility.validateCredentials(exceptionCred,
+            TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
-                "API key is not valid: unexpected exception=A JSONObject text must begin with '{' at character 1");
+            "Credentials are not valid: unexpected exception = A JSONObject text must begin with '{' at character 1");
     }
 
+/*
 
 
   @Test

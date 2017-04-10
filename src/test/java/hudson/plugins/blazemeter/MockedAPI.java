@@ -62,6 +62,7 @@ public class MockedAPI {
 
     }
 */
+
     public static void userProfile() throws IOException {
 
         String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -95,8 +96,8 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
-/*
 
+        credential = Credentials.basic(TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
         jsonFile = new File(TestConstants.RESOURCES + "/getUserEmail_jexception.txt");
         userProfile = FileUtils.readFileToString(jsonFile);
 
@@ -105,13 +106,14 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_EXCEPTION),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
 
+/* TODO
         mockServer.when(
             request()
                 .withMethod("GET")

@@ -102,7 +102,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
             if (testList == null) {
-                items.add(Constants.CREDENTIALS_ARE_NOT_VALID, "-1");
+                items.add(Constants.CRED_ARE_NOT_VALID, "-1");
             } else if (testList.isEmpty()) {
                 items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "-1");
             } else {

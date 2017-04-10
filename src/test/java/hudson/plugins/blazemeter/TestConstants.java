@@ -53,6 +53,8 @@ public interface TestConstants {
     String JTL_URL = mockedApiUrl+"/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?" +
         "AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D";
 
+    String MOCK_EXCEPTION_USER="exceptionUser";
+    String MOCK_EXCEPTION_PASSWORD="exceptionPassword";
     String MOCK_INVALID_USER="invalidUser";
     String MOCK_INVALID_PASSWORD="invalidPassword";
     String MOCK_VALID_ID="validId";

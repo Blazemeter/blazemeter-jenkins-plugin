@@ -30,7 +30,7 @@ public interface JsonConsts {
     String TEST_ID="testId";
     String TEST_COLLECTION_ID="testCollectionId";
     String NOTE="note";
-    String MAIL="mail";
+    String MAIL ="mail";
     String CODE="code";
     String STATUS="status";
     String CONFIGURATION="configuration";

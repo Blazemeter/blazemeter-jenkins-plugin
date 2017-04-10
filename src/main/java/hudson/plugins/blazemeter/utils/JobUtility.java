@@ -531,8 +531,13 @@ public class JobUtility {
                     logger.warn("User profile: " + user.toString());
                     return FormValidation.errorWithMarkup("Credentials are not valid: error = " + user.get(JsonConsts.ERROR).toString());
                 } else {
-                    logger.warn(Constants.CRED_VALID + user.getString(JsonConsts.MAIL));
-                    return FormValidation.ok(Constants.CRED_VALID + user.getString(JsonConsts.MAIL));
+                    if (user.has(JsonConsts.RESULT)) {
+                        net.sf.json.JSONObject result = user.getJSONObject(JsonConsts.RESULT);
+                        if(result.has(JsonConsts.MAIL)){
+                            logger.warn(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
+                            return FormValidation.ok(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
+                        }
+                    }
                 }
             }
         } catch (ClassCastException e) {
