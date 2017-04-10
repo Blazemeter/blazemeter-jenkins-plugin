@@ -20,11 +20,7 @@ public interface TestConstants {
 
     // Mocked API constants
     String MOCKED_USER_KEY_RETRIES ="mockedAPIKeyRetries";
-    String MOCKED_USER_KEY_TEST_TYPE ="mockedAPIKeyTestType";
     String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
-    String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
-    String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
-    String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
     int mockedApiPort=1234;
     String proxyPort="2345";
     String mockedApiHost="http://127.0.0.1:";
@@ -67,5 +63,10 @@ public interface TestConstants {
     String MOCK_VALID_DESCRIPTION="validDescription";
     String MOCK_VALID_USER="validUser";
     String MOCK_VALID_PASSWORD="validPassword";
-
+    String MOCK_1_TEST_USER ="1-test-user";
+    String MOCK_1_TEST_PASSWORD ="1-test-password";
+    String MOCK_0_TEST_USER ="0-test-user";
+    String MOCK_0_TEST_PASSWORD ="0-test-password";
+    String MOCK_5_TEST_USER ="5-test-user";
+    String MOCK_5_TEST_PASSWORD ="5-test-password";
 }

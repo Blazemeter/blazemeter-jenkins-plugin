@@ -515,9 +515,8 @@ public class MockedAPI {
     }
 
 
-/* TODO
-
     public static void getTests() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String expectedPath = UrlManager.V4+"/web/tests";
         File jsonFile = new File(TestConstants.RESOURCES + "/getTests_10.json");
         String getTests = FileUtils.readFileToString(jsonFile);
@@ -527,13 +526,14 @@ public class MockedAPI {
                 .withPath(expectedPath)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8)
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(getTests));
 
+        credential = Credentials.basic(TestConstants.MOCK_1_TEST_USER, TestConstants.MOCK_1_TEST_PASSWORD);
         jsonFile = new File(TestConstants.RESOURCES + "/getTests_1.json");
         getTests = FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -541,13 +541,14 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_1_TEST),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(getTests));
 
+        credential = Credentials.basic(TestConstants.MOCK_0_TEST_USER, TestConstants.MOCK_0_TEST_PASSWORD);
         jsonFile = new File(TestConstants.RESOURCES + "/getTests_0.json");
         getTests = FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -555,13 +556,14 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_0_TESTS),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(getTests));
 
+        credential = Credentials.basic(TestConstants.MOCK_5_TEST_USER, TestConstants.MOCK_5_TEST_PASSWORD);
         jsonFile = new File(TestConstants.RESOURCES + "/getTests_5.json");
         getTests = FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -569,12 +571,13 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_5_TESTS),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(getTests));
+/*
 
         File returnFile = new File(TestConstants.RESOURCES + "/getTestType.json");
         String returnStr = FileUtils.readFileToString(returnFile);
@@ -590,7 +593,11 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(returnStr));
 
+*/
     }
+
+
+/* TODO
 
     public static void jtl() throws IOException {
         String expectedPath = UrlManager.V4 + "/" +

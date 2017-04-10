@@ -45,9 +45,9 @@ public class TestJobUtility {
         MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
+        MockedAPI.getTests();
 
         /*TODO
-        MockedAPI.getTests();
         MockedAPI.notes();
         MockedAPI.getTestReport();
         MockedAPI.getListOfSessionIds();
