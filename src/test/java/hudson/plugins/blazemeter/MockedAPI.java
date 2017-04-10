@@ -22,6 +22,7 @@ import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.mockserver.integration.ClientAndServer;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -62,6 +63,198 @@ public class MockedAPI {
 
     }
 */
+
+
+    public static void stopMaster() throws IOException {
+
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        File jsonFile = new File(TestConstants.RESOURCES + "/terminateTest.json");
+        String terminateTest = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/terminate")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(terminateTest));
+
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/terminate")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(terminateTest));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/stopTest.json");
+        String stopTest = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/stop")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(stopTest));
+        mockServer.when(
+            request()
+                .withMethod("POST")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/stop")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(stopTest));
+
+    }
+
+    public static void getMasterStatus() throws IOException {
+
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        File jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_25.json");
+        String testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_15102806 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            exactly(1)
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_WAIT_FOR_FINISH + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential), exactly(1)
+
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100_notes.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100_notes + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_NOT_FOUND + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_70.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+
+        credential = Credentials.basic(TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
+        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_0.json");
+        testStatus = FileUtils.readFileToString(jsonFile);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_0 + "/status")
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION,credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(testStatus));
+
+    }
+
 
     public static void userProfile() throws IOException {
 
@@ -113,6 +306,7 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
 
+
 /* TODO
         mockServer.when(
             request()
@@ -128,187 +322,7 @@ public class MockedAPI {
 */
 
     }
-/*
-    public static void getMasterStatus() throws IOException {
-
-        File jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_25.json");
-        String testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_15102806 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            exactly(1)
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_70.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_0.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_0 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_EXCEPTION),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_WAIT_FOR_FINISH + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID), exactly(1)
-
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100_notes.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100_notes + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
-        testStatus = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_NOT_FOUND + "/status")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(testStatus));
-
-    }
-
-    public static void stopTestSession() throws IOException {
-
-        File jsonFile = new File(TestConstants.RESOURCES + "/terminateTest.json");
-        String terminateTest = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/terminate")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(terminateTest));
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/terminate")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(terminateTest));
-
-        jsonFile = new File(TestConstants.RESOURCES + "/stopTest.json");
-        String stopTest = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/stop")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(stopTest));
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/stop")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(stopTest));
-
-    }
+/* TODO
 
     public static void startTest() throws IOException {
 

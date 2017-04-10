@@ -15,6 +15,8 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
@@ -38,9 +40,10 @@ public class TestJobUtility {
     public static void setUp() throws IOException {
         MockedAPI.startAPI();
         MockedAPI.userProfile();
-/*
-        MockedAPI.stopTestSession();
+        MockedAPI.stopMaster();
         MockedAPI.getMasterStatus();
+
+        /*TODO
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
@@ -61,8 +64,8 @@ public class TestJobUtility {
 
     @Test
     public void getUserEmail_positive() throws IOException, JSONException {
-        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "validId",
-            "validDescription", TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
         String email = JobUtility.getUserEmail(validCred, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
@@ -70,8 +73,8 @@ public class TestJobUtility {
 
     @Test
     public void getUserEmail_negative() throws IOException, JSONException {
-        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
-            "invalidDescription", "invalidUser", "invalidPassword");
+        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
+            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
 
         String email = JobUtility.getUserEmail(invalidCred, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "");
@@ -80,8 +83,8 @@ public class TestJobUtility {
     @Test
     public void getUserEmail_exception() throws IOException, JSONException {
         BlazemeterCredentialImpl exceptionCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
-            "exceptionId",
-            "exceptionDescription", TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
+            TestConstants.MOCK_EXCEPTION_ID,
+            TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
 
         String email = JobUtility.getUserEmail(exceptionCred, TestConstants.mockedApiUrl);
         Assert.assertEquals(email, "");
@@ -89,8 +92,8 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_positive() throws IOException, JSONException {
-        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "validId",
-            "validDescription", TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
         FormValidation validation = JobUtility.validateCredentials(validCred,
             TestConstants.mockedApiUrl);
@@ -100,14 +103,14 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_negative() throws IOException, JSONException {
-        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, "invalidId",
-            "invalidDescription", "invalidUser", "invalidPassword");
+        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
+            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
 
         FormValidation validation = JobUtility.validateCredentials(invalidCred,
             TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
-        Assert.assertEquals(Constants.CRED_ARE_NOT_VALID+": username = "+TestConstants.MOCK_INVALID_USER+
-            ", password = "+TestConstants.MOCK_INVALID_PASSWORD+" blazemeterUrl = "+TestConstants.mockedApiUrl+"." +
+        Assert.assertEquals(Constants.CRED_ARE_NOT_VALID + ": username = " + TestConstants.MOCK_INVALID_USER +
+            ", password = " + TestConstants.MOCK_INVALID_PASSWORD + " blazemeterUrl = " + TestConstants.mockedApiUrl + "." +
             " Please, check proxy settings, serverUrl and credentials.", validation.getMessage());
     }
 
@@ -124,15 +127,17 @@ public class TestJobUtility {
             "Credentials are not valid: unexpected exception = A JSONObject text must begin with '{' at character 1");
     }
 
-/*
+    @Test
+    public void validateUserKey_empty() throws IOException, JSONException {
+        BlazemeterCredentialImpl emptyCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+            "",
+            "", TestConstants.MOCK_EMPTY_USER, TestConstants.MOCK_EMPTY_PASSWORD);
 
-
-  @Test
-    public void validateUserKey_empty() throws IOException,JSONException{
-        FormValidation validation= JobUtility.validateCredentials("", TestConstants.mockedApiUrl);
+        FormValidation validation = JobUtility.validateCredentials(emptyCred, TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(), Constants.CRED_PASS_EMPTY);
     }
+
 
     @Test
     public void getVersion() throws IOException,JSONException {
@@ -141,10 +146,12 @@ public class TestJobUtility {
     }
 
 
-
-  @Test
+    @Test
     public void stopMaster(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+      BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+          TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
         boolean terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
         Assert.assertEquals(terminate, true);
         terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_70, stdErrLog);
@@ -155,6 +162,8 @@ public class TestJobUtility {
         Assert.assertEquals(terminate, false);
     }
 
+/*
+TODO
 
 
   @Test
