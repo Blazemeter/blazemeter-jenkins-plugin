@@ -17,6 +17,7 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
+import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
@@ -42,9 +43,9 @@ public class TestJobUtility {
         MockedAPI.userProfile();
         MockedAPI.stopMaster();
         MockedAPI.getMasterStatus();
+        MockedAPI.getCIStatus();
 
         /*TODO
-        MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
         MockedAPI.notes();
@@ -162,6 +163,60 @@ public class TestJobUtility {
         Assert.assertEquals(terminate, false);
     }
 
+
+    @Test
+    public void getCIStatus_success(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog, stdErrLog);
+        Assert.assertEquals(CIStatus.success,ciStatus);
+    }
+
+
+
+    @Test
+    public void getCIStatus_failure(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog, stdErrLog);
+        Assert.assertEquals(CIStatus.failures,ciStatus);
+    }
+
+
+
+    @Test
+    public void getCIStatus_error_61700(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_61700, stdErrLog, stdErrLog);
+        Assert.assertEquals(CIStatus.errors,ciStatus);
+    }
+
+
+
+    @Test
+    public void getCIStatus_error_0(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_0, stdErrLog, stdErrLog);
+        Assert.assertEquals(CIStatus.failures,ciStatus);
+    }
+
+
+
+    @Test
+    public void getCIStatus_error_70404(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_70404, stdErrLog, stdErrLog);
+        Assert.assertEquals(CIStatus.failures,ciStatus);
+    }
+
 /*
 TODO
 
@@ -204,49 +259,6 @@ TODO
     }
 
 
-
-  @Test
-    public void getCIStatus_success(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog, stdErrLog);
-        Assert.assertEquals(CIStatus.success,ciStatus);
-    }
-
-
-
-  @Test
-    public void getCIStatus_failure(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog, stdErrLog);
-        Assert.assertEquals(CIStatus.failures,ciStatus);
-    }
-
-
-
-  @Test
-    public void getCIStatus_error_61700(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_61700, stdErrLog, stdErrLog);
-        Assert.assertEquals(CIStatus.errors,ciStatus);
-    }
-
-
-
-  @Test
-    public void getCIStatus_error_0(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_0, stdErrLog, stdErrLog);
-        Assert.assertEquals(CIStatus.failures,ciStatus);
-    }
-
-
-
-  @Test
-    public void getCIStatus_error_70404(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_70404, stdErrLog, stdErrLog);
-        Assert.assertEquals(CIStatus.failures,ciStatus);
-    }
 
     @Test
     public void errorsFailed_true_0() throws JSONException, IOException {

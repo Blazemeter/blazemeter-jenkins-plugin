@@ -20,6 +20,7 @@ import hudson.plugins.blazemeter.utils.JsonConsts;
 import java.io.IOException;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -43,9 +44,9 @@ public class TestApiImpl {
         MockedAPI.startTest();
         MockedAPI.active();
         MockedAPI.ping();
+        MockedAPI.getTestReport();
         /*TODO
         MockedAPI.getTests();
-        MockedAPI.getTestReport();
         */
 
         /* TODO
@@ -137,6 +138,15 @@ public class TestApiImpl {
         }
     }
 
+    @Test
+    public void getTestReport() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        JSONObject testReport = blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
+        Assert.assertTrue(testReport.length() == 33);
+    }
+
 
 /*
     TODO
@@ -208,14 +218,6 @@ public class TestApiImpl {
 
     }
 
-    @Test
-    public void getTestReport() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        JSONObject testReport = blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
-        Assert.assertTrue(testReport.length() == 33);
-
-
-    }
 
     @Test
     public void getJtl() throws JSONException,IOException{
