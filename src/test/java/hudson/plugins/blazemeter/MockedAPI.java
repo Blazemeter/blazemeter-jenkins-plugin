@@ -17,9 +17,12 @@ package hudson.plugins.blazemeter;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.mockserver.integration.ClientAndServer;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.exactly;
@@ -597,9 +600,9 @@ public class MockedAPI {
     }
 
 
-/* TODO
-
     public static void jtl() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
         String expectedPath = UrlManager.V4 + "/" +
             "sessions/" + TestConstants.MOCKED_SESSION + "/reports/logs";
 
@@ -610,7 +613,7 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
@@ -632,6 +635,46 @@ public class MockedAPI {
             .respond(
                 response().withStatusCode(200).withBody(bas));
     }
+
+
+    public static void getListOfSessionIds() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
+            TestConstants.TEST_MASTER_ID + UrlManager.SESSIONS;
+
+        File jf = new File(TestConstants.RESOURCES + "/listOfsessionIds.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
+            TestConstants.TEST_MASTER_SUCCESS + UrlManager.SESSIONS;
+
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader("Accept", "application/json")
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+    }
+
+
+/* TODO
 
     public static void junit() throws IOException {
         String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -700,40 +743,6 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jo));
 
-    }
-
-    public static void getListOfSessionIds() throws IOException {
-        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_ID + UrlManager.SESSIONS;
-
-        File jf = new File(TestConstants.RESOURCES + "/listOfsessionIds.json");
-        String jo = FileUtils.readFileToString(jf);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(jo));
-
-        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_SUCCESS + UrlManager.SESSIONS;
-
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(jo));
     }
 
     public static void properties() throws IOException {

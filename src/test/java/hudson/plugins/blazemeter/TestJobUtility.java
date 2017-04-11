@@ -24,6 +24,7 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
@@ -54,11 +55,11 @@ public class TestJobUtility {
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
         MockedAPI.notes();
+        MockedAPI.getTestReport();
+        MockedAPI.jtl();
+        MockedAPI.getListOfSessionIds();
 
         /*TODO
-        MockedAPI.getTestReport();
-        MockedAPI.getListOfSessionIds();
-        MockedAPI.jtl();
         MockedAPI.junit();
         MockedAPI.jtl_zip();
         MockedAPI.properties();
@@ -384,34 +385,27 @@ public class TestJobUtility {
     }
 
 
-
-/*
-TODO
-
-
-
-
-
-
-
-  @Test
+    @Test
     public void agReport(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
         JSONObject ar = JobUtility.requestAggregateReport(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
         Assert.assertTrue(ar.length()==33);
     }
 
-
-
-  @Test
-    public void jtlUrls(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID,stdErrLog,stdErrLog);
-        Assert.assertTrue(sessions.size()==1);
-        Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION),TestConstants.JTL_URL);
+    @Test
+    public void jtlUrls() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
+        Assert.assertTrue(sessions.size() == 1);
+        Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION), TestConstants.JTL_URL);
     }
 
-
+    /*
+TODO
 
   @Test
     public void retrieveJUNITXMLreport() {
