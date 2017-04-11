@@ -21,12 +21,18 @@ import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
+import java.io.File;
 import java.io.IOException;
+import javax.mail.MessagingException;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -252,8 +258,44 @@ public class TestJobUtility {
     }
 
 
-/*
-TODO
+    @Test
+    @Ignore
+    public void collection_true(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        try {
+            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,validCred, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Test
+    @Ignore
+    public void collection_false(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
+        try {
+            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,validCred, TestConstants.mockedApiUrl));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }catch (MessagingException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -271,7 +313,7 @@ TODO
     @Test
     public void errorsFailed_true_0() throws JSONException, IOException {
         File error_0=new File(TestConstants.RESOURCES+ "/ciStatus_error_0.json");
-        String error_0_str=FileUtils.readFileToString(error_0);
+        String error_0_str= FileUtils.readFileToString(error_0);
         JSONArray error_0_json=new JSONArray(error_0_str);
         Assert.assertTrue(JobUtility.errorsFailed(error_0_json));
     }
@@ -291,6 +333,11 @@ TODO
         JSONArray error_json=new JSONArray(error_str);
         Assert.assertFalse(JobUtility.errorsFailed(error_json));
     }
+
+
+/*
+TODO
+
 
 
 
@@ -323,38 +370,6 @@ TODO
     }
 
 
-
-  @Test
-    public void collection_true(){
-        try {
-            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }catch (MessagingException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-  @Test
-    public void collection_false(){
-        try {
-            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }catch (MessagingException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void prepareProps() throws JSONException {
