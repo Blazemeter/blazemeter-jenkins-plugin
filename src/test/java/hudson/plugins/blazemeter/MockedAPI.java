@@ -736,51 +736,6 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(jo));
     }
 
-    public static void notes() throws IOException {
-        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_ID;
-
-        File jf = new File(TestConstants.RESOURCES + "/notes.json");
-        String jo = FileUtils.readFileToString(jf);
-        mockServer.when(
-            request()
-                .withMethod("PATCH")
-                .withPath(expectedPath)
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(jo));
-
-        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_100_notes;
-        mockServer.when(
-            request()
-                .withMethod("PATCH")
-                .withPath(expectedPath)
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(jo));
-
-        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_15102806;
-        mockServer.when(
-            request()
-                .withMethod("PATCH")
-                .withPath(expectedPath)
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(jo));
-
-    }
-
     public static void properties() throws IOException {
         String expectedPath = UrlManager.V4 + UrlManager.SESSIONS + "/" +
             TestConstants.MOCKED_SESSION + "/properties";
@@ -803,6 +758,53 @@ public class MockedAPI {
     }
 
 */
+
+
+    public static void notes() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
+            TestConstants.TEST_MASTER_ID;
+
+        File jf = new File(TestConstants.RESOURCES + "/notes.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("PATCH")
+                .withPath(expectedPath)
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
+            TestConstants.TEST_MASTER_100_notes;
+        mockServer.when(
+            request()
+                .withMethod("PATCH")
+                .withPath(expectedPath)
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+        expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
+            TestConstants.TEST_MASTER_15102806;
+        mockServer.when(
+            request()
+                .withMethod("PATCH")
+                .withPath(expectedPath)
+                .withHeader(Api.AUTHORIZATION, credential),
+            unlimited()
+        )
+            .respond(
+                response().withHeader("application/json")
+                    .withStatusCode(200).withBody(jo));
+
+    }
 
 
     public static void active() throws IOException {

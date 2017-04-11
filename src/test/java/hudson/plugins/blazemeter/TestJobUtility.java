@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -52,9 +53,9 @@ public class TestJobUtility {
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
         MockedAPI.getTests();
+        MockedAPI.notes();
 
         /*TODO
-        MockedAPI.notes();
         MockedAPI.getTestReport();
         MockedAPI.getListOfSessionIds();
         MockedAPI.jtl();
@@ -283,7 +284,7 @@ public class TestJobUtility {
     @Ignore
     public void collection_false(){
         BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         try {
             Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,validCred, TestConstants.mockedApiUrl));
         } catch (JSONException e) {
@@ -335,18 +336,12 @@ public class TestJobUtility {
     }
 
 
-/*
-TODO
-
-
-
-
-  @Test
+    @Test
     public void testIdExists(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         try {
-            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_5039530_ID,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Assert.assertTrue(JobUtility.testIdExists(TestConstants.TEST_5039530_ID,validCred, TestConstants.mockedApiUrl));
         }catch (IOException e) {
             e.printStackTrace();
         }catch (MessagingException e) {
@@ -356,19 +351,18 @@ TODO
 
 
 
-  @Test
+    @Test
     public void testIdExists_negative(){
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         try {
-            Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Assert.assertFalse(JobUtility.testIdExists(TestConstants.TEST_MASTER_ERROR_0,validCred, TestConstants.mockedApiUrl));
         }catch (IOException e) {
             e.printStackTrace();
         }catch (MessagingException e) {
             e.printStackTrace();
         }
     }
-
 
 
     @Test
@@ -380,12 +374,23 @@ TODO
 
 
 
-  @Test
+    @Test
     public void notes(){
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
         boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
         Assert.assertTrue(notes);
     }
+
+
+
+/*
+TODO
+
+
+
+
 
 
 
