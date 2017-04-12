@@ -62,10 +62,8 @@ public class TestJobUtility {
         MockedAPI.getListOfSessionIds();
         MockedAPI.junit();
         MockedAPI.jtl_zip();
-
-        /*TODO
         MockedAPI.properties();
-*/
+
     }
 
     @AfterClass
@@ -447,12 +445,12 @@ public class TestJobUtility {
 
     }
 
-    /*
-TODO
-
     @Test
     public void properties() {
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
         String prps = "v=r,v=i";
         JSONArray arr=null;
         try {
@@ -465,6 +463,10 @@ TODO
 
 
     }
+
+    /*
+TODO
+
 
     @Test
     public void postProcess_success(){

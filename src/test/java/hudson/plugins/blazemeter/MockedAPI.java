@@ -29,6 +29,7 @@ import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.matchers.Times.unlimited;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import org.mockserver.model.Parameter;
 
 public class MockedAPI {
     private static ClientAndServer mockServer;
@@ -747,7 +748,12 @@ public class MockedAPI {
 
     }
 
+
+*/
+
+
     public static void properties() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String expectedPath = UrlManager.V4 + UrlManager.SESSIONS + "/" +
             TestConstants.MOCKED_SESSION + "/properties";
 
@@ -757,7 +763,7 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(expectedPath)
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID)
+                .withHeader(Api.AUTHORIZATION, credential)
                 .withQueryStringParameters(
                     new Parameter("target", "all")
                 ),
@@ -767,9 +773,6 @@ public class MockedAPI {
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(jo));
     }
-
-*/
-
 
     public static void notes() throws IOException {
         String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
