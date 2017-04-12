@@ -61,9 +61,9 @@ public class TestJobUtility {
         MockedAPI.jtl();
         MockedAPI.getListOfSessionIds();
         MockedAPI.junit();
+        MockedAPI.jtl_zip();
 
         /*TODO
-        MockedAPI.jtl_zip();
         MockedAPI.properties();
 */
     }
@@ -428,8 +428,6 @@ public class TestJobUtility {
         }
     }
 
-    /*
-TODO
 
     @Test
     public void downloadJtlReport() {
@@ -448,6 +446,9 @@ TODO
         }
 
     }
+
+    /*
+TODO
 
     @Test
     public void properties() {
