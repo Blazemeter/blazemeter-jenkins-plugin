@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,9 +60,9 @@ public class TestJobUtility {
         MockedAPI.getTestReport();
         MockedAPI.jtl();
         MockedAPI.getListOfSessionIds();
+        MockedAPI.junit();
 
         /*TODO
-        MockedAPI.junit();
         MockedAPI.jtl_zip();
         MockedAPI.properties();
 */
@@ -404,18 +406,19 @@ public class TestJobUtility {
         Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION), TestConstants.JTL_URL);
     }
 
-    /*
-TODO
 
-  @Test
+    @Test
     public void retrieveJUNITXMLreport() {
-        Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/junit"));
         try {
             fp.mkdirs();
             JobUtility.retrieveJUNITXMLreport(api, TestConstants.TEST_MASTER_ID, fp, stdErrLog, stdErrLog);
             Assert.assertTrue(fp.exists());
             Assert.assertTrue(fp.list().size()==1);
+            Assert.assertFalse(StringUtils.isBlank(fp.list().get(0).readToString()));
             fp.deleteRecursive();
             Assert.assertFalse(fp.exists());
         } catch (IOException e) {
@@ -424,6 +427,9 @@ TODO
             Assert.fail();
         }
     }
+
+    /*
+TODO
 
     @Test
     public void downloadJtlReport() {

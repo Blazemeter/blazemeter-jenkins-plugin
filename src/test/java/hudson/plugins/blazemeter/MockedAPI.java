@@ -673,10 +673,8 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(jo));
     }
 
-
-/* TODO
-
     public static void junit() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
             TestConstants.TEST_MASTER_ID + "/reports/thresholds";
 
@@ -687,7 +685,7 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
@@ -702,13 +700,17 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(xml));
     }
+
+
+/* TODO
+
 
     public static void publicToken() throws IOException {
         String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
