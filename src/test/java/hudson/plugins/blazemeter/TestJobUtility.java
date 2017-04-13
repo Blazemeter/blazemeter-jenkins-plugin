@@ -25,6 +25,8 @@ import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import javax.mail.MessagingException;
 import org.apache.commons.io.FileUtils;
@@ -525,20 +527,24 @@ TODO
             Assert.fail();
         }
     }
-  @Test
+*/
+
+    @Test
     public void waitForFinish() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
         Date start = Calendar.getInstance().getTime();
         try {
-            Api api = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+            Api api = new ApiImpl(validCred, TestConstants.mockedApiUrl);
             JobUtility.waitForFinish(api, "1", stdErrLog, TestConstants.TEST_MASTER_WAIT_FOR_FINISH);
             long after = Calendar.getInstance().getTime().getTime();
             long diffInSec = (after - start.getTime()) / 1000;
-            Assert.assertTrue(diffInSec>25);
-            Assert.assertTrue(diffInSec<35);
+            Assert.assertTrue(diffInSec > 25);
+            Assert.assertTrue(diffInSec < 35);
         } catch (InterruptedException e) {
             Assert.fail();
         }
     }
-*/
 
 }
