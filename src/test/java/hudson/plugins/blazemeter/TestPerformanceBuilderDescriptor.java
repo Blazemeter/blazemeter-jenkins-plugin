@@ -34,19 +34,4 @@ public class TestPerformanceBuilderDescriptor {
         Assert.assertEquals(Constants.A_BLAZEMETER_COM + 123, bd.getBlazeMeterURL());
 
     }
-/*
-    TODO
-    @Test
-    public void no_api_key() {
-       BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-        try {
-            ListBoxModel lbm = bd.doFillTestIdItems(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.TEST_5039530_ID);
-            Assert.assertTrue(lbm.size()==1);
-            Assert.assertEquals(lbm.get(0).name,Constants.NO_CREDENTIALS);
-        } catch (FormValidation formValidation) {
-            formValidation.printStackTrace();
-        }
-    }
-*/
-
 }
