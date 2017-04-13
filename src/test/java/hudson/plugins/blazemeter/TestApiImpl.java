@@ -18,6 +18,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.JsonConsts;
 import java.io.IOException;
+import javax.servlet.ServletException;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,8 +46,8 @@ public class TestApiImpl {
         MockedAPI.active();
         MockedAPI.ping();
         MockedAPI.getTestReport();
-        /*TODO
         MockedAPI.getTests();
+        /*TODO
         */
 
         /* TODO
@@ -148,6 +149,31 @@ public class TestApiImpl {
     }
 
 
+    @Test
+    public void getTestCount_zero() {
+        try {
+            blazemeterApiV3 = new ApiImpl(BlazemeterCredentialImpl.EMPTY, TestConstants.mockedApiUrl);
+            Assert.assertEquals(blazemeterApiV3.getTestCount(), -1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void getTestsCount_4() throws IOException, JSONException, ServletException {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        int count = blazemeterApiV3.getTestCount();
+        Assert.assertTrue(count == 4);
+
+    }
+
 /*
     TODO
 
@@ -189,21 +215,6 @@ public class TestApiImpl {
 
 
     @Test
-    public void getTestCount_zero() {
-        try {
-            blazemeterApiV3 = new ApiImpl(null, TestConstants.mockedApiUrl);
-            Assert.assertEquals(blazemeterApiV3.getTestCount(), 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Test
     public void getTestRunStatus_notFound() {
         blazemeterApiV3 = new ApiImpl(null, TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.getTestStatus(null), TestStatus.NotFound);
@@ -226,22 +237,6 @@ public class TestApiImpl {
         Assert.assertTrue(jtl.length() == 3);
         Assert.assertTrue(((JSONObject)jtl.get(JsonConsts.RESULT)).has(JsonConsts.DATA_URL));
 
-
-    }
-
-    @Test
-    public void getTestsCount_4() throws IOException, JSONException, ServletException {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        int count = blazemeterApiV3.getTestCount();
-        Assert.assertTrue(count == 4);
-
-    }
-
-    @Test
-    public void getTestsCount_1() throws IOException, JSONException, ServletException {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_1_TEST, TestConstants.mockedApiUrl);
-        int count = blazemeterApiV3.getTestCount();
-        Assert.assertTrue(count == 1);
 
     }
 

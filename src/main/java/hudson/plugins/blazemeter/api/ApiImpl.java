@@ -254,6 +254,9 @@ public class ApiImpl implements Api {
         } catch (RuntimeException e) {
             bzmLog.warn("Error getting response from server: ", e);
             return -1;
+        } catch (Exception e) {
+            bzmLog.warn("Error getting response from server: ", e);
+            return -1;
         }
     }
 
