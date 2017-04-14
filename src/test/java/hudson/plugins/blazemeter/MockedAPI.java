@@ -709,11 +709,8 @@ public class MockedAPI {
                     .withStatusCode(200).withBody(xml));
     }
 
-
-/* TODO
-
-
     public static void publicToken() throws IOException {
+        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
             TestConstants.TEST_MASTER_ID + "/publicToken";
 
@@ -724,7 +721,7 @@ public class MockedAPI {
                 .withMethod("POST")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
@@ -739,7 +736,7 @@ public class MockedAPI {
                 .withMethod("POST")
                 .withPath(expectedPath)
                 .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_VALID),
+                .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
@@ -748,8 +745,6 @@ public class MockedAPI {
 
     }
 
-
-*/
 
 
     public static void properties() throws IOException {
