@@ -279,20 +279,7 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(startCollection));
-
-        /*TODO
-        mockServer.when(
-            request()
-                .withMethod("POST")
-                .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.AUTHORIZATION, TestConstants.MOCKED_USER_KEY_RETRIES),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(""));
-    */}
+}
 
 
     public static void userProfile() throws IOException {
@@ -344,21 +331,6 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(userProfile));
-
-
-/* TODO
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + "/user")
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_RETRIES),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(""));
-*/
 
     }
 
