@@ -239,6 +239,25 @@ public class TestApiImpl {
 
 
 
+    @Test
+    public void getTestSessionStatusCode_0() {
+        BlazemeterCredentialImpl exceptionCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_EXCEPTION_ID,
+            TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
+
+        blazemeterApiV3 = new ApiImpl(exceptionCred, TestConstants.mockedApiUrl);
+        int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
+        Assert.assertTrue(status == 0);
+    }
+
+    @Test
+    public void getTestSessionStatusCode_25() {
+        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        blazemeterApiV3 = new ApiImpl(validCred, TestConstants.mockedApiUrl);
+        int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_25);
+        Assert.assertTrue(status == 25);
+    }
+
 /*
     TODO
 
@@ -304,13 +323,6 @@ public class TestApiImpl {
     }
 
     @Test
-    public void getTestSessionStatusCode_25() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_25);
-        Assert.assertTrue(status == 25);
-    }
-
-    @Test
     public void getTestSessionStatusCode_70() {
         blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_70);
@@ -329,13 +341,6 @@ public class TestApiImpl {
         blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_100);
         Assert.assertTrue(status == 100);
-    }
-
-    @Test
-    public void getTestSessionStatusCode_0() {
-        blazemeterApiV3 = new ApiImpl(TestConstants.MOCKED_USER_KEY_EXCEPTION, TestConstants.mockedApiUrl);
-        int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
-        Assert.assertTrue(status == 0);
     }
 
 
