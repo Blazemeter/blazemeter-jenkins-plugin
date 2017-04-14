@@ -14,12 +14,26 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.ProxyConfiguration;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
+import hudson.remoting.VirtualChannel;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.Mockito;
+
 public class TestBlazeMeterBuild {
-/*
-    TODO
-    mock-server.com does not support expectations with basic authentication.
-    Due to JEN-232 all expectations should be changed or need to select another
-    mocking framework.
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -47,11 +61,14 @@ public class TestBlazeMeterBuild {
         String notes="a";
         String sessionProperties="f";
         try {
+            BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+                TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+
             FreeStyleProject project = j.createFreeStyleProject();
             AbstractBuild b = project.scheduleBuild2(0).get();
             BuildListener l = Mockito.mock(BuildListener.class);
             BlazeMeterBuild bb = new BlazeMeterBuild();
-            bb.setCredential(TestConstants.MOCKED_USER_KEY_VALID);
+            bb.setCredential(validCred);
             bb.setServerUrl(TestConstants.mockedApiUrl);
             bb.setTestId(testId);
             bb.setNotes(notes);
@@ -96,11 +113,17 @@ public class TestBlazeMeterBuild {
         try {
             j.getInstance().proxy=new ProxyConfiguration("",0);
             j.getInstance().proxy.save();
+            BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+                TestConstants.MOCK_INVALID_ID,
+                TestConstants.MOCK_INVALID_DESCRIPTION,
+                TestConstants.MOCK_INVALID_USER,
+                TestConstants.MOCK_INVALID_PASSWORD);
+
             FreeStyleProject project = j.createFreeStyleProject();
             AbstractBuild b = project.scheduleBuild2(0).get();
             BuildListener l = Mockito.mock(BuildListener.class);
             BlazeMeterBuild bb = new BlazeMeterBuild();
-            bb.setCredential(TestConstants.MOCKED_USER_KEY_INVALID);
+            bb.setCredential(invalidCred);
             bb.setServerUrl(TestConstants.mockedApiUrl);
             bb.setTestId(testId);
             bb.setNotes(notes);
@@ -132,6 +155,6 @@ public class TestBlazeMeterBuild {
             e.printStackTrace();
         }
     }
-*/
+
 
 }
