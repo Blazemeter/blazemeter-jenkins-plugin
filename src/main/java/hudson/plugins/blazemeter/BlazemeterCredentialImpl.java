@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import java.io.IOException;
@@ -106,10 +105,11 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
             return "icon-credentials-userpass";
         }
 
-        public FormValidation doTestConnection(@QueryParameter("id") final String credentialsId)
+        public FormValidation doTestConnection(@QueryParameter("username") final String username, @QueryParameter("password") final String password)
             throws MessagingException, IOException, JSONException, ServletException {
-            BlazemeterCredentialImpl credential = Utils.findCredentials(credentialsId,CredentialsScope.GLOBAL);
-            return JobUtility.validateCredentials(credential,BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+
+            return JobUtility.validateCredentials(username,Secret.decrypt(password).getPlainText(),
+                BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
         }
 
     }

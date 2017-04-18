@@ -18,7 +18,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
@@ -512,14 +511,14 @@ public class JobUtility {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateCredentials(BlazemeterCredentialImpl c, String blazeMeterUrl) {
-        if (StringUtils.isBlank(c.getPassword().getPlainText())) {
+    public static FormValidation validateCredentials(String username, String password, String blazeMeterUrl) {
+        if (StringUtils.isBlank(password)) {
             logger.warn(Constants.CRED_PASS_EMPTY);
             return FormValidation.errorWithMarkup(Constants.CRED_PASS_EMPTY);
         }
         try {
-            logger.info("Validating credentials started: username = " + c.getUsername() + " password = " + c.getPassword().getEncryptedValue());
-            String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+            logger.info("Validating credentials started: username = " + username + " password = " + password);
+            String bc = Credentials.basic(username, password);
             Api api = new ApiImpl(bc, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl = " + blazeMeterUrl);
             JSONObject u = api.getUser();
@@ -535,7 +534,7 @@ public class JobUtility {
                 } else {
                     if (user.has(JsonConsts.RESULT)) {
                         net.sf.json.JSONObject result = user.getJSONObject(JsonConsts.RESULT);
-                        if(result.has(JsonConsts.MAIL)){
+                        if (result.has(JsonConsts.MAIL)) {
                             logger.warn(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
                             return FormValidation.ok(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
                         }
@@ -550,10 +549,10 @@ public class JobUtility {
             logger.warn(e);
             return FormValidation.errorWithMarkup("Credentials are not valid: unexpected exception = " + e.getMessage().toString());
         }
-        logger.warn("Credentials are not valid: username = " + c.getUsername() +
-            ", password = " + c.getPassword() + " blazemeterUrl = " + blazeMeterUrl);
+        logger.warn("Credentials are not valid: username = " + username +
+            ", password = " + password + " blazemeterUrl = " + blazeMeterUrl);
         logger.warn(" Please, check proxy settings, serverUrl and credentials.");
-        return FormValidation.error("Credentials are not valid: username = " + c.getUsername() + ", password = " + c.getPassword()
+        return FormValidation.error("Credentials are not valid: username = " + username + ", password = " + password
             + " blazemeterUrl = " + blazeMeterUrl +
             ". Please, check proxy settings, serverUrl and credentials.");
     }
