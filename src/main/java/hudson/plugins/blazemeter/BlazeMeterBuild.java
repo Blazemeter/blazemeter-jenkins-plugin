@@ -45,7 +45,7 @@ import org.json.JSONException;
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
 
-    private BlazemeterCredentialImpl credential = null;
+    private String credential = null;
 
     private String serverUrl = "";
 
@@ -105,11 +105,13 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+/*
 
             lentry.append("Credentials " + this.credential.getDescription() + ", serverUrl = " + this.serverUrl);
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+*/
 
             ProxyConfiguration proxy = ProxyConfiguration.load();
             if (proxy != null) {
@@ -143,11 +145,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         bzmLog.info(lentry.toString());
         consLog.info(lentry.toString());
         lentry.setLength(0);
-
-        lentry.append("Credentials " + this.credential.getDescription()+" are valid with " + this.serverUrl);
+/*
+        lentry.append("Credentials " + Credentialsthis.credential.getDescription()+" are valid with " + this.serverUrl);
         bzmLog.info(lentry.toString());
         consLog.info(lentry.toString());
-        lentry.setLength(0);
+        lentry.setLength(0);*/
 
         lentry.append("User's e-mail = " + userEmail);
         bzmLog.info(lentry.toString());
@@ -331,7 +333,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
     }
 
 
-    public void setCredential(BlazemeterCredentialImpl credential) {
+    public void setCredential(String credential) {
         this.credential = credential;
     }
 

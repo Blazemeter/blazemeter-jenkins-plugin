@@ -43,6 +43,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import okhttp3.Credentials;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -97,8 +98,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
 
         }
-
-        Api api = new ApiImpl(credential, this.blazeMeterURL);
+        String bc = Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText());
+        Api api = new ApiImpl(bc, this.blazeMeterURL);
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
             if (testList == null) {

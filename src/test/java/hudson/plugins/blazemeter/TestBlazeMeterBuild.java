@@ -25,6 +25,7 @@ import hudson.model.Result;
 import hudson.remoting.VirtualChannel;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import okhttp3.Credentials;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -61,14 +62,15 @@ public class TestBlazeMeterBuild {
         String notes="a";
         String sessionProperties="f";
         try {
-            BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
                 TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
             FreeStyleProject project = j.createFreeStyleProject();
             AbstractBuild b = project.scheduleBuild2(0).get();
             BuildListener l = Mockito.mock(BuildListener.class);
             BlazeMeterBuild bb = new BlazeMeterBuild();
-            bb.setCredential(validCred);
+            String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+            bb.setCredential(bc);
             bb.setServerUrl(TestConstants.mockedApiUrl);
             bb.setTestId(testId);
             bb.setNotes(notes);
@@ -83,8 +85,8 @@ public class TestBlazeMeterBuild {
             bb.setBuildId(buildId);
             String jobName = b.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             bb.setJobName(jobName);
-            VirtualChannel c = j.getInstance().getChannel();
-            EnvVars ev = EnvVars.getRemote(c);
+            VirtualChannel channel = j.getInstance().getChannel();
+            EnvVars ev = EnvVars.getRemote(channel);
             bb.setEv(ev);
             bb.setListener(l);
             Result r = bb.call();
@@ -113,7 +115,7 @@ public class TestBlazeMeterBuild {
         try {
             j.getInstance().proxy=new ProxyConfiguration("",0);
             j.getInstance().proxy.save();
-            BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+            BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
                 TestConstants.MOCK_INVALID_ID,
                 TestConstants.MOCK_INVALID_DESCRIPTION,
                 TestConstants.MOCK_INVALID_USER,
@@ -123,7 +125,8 @@ public class TestBlazeMeterBuild {
             AbstractBuild b = project.scheduleBuild2(0).get();
             BuildListener l = Mockito.mock(BuildListener.class);
             BlazeMeterBuild bb = new BlazeMeterBuild();
-            bb.setCredential(invalidCred);
+            String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+            bb.setCredential(bc);
             bb.setServerUrl(TestConstants.mockedApiUrl);
             bb.setTestId(testId);
             bb.setNotes(notes);
@@ -138,8 +141,8 @@ public class TestBlazeMeterBuild {
             bb.setBuildId(buildId);
             String jobName = b.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             bb.setJobName(jobName);
-            VirtualChannel c = j.getInstance().getChannel();
-            EnvVars ev = EnvVars.getRemote(c);
+            VirtualChannel channel = j.getInstance().getChannel();
+            EnvVars ev = EnvVars.getRemote(channel);
             bb.setEv(ev);
             bb.setListener(l);
             Result r = bb.call();

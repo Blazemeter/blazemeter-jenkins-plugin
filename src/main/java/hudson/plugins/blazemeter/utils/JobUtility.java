@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.mail.MessagingException;
+import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
@@ -518,7 +519,8 @@ public class JobUtility {
         }
         try {
             logger.info("Validating credentials started: username = " + c.getUsername() + " password = " + c.getPassword().getEncryptedValue());
-            Api api = new ApiImpl(c, blazeMeterUrl);
+            String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+            Api api = new ApiImpl(bc, blazeMeterUrl);
             logger.info("Getting user details from server: serverUrl = " + blazeMeterUrl);
             JSONObject u = api.getUser();
             net.sf.json.JSONObject user = null;
@@ -556,7 +558,7 @@ public class JobUtility {
             ". Please, check proxy settings, serverUrl and credentials.");
     }
 
-    public static String getUserEmail(BlazemeterCredentialImpl credential, String blazemeterUrl) {
+    public static String getUserEmail(String credential, String blazemeterUrl) {
         Api api = new ApiImpl(credential, blazemeterUrl);
 
         try {
@@ -605,7 +607,7 @@ public class JobUtility {
         return p;
     }
 
-    public static boolean testIdExists(String testId, BlazemeterCredentialImpl c, String serverUrl) throws IOException,
+    public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
         MessagingException {
         boolean testIdExists = false;
         Api api = new ApiImpl(c, serverUrl);
@@ -621,7 +623,7 @@ public class JobUtility {
         return testIdExists;
     }
 
-    public static boolean collection(String testId, BlazemeterCredentialImpl c, String serverUrl) throws Exception {
+    public static boolean collection(String testId, String c, String serverUrl) throws Exception {
         boolean exists = false;
         boolean collection = false;
 

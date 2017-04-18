@@ -25,6 +25,7 @@ import java.util.Collection;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
+import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.log.StdErrLog;
 
@@ -47,7 +48,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             credentialsPresent = !StringUtils.isBlank(credential.getId());
             logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
             if (credentialsPresent) {
-                Api api = new ApiImpl(credential, serverUrl);
+                Api api = new ApiImpl(Credentials.basic(credential.getUsername(),credential.getPassword().getPlainText()), serverUrl);
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
                 logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +

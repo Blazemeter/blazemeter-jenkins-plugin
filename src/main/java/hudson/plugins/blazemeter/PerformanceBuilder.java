@@ -32,6 +32,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
 import javax.annotation.Nonnull;
+import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -104,7 +105,7 @@ public class PerformanceBuilder extends Builder{
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            b.setCredential(credential);
+            b.setCredential(Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText()));
             b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);

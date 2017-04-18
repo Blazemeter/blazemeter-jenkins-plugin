@@ -16,7 +16,6 @@ package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.ProxyConfiguration;
-import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
@@ -56,14 +55,13 @@ public class ApiImpl implements Api {
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
 
-    public ApiImpl(BlazemeterCredentialImpl c, String blazeMeterUrl){
+    public ApiImpl(String c, String blazeMeterUrl){
         this(c, blazeMeterUrl,new HttpLoggingInterceptor(),null);
     }
 
-    public ApiImpl(BlazemeterCredentialImpl c, String blazeMeterUrl,
+    public ApiImpl(String c, String blazeMeterUrl,
                      HttpLoggingInterceptor httpLog,StdErrLog bzmLog) {
-        this.credential = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
+        this.credential = c;
         this.bzmLog = (bzmLog!=null?bzmLog:new StdErrLog(Constants.BZM_JEN));
         urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
