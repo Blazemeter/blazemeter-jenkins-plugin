@@ -21,8 +21,16 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
+import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.Utils;
+import hudson.util.FormValidation;
 import hudson.util.Secret;
+import java.io.IOException;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import net.sf.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 @SuppressWarnings("unused") // read resolved by extension plugins
 public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
@@ -97,6 +105,13 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
         public String getIconClassName() {
             return "icon-credentials-userpass";
         }
+
+        public FormValidation doTestConnection(@QueryParameter("id") final String credentialsId)
+            throws MessagingException, IOException, JSONException, ServletException {
+            BlazemeterCredentialImpl credential = Utils.findCredentials(credentialsId,CredentialsScope.GLOBAL);
+            return JobUtility.validateCredentials(credential,BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+        }
+
     }
 }
 

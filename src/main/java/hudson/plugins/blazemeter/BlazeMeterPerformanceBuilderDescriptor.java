@@ -23,14 +23,11 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,9 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import okhttp3.Credentials;
 import org.kohsuke.stapler.QueryParameter;
@@ -172,11 +166,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     // Used by global.jelly to authenticate User key
 
-    public FormValidation doTestConnection(@QueryParameter("id") final String credentialsId)
-            throws MessagingException, IOException, JSONException, ServletException {
-        BlazemeterCredentialImpl credential = Utils.findCredentials(credentialsId,CredentialsScope.GLOBAL);
-        return JobUtility.validateCredentials(credential,this.blazeMeterURL);
-    }
+
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
