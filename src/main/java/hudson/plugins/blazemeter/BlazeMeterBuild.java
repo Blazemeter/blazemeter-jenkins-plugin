@@ -145,11 +145,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         bzmLog.info(lentry.toString());
         consLog.info(lentry.toString());
         lentry.setLength(0);
-/*
-        lentry.append("Credentials " + Credentialsthis.credential.getDescription()+" are valid with " + this.serverUrl);
-        bzmLog.info(lentry.toString());
-        consLog.info(lentry.toString());
-        lentry.setLength(0);*/
 
         lentry.append("User's e-mail = " + userEmail);
         bzmLog.info(lentry.toString());
