@@ -15,26 +15,28 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import hudson.*;
-import java.io.File;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.plugins.blazemeter.utils.BuildResult;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
+import java.io.IOException;
+import javax.annotation.Nonnull;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.io.IOException;
 
-
-public class PerformanceBuilder extends Builder {
+public class PerformanceBuilder extends Builder{
 
     private String jobApiKey = "";
 
@@ -82,22 +84,24 @@ public class PerformanceBuilder extends Builder {
         return BuildStepMonitor.BUILD;
     }
 
-
-    @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull final Run<?, ?> run,
+        @Nonnull final FilePath workspace,
+        @Nonnull final Launcher launcher,
+        @Nonnull final TaskListener listener,
+        EnvVars v) throws InterruptedException, IOException {
         Result r = null;
-        BuildReporter br=new BuildReporter();
+        BuildReporter br = new BuildReporter();
         try {
-            boolean valid = DESCRIPTOR.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
+            boolean valid = Utils.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
             if (!valid) {
-                listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0,3) + "... is absent in credentials store.");
-                r=Result.NOT_BUILT;
-                return true;
+                listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0, 3) + "... is absent in credentials store.");
+                r = Result.NOT_BUILT;
+                run.setResult(r);
+                return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
-            b.setServerUrl(this.serverUrl!=null?this.serverUrl:Constants.A_BLAZEMETER_COM);
+            b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
@@ -106,35 +110,33 @@ public class PerformanceBuilder extends Builder {
             b.setGetJtl(this.getJtl);
             b.setGetJunit(this.getJunit);
             b.setListener(listener);
-            FilePath ws = build.getWorkspace();
-            b.setWs(ws);
-            String buildId=build.getId();
+            b.setWs(workspace);
+            String buildId = run.getId();
             b.setBuildId(buildId);
-            String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
+            String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            EnvVars ev=build.getEnvironment(listener);
+            EnvVars ev = v == null ? run.getEnvironment(listener) : v;
             b.setEv(ev);
-            ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
-            FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
-            br=new BuildReporter();
+            ReportUrlTask rugt = new ReportUrlTask(run, jobName, c);
+            br = new BuildReporter();
             br.run(rugt);
             r = c.call(b);
         } catch (InterruptedException e) {
-            r=Result.ABORTED;
+            r = Result.ABORTED;
         } catch (Exception e) {
             r = Result.FAILURE;
         } finally {
             br.stop();
-            BuildResult rstr = BuildResult.valueOf(r.toString());
-            build.setResult(r);
-            switch (rstr) {
-                case FAILURE:
-                    return false;
-                default:
-                    return true;
-            }
+            run.setResult(r);
         }
+    }
+
+    @Override
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
+        BuildListener listener) throws InterruptedException, IOException {
+        this.perform(build, build.getWorkspace(), launcher, listener,null);
+        return !build.getResult().equals(Result.FAILURE);
     }
 
 
@@ -194,13 +196,6 @@ public class PerformanceBuilder extends Builder {
         this.sessionProperties = sessionProperties;
     }
 
-    @Override
-    public BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
-        return DESCRIPTOR;
-    }
-
-    @Extension
-    public static final BlazeMeterPerformanceBuilderDescriptor DESCRIPTOR = new BlazeMeterPerformanceBuilderDescriptor();
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})

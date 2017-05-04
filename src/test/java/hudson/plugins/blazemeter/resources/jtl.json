@@ -1,0 +1,42 @@
+{
+  "result":{
+    "dataUrl":"https://a.blazemeter.com/api/latest/sessions/r-v3-585114ca535ed/reports/logs/data",
+    "data":[
+      {
+        "summary":[
+
+        ],
+        "dataUrl":"https://blazemeter.s3.amazonaws.com/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jmeter-console0.log?AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=%2FJIqOPN4gCSlliv5UpNelpcjbsw%3D",
+        "filename":"jmeter-console0.log",
+        "linesCount":71,
+        "tailDataUrl":"https://blazemeter.s3.amazonaws.com/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jmeter-console0.log.tail.bz?AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=ZKqY7MU204Tv2sNdcVdmObqGO2k%3D",
+        "serverType":"console",
+        "title":"jmeter-console0",
+        "serverId":"3770f7ce4582",
+        "messageTypes":[
+          {
+            "count":71,
+            "name":"INFO"
+          }
+        ]
+      },
+      {
+        "dataUrl":"http://127.0.0.1:1234/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D",
+        "filename":"jtls_and_more.zip",
+        "tailDataUrl":false,
+        "title":"Zip"
+      }
+    ],
+    "overrideLocationId":null,
+    "locationId":"harbor-5591335d8588531f5cde3a04",
+    "name":"Logs",
+    "session_id":"r-v3-585114ca535ed",
+    "location":"harbor-5591335d8588531f5cde3a04",
+    "source":"",
+    "id":"logs",
+    "type":"Logs",
+    "hash":"logs"
+  },
+  "api_version":2,
+  "error":null
+}

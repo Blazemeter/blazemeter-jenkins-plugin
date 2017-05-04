@@ -1,52 +1,21 @@
+[![Coverage Status](https://coveralls.io/repos/github/Blazemeter/blazemeter-jenkins-plugin/badge.svg?branch=master)](https://coveralls.io/github/Blazemeter/blazemeter-jenkins-plugin?branch=master)
 
-BlazeMeter Job DSL Example:
----------------------------
+#### 1. What's this?
 
-before v.2.7
-------------
+This is [jenkins](http://jenkins.io) plugin for running performance test at [load testing platform](http://blazemeter.com).
+It allows to include cloud testing into CD pipeline. 
+It supports jenkins [Job DSL](https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin), hence it's configuration can be
+saved in CVS as a part of configuration.
 
-    job('bza-from-dsl'){
-       configure{project-> project/'builders'<< builder(class:'hudson.plugins.blazemeter.PerformanceBuilder'){
-           jobApiKey 'value-of-your-key-that-is-present-in-credentials'
-           serverUrl 'https://a.blazemeter.com'
-           testId 'testId-existing-on-server'
-           notes 'x\nc\nu\ni'
-           /** this note is equal to 
-           x
-           c
-           u
-           i
-           **/
-           sessionProperties ''
-           jtlPath ''
-           junitPath ''
-           getJtl true
-           getJunit true
-           }
-       }
-    }
+#### 2. Installation & usage
 
-v.2.7
------
+Please, refer to [plugin's wiki](https://github.com/jenkinsci/blazemeter-plugin/wiki) for further instructions. 
 
-    job('bza-from-dsl'){
-       steps{
-         blazeMeterTest{
-           jobApiKey 'value-of-your-key-that-is-present-in-credentials'
-           testId 'testId-existing-on-server'
-           notes 'x\nc\nu\ni'
-            /** this note is equal to 
-            x
-            c
-            u
-            i
-            **/
-           sessionProperties '' 
-           jtlPath '' 
-           junitPath '' 
-           getJtl false 
-           getJunit false 
-      
-         }
-       }
-    }
+#### 3. Tests
+
+    mvn test
+
+#### 4. License
+ 
+    Apache License, Version 2.0
+

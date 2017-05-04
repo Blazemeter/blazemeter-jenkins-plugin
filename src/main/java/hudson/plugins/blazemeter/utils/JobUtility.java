@@ -22,10 +22,25 @@ import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.testresult.TestResult;
+import hudson.plugins.blazemeter.testresult.AgrReport;
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import org.apache.commons.io.IOUtils;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import javax.mail.MessagingException;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -33,15 +48,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.mail.MessagingException;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-
-import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 
 
 public class JobUtility {
@@ -93,7 +99,7 @@ public class JobUtility {
             jo = api.generatePublicToken(masterId);
             if (jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
                 JSONObject result = jo.getJSONObject(JsonConsts.RESULT);
-                publicToken = result.getString("publicToken");
+                publicToken = result.getString(JsonConsts.PUBLIC_TOKEN);
                 reportUrl = api.getBlazeMeterURL() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
             } else {
                 bzmLog.warn(letnry.toString() + jo.get(JsonConsts.ERROR).toString());
@@ -354,19 +360,18 @@ public class JobUtility {
             } catch (Exception e) {
                 bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                 consLog.warn("Failed to resolve jtlPath: " + e.getMessage());
-                bzmLog.warn("JTL report will be saved to workspace");
-                consLog.warn("JTL report will be saved to workspace");
+                bzmLog.warn("Junit report will be saved to workspace");
+                consLog.warn("Junit report will be saved to workspace");
                 junitPath = dfp;
             }
             retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog,consLog);
         } else {
-            bzmLog.info("JUNIT report won't be requested: check-box is unchecked.");
-            consLog.info("JUNIT report won't be requested: check-box is unchecked.");
+            bzmLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
+            consLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
         }
-        Thread.sleep(30000);
         FilePath jtlPath = null;
-        HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
         if (isJtl) {
+            HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
             } else {
@@ -388,8 +393,8 @@ public class JobUtility {
             }
             JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog,consLog);
         } else {
-            bzmLog.info("JTL report won't be requested: check-box is unchecked.");
-            consLog.info("JTL report won't be requested: check-box is unchecked.");
+            bzmLog.info("JTL report won't be requested: isJtl = " + isJtl);
+            consLog.info("JTL report won't be requested: isJtl = " + isJtl);
         }
 
 
@@ -402,16 +407,11 @@ public class JobUtility {
             consLog.info("Aggregate report is not available after 4 attempts.");
             return result;
         }
-        TestResult testResult = null;
+        AgrReport testResult = null;
         try {
-            testResult = new TestResult(testReport);
+            testResult = new AgrReport(testReport);
             bzmLog.info(testResult.toString());
             consLog.info(testResult.toString());
-        } catch (IOException ioe) {
-            bzmLog.info("Failed to get test result. Try to check server for it");
-            consLog.info("Failed to get test result. Try to check server for it");
-            bzmLog.info("ERROR: Failed to generate TestResult: " + ioe);
-            consLog.info("ERROR: Failed to generate TestResult: " + ioe);
         } catch (JSONException je) {
             bzmLog.info("Failed to get test result. Try to check server for it");
             consLog.info("Failed to get test result. Try to check server for it");
@@ -488,9 +488,8 @@ public class JobUtility {
     }
 
 
-    public static boolean stopTestSession(Api api, String masterId, StdErrLog jenBuildLog) {
+    public static boolean stopMaster(Api api, String masterId) throws Exception{
         boolean terminate = false;
-        try {
             int statusCode = api.getTestMasterStatusCode(masterId);
             if (statusCode < 100 & statusCode != 0) {
                 api.terminateTest(masterId);
@@ -500,11 +499,7 @@ public class JobUtility {
                 api.stopTest(masterId);
                 terminate = false;
             }
-        } catch (Exception e) {
-            jenBuildLog.warn("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
-        } finally {
             return terminate;
-        }
     }
 
     public static String version() {
@@ -515,17 +510,6 @@ public class JobUtility {
             props.setProperty(Constants.VERSION, "N/A");
         }
         return props.getProperty(Constants.VERSION);
-    }
-
-    public static String emptyBodyJson() {
-        String eb = "";
-        try {
-            InputStream is = JobUtility.class.getResourceAsStream("emptyBody.json");
-            eb = IOUtils.toString(is);
-        } catch (IOException ex) {
-        } finally {
-            return eb;
-        }
     }
 
     public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
@@ -585,26 +569,27 @@ public class JobUtility {
         return getUserEmail(userKey, blazemeterUrl, null);
     }
 
-
-    public static void properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
+    public static boolean properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = null;
-        try{
-            sessionsIds=api.getListOfSessionIds(masterId);
-        }catch (Exception e){
-            jenBuildLog.info("Failed to get list of sessions for masterId = "+masterId,e);
+        try {
+            sessionsIds = api.getListOfSessionIds(masterId);
+        } catch (Exception e) {
+            jenBuildLog.info("Failed to get list of sessions for masterId = " + masterId, e);
 
         }
         jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
+        boolean p = true;
         for (String s : sessionsIds) {
+            boolean sp = false;
             jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
             int n = 1;
-            boolean submit = false;
-            while (!submit && n < 6) {
+            while (!sp && n < 6) {
                 try {
-                    submit = api.properties(properties, s);
-                    if (!submit) {
+                    sp = api.properties(properties, s);
+                    if (!sp) {
                         jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s + " retry # " + n);
                         Thread.sleep(DELAY);
+                        p = sp;
                     }
                 } catch (Exception e) {
                     jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s, e);
@@ -613,7 +598,9 @@ public class JobUtility {
                 }
             }
         }
+        return p;
     }
+
     public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
             MessagingException {
         boolean testIdExists=false;

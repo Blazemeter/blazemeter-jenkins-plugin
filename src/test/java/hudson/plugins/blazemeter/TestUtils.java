@@ -14,7 +14,10 @@
 
 package hudson.plugins.blazemeter;
 
+import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.plugins.blazemeter.utils.Utils;
+import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,5 +37,13 @@ public class TestUtils {
         Assert.assertEquals("5166480", Utils.getTestId("5166480.http"));
         Assert.assertEquals("123452345", Utils.getTestId("123452345"));
 
+    }
+
+    @Test
+    public void resolveFilePath() throws Exception {
+        FilePath fp = new FilePath(new File(System.getProperty("user.dir")));
+        FilePath rfp=Utils.resolvePath(fp,"vfhtthaha",new EnvVars());
+        Assert.assertTrue(rfp.exists());
+        rfp.delete();
     }
 }

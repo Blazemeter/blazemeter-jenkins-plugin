@@ -22,7 +22,6 @@ public interface TestConstants {
     String MOCKED_USER_KEY_VALID ="mockedAPIKeyValid";
     String MOCKED_USER_KEY_RETRIES ="mockedAPIKeyRetries";
     String MOCKED_USER_KEY_TEST_TYPE ="mockedAPIKeyTestType";
-    String MOCKED_USER_KEY_V2 ="mockedAPIKeyV2";
     String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
     String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
     String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
@@ -34,6 +33,8 @@ public interface TestConstants {
     String mockedApiUrl=mockedApiHost+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
+    String TEST_MASTER_WAIT_FOR_FINISH ="testMasterIdWaitForFinish";
+    String TEST_MASTER_15102806 ="15102806";
     String TEST_5039530_ID ="5039530";
     String TEST_5075679_ID ="5075679";
     String TEST_MASTER_NOT_FOUND ="testMaster-not-found";
@@ -42,10 +43,15 @@ public interface TestConstants {
     String TEST_MASTER_70 ="testMaster-70";
     String TEST_MASTER_100 ="testMaster-100";
     String TEST_MASTER_140 ="testMaster-140";
+    String TEST_MASTER_100_notes ="testMaster-100_notes";
     String TEST_MASTER_SUCCESS ="testMasterSuccess";
     String TEST_MASTER_FAILURE ="testMasterFailure";
     String TEST_MASTER_ERROR_61700 ="testMasterError_61700";
     String TEST_MASTER_ERROR_0 ="testMasterError_0";
     String TEST_MASTER_ERROR_70404 ="testMasterError_70404";
 
+    String MOCKED_SESSION ="r-v3-585114ca535ed";
+    String MOCKED_NOTE = "bbbbbbbbbbbbbbbbbbbbb";
+    String JTL_URL = mockedApiUrl+"/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?" +
+        "AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D";
 }

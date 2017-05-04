@@ -16,17 +16,29 @@ package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.google.common.collect.LinkedHashMultimap;
+import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -34,13 +46,9 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.*;
 
 
-
+@Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
@@ -50,6 +58,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         load();
+        descriptor=this;
+    }
+
+    public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
+        super(PerformanceBuilder.class);
+        load();
+        this.blazeMeterURL=blazeMeterURL;
         descriptor=this;
     }
 
@@ -109,6 +124,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
         ListBoxModel items = new ListBoxModel();
+        try{
+
         Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
         for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
@@ -125,7 +142,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 option.selected=false;
             }
         }
-        return items;
+        }catch (NullPointerException npe){
+
+        }finally {
+            return items;
+        }
     }
 
     public List<BlazemeterCredentialImpl> getCredentials(Object scope) {
@@ -170,17 +191,21 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public List<String> getKeys(){
+    public List<String> getKeys() {
         List<String> apiKeys = new ArrayList<String>();
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredentialImpl c : CredentialsProvider
+        try {
+            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            String key = c.getApiKey();
-            if (!apiKeys.contains(key)) {
-                apiKeys.add(key);
+                String key = c.getApiKey();
+                if (!apiKeys.contains(key)) {
+                    apiKeys.add(key);
+                }
             }
+        } catch (Exception e) {
+        } finally {
+            return apiKeys;
         }
-        return apiKeys;
     }
 
     public String getName() {

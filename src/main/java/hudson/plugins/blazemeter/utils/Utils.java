@@ -13,8 +13,16 @@
  */
 
 package hudson.plugins.blazemeter.utils;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.model.Item;
+import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
+import hudson.security.ACL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 
@@ -48,4 +56,33 @@ public class Utils {
         }
         return fp;
     }
+
+    public static List<BlazemeterCredentialImpl> getCredentials(Object scope) {
+        List<BlazemeterCredentialImpl> result = new ArrayList<BlazemeterCredentialImpl>();
+        Set<String> apiKeys = new HashSet<String>();
+
+        Item item = scope instanceof Item ? (Item) scope : null;
+        for (BlazemeterCredentialImpl c : CredentialsProvider
+            .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+            String id = c.getId();
+            if (!apiKeys.contains(id)) {
+                result.add(c);
+                apiKeys.add(id);
+            }
+        }
+        return result;
+    }
+
+    public static boolean credPresent(String userKey, Object scope) {
+        List<BlazemeterCredentialImpl> cred = getCredentials(scope);
+
+        boolean valid = false;
+        for (BlazemeterCredentialImpl c : cred) {
+            if (c.getApiKey().equals(userKey)) {
+                valid = true;
+            }
+        }
+        return valid;
+    }
+
 }

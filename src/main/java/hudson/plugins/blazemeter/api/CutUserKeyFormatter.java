@@ -15,17 +15,16 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
+import org.apache.commons.lang.StringUtils;
 
 public class CutUserKeyFormatter extends SimpleFormatter {
 
     @Override
     public synchronized String format(LogRecord record) {
         String logEntry=super.format(record);
-        int apiKey=logEntry.lastIndexOf("api_key");
+        int apiKey=logEntry.lastIndexOf(Api.X_API_KEY)+1;
         if(apiKey>0){
             String keyToReplace=logEntry.substring(apiKey+13,apiKey+28);
             return StringUtils.replace(logEntry,keyToReplace, Constants.THREE_DOTS);

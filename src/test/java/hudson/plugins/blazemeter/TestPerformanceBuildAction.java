@@ -1,5 +1,3 @@
-package hudson.plugins.blazemeter.utils;
-
 /**
  Copyright 2016 BlazeMeter Inc.
 
@@ -14,10 +12,21 @@ package hudson.plugins.blazemeter.utils;
  limitations under the License.
  */
 
-public enum BuildResult {
-    ABORTED,
-    SUCCESS,
-    NOT_BUILT,
-    FAILURE,
-    UNSTABLE
+package hudson.plugins.blazemeter;
+
+import hudson.model.AbstractBuild;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+public class TestPerformanceBuildAction {
+
+    @Test
+    public void target() {
+        AbstractBuild b = Mockito.mock(AbstractBuild.class);
+        PerformanceBuildAction ba = new PerformanceBuildAction(b);
+        PerformanceReportMap m1=ba.getTarget();
+        PerformanceReportMap m2=ba.getTarget();
+        Assert.assertEquals(m1,m2);
+    }
 }

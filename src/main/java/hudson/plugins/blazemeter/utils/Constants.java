@@ -16,6 +16,7 @@ package hudson.plugins.blazemeter.utils;
 
 public interface Constants {
     String BZM_JEN="BZM-JEN";
+    String MASTER_ID ="masterId";
     String HTTP_LOG="http-log";
     String BZM_LOG ="bzm-log";
     String BM_TRESHOLDS="bm-thresholds.xml";

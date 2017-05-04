@@ -15,19 +15,16 @@
 package hudson.plugins.blazemeter.api;
 
 import com.google.common.collect.LinkedHashMultimap;
-import hudson.plugins.blazemeter.api.urlmanager.UrlManager;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import okhttp3.MediaType;
-import org.eclipse.jetty.util.log.StdErrLog;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import okhttp3.MediaType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public interface Api {
@@ -35,6 +32,7 @@ public interface Api {
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     MediaType TEXT = MediaType.parse("text/plain; charset=ISO-8859-1");
     String ACCEPT="Accept";
+    String X_API_KEY = "X-Api-Key";
     String CONTENT_TYPE="Content-type";
     String APP_JSON="application/json";
     String APP_JSON_UTF_8="application/json; charset=UTF-8";
@@ -79,5 +77,4 @@ public interface Api {
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;
 
-    public JSONObject testConfig(String testId) throws IOException, JSONException;
 }

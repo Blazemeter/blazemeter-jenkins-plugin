@@ -15,27 +15,21 @@
 package hudson.plugins.blazemeter.api;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import okhttp3.logging.HttpLoggingInterceptor;
-
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class HttpLogger implements HttpLoggingInterceptor.Logger {
 
     private Logger httpLog = Logger.getLogger(Constants.HTTP_LOG);
     private FileHandler http_lfh;
 
-    public HttpLogger(String httpLog_f) {
-        try {
-            http_lfh = new FileHandler(httpLog_f);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public HttpLogger(String httpLog_f) throws IOException {
+        http_lfh = new FileHandler(httpLog_f);
         http_lfh.setFormatter(new CutUserKeyFormatter());
         httpLog.addHandler(http_lfh);
         httpLog.setUseParentHandlers(false);
-
     }
 
     @Override

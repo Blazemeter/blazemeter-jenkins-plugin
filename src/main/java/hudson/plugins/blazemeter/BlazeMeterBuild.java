@@ -17,14 +17,23 @@ package hudson.plugins.blazemeter;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.ProxyConfiguration;
-import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiV3Impl;
 import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.*;
+import hudson.plugins.blazemeter.utils.Constants;
+import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
+import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.JsonConsts;
+import hudson.plugins.blazemeter.utils.LogEntries;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.remoting.Callable;
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Calendar;
+import java.util.HashMap;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,13 +41,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.jenkinsci.remoting.RoleChecker;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Calendar;
-import java.util.HashMap;
-
-import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
@@ -68,11 +70,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private EnvVars ev = null;
 
-    private BuildListener listener=null;
+    private TaskListener listener=null;
 
     @Override
     public Result call() throws Exception {
-        
+
         Result result=Result.SUCCESS;
         StringBuilder lentry=new StringBuilder();
         File ld = new File(this.ws.getRemote()+
@@ -100,7 +102,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
         String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
         if (userEmail.isEmpty()) {
-            ProxyConfiguration proxy = ProxyConfiguration.load();
             lentry.append("Please, check that settings are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
@@ -111,28 +112,31 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.info(lentry.toString());
             lentry.setLength(0);
 
-            lentry.append("ProxyHost = " + proxy.name);
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+            ProxyConfiguration proxy = ProxyConfiguration.load();
+            if (proxy != null) {
+                lentry.append("ProxyHost = " + proxy.name);
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            lentry.append("ProxyPort = " + proxy.port);
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+                lentry.append("ProxyPort = " + proxy.port);
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            lentry.append("ProxyUser = " + proxy.getUserName());
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
+                lentry.append("ProxyUser = " + proxy.getUserName());
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
 
-            String proxyPass = proxy.getPassword();
+                String proxyPass = proxy.getPassword();
 
-            lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, ENCRYPT_CHARS_NUM)) + "...");
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
-
+                lentry.append("ProxyPass = " + (StringUtils.isBlank(proxyPass) ? "" : proxyPass.substring(0, ENCRYPT_CHARS_NUM)) + "...");
+                bzmLog.info(lentry.toString());
+                consLog.info(lentry.toString());
+                lentry.setLength(0);
+            }
+            ((HttpLogger) httpLogger).close();
             return Result.FAILURE;
         }
 
@@ -178,6 +182,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         try {
             startTestResp = api.startTest(testId_num, collection);
             if (startTestResp.size()==0) {
+                lentry.append("Unable to start test: possible reasion - test with non-existent OPL");
+                consLog.warn(lentry.toString());
+                lentry.setLength(0);
                 return Result.FAILURE;
             }
             if(startTestResp.containsKey(JsonConsts.ERROR)){
@@ -204,6 +211,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
             return Result.FAILURE;
+        }finally {
+            ((HttpLogger) httpLogger).close();
         }
 
 
@@ -218,6 +227,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
 
+        ev.put(this.jobName+"-"+this.buildId+"-"+Constants.MASTER_ID,masterId);
         String reportUrl= JobUtility.getReportUrl(api, masterId, bzmLog);
         lentry.append("BlazeMeter test report will be available at " + reportUrl);
         consLog.info(lentry.toString());
@@ -227,7 +237,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         consLog.info("For more detailed logs, please, refer to " + bzmLog_f.getCanonicalPath());
         consLog.info("Communication with BZM server is logged at " + httpLog_f.getCanonicalPath());
 
-        ((EnvVars) EnvVars.masterEnvVars).put(this.jobName+"-"+this.buildId,reportUrl);
+        EnvVars.masterEnvVars.put(this.jobName+"-"+this.buildId,reportUrl);
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {
             if (!StringUtils.isBlank(this.sessionProperties)) {
@@ -235,12 +245,10 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 JobUtility.properties(api, props, masterId, bzmLog);
             }
             JobUtility.waitForFinish(api, testId_num, bzmLog, masterId);
-
             lentry.append("BlazeMeter test# " + testId_num + " ended at " + Calendar.getInstance().getTime());
             consLog.info(lentry.toString());
             bzmLog.info(lentry.toString());
             lentry.setLength(0);
-
             result = JobUtility.postProcess(this.ws,
                     buildId,
                     api,
@@ -251,7 +259,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                     this.getJtl,
                     this.jtlPath,
                     bzmLog,
-                    consLog);
+                consLog);
             Thread.sleep(15000);//let master pull logs to browser
             return result;
         } catch (InterruptedException e) {
@@ -259,16 +267,22 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.ABORTED;
+            result = Result.ABORTED;
+            return result;
         } catch (Exception e) {
             lentry.append("Job was stopped due to unknown reason");
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
-            return Result.NOT_BUILT;
+            result = Result.NOT_BUILT;
+            return result;
         } finally {
-            ((HttpLogger)httpLogger).close();
-            ((EnvVars) EnvVars.masterEnvVars).remove(this.jobName+"-"+this.buildId);
+            lentry.append("BlazeMeter test set result = "+result.toString());
+            consLog.info(lentry.toString());
+            bzmLog.info(lentry.toString());
+            lentry.setLength(0);
+
+            EnvVars.masterEnvVars.remove(this.jobName+"-"+this.buildId);
             TestStatus testStatus = api.getTestStatus(masterId);
 
             if (testStatus.equals(TestStatus.Running)) {
@@ -276,7 +290,19 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 consLog.info(lentry.toString());
                 bzmLog.info(lentry.toString());
                 lentry.setLength(0);
-                JobUtility.stopTestSession(api, masterId, bzmLog);
+
+                lentry.append(masterId+" is still running after finishing job post-process");
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+
+                lentry.append(masterId+" will be aborted");
+                consLog.info(lentry.toString());
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+
+
+                JobUtility.stopMaster(api, masterId);
                 return Result.ABORTED;
             } else if (testStatus.equals(TestStatus.NotFound)) {
                 lentry.append("Test not found error");
@@ -291,12 +317,15 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 lentry.setLength(0);
                 return Result.FAILURE;
             }
+             console_logger.close();
+            ((HttpLogger) httpLogger).close();
+
         }
     }
 
     @Override
     public void checkRoles(RoleChecker roleChecker) throws SecurityException {
-        
+
     }
 
     public void setEv(EnvVars ev) {
@@ -362,7 +391,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         this.jobName = jobName;
     }
 
-    public void setListener(BuildListener listener) {
+    public void setListener(TaskListener listener) {
         this.listener = listener;
     }
 }

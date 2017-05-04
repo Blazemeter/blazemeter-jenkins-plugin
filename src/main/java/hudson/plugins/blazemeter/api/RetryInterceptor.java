@@ -14,12 +14,11 @@
 
 package hudson.plugins.blazemeter.api;
 
+import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jetty.util.log.StdErrLog;
-
-import java.io.IOException;
 
 public class RetryInterceptor implements Interceptor {
 
@@ -33,7 +32,7 @@ public class RetryInterceptor implements Interceptor {
         Response response = chain.proceed(request);
         int retry = 1;
         int maxRetries=3;
-        while (!respSuccess(response) && retry < maxRetries+1) {
+        while (retry(response) && retry < maxRetries+1) {
             try{
                 Thread.sleep(1000*retry);
             }catch (InterruptedException e){
@@ -46,8 +45,8 @@ public class RetryInterceptor implements Interceptor {
         return response;
     }
 
-    private boolean respSuccess(Response response) {
-        boolean respSuccess = response.isSuccessful() || response.code() <= 406;
-        return respSuccess;
+    private boolean retry(Response response) {
+        boolean retry = !(response.isSuccessful() || response.code() <= 406 || response.code()==500);
+        return retry;
     }
 }

@@ -14,24 +14,20 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
 import hudson.model.ModelObject;
-import java.io.IOException;
-
-import hudson.model.TaskListener;
+import hudson.model.Run;
 
 public class PerformanceReportMap implements ModelObject {
 
     private transient PerformanceBuildAction buildAction;
 
-    PerformanceReportMap(final PerformanceBuildAction buildAction, TaskListener listener)
-            throws IOException {
+    PerformanceReportMap(final PerformanceBuildAction buildAction){
         this.buildAction = buildAction;
     }
 
 
-    public AbstractBuild<?, ?> getBuild() {
-        return buildAction.getBuild();
+    public Run getRun() {
+        return buildAction.getRun();
     }
 
     public String getDisplayName() {

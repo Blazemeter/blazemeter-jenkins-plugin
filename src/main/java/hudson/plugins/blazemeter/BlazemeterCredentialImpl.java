@@ -23,13 +23,13 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import java.io.IOException;
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import java.io.IOException;
 
 public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials {
     private static final long serialVersionUID = 1L;

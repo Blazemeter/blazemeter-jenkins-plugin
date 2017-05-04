@@ -25,50 +25,43 @@ public interface UrlManager {
     String LATEST="/api/latest";
     String TESTS="/tests";
     String MASTERS="/masters";
+    String SESSIONS="/sessions";
     String WEB="/web";
     String CI_STATUS="/ci-status";
     String getServerUrl();
 
-    void setServerUrl(String serverUrl);
+    String masterStatus(String appKey, String testId);
 
-    String masterStatus(String appKey, String userKey, String testId);
+    String tests(String appKey);
 
-    String tests(String appKey, String userKey);
+    String activeTests(String appKey);
 
-    String activeTests(String appKey, String userKey);
+    String masterId(String appKey, String masterId);
 
-    String masterId(String appKey,String userKey, String masterId);
+    String testStart(String appKey, String testId);
 
-    String testStart(String appKey, String userKey, String testId);
+    String collectionStart(String appKey, String collectionId);
 
-    String collectionStart(String appKey, String userKey, String collectionId);
+    String testStop(String appKey, String testId);
 
-    String testStop(String appKey, String userKey, String testId);
+    String testTerminate(String appKey, String testId);
 
-    String testTerminate(String appKey, String userKey, String testId);
+    String testReport(String appKey, String reportId);
 
-    String testReport(String appKey, String userKey, String reportId);
+    String getUser(String appKey);
 
-    String getUser(String appKey, String userKey);
+    String getCIStatus(String appKey, String sessionId);
 
-    String getCIStatus(String appKey, String userKey, String sessionId);
+    String retrieveJUNITXML(String appKey, String sessionId);
 
-    String testConfig(String appKey, String userKey, String testId);
+    String retrieveJTLZIP(String appKey, String sessionId);
 
-    String postJsonConfig(String appKey, String userKey, String testId);
+    String generatePublicToken(String appKey, String sessionId);
 
-    String createTest(String appKey, String userKey);
-
-    String retrieveJUNITXML(String appKey, String userKey, String sessionId);
-
-    String retrieveJTLZIP(String appKey, String userKey, String sessionId);
-
-    String generatePublicToken(String appKey, String userKey, String sessionId);
-
-    String listOfSessionIds(String appKey, String userKey, String masterId);
+    String listOfSessionIds(String appKey, String masterId);
 
     String version(String appKey);
 
-    String properties(String appKey, String userKey, String sessionId);
+    String properties(String appKey, String sessionId);
 }
 
