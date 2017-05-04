@@ -31,4 +31,5 @@ public interface Constants {
     String CRED_ARE_NOT_VALID = "Credentials are not valid";
     String NO_TESTS_FOR_CREDENTIALS = "No tests for credentials";
     int ENCRYPT_CHARS_NUM = 3;
+    String MASTER_ID = "masterId";
 }

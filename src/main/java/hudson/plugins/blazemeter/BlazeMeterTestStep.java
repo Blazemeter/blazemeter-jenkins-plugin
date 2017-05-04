@@ -20,7 +20,7 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import java.util.HashSet;
@@ -202,7 +202,7 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
+            Api api = new ApiImpl(this.credentialsId, this.serverUrl);
             if (api.active(this.testId)) {
                 String jobName = this.v.get("JOB_NAME");
                 String buildId = this.v.get("BUILD_ID");

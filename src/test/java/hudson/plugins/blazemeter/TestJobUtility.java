@@ -107,10 +107,8 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_positive() throws IOException, JSONException {
-        BlazemeterCredentialImpl validCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-
-        FormValidation validation = JobUtility.validateCredentials(validCred,
+        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_VALID_USER,
+            TestConstants.MOCK_VALID_PASSWORD,
             TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.OK);
         Assert.assertEquals(validation.getMessage(), Constants.CRED_ARE_VALID + "dzmitry.kashlach@blazemeter.com");
@@ -118,10 +116,8 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_negative() throws IOException, JSONException {
-        BlazemeterCredentialImpl invalidCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
-            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
-
-        FormValidation validation = JobUtility.validateCredentials(invalidCred,
+        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_INVALID_USER,
+            TestConstants.MOCK_INVALID_PASSWORD,
             TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(Constants.CRED_ARE_NOT_VALID + ": username = " + TestConstants.MOCK_INVALID_USER +
@@ -131,11 +127,8 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_exception() throws IOException, JSONException {
-        BlazemeterCredentialImpl exceptionCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
-            "exceptionId",
-            "exceptionDescription", TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
-
-        FormValidation validation = JobUtility.validateCredentials(exceptionCred,
+        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_EXCEPTION_USER,
+            TestConstants.MOCK_EXCEPTION_PASSWORD,
             TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
@@ -144,11 +137,8 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_empty() throws IOException, JSONException {
-        BlazemeterCredentialImpl emptyCred = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
-            "",
-            "", TestConstants.MOCK_EMPTY_USER, TestConstants.MOCK_EMPTY_PASSWORD);
-
-        FormValidation validation = JobUtility.validateCredentials(emptyCred, TestConstants.mockedApiUrl);
+        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_EMPTY_USER,
+            TestConstants.MOCK_EMPTY_PASSWORD,TestConstants.mockedApiUrl);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(), Constants.CRED_PASS_EMPTY);
     }
@@ -168,7 +158,9 @@ public class TestJobUtility {
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
         Api api = new ApiImpl(bc, TestConstants.mockedApiUrl);
-        boolean terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
+        try{
+
+        boolean terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_25);
         Assert.assertEquals(terminate, true);
         terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_70);
         Assert.assertEquals(terminate, true);
@@ -176,6 +168,10 @@ public class TestJobUtility {
         Assert.assertEquals(terminate, false);
         terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_140);
         Assert.assertEquals(terminate, false);
+        }catch (Exception e){
+            Assert.fail();
+        }
+
     }
 
 
