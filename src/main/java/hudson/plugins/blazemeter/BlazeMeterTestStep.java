@@ -19,9 +19,14 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
@@ -147,6 +152,8 @@ public class BlazeMeterTestStep extends Step {
         @SuppressWarnings("rawtypes")
         private transient StepContext context;
 
+        private EnvVars v=null;
+
         protected BlazeMeterTestExecution(@Nonnull final StepContext context,
             @Nonnull final String credentialsId,
             @Nonnull final String serverUrl,
@@ -182,14 +189,30 @@ public class BlazeMeterTestStep extends Step {
                 this.getJtl,
                 this.getJunit
             );
+
             Run r = this.context.get(Run.class);
             FilePath fp = this.context.get(FilePath.class);
             Launcher l = this.context.get(Launcher.class);
             TaskListener tl = this.context.get(TaskListener.class);
-            EnvVars v = this.context.get(EnvVars.class);
+            this.v = this.context.get(EnvVars.class);
             pb.perform(r, fp, l, tl, v);
             return null;
         }
+
+        @Override
+        public void stop(Throwable cause) throws Exception {
+            this.context.onFailure(cause);
+            Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
+            if (api.active(this.testId)) {
+                String jobName = this.v.get("JOB_NAME");
+                String buildId = this.v.get("BUILD_ID");
+                String masterId = this.v.get(jobName + "-" + buildId + "-" + Constants.MASTER_ID);
+                if (!StringUtils.isBlank(masterId)) {
+                    JobUtility.stopMaster(api, masterId);
+                }
+            }
+        }
+
     }
 
     @Extension

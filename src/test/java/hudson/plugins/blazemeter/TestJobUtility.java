@@ -170,11 +170,11 @@ public class TestJobUtility {
         Api api = new ApiImpl(bc, TestConstants.mockedApiUrl);
         boolean terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_25, stdErrLog);
         Assert.assertEquals(terminate, true);
-        terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_70, stdErrLog);
+        terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_70);
         Assert.assertEquals(terminate, true);
-        terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_100, stdErrLog);
+        terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_100);
         Assert.assertEquals(terminate, false);
-        terminate = JobUtility.stopTestSession(api, TestConstants.TEST_MASTER_140, stdErrLog);
+        terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_140);
         Assert.assertEquals(terminate, false);
     }
 

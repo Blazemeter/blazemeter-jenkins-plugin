@@ -483,6 +483,8 @@ public class JobUtility {
     }
 
     public static boolean stopTestSession(Api api, String masterId, StdErrLog jenBuildLog) {
+
+    public static boolean stopMaster(Api api, String masterId) throws Exception{
         boolean terminate = false;
         try {
             int statusCode = api.getTestMasterStatusCode(masterId);
@@ -528,7 +530,7 @@ public class JobUtility {
                 logger.warn(u.toString());
                 user = net.sf.json.JSONObject.fromObject(u.toString());
                 if (user.has(JsonConsts.ERROR) && !user.get(JsonConsts.ERROR).equals(null)) {
-                    logger.warn("API key is not valid: error = " + user.get(JsonConsts.ERROR).toString());
+                    logger.warn("Credentials are not valid: error = " + user.get(JsonConsts.ERROR).toString());
                     logger.warn("User profile: " + user.toString());
                     return FormValidation.errorWithMarkup("Credentials are not valid: error = " + user.get(JsonConsts.ERROR).toString());
                 } else {
