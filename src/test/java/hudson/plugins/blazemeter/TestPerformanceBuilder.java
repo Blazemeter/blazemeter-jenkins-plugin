@@ -30,7 +30,7 @@ public class TestPerformanceBuilder {
 
     @Test
     public void perform_failure() {
-        String apiKey="1";
+        String credentialsId="1";
         String serverUrl="1";
         String testId="1";
         String jtlPath="1";
@@ -39,7 +39,7 @@ public class TestPerformanceBuilder {
         boolean getJtl=false;
         String notes="a";
         String sessionProperties = "f";
-        PerformanceBuilder pb = new PerformanceBuilder(apiKey, serverUrl, testId, notes, sessionProperties, jtlPath, junitPath, getJtl, getJunit);
+        PerformanceBuilder pb = new PerformanceBuilder(credentialsId, serverUrl, testId, notes, sessionProperties, jtlPath, junitPath, getJtl, getJunit);
         try {
             FreeStyleProject project = j.createFreeStyleProject();
             project.getBuildersList().add(pb);

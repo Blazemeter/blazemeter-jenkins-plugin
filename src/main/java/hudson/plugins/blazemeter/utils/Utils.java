@@ -73,16 +73,14 @@ public class Utils {
         return result;
     }
 
-    public static boolean credPresent(String userKey, Object scope) {
-        List<BlazemeterCredentialImpl> cred = getCredentials(scope);
-
-        boolean valid = false;
-        for (BlazemeterCredentialImpl c : cred) {
-            if (c.getApiKey().equals(userKey)) {
-                valid = true;
+    public static BlazemeterCredentialImpl findCredentials(String credentialsId, Object scope) {
+        List<BlazemeterCredentialImpl> creds = getCredentials(scope);
+        BlazemeterCredentialImpl cred = BlazemeterCredentialImpl.EMPTY;
+        for (BlazemeterCredentialImpl c : creds) {
+            if (c.getId().equals(credentialsId)) {
+                cred=c;
             }
         }
-        return valid;
+        return cred;
     }
-
 }

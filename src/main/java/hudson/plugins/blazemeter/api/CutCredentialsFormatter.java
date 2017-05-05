@@ -19,15 +19,15 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import org.apache.commons.lang.StringUtils;
 
-public class CutUserKeyFormatter extends SimpleFormatter {
+public class CutCredentialsFormatter extends SimpleFormatter {
 
     @Override
     public synchronized String format(LogRecord record) {
-        String logEntry=super.format(record);
-        int apiKey=logEntry.lastIndexOf(Api.X_API_KEY)+1;
-        if(apiKey>0){
-            String keyToReplace=logEntry.substring(apiKey+13,apiKey+28);
-            return StringUtils.replace(logEntry,keyToReplace, Constants.THREE_DOTS);
+        String logEntry = super.format(record);
+        int authorization = logEntry.lastIndexOf(Api.AUTHORIZATION) + 1;
+        if (authorization > 0) {
+            String keyToReplace = logEntry.substring(authorization + 13, logEntry.length() - 10);
+            return StringUtils.replace(logEntry, keyToReplace, Constants.SPACE_THREE_DOTS);
         }
         return logEntry;
     }

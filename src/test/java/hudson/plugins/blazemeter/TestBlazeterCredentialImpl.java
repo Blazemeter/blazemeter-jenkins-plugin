@@ -14,17 +14,30 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.util.Secret;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 public class TestBlazeterCredentialImpl {
 
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
+
     @Test
-    public void id() {
-        String ak = "e7d12123456rpqifveej";
-        String description = "e7d12123456rpqifveejdescription";
-        String expectedId = "e7d1...veej";
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(ak, description);
-        Assert.assertEquals(expectedId,c.getId());
+    public void constructor() {
+        CredentialsScope scope = CredentialsScope.GLOBAL;
+        String id = "12345";
+        String description="vbfgthryfhds";
+        String username="vnfhryegdvsfx";
+        String password="qwertyuijkmn";
+        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(scope, id,description,username,password);
+        Assert.assertEquals(scope.getDisplayName(),c.getScope().getDisplayName());
+        Assert.assertEquals(id,c.getId());
+        Assert.assertEquals(description,c.getDescription());
+        Assert.assertEquals(username,c.getUsername());
+        Assert.assertEquals(Secret.fromString(password),c.getPassword());
     }
 }

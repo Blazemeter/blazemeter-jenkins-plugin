@@ -27,7 +27,7 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
 
     public HttpLogger(String httpLog_f) throws IOException {
         http_lfh = new FileHandler(httpLog_f);
-        http_lfh.setFormatter(new CutUserKeyFormatter());
+        http_lfh.setFormatter(new CutCredentialsFormatter());
         httpLog.addHandler(http_lfh);
         httpLog.setUseParentHandlers(false);
     }

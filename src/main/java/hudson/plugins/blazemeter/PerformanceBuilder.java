@@ -32,13 +32,15 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
 import javax.annotation.Nonnull;
+import okhttp3.Credentials;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 
 public class PerformanceBuilder extends Builder{
 
-    private String jobApiKey = "";
+    private String credentialsId = "";
 
     private String serverUrl = "";
 
@@ -58,7 +60,7 @@ public class PerformanceBuilder extends Builder{
 
 
     @DataBoundConstructor
-    public PerformanceBuilder(String jobApiKey,
+    public PerformanceBuilder(String credentialsId,
                               String serverUrl,
                               String testId,
                               String notes,
@@ -68,7 +70,7 @@ public class PerformanceBuilder extends Builder{
                               boolean getJtl,
                               boolean getJunit
     ) {
-        this.jobApiKey = jobApiKey;
+        this.credentialsId = credentialsId;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
@@ -91,16 +93,19 @@ public class PerformanceBuilder extends Builder{
         EnvVars v) throws InterruptedException, IOException {
         Result r = null;
         BuildReporter br = new BuildReporter();
+        boolean credentialsPresent = false;
         try {
-            boolean valid = Utils.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
-            if (!valid) {
-                listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0, 3) + "... is absent in credentials store.");
+            BlazemeterCredentialImpl credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            credentialsPresent = !StringUtils.isBlank(credential.getId());
+
+            if (!credentialsPresent) {
+                listener.error("Can not start build: userKey=" + this.credentialsId + "... is absent in credentials store.");
                 r = Result.NOT_BUILT;
                 run.setResult(r);
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            b.setJobApiKey(this.jobApiKey);
+            b.setCredential(Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText()));
             b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
@@ -140,12 +145,12 @@ public class PerformanceBuilder extends Builder{
     }
 
 
-    public String getJobApiKey() {
-        return jobApiKey;
+    public String getCredentialsId() {
+        return credentialsId;
     }
 
-    public void setJobApiKey(String jobApiKey) {
-        this.jobApiKey = jobApiKey;
+    public void setCredentialsId(String credentialsId) {
+        this.credentialsId = credentialsId;
     }
 
     public String getTestId() {

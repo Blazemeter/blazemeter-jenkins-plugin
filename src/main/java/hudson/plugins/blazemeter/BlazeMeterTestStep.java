@@ -20,7 +20,7 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
 import java.util.HashSet;
@@ -36,7 +36,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 public class BlazeMeterTestStep extends Step {
 
-    private String jobApiKey = "";
+    private String credentialsId = "";
 
     private String serverUrl = "";
 
@@ -55,7 +55,7 @@ public class BlazeMeterTestStep extends Step {
     private boolean getJunit = false;
 
     @DataBoundConstructor
-    public BlazeMeterTestStep(String jobApiKey,
+    public BlazeMeterTestStep(String credentialsId,
         String serverUrl,
         String testId,
         String notes,
@@ -66,7 +66,7 @@ public class BlazeMeterTestStep extends Step {
         boolean getJunit
 
     ) {
-        this.jobApiKey = jobApiKey;
+        this.credentialsId = credentialsId;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
@@ -80,7 +80,7 @@ public class BlazeMeterTestStep extends Step {
 
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {
-        return new BlazeMeterTestExecution(stepContext, this.jobApiKey,
+        return new BlazeMeterTestExecution(stepContext, this.credentialsId,
             this.serverUrl,
             this.testId,
             this.notes,
@@ -91,8 +91,8 @@ public class BlazeMeterTestStep extends Step {
             this.getJunit);
     }
 
-    public String getJobApiKey() {
-        return this.jobApiKey;
+    public String getCredentialsId() {
+        return this.credentialsId;
     }
 
     public String getServerUrl() {
@@ -131,7 +131,7 @@ public class BlazeMeterTestStep extends Step {
 
         private static final long serialVersionUID = 1L;
 
-        private String jobApiKey = "";
+        private String credentialsId = "";
 
         private String serverUrl = "";
 
@@ -155,7 +155,7 @@ public class BlazeMeterTestStep extends Step {
         private EnvVars v=null;
 
         protected BlazeMeterTestExecution(@Nonnull final StepContext context,
-            @Nonnull final String jobApiKey,
+            @Nonnull final String credentialsId,
             @Nonnull final String serverUrl,
             @Nonnull final String testId,
             @Nonnull final String notes,
@@ -166,7 +166,7 @@ public class BlazeMeterTestStep extends Step {
             @Nonnull final boolean getJunit) {
             super(context);
             this.context = context;
-            this.jobApiKey = jobApiKey;
+            this.credentialsId = credentialsId;
             this.serverUrl = serverUrl;
             this.testId = testId;
             this.notes = notes;
@@ -179,7 +179,7 @@ public class BlazeMeterTestStep extends Step {
 
         @Override
         protected Void run() throws Exception {
-            PerformanceBuilder pb = new PerformanceBuilder(this.jobApiKey,
+            PerformanceBuilder pb = new PerformanceBuilder(this.credentialsId,
                 this.serverUrl,
                 this.testId,
                 this.notes,
@@ -202,7 +202,7 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
+            Api api = new ApiImpl(this.credentialsId, this.serverUrl);
             if (api.active(this.testId)) {
                 String jobName = this.v.get("JOB_NAME");
                 String buildId = this.v.get("BUILD_ID");

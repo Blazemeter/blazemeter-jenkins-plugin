@@ -20,7 +20,7 @@ import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -44,7 +44,8 @@ import org.json.JSONException;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
-    private String jobApiKey = "";
+
+    private String credential = null;
 
     private String serverUrl = "";
 
@@ -97,20 +98,20 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
-        Api api = new ApiV3Impl(this.jobApiKey,this.serverUrl,httpLog,bzmLog);
-
-        String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
-        String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
+        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog);
+        String userEmail = JobUtility.getUserEmail(this.credential, this.serverUrl);
         if (userEmail.isEmpty()) {
             lentry.append("Please, check that settings are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+/*
 
-            lentry.append("UserKey = " + apiKeyTrimmed + ", serverUrl = " + this.serverUrl);
+            lentry.append("Credentials " + this.credential.getDescription() + ", serverUrl = " + this.serverUrl);
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+*/
 
             ProxyConfiguration proxy = ProxyConfiguration.load();
             if (proxy != null) {
@@ -145,11 +146,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         consLog.info(lentry.toString());
         lentry.setLength(0);
 
-        lentry.append("User key = " + apiKeyTrimmed + " is valid with " + this.serverUrl);
-        bzmLog.info(lentry.toString());
-        consLog.info(lentry.toString());
-        lentry.setLength(0);
-
         lentry.append("User's e-mail = " + userEmail);
         bzmLog.info(lentry.toString());
         consLog.info(lentry.toString());
@@ -158,7 +154,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String testId_num = Utils.getTestId(this.testId);
         boolean collection = false;
         try {
-            collection = JobUtility.collection(testId_num, this.jobApiKey, this.serverUrl);
+            collection = JobUtility.collection(testId_num, this.credential, this.serverUrl);
         } catch (Exception e) {
             lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
@@ -333,8 +329,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
     }
 
 
-    public void setJobApiKey(String jobApiKey) {
-        this.jobApiKey = jobApiKey;
+    public void setCredential(String credential) {
+        this.credential = credential;
     }
 
     public String getTestId() {

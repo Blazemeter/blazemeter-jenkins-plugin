@@ -1,15 +1,15 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter.utils;
@@ -19,12 +19,10 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.AgrReport;
-import static hudson.plugins.blazemeter.utils.Constants.ENCRYPT_CHARS_NUM;
-import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,6 +39,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.mail.MessagingException;
+import okhttp3.Credentials;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -48,7 +48,6 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 public class JobUtility {
     private static StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
@@ -58,7 +57,7 @@ public class JobUtility {
     }
 
     public static void waitForFinish(Api api, String testId, AbstractLogger bzmLog,
-                                     String masterId) throws InterruptedException {
+        String masterId) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
@@ -67,8 +66,8 @@ public class JobUtility {
 
             if (!testStatus.equals(TestStatus.Running)) {
                 bzmLog.info("BlazeMeter TestStatus for masterId " +
-                        masterId
-                        + " is not 'Running': finishing build.... ");
+                    masterId
+                    + " is not 'Running': finishing build.... ");
                 bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
             }
@@ -89,11 +88,11 @@ public class JobUtility {
         }
     }
 
-    public static String getReportUrl(Api api, String masterId,StdErrLog bzmLog) throws Exception {
+    public static String getReportUrl(Api api, String masterId, StdErrLog bzmLog) throws Exception {
         JSONObject jo = null;
         String publicToken = "";
         String reportUrl = null;
-        StringBuilder letnry=new StringBuilder();
+        StringBuilder letnry = new StringBuilder();
         letnry.append("Problems with generating public-token for report URL: ");
         try {
             jo = api.generatePublicToken(masterId);
@@ -125,12 +124,12 @@ public class JobUtility {
     }
 
     public static void saveReport(String reportName,
-                                  String report,
-                                  FilePath filePath,
-                                  StdErrLog bzmLog,
-                                  StdErrLog consLog) {
+        String report,
+        FilePath filePath,
+        StdErrLog bzmLog,
+        StdErrLog consLog) {
         FilePath junit = null;
-        StringBuilder letnry=new StringBuilder();
+        StringBuilder letnry = new StringBuilder();
         letnry.append("ERROR: Failed to save XML report to filepath=");
 
         try {
@@ -140,8 +139,8 @@ public class JobUtility {
             }
             junit.write(report, System.getProperty("file.encoding"));
         } catch (FileNotFoundException e) {
-            bzmLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
-            consLog.info(letnry.toString()+ junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
+            bzmLog.info(letnry.toString() + junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
+            consLog.info(letnry.toString() + junit.getParent() + "/" + junit.getName() + " : " + e.getMessage());
         } catch (IOException e) {
             bzmLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
             consLog.info(letnry.toString() + filePath.getParent() + "/" + filePath.getName() + " : " + e.getMessage());
@@ -216,17 +215,17 @@ public class JobUtility {
         return false;
     }
 
-    public static HashMap<String,String> jtlUrls(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog){
-        HashMap<String,String> jtlUrls=new HashMap<String, String>();
-        List<String> sessionsIds=null;
-        try{
+    public static HashMap<String, String> jtlUrls(Api api, String masterId, StdErrLog bzmLog, StdErrLog consLog) {
+        HashMap<String, String> jtlUrls = new HashMap<String, String>();
+        List<String> sessionsIds = null;
+        try {
             sessionsIds = api.getListOfSessionIds(masterId);
-        }catch (Exception e){
-            bzmLog.info("Failed to get list of sessions for masterId="+masterId,e);
-            consLog.info("Failed to get list of sessions for masterId="+masterId,e);
+        } catch (Exception e) {
+            bzmLog.info("Failed to get list of sessions for masterId=" + masterId, e);
+            consLog.info("Failed to get list of sessions for masterId=" + masterId, e);
         }
         for (String s : sessionsIds) {
-            StringBuilder dataUrl=new StringBuilder();
+            StringBuilder dataUrl = new StringBuilder();
             try {
                 JSONObject jo = api.retrieveJtlZip(s);
                 JSONArray data = jo.getJSONObject(JsonConsts.RESULT).getJSONArray(JsonConsts.DATA);
@@ -234,26 +233,26 @@ public class JobUtility {
                     String title = data.getJSONObject(i).getString("title");
                     if (title.equals("Zip")) {
                         dataUrl.append(data.getJSONObject(i).getString(JsonConsts.DATA_URL));
-                        jtlUrls.put(s,dataUrl.toString());
-                        bzmLog.info("SessionId="+s+", jtlUrl="+dataUrl.toString());
-                        consLog.info("SessionId="+s+", jtlUrl="+dataUrl.toString());
+                        jtlUrls.put(s, dataUrl.toString());
+                        bzmLog.info("SessionId=" + s + ", jtlUrl=" + dataUrl.toString());
+                        consLog.info("SessionId=" + s + ", jtlUrl=" + dataUrl.toString());
                         dataUrl.setLength(0);
                         break;
                     }
                 }
             } catch (JSONException e) {
-                bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
-                consLog.info("Failed to get url for JTL report, sessionId="+s,e);
+                bzmLog.info("Failed to get url for JTL report, sessionId=" + s, e);
+                consLog.info("Failed to get url for JTL report, sessionId=" + s, e);
             } catch (IOException e) {
-                bzmLog.info("Failed to get url for JTL report, sessionId="+s,e);
-                consLog.info("Failed to get url for JTL report, sessionId="+s,e);
+                bzmLog.info("Failed to get url for JTL report, sessionId=" + s, e);
+                consLog.info("Failed to get url for JTL report, sessionId=" + s, e);
             }
 
         }
         return jtlUrls;
     }
 
-    public static void downloadJtlReport(String sessionId, String jtlUrl, FilePath filePath, StdErrLog bzmLog,StdErrLog consLog) {
+    public static void downloadJtlReport(String sessionId, String jtlUrl, FilePath filePath, StdErrLog bzmLog, StdErrLog consLog) {
         URL url = null;
         try {
             url = new URL(jtlUrl);
@@ -302,18 +301,17 @@ public class JobUtility {
         }
     }
 
-    public static void downloadJtlReports(HashMap<String,String> jtlUrls, FilePath filePath,
-                                          StdErrLog bzmBuildLog,StdErrLog consLog) {
-        Set<String> sessionsIds=jtlUrls.keySet();
+    public static void downloadJtlReports(HashMap<String, String> jtlUrls, FilePath filePath,
+        StdErrLog bzmBuildLog, StdErrLog consLog) {
+        Set<String> sessionsIds = jtlUrls.keySet();
         for (String s : sessionsIds) {
             FilePath jtl = new FilePath(filePath, s + Constants.BM_ARTEFACTS);
-            downloadJtlReport(s, jtlUrls.get(s),jtl, bzmBuildLog,consLog);
+            downloadJtlReport(s, jtlUrls.get(s), jtl, bzmBuildLog, consLog);
         }
     }
 
-
     public static void retrieveJUNITXMLreport(Api api, String masterId,
-                                              FilePath junitPath, StdErrLog bzmLog,StdErrLog consLog) {
+        FilePath junitPath, StdErrLog bzmLog, StdErrLog consLog) {
         String junitReport = "";
         bzmLog.info("Requesting JUNIT report from server, masterId=" + masterId);
         consLog.info("Requesting JUNIT report from server, masterId=" + masterId);
@@ -332,21 +330,21 @@ public class JobUtility {
     }
 
     public static Result postProcess(
-            FilePath workspace,
-            String buildId,
-            Api api,
-            String masterId,
-            EnvVars envVars,
-            boolean isJunit,
-            String junitPathStr,
-            boolean isJtl,
-            String jtlPathStr,
-            StdErrLog bzmLog,
-            StdErrLog consLog) throws InterruptedException {
+        FilePath workspace,
+        String buildId,
+        Api api,
+        String masterId,
+        EnvVars envVars,
+        boolean isJunit,
+        String junitPathStr,
+        boolean isJtl,
+        String jtlPathStr,
+        StdErrLog bzmLog,
+        StdErrLog consLog) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
-        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog,consLog);
+        CIStatus ciStatus = JobUtility.validateCIStatus(api, masterId, bzmLog, consLog);
         if (ciStatus.equals(CIStatus.errors)) {
             result = Result.UNSTABLE;
             return result;
@@ -364,21 +362,21 @@ public class JobUtility {
                 consLog.warn("Junit report will be saved to workspace");
                 junitPath = dfp;
             }
-            retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog,consLog);
+            retrieveJUNITXMLreport(api, masterId, junitPath, bzmLog, consLog);
         } else {
             bzmLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
             consLog.info("JUNIT report won't be requested: isJunit = " + isJunit);
         }
         FilePath jtlPath = null;
         if (isJtl) {
-            HashMap<String,String> jtlUrls=JobUtility.jtlUrls(api,masterId,bzmLog,consLog);
+            HashMap<String, String> jtlUrls = JobUtility.jtlUrls(api, masterId, bzmLog, consLog);
             if (StringUtil.isBlank(jtlPathStr)) {
                 jtlPath = dfp;
             } else {
                 try {
                     jtlPath = Utils.resolvePath(dfp, jtlPathStr, envVars);
-                    bzmLog.info("Will use the following path for JTL: " +  jtlPath.getParent().getName() + "/" + jtlPath.getName());
-                    consLog.info("Will use the following path for JTL: " +  jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    bzmLog.info("Will use the following path for JTL: " + jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    consLog.info("Will use the following path for JTL: " + jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 } catch (Exception e) {
                     bzmLog.warn("Failed to resolve jtlPath: " + e.getMessage());
                     consLog.warn("Failed to resolve jtlPath: " + e.getMessage());
@@ -387,20 +385,18 @@ public class JobUtility {
                     jtlPath = dfp;
                 }
                 bzmLog.info("Will use the following path for JTL: " +
-                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 consLog.info("Will use the following path for JTL: " +
-                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                    jtlPath.getParent().getName() + "/" + jtlPath.getName());
             }
-            JobUtility.downloadJtlReports(jtlUrls,jtlPath,bzmLog,consLog);
+            JobUtility.downloadJtlReports(jtlUrls, jtlPath, bzmLog, consLog);
         } else {
             bzmLog.info("JTL report won't be requested: isJtl = " + isJtl);
             consLog.info("JTL report won't be requested: isJtl = " + isJtl);
         }
 
-
         //get testGetArchive information
-        JSONObject testReport = requestAggregateReport(api,masterId,bzmLog,consLog);
-
+        JSONObject testReport = requestAggregateReport(api, masterId, bzmLog, consLog);
 
         if (testReport == null || testReport.equals("null")) {
             bzmLog.info("Aggregate report is not available after 4 attempts.");
@@ -423,8 +419,7 @@ public class JobUtility {
 
     }
 
-
-    public static JSONObject requestAggregateReport(Api api, String masterId,StdErrLog bzmLog,StdErrLog consLog) {
+    public static JSONObject requestAggregateReport(Api api, String masterId, StdErrLog bzmLog, StdErrLog consLog) {
         JSONObject testReport = null;
         int retries = 1;
         try {
@@ -487,7 +482,6 @@ public class JobUtility {
         return props;
     }
 
-
     public static boolean stopMaster(Api api, String masterId) throws Exception{
         boolean terminate = false;
             int statusCode = api.getTestMasterStatusCode(masterId);
@@ -512,51 +506,60 @@ public class JobUtility {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateUserKey(String userKey, String blazeMeterUrl) {
-        if (userKey.isEmpty()) {
-            logger.warn(Constants.API_KEY_EMPTY);
-            return FormValidation.errorWithMarkup(Constants.API_KEY_EMPTY);
+    public static FormValidation validateCredentials(String username, String password, String blazeMeterUrl) {
+        if (StringUtils.isBlank(password)) {
+            logger.warn(Constants.CRED_PASS_EMPTY);
+            return FormValidation.errorWithMarkup(Constants.CRED_PASS_EMPTY);
         }
-        String encryptedKey = userKey.substring(0, ENCRYPT_CHARS_NUM) + "...";
         try {
-            logger.info("Validating API key started: API key=" + encryptedKey);
-            Api bzm = new ApiV3Impl(userKey, blazeMeterUrl);
-            logger.info("Getting user details from server: serverUrl=" + blazeMeterUrl);
-            JSONObject u = bzm.getUser();
+            logger.info("Validating credentials started: username = " + username + " password = " + password);
+            String bc = Credentials.basic(username, password);
+            Api api = new ApiImpl(bc, blazeMeterUrl);
+            logger.info("Getting user details from server: serverUrl = " + blazeMeterUrl);
+            JSONObject u = api.getUser();
             net.sf.json.JSONObject user = null;
             if (u != null) {
                 logger.warn("Received user information:");
                 logger.warn(u.toString());
                 user = net.sf.json.JSONObject.fromObject(u.toString());
                 if (user.has(JsonConsts.ERROR) && !user.get(JsonConsts.ERROR).equals(null)) {
-                    logger.warn("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
+                    logger.warn("Credentials are not valid: error = " + user.get(JsonConsts.ERROR).toString());
                     logger.warn("User profile: " + user.toString());
-                    return FormValidation.errorWithMarkup("API key is not valid: error=" + user.get(JsonConsts.ERROR).toString());
+                    return FormValidation.errorWithMarkup("Credentials are not valid: error = " + user.get(JsonConsts.ERROR).toString());
                 } else {
-                    logger.warn(Constants.API_KEY_VALID + user.getString(JsonConsts.MAIL));
-                    return FormValidation.ok(Constants.API_KEY_VALID + user.getString(JsonConsts.MAIL));
+                    if (user.has(JsonConsts.RESULT)) {
+                        net.sf.json.JSONObject result = user.getJSONObject(JsonConsts.RESULT);
+                        if (result.has(JsonConsts.MAIL)) {
+                            logger.warn(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
+                            return FormValidation.ok(Constants.CRED_ARE_VALID + result.getString(JsonConsts.MAIL));
+                        }
+                    }
                 }
             }
         } catch (ClassCastException e) {
-            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn("Credentials are not valid: unexpected exception = " + e.getMessage().toString());
             logger.warn(e);
         } catch (Exception e) {
-            logger.warn("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            logger.warn("Credentials are not valid: unexpected exception = " + e.getMessage().toString());
             logger.warn(e);
-            return FormValidation.errorWithMarkup("API key is not valid: unexpected exception=" + e.getMessage().toString());
+            return FormValidation.errorWithMarkup("Credentials are not valid: unexpected exception = " + e.getMessage().toString());
         }
-        logger.warn("API key is not valid: userKey=" + encryptedKey + " blazemeterUrl=" + blazeMeterUrl);
-        logger.warn(" Please, check proxy settings, serverUrl and userKey.");
-        return FormValidation.error("API key is not valid: API key=" + encryptedKey + " blazemeterUrl=" + blazeMeterUrl +
-                ". Please, check proxy settings, serverUrl and userKey.");
+        logger.warn("Credentials are not valid: username = " + username +
+            ", password = " + password + " blazemeterUrl = " + blazeMeterUrl);
+        logger.warn(" Please, check proxy settings, serverUrl and credentials.");
+        return FormValidation.error("Credentials are not valid: username = " + username + ", password = " + password
+            + " blazemeterUrl = " + blazeMeterUrl +
+            ". Please, check proxy settings, serverUrl and credentials.");
     }
 
-    public static String getUserEmail(String userKey, String blazemeterUrl, VirtualChannel c) {
-        Api bzm = new ApiV3Impl(userKey, blazemeterUrl);
+    public static String getUserEmail(String credential, String blazemeterUrl) {
+        Api api = new ApiImpl(credential, blazemeterUrl);
+
         try {
-            net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(bzm.getUser().toString());
-            if (user.has(JsonConsts.MAIL)) {
-                return user.getString(JsonConsts.MAIL);
+            net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(api.getUser().toString());
+            if (user.has(JsonConsts.RESULT)) {
+                net.sf.json.JSONObject result = user.getJSONObject(JsonConsts.RESULT);
+                return result.getString(JsonConsts.MAIL);
             } else {
                 return "";
             }
@@ -565,9 +568,6 @@ public class JobUtility {
         }
     }
 
-    public static String getUserEmail(String userKey, String blazemeterUrl) {
-        return getUserEmail(userKey, blazemeterUrl, null);
-    }
 
     public static boolean properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
         List<String> sessionsIds = null;
@@ -601,42 +601,41 @@ public class JobUtility {
         return p;
     }
 
-    public static boolean testIdExists(String testId,String apiKey,String serverUrl) throws JSONException, IOException,
-            MessagingException {
-        boolean testIdExists=false;
-        Api api = new ApiV3Impl(apiKey,serverUrl);
+    public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
+        MessagingException {
+        boolean testIdExists = false;
+        Api api = new ApiImpl(c, serverUrl);
         LinkedHashMultimap tests = api.testsMultiMap();
-        Set<Map.Entry> entries=tests.entries();
-        for(Map.Entry e:entries){
-            int point=((String)e.getValue()).indexOf(".");
-            testIdExists=testId.equals(((String)e.getValue()).substring(0,point));
-            if(testIdExists){
+        Set<Map.Entry> entries = tests.entries();
+        for (Map.Entry e : entries) {
+            int point = ((String) e.getValue()).indexOf(".");
+            testIdExists = testId.equals(((String) e.getValue()).substring(0, point));
+            if (testIdExists) {
                 break;
             }
         }
         return testIdExists;
     }
 
+    public static boolean collection(String testId, String c, String serverUrl) throws Exception {
+        boolean exists = false;
+        boolean collection = false;
 
-    public static boolean collection(String testId,String apiKey,String serverUrl) throws Exception{
-        boolean exists=false;
-        boolean collection=false;
-
-        Api api = new ApiV3Impl(apiKey,serverUrl);
+        Api api = new ApiImpl(c, serverUrl);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
             int point = ((String) e.getValue()).indexOf(".");
-            if (testId.equals(((String) e.getValue()).substring(0,point))) {
-                collection = (((String) e.getValue()).substring(point+1)).contains("multi");
-                exists=true;
+            if (testId.equals(((String) e.getValue()).substring(0, point))) {
+                collection = (((String) e.getValue()).substring(point + 1)).contains("multi");
+                exists = true;
             }
             if (collection) {
                 break;
             }
         }
-        if(!exists){
-            throw new Exception("Test with test id = "+testId+" is not present on server");
+        if (!exists) {
+            throw new Exception("Test with test id = " + testId + " is not present on server");
         }
         return collection;
     }

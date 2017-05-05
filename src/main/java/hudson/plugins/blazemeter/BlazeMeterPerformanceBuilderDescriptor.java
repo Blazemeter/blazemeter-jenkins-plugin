@@ -15,20 +15,19 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,11 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
+import okhttp3.Credentials;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -82,25 +78,28 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
-    // Used by config.jelly to display the test list.
-    public ListBoxModel doFillTestIdItems(@QueryParameter("jobApiKey") String apiKey, @QueryParameter("testId") String savedTestId) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String credentialsId, @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        List<String> keys = getKeys();
-        if (!keys.contains(apiKey) || StringUtils.isBlank(apiKey)) {
-            if (keys.size() > 0) {
-                apiKey = keys.get(0);
-            } else {
-                items.add(Constants.NO_API_KEY, "-1");
-                return items;
+        BlazemeterCredentialImpl credential = BlazemeterCredentialImpl.EMPTY;
+        List<BlazemeterCredentialImpl> creds = getCredentials(CredentialsScope.GLOBAL);
+        for (BlazemeterCredentialImpl c : creds) {
+            if (c.getId().equals(credentialsId)) {
+                credential = c;
             }
         }
-        Api api = new ApiV3Impl(apiKey, this.blazeMeterURL);
+        if (credential.equals(BlazemeterCredentialImpl.EMPTY)) {
+            items.add(Constants.NO_CREDENTIALS, "-1");
+            return items;
+
+        }
+        String bc = Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText());
+        Api api = new ApiImpl(bc, this.blazeMeterURL);
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
             if (testList == null) {
-                items.add(Constants.API_KEY_IS_NOT_VALID, "-1");
+                items.add(Constants.CRED_ARE_NOT_VALID, "-1");
             } else if (testList.isEmpty()) {
-                items.add(Constants.NO_TESTS_FOR_API_KEY, "-1");
+                items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "-1");
             } else {
                 Set set = testList.entries();
                 for (Object test : set) {
@@ -122,29 +121,29 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return items;
     }
 
-    public ListBoxModel doFillJobApiKeyItems(@QueryParameter String jobApiKey) {
+    public ListBoxModel doFillCredentialsIdItems(@QueryParameter String credentialsId) {
         ListBoxModel items = new ListBoxModel();
-        try{
+        try {
 
-        Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-        for (BlazemeterCredentialImpl c : CredentialsProvider
+            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            for (BlazemeterCredentialImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            items.add(new ListBoxModel.Option(c.getDescription(),
-                    c.getApiKey(),
+                items.add(new ListBoxModel.Option(c.getDescription(),
+                    c.getId(),
                     false));
-        }
-        Iterator<ListBoxModel.Option> iterator=items.iterator();
-        while(iterator.hasNext()){
-            ListBoxModel.Option option=iterator.next();
-            try{
-                option.selected=jobApiKey.substring(0,4).equals(option.value.substring(0,4))?true:false;
-            }catch (Exception e){
-                option.selected=false;
             }
-        }
-        }catch (NullPointerException npe){
+            Iterator<ListBoxModel.Option> iterator = items.iterator();
+            while (iterator.hasNext()) {
+                ListBoxModel.Option option = iterator.next();
+                try {
+                    option.selected = credentialsId.equals(option.value) ? true : false;
+                } catch (Exception e) {
+                    option.selected = false;
+                }
+            }
+        } catch (NullPointerException npe) {
 
-        }finally {
+        } finally {
             return items;
         }
     }
@@ -165,23 +164,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return result;
     }
 
-    public boolean credPresent(String userKey, Object scope) {
-        List<BlazemeterCredentialImpl> cred = getCredentials(scope);
-        boolean valid = false;
-        for (BlazemeterCredentialImpl c : cred) {
-            if (c.getApiKey().equals(userKey)) {
-                valid = true;
-            }
-        }
-        return valid;
-    }
-
-
     // Used by global.jelly to authenticate User key
-    public FormValidation doTestConnection(@QueryParameter("apiKey") final String userKey)
-            throws MessagingException, IOException, JSONException, ServletException {
-        return JobUtility.validateUserKey(userKey,this.blazeMeterURL);
-    }
+
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
@@ -189,23 +173,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
         save();
         return true;
-    }
-
-    public List<String> getKeys() {
-        List<String> apiKeys = new ArrayList<String>();
-        try {
-            Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-            for (BlazemeterCredentialImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-                String key = c.getApiKey();
-                if (!apiKeys.contains(key)) {
-                    apiKeys.add(key);
-                }
-            }
-        } catch (Exception e) {
-        } finally {
-            return apiKeys;
-        }
     }
 
     public String getName() {

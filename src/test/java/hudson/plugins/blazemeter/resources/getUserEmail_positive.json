@@ -1,257 +1,75 @@
 {
-  "id": 1689,
-  "name": "Dzmitry",
-  "firstName": "Dzmitry",
-  "lastName": "",
-  "displayName": "Dzmitry",
-  "company": "BM",
-  "phone": null,
-  "mail": "dzmitry.kashlach@blazemeter.com",
-  "access": 1436439020,
-  "login": 1430747350,
-  "updated": 0,
-  "created": 1324748306,
-  "enabled": true,
-  "master": null,
-  "credits": 3686,
-  "timezone": 10800,
-  "features": {
-    "webdriver": true,
-    "onpremise": true,
-    "vpc": true,
-    "v3": true,
-    "multi": true
+  "result":{
+    "lastName":"",
+    "preferences":{
+      "activeAccountId":40678,
+      "activeWorkspaceId":32563,
+      "activeProjectId":75032,
+      "activeOrganizationId":32563,
+      "id":"56c31f1488a875dd6b16394b",
+      "userId":1689,
+      "aggregateReportFields":[
+        "labelName",
+        "samples",
+        "avgResponseTime",
+        "90line",
+        "95line",
+        "99line",
+        "minResponseTime",
+        "maxResponseTime",
+        "avgBytes",
+        "avgThroughput",
+        "errorsRate"
+      ]
+    },
+    "access":1491571270,
+    "apiKey":"e7d12bxrmq8rpqifveej",
+    "mail":"dzmitry.kashlach@blazemeter.com",
+    "timezone":10800,
+    "created":1324748306,
+    "displayName":"Dzmitry",
+    "roles":[
+      "authenticated user",
+      "Jmeter in the Cloud",
+      "Developer",
+      "JIC",
+      "beta",
+      "vpc",
+      "taurusUi",
+      "authenticated",
+      "user",
+      "new-billing"
+    ],
+    "login":1489571388,
+    "defaultProjectId":75032,
+    "enabled":true,
+    "firstName":"Dzmitry",
+    "features":{
+      "onpremise":true,
+      "taurusUi":true,
+      "vpc":true,
+      "v3":true,
+      "newBilling":true
+    },
+    "legacyApiKeyDisabled":null,
+    "name":"Dzmitry",
+    "id":1689,
+    "defaultProject":{
+      "organizationId":32563,
+      "accountId":40678,
+      "accountName":"Account",
+      "created":1482650431,
+      "name":"Default project",
+      "description":null,
+      "workspaceName":"Dzmitry's Workspace",
+      "id":75032,
+      "userId":1689,
+      "updated":1482650431,
+      "workspaceId":32563
+    },
+    "updated":1482650434,
+    "email":"dzmitry.kashlach@blazemeter.com"
   },
-  "plan": {
-    "id": "ENTERPRISE",
-    "planType": "ENTERPRISE",
-    "totalCredits": 1500,
-    "concurrency": 36000,
-    "engines": 60,
-    "isMetered": false,
-    "duration": 712,
-    "reportRetention": -1,
-    "threadsPerEngine": 600,
-    "threadsPerMediumEngine": 300
-  },
-  "apiKey": "881a84b35e97c4342bf11",
-  "api-key": "881a84b35e97c4342bf11",
-  "roles": [
-    "authenticated user",
-    "Jmeter in the Cloud",
-    "Developer",
-    "JIC",
-    "beta",
-    "vpc",
-    "authenticated",
-    "user"
-  ],
-  "locations": [
-    {
-      "id": "eu-west-1",
-      "title": "EU West (Ireland)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "us-east-1",
-      "title": "US East (Virginia)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "us-west-1",
-      "title": "US West (N.California)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "us-west-2",
-      "title": "US West (Oregon)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "ap-southeast-1",
-      "title": "Asia Pacific (Singapore)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "ap-southeast-2",
-      "title": "Australia (Sydney)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "ap-northeast-1",
-      "title": "Japan (Tokyo)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "sa-east-1",
-      "title": "South America (Sao Paulo)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "us-central1-a",
-      "title": "US Central (Google)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "asia-east1-a",
-      "title": "Asia West (Google)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "europe-west1-b",
-      "title": "Europe West (Google)",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": true
-      },
-      "sandbox": false
-    },
-    {
-      "id": "545b7602f31e4a9a4e495a4a",
-      "title": "DZMITRYKASHLACH",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 600,
-        "concurrency": 36000,
-        "engines": 60,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": false
-      },
-      "sandbox": false
-    },
-    {
-      "id": "harbor-5591335d8588531f5cde3a04",
-      "title": "Sandbox",
-      "types": [],
-      "limits": {
-        "threadsPerEngine": 20,
-        "concurrency": 20,
-        "engines": 0,
-        "duration": 712
-      },
-      "capabilities": {
-        "dedicatedIps": false
-      },
-      "sandbox": false
-    }
-  ],
-  "defaultProject": {
-    "id": 325,
-    "name": "Default",
-    "userId": 1689,
-    "description": "This is default project",
-    "created": 1425361366,
-    "updated": 1425361366,
-    "organizationId": null
-  },
-  "expiration": null,
-  "beforeRetentionWasEnabled": true
+  "api_version":4,
+  "error":null
 }

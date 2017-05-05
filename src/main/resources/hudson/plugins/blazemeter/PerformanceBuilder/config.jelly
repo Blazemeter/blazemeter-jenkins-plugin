@@ -14,8 +14,8 @@
      limitations under the License.
     -->
 
-    <f:entry title="${%API Key:}">
-        <f:select style="width:32em;" field="jobApiKey"/>
+    <f:entry title="${%Credentials ID:}">
+        <f:select style="width:32em;" field="credentialsId"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:">
         <f:select style="width:32em;" field="testId">
