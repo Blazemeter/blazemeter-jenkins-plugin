@@ -107,9 +107,15 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
 
         public FormValidation doTestConnection(@QueryParameter("username") final String username, @QueryParameter("password") final String password)
             throws MessagingException, IOException, JSONException, ServletException {
-
-            return JobUtility.validateCredentials(username,Secret.decrypt(password).getPlainText(),
-                BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
+            String plainPass = null;
+            Secret decrPassword = Secret.fromString(password);
+            try {
+                plainPass = decrPassword.getPlainText();
+            } catch (NullPointerException npe) {
+                return FormValidation.error("Failed to decrypt password to plain text");
+            }
+            String serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+            return JobUtility.validateCredentials(username, plainPass, serverUrl);
         }
 
     }
