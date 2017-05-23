@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -70,6 +71,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void startTest_single() throws JSONException, IOException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -81,6 +83,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void startTest_collection() throws JSONException, IOException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -93,6 +96,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void active() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -104,6 +108,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void activeNot() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -115,6 +120,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void ping_true() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -131,6 +137,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void ping_false() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -146,6 +153,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getTestReport() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -156,6 +164,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getTestCount_zero() {
         try {
             String bc = Credentials.basic("", "");
@@ -172,6 +181,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getTestsCount_4() throws IOException, JSONException, ServletException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -183,6 +193,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void notes() throws Exception {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -193,6 +204,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void properties_true() throws Exception {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -205,6 +217,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void junit() throws IOException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -215,6 +228,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getJtl() throws JSONException, IOException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -227,6 +241,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getListOfSessionIds() throws IOException, JSONException {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
@@ -248,6 +263,7 @@ public class TestApiImpl {
     }
 
     @Test
+    @Ignore
     public void getTestSessionStatusCode_0() {
         BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_EXCEPTION_ID,
             TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
