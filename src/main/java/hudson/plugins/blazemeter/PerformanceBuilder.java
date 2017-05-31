@@ -95,7 +95,7 @@ public class PerformanceBuilder extends Builder{
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
         try {
-            BlazemeterCredentialImpl credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentialsBAImpl credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {

@@ -80,19 +80,25 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String credentialsId, @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        BlazemeterCredentialImpl credential = BlazemeterCredentialImpl.EMPTY;
-        List<BlazemeterCredentialImpl> creds = getCredentials(CredentialsScope.GLOBAL);
-        for (BlazemeterCredentialImpl c : creds) {
+        BlazemeterCredentials credential = BlazemeterCredentialsBAImpl.EMPTY;
+        List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
+        for (BlazemeterCredentials c : creds) {
             if (c.getId().equals(credentialsId)) {
                 credential = c;
             }
         }
-        if (credential.equals(BlazemeterCredentialImpl.EMPTY)) {
+
+        if (credential.equals(BlazemeterCredentialsBAImpl.EMPTY)) {
             items.add(Constants.NO_CREDENTIALS, "-1");
             return items;
 
         }
-        String bc = Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText());
+        String bc = null;
+        if (credential instanceof BlazemeterCredentials) {
+            String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
+            String password = ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText();
+            bc = Credentials.basic(username, password);
+        }
         Api api = new ApiImpl(bc, this.blazeMeterURL);
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
@@ -126,8 +132,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         try {
 
             Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-            for (BlazemeterCredentialImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+            for (BlazemeterCredentials c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+                items.add(new ListBoxModel.Option(c.getDescription(),
+                    c.getId(),
+                    false));
+            }
+            for (BlazemeterCredentials c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialsLegacyImpl.class, item, ACL.SYSTEM)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
                     c.getId(),
                     false));
@@ -148,19 +160,27 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
     }
 
-    public List<BlazemeterCredentialImpl> getCredentials(Object scope) {
-        List<BlazemeterCredentialImpl> result = new ArrayList<BlazemeterCredentialImpl>();
-        Set<String> apiKeys = new HashSet<String>();
+    public List<BlazemeterCredentials> getCredentials(Object scope) {
+        List<BlazemeterCredentials> result = new ArrayList<BlazemeterCredentials>();
+        Set<String> addedCredentials = new HashSet<String>();
 
         Item item = scope instanceof Item ? (Item) scope : null;
-        for (BlazemeterCredentialImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
-                result.add(c);
-                apiKeys.add(id);
-            }
+        StringBuilder id = null;
+        for (BlazemeterCredentialsBAImpl c : CredentialsProvider
+            .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+            id.append(c.getId());
+            result.add(c);
+            addedCredentials.add(id.toString());
+            id.setLength(0);
         }
+        for (BlazemeterCredentialsLegacyImpl c : CredentialsProvider
+            .lookupCredentials(BlazemeterCredentialsLegacyImpl.class, item, ACL.SYSTEM)) {
+            id.append(c.getId());
+            result.add(c);
+            addedCredentials.add(id.toString());
+            id.setLength(0);
+        }
+
         return result;
     }
 

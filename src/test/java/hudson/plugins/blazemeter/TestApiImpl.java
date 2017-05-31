@@ -73,7 +73,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void startTest_single() throws JSONException, IOException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc,
@@ -85,7 +85,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void startTest_collection() throws JSONException, IOException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
@@ -98,7 +98,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void active() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
@@ -110,7 +110,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void activeNot() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
@@ -122,7 +122,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void ping_true() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
@@ -139,7 +139,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void ping_false() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
@@ -155,7 +155,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void getTestReport() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -183,7 +183,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void getTestsCount_4() throws IOException, JSONException, ServletException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -195,7 +195,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void notes() throws Exception {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -206,7 +206,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void properties_true() throws Exception {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -219,7 +219,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void junit() throws IOException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -230,7 +230,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void getJtl() throws JSONException, IOException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -243,7 +243,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void getListOfSessionIds() throws IOException, JSONException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -253,7 +253,7 @@ public class TestApiImpl {
 
     @Test
     public void publicToken() throws IOException, JSONException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -265,7 +265,7 @@ public class TestApiImpl {
     @Test
     @Ignore
     public void getTestSessionStatusCode_0() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_EXCEPTION_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_EXCEPTION_ID,
             TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -275,7 +275,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestSessionStatusCode_25() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -285,7 +285,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestsCount_0() throws IOException, JSONException, ServletException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_0_TEST_USER, TestConstants.MOCK_0_TEST_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -296,7 +296,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestSessionStatusCode_70() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -306,7 +306,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestSessionStatusCode_140() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -316,7 +316,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestSessionStatusCode_100() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -326,7 +326,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestStatus_Running() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -336,7 +336,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestInfo_NotRunning() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -346,7 +346,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestList_4_5() throws IOException, JSONException, ServletException, MessagingException {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_5_TEST_USER, TestConstants.MOCK_5_TEST_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);
@@ -358,7 +358,7 @@ public class TestApiImpl {
 
     @Test
     public void getTestInfo_Error() {
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl);

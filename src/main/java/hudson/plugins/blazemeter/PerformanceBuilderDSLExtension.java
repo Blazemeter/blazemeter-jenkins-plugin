@@ -44,7 +44,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            BlazemeterCredentialImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentialsBAImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
             logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
             if (credentialsPresent) {

@@ -32,10 +32,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 @SuppressWarnings("unused") // read resolved by extension plugins
-public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
-    StandardUsernamePasswordCredentials {
+public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials implements BlazemeterCredentials,StandardUsernamePasswordCredentials {
 
-     public static BlazemeterCredentialImpl EMPTY = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,"","","","");
+     public static BlazemeterCredentialsBAImpl EMPTY = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL,"","","","");
     /**
      * The username.
      */
@@ -59,7 +58,7 @@ public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
      */
     @DataBoundConstructor
     @SuppressWarnings("unused") // by stapler
-    public   BlazemeterCredentialImpl(@CheckForNull CredentialsScope scope,
+    public BlazemeterCredentialsBAImpl(@CheckForNull CredentialsScope scope,
         @CheckForNull String id, @CheckForNull String description,
         @CheckForNull String username, @CheckForNull String password) {
         super(scope, id, description);
