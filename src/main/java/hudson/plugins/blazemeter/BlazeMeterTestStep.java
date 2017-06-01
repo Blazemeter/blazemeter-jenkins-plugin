@@ -202,7 +202,7 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            Api api = new ApiImpl(this.credentialsId, this.serverUrl);
+            Api api = new ApiImpl(this.credentialsId, this.serverUrl,/*TODO*/false);
             if (api.active(this.testId)) {
                 String jobName = this.v.get("JOB_NAME");
                 String buildId = this.v.get("BUILD_ID");

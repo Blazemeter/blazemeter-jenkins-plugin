@@ -98,7 +98,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
-        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog);
+        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,/*TODO*/false);
         String userEmail = JobUtility.getUserEmail(this.credential, this.serverUrl);
         if (userEmail.isEmpty()) {
             lentry.append("Please, check that settings are valid.");

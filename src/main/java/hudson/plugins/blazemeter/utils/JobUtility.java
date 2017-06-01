@@ -514,7 +514,7 @@ public class JobUtility {
         try {
             logger.info("Validating credentials started: username = " + username + " password = " + password);
             String bc = Credentials.basic(username, password);
-            Api api = new ApiImpl(bc, blazeMeterUrl);
+            Api api = new ApiImpl(bc, blazeMeterUrl,/*TODO*/false);
             logger.info("Getting user details from server: serverUrl = " + blazeMeterUrl);
             JSONObject u = api.getUser();
             net.sf.json.JSONObject user = null;
@@ -553,7 +553,7 @@ public class JobUtility {
     }
 
     public static String getUserEmail(String credential, String blazemeterUrl) {
-        Api api = new ApiImpl(credential, blazemeterUrl);
+        Api api = new ApiImpl(credential, blazemeterUrl,/*TODO*/false);
 
         try {
             net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(api.getUser().toString());
@@ -604,7 +604,7 @@ public class JobUtility {
     public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
         MessagingException {
         boolean testIdExists = false;
-        Api api = new ApiImpl(c, serverUrl);
+        Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
@@ -621,7 +621,7 @@ public class JobUtility {
         boolean exists = false;
         boolean collection = false;
 
-        Api api = new ApiImpl(c, serverUrl);
+        Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {

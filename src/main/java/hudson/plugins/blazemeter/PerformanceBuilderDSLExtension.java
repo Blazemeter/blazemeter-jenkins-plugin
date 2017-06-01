@@ -48,7 +48,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             credentialsPresent = !StringUtils.isBlank(credential.getId());
             logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
             if (credentialsPresent) {
-                Api api = new ApiImpl(Credentials.basic(credential.getUsername(),credential.getPassword().getPlainText()), serverUrl);
+                Api api = new ApiImpl(Credentials.basic(credential.getUsername(),credential.getPassword().getPlainText()), serverUrl,/*TODO*/false);
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
                 logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
