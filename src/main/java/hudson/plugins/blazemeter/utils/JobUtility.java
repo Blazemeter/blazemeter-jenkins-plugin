@@ -552,9 +552,7 @@ public class JobUtility {
             ". Please, check proxy settings, serverUrl and credentials.");
     }
 
-    public static String getUserEmail(String credential, String blazemeterUrl) {
-        Api api = new ApiImpl(credential, blazemeterUrl,/*TODO*/false);
-
+    public static String getUserEmail(Api api) {
         try {
             net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(api.getUser().toString());
             if (user.has(JsonConsts.RESULT)) {
@@ -617,11 +615,10 @@ public class JobUtility {
         return testIdExists;
     }
 
-    public static boolean collection(String testId, String c, String serverUrl) throws Exception {
+    public static boolean collection(String testId, Api api) throws Exception {
         boolean exists = false;
         boolean collection = false;
 
-        Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {

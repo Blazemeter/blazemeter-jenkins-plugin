@@ -80,9 +80,8 @@ public class TestJobUtility {
         BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        String email = JobUtility.getUserEmail(bc,
-            TestConstants.mockedApiUrl);
+        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
 
@@ -91,7 +90,8 @@ public class TestJobUtility {
         BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
             TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        String email = JobUtility.getUserEmail(bc, TestConstants.mockedApiUrl);
+        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "");
     }
 
@@ -101,7 +101,8 @@ public class TestJobUtility {
             TestConstants.MOCK_EXCEPTION_ID,
             TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        String email = JobUtility.getUserEmail(bc, TestConstants.mockedApiUrl);
+        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "");
     }
 
@@ -275,9 +276,10 @@ public class TestJobUtility {
         BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
+        ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
 
         try {
-            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,bc, TestConstants.mockedApiUrl));
+            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,api));
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {
@@ -299,7 +301,8 @@ public class TestJobUtility {
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
 
         try {
-            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,bc, TestConstants.mockedApiUrl));
+            ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,api));
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {

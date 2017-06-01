@@ -95,7 +95,7 @@ public class PerformanceBuilder extends Builder{
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
         try {
-            BlazemeterCredentialsBAImpl credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -105,7 +105,15 @@ public class PerformanceBuilder extends Builder{
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            b.setCredential(Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText()));
+            String buildCr = "";
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+            } else {
+                buildCr = ((BlazemeterCredentialsLegacyImpl) credential).getKey();
+                b.setCredLegacy(true);
+            }
+            b.setCredential(buildCr);
             b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);

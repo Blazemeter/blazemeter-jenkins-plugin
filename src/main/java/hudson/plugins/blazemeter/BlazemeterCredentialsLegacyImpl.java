@@ -31,7 +31,7 @@ import org.kohsuke.stapler.QueryParameter;
 @SuppressWarnings("unused") // read resolved by extension plugins
 public class BlazemeterCredentialsLegacyImpl extends BaseStandardCredentials implements BlazemeterCredentials {
 
-//     public static BlazemeterCredentialsLegacyImpl EMPTY = new BlazemeterCredentialsLegacyImpl(CredentialsScope.GLOBAL,"","","","");
+     public static BlazemeterCredentialsLegacyImpl EMPTY = new BlazemeterCredentialsLegacyImpl(CredentialsScope.GLOBAL,"","","");
     /**
      * The key.
      */
