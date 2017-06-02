@@ -563,4 +563,8 @@ public class ApiImpl implements Api {
         return true;
     }
 
+    @Override
+    public String getCredential() {
+        return this.credential;
+    }
 }

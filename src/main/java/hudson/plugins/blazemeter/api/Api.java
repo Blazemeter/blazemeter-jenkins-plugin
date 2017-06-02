@@ -78,4 +78,5 @@ public interface Api {
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;
 
+    String getCredential();
 }

@@ -20,6 +20,9 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiImpl;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import java.io.IOException;
 import javax.mail.MessagingException;
@@ -85,22 +88,16 @@ public class BlazemeterCredentialsLegacyImpl extends BaseStandardCredentials imp
             return "icon-credentials-userpass";
         }
 
-        public FormValidation doTestConnection(@QueryParameter("key") final String username)
+        public FormValidation doTestConnection(@QueryParameter("key") final String key)
             throws MessagingException, IOException, JSONException, ServletException {
-            /* TODO
-            String plainPass = null;
-            Secret decrPassword = Secret.fromString(password);
-            try {
-                plainPass = decrPassword.getPlainText();
-            } catch (NullPointerException npe) {
-                return FormValidation.error("Failed to decrypt password to plain text");
-            }
             String serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            */
-//            return JobUtility.validateCredentials(username, plainPass, serverUrl);
-            return FormValidation.error("Not implemented");
+            Api api = new ApiImpl(key, serverUrl, true);
+            FormValidation f = JobUtility.validateCredentials(api);
+            if (f.kind.equals(FormValidation.Kind.ERROR)) {
+                return FormValidation.error("Api key = " + key + " is not valid with " + serverUrl + ". " + f.getMessage());
+            } else {
+                return FormValidation.ok(f.getMessage());
+            }
         }
-
     }
 }
-

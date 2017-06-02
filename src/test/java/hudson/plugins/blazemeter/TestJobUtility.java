@@ -108,29 +108,27 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_positive() throws IOException, JSONException {
-        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_VALID_USER,
-            TestConstants.MOCK_VALID_PASSWORD,
-            TestConstants.mockedApiUrl);
+        String cred = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
+        Api api = new ApiImpl(cred, TestConstants.mockedApiUrl, false);
+        FormValidation validation = JobUtility.validateCredentials(api);
         Assert.assertEquals(validation.kind, FormValidation.Kind.OK);
         Assert.assertEquals(validation.getMessage(), Constants.CRED_ARE_VALID + "dzmitry.kashlach@blazemeter.com");
     }
 
     @Test
     public void validateUserKey_negative() throws IOException, JSONException {
-        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_INVALID_USER,
-            TestConstants.MOCK_INVALID_PASSWORD,
-            TestConstants.mockedApiUrl);
+        String cred = Credentials.basic(TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
+        Api api = new ApiImpl(cred, TestConstants.mockedApiUrl, false);
+        FormValidation validation = JobUtility.validateCredentials(api);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
-        Assert.assertEquals(Constants.CRED_ARE_NOT_VALID + ": username = " + TestConstants.MOCK_INVALID_USER +
-            ", password = " + TestConstants.MOCK_INVALID_PASSWORD + " blazemeterUrl = " + TestConstants.mockedApiUrl + "." +
-            " Please, check proxy settings, serverUrl and credentials.", validation.getMessage());
     }
 
     @Test
     public void validateUserKey_exception() throws IOException, JSONException {
-        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_EXCEPTION_USER,
-            TestConstants.MOCK_EXCEPTION_PASSWORD,
-            TestConstants.mockedApiUrl);
+        String cred = Credentials.basic(TestConstants.MOCK_EXCEPTION_USER,
+            TestConstants.MOCK_EXCEPTION_PASSWORD);
+        Api api = new ApiImpl(cred, TestConstants.mockedApiUrl, false);
+        FormValidation validation = JobUtility.validateCredentials(api);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
         Assert.assertEquals(validation.getMessage(),
             "Credentials are not valid: unexpected exception = A JSONObject text must begin with '{' at character 1");
@@ -138,10 +136,12 @@ public class TestJobUtility {
 
     @Test
     public void validateUserKey_empty() throws IOException, JSONException {
-        FormValidation validation = JobUtility.validateCredentials(TestConstants.MOCK_EMPTY_USER,
-            TestConstants.MOCK_EMPTY_PASSWORD,TestConstants.mockedApiUrl);
+        String cred = Credentials.basic(TestConstants.MOCK_EMPTY_USER,
+            TestConstants.MOCK_EMPTY_PASSWORD);
+        Api api = new ApiImpl(cred, TestConstants.mockedApiUrl, false);
+        FormValidation validation = JobUtility.validateCredentials(api);
         Assert.assertEquals(validation.kind, FormValidation.Kind.ERROR);
-        Assert.assertEquals(validation.getMessage(), Constants.CRED_PASS_EMPTY);
+        Assert.assertEquals(validation.getMessage(), Constants.CRED_EMPTY);
     }
 
 
