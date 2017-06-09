@@ -1,6 +1,6 @@
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.testresult.AgrReport;
+import hudson.plugins.blazemeter.testresult.TestReport;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
@@ -18,7 +18,7 @@ public class TestAgrReport {
     public void agrReport() throws IOException, JSONException {
         File jf = new File(TestConstants.RESOURCES + "/agreport.json");
         String jo = FileUtils.readFileToString(jf);
-        AgrReport r = new AgrReport(new JSONObject(jo));
+        TestReport r = new TestReport(new JSONObject(jo));
         Assert.assertTrue(r.average==6.0520833333333);
         Assert.assertTrue(r.min==0);
         Assert.assertTrue(r.max==172);

@@ -405,8 +405,8 @@ public class TestJobUtility {
             TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         Api api = new ApiImpl(bc, TestConstants.mockedApiUrl);
-        JSONObject ar = JobUtility.requestAggregateReport(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
-        Assert.assertTrue(ar.length() == 33);
+        String ar = JobUtility.requestReport(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
+        Assert.assertTrue(ar.length() == 105);
     }
 
     @Test

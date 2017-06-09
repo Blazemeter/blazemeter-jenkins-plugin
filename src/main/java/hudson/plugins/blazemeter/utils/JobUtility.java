@@ -22,7 +22,7 @@ import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.testresult.AgrReport;
+import hudson.plugins.blazemeter.testresult.TestReport;
 import hudson.util.FormValidation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -396,48 +396,44 @@ public class JobUtility {
         }
 
         //get testGetArchive information
-        JSONObject testReport = requestAggregateReport(api, masterId, bzmLog, consLog);
+        String testReport = requestReport(api, masterId, bzmLog, consLog);
 
-        if (testReport == null || testReport.equals("null")) {
-            bzmLog.info("Aggregate report is not available after 4 attempts.");
-            consLog.info("Aggregate report is not available after 4 attempts.");
+        if (StringUtils.isBlank(testReport)) {
+            bzmLog.info("Test report is not available after 4 attempts.");
+            consLog.info("Test report is not available after 4 attempts.");
             return result;
+        }else{
+            bzmLog.info(testReport);
+            consLog.info(testReport);
         }
-        AgrReport testResult = null;
-        try {
-            testResult = new AgrReport(testReport);
-            bzmLog.info(testResult.toString());
-            consLog.info(testResult.toString());
-        } catch (JSONException je) {
-            bzmLog.info("Failed to get test result. Try to check server for it");
-            consLog.info("Failed to get test result. Try to check server for it");
-            bzmLog.info("ERROR: Failed to generate TestResult: " + je);
-            consLog.info("ERROR: Failed to generate TestResult: " + je);
-        } finally {
-            return result;
-        }
-
+        return result;
     }
 
-    public static JSONObject requestAggregateReport(Api api, String masterId, StdErrLog bzmLog, StdErrLog consLog) {
-        JSONObject testReport = null;
+    public static String requestReport(Api api, String masterId, StdErrLog bzmLog, StdErrLog consLog) {
+        JSONObject jr = null;
         int retries = 1;
+        TestReport r = null;
         try {
-            while (retries < 5 && testReport == null) {
-                bzmLog.info("Trying to get aggregate test report from server, attempt# " + retries);
-                consLog.info("Trying to get aggregate test report from server, attempt# " + retries);
-                testReport = api.testReport(masterId);
-                if (testReport != null) {
-                    return testReport;
+            while (retries < 5 && jr == null) {
+                bzmLog.info("Trying to get  test report from server, attempt# " + retries);
+                consLog.info("Trying to get  test report from server, attempt# " + retries);
+                jr = api.funcReport(masterId);
+                if (jr != null) {
+                    bzmLog.info("Got functional report from server");
+                    consLog.info("Got functional report from server");
+                    return jr.toString();
+                } else {
+                    jr = api.testReport(masterId);
+                    r = new TestReport(jr);
                 }
                 Thread.sleep(5000);
                 retries++;
             }
         } catch (Exception e) {
-            bzmLog.info("Failed to get test report from server.");
-            consLog.info("Failed to get test report from server.");
+            bzmLog.info("Failed to get test report from server: " + e.getMessage());
+            consLog.info("Failed to get test report from server: " + e.getMessage());
         }
-        return testReport;
+        return r == null ? "" : r.toString();
     }
 
     public static boolean notes(Api api, String masterId, String notes, StdErrLog jenBuildLog) {

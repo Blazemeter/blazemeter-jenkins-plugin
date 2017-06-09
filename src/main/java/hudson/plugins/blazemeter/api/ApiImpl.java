@@ -561,4 +561,31 @@ public class ApiImpl implements Api {
         return true;
     }
 
+    @Override
+    public JSONObject funcReport(final String masterId) throws Exception {
+
+        String url = this.urlManager.funcReport(APP_KEY, masterId);
+        JSONObject fSummary = null;
+        JSONObject result = null;
+        try {
+            Request r = new Request.Builder().url(url).get()
+                .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION, this.credential)
+                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
+            if (result.has("functionalSummary")) {
+                fSummary = result.getJSONObject("functionalSummary");
+            }
+        } catch (JSONException je) {
+            bzmLog.warn("Functional report(result object): " + result);
+            bzmLog.warn("Error while parsing functional report: check common jenkins log and make sure that functional report" +
+                "is valid/not empty.", je);
+        } catch (Exception e) {
+            bzmLog.warn("Functional report(result object): " + result);
+            bzmLog.warn("Error while parsing functional report summary: check common jenkins log and make sure that functional report" +
+                "is valid/not empty.", e);
+        } finally {
+            return fSummary;
+        }
+    }
 }
