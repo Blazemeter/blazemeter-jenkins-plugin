@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import net.sf.json.JSONObject;
 import okhttp3.Credentials;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -78,19 +79,23 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
-    public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String credentialsId, @QueryParameter("testId") String savedTestId) throws FormValidation {
+    public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId")String crid,
+        @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        BlazemeterCredentialImpl credential = BlazemeterCredentialImpl.EMPTY;
         List<BlazemeterCredentialImpl> creds = getCredentials(CredentialsScope.GLOBAL);
-        for (BlazemeterCredentialImpl c : creds) {
-            if (c.getId().equals(credentialsId)) {
-                credential = c;
+        BlazemeterCredentialImpl credential = BlazemeterCredentialImpl.EMPTY;
+        if (StringUtils.isBlank(crid)) {
+            if (creds.size() > 0) {
+                crid = creds.get(0).getId();
+            } else {
+                items.add(Constants.NO_CREDENTIALS, "-1");
+                return items;
             }
         }
-        if (credential.equals(BlazemeterCredentialImpl.EMPTY)) {
-            items.add(Constants.NO_CREDENTIALS, "-1");
-            return items;
-
+        for (BlazemeterCredentialImpl c : creds) {
+            if (c.getId().equals(crid)) {
+                credential = c;
+            }
         }
         String bc = Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText());
         Api api = new ApiImpl(bc, this.blazeMeterURL);
@@ -121,7 +126,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return items;
     }
 
-    public ListBoxModel doFillCredentialsIdItems(@QueryParameter String credentialsId) {
+    public ListBoxModel doFillCredentialsIdItems(@QueryParameter("credentialsId") String credentialsId) {
         ListBoxModel items = new ListBoxModel();
         try {
 
@@ -136,7 +141,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             while (iterator.hasNext()) {
                 ListBoxModel.Option option = iterator.next();
                 try {
-                    option.selected = credentialsId.equals(option.value) ? true : false;
+                    option.selected = StringUtils.isBlank(credentialsId)||credentialsId.equals(option.value);
                 } catch (Exception e) {
                     option.selected = false;
                 }
