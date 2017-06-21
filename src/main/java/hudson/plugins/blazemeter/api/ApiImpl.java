@@ -564,7 +564,7 @@ public class ApiImpl implements Api {
     @Override
     public JSONObject funcReport(final String masterId) throws Exception {
 
-        String url = this.urlManager.funcReport(APP_KEY, masterId);
+        String url = this.urlManager.masterId(APP_KEY, masterId);
         JSONObject fSummary = null;
         JSONObject result = null;
         try {

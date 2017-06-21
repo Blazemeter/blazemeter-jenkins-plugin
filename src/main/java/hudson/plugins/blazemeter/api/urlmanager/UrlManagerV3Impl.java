@@ -261,16 +261,5 @@ public class UrlManagerV3Impl implements UrlManager {
         }
         return properties= serverUrl + V4 +UrlManager.SESSIONS+"/"+sessionId+"/properties?target=all&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
-
-    @Override
-    public String funcReport(String appKey, final String masterId) {
-        String funcReport = null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return NO_URL;
-        }
-        return funcReport = serverUrl + V4 + UrlManager.MASTERS + "/" + masterId;
-    }
 }
 

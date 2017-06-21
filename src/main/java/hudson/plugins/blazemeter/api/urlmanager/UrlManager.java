@@ -63,6 +63,5 @@ public interface UrlManager {
 
     String properties(String appKey, String sessionId);
 
-    String funcReport(String appKey, String masterId);
 }
 
