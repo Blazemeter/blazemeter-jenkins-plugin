@@ -13,13 +13,14 @@
  */
 
 package hudson.plugins.blazemeter.utils;
+
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Item;
+import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
 import hudson.plugins.blazemeter.BlazemeterCredentials;
 import hudson.plugins.blazemeter.BlazemeterCredentialsBAImpl;
-import hudson.plugins.blazemeter.BlazemeterCredentialsLegacyImpl;
 import hudson.security.ACL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +73,7 @@ public class Utils {
             }
         }
         for (BlazemeterCredentials c : CredentialsProvider
-            .lookupCredentials(BlazemeterCredentialsLegacyImpl.class, item, ACL.SYSTEM)) {
+            .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
                 result.add(c);

@@ -32,5 +32,7 @@ public interface Constants {
     String NO_TESTS_FOR_CREDENTIALS = "No tests for credentials";
     int ENCRYPT_CHARS_NUM = 3;
     String MASTER_ID = "masterId";
-    String CRED_EMPTY_VALUE="Basic Og==";
+    String CRED_EMPTY_VALUE = "Basic Og==";
+    String THREE_DOTS = "...";
+    String LEGACY=" - LEGACY KEY(WILL BE DEPRECATED)";
 }

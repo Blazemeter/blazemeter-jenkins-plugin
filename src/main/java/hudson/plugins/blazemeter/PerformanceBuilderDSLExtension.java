@@ -55,7 +55,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                         ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
                     api = new ApiImpl(buildCr, serverUrl, false);
                 } else {
-                    buildCr = ((BlazemeterCredentialsLegacyImpl) credential).getKey();
+                    buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                     api = new ApiImpl(buildCr, serverUrl, true);
                 }
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();

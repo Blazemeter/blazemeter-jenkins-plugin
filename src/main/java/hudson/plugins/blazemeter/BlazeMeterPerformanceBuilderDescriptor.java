@@ -101,9 +101,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             bc = Credentials.basic(username, password);
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
-        if (credential instanceof BlazemeterCredentialsLegacyImpl) {
-            String key = ((BlazemeterCredentialsLegacyImpl) credential).getKey();
-            api = new ApiImpl(key, this.blazeMeterURL, true);
+        if (credential instanceof BlazemeterCredentialImpl) {
+            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
+            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
@@ -144,8 +144,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     false));
             }
             for (BlazemeterCredentials c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialsLegacyImpl.class, item, ACL.SYSTEM)) {
-                items.add(new ListBoxModel.Option(c.getDescription(),
+                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+                items.add(new ListBoxModel.Option(c.getDescription()+Constants.LEGACY,
                     c.getId(),
                     false));
             }
@@ -178,8 +178,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             addedCredentials.add(id.toString());
             id.setLength(0);
         }
-        for (BlazemeterCredentialsLegacyImpl c : CredentialsProvider
-            .lookupCredentials(BlazemeterCredentialsLegacyImpl.class, item, ACL.SYSTEM)) {
+        for (BlazemeterCredentialImpl c : CredentialsProvider
+            .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             id.append(c.getId());
             result.add(c);
             addedCredentials.add(id.toString());

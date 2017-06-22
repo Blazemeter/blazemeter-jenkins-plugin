@@ -110,7 +110,7 @@ public class PerformanceBuilder extends Builder{
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
             } else {
-                buildCr = ((BlazemeterCredentialsLegacyImpl) credential).getKey();
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                 b.setCredLegacy(true);
             }
             b.setCredential(buildCr);
