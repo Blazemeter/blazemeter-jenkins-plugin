@@ -40,6 +40,8 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class PerformanceBuilder extends Builder{
 
+    private String jobApiKey = "";
+
     private String credentialsId = "";
 
     private String serverUrl = "";
@@ -95,7 +97,10 @@ public class PerformanceBuilder extends Builder{
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
         try {
-            BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            String credId=(StringUtils.isBlank(this.credentialsId)&&!StringUtils.isBlank(this.jobApiKey))?
+                Utils.calcLegacyId(this.jobApiKey):this.credentialsId;
+
+            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -209,6 +214,13 @@ public class PerformanceBuilder extends Builder{
         this.sessionProperties = sessionProperties;
     }
 
+    public String getJobApiKey() {
+        return this.jobApiKey;
+    }
+
+    public void setJobApiKey(final String jobApiKey) {
+        this.jobApiKey = jobApiKey;
+    }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})

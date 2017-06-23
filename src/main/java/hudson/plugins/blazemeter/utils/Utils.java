@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 
@@ -93,5 +94,9 @@ public class Utils {
             }
         }
         return cred;
+    }
+
+    public static String calcLegacyId(String jobApiKey){
+        return StringUtils.left(jobApiKey,4) + Constants.THREE_DOTS + StringUtils.right(jobApiKey, 4);
     }
 }
