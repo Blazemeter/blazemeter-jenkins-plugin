@@ -82,8 +82,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId")String crid,
         @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        List<BlazemeterCredentialImpl> creds = getCredentials(CredentialsScope.GLOBAL);
-        BlazemeterCredentialImpl credential = BlazemeterCredentialImpl.EMPTY;
+        List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
+        BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
             if (creds.size() > 0) {
                 crid = creds.get(0).getId();
@@ -92,7 +92,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 return items;
             }
         }
-        for (BlazemeterCredentialImpl c : creds) {
+        for (BlazemeterCredentials c : creds) {
             if (c.getId().equals(crid)) {
                 credential = c;
             }
