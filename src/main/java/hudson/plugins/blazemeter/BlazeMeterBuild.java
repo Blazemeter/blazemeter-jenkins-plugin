@@ -45,6 +45,8 @@ import org.json.JSONException;
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
 
+    private boolean credLegacy=false;
+
     private String credential = null;
 
     private String serverUrl = "";
@@ -98,26 +100,14 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
-        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog);
-
-        lentry.append("BlazeMeter serverUrl = "+this.serverUrl);
-        bzmLog.info(lentry.toString());
-        consLog.info(lentry.toString());
-        lentry.setLength(0);
-
-        String userEmail = JobUtility.getUserEmail(this.credential, this.serverUrl);
+        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,this.credLegacy);
+        String userEmail = JobUtility.getUserEmail(api);
         if (userEmail.isEmpty()) {
+            lentry.append("Please, check that credentials are valid.");
             lentry.append("Please, check that settings(credentials & serverUrl) are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
-/*
-
-            lentry.append("Credentials " + this.credential.getDescription() + ", serverUrl = " + this.serverUrl);
-            bzmLog.info(lentry.toString());
-            consLog.info(lentry.toString());
-            lentry.setLength(0);
-*/
 
             ProxyConfiguration proxy = ProxyConfiguration.load();
             if (proxy != null) {
@@ -160,7 +150,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String testId_num = Utils.getTestId(this.testId);
         boolean collection = false;
         try {
-            collection = JobUtility.collection(testId_num, this.credential, this.serverUrl);
+            collection = JobUtility.collection(testId_num, api);
         } catch (Exception e) {
             lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
@@ -395,5 +385,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     public void setListener(TaskListener listener) {
         this.listener = listener;
+    }
+
+    public void setCredLegacy(final boolean credLegacy) {
+        this.credLegacy = credLegacy;
     }
 }

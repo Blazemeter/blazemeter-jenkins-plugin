@@ -44,11 +44,20 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            BlazemeterCredentialImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
             logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
+            String buildCr = "";
+            Api api = null;
             if (credentialsPresent) {
-                Api api = new ApiImpl(Credentials.basic(credential.getUsername(),credential.getPassword().getPlainText()), serverUrl);
+                if (credential instanceof BlazemeterCredentialsBAImpl) {
+                    buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                        ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+                    api = new ApiImpl(buildCr, serverUrl, false);
+                } else {
+                    buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                    api = new ApiImpl(buildCr, serverUrl, true);
+                }
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap();
                 Collection<String> values = tests.values();
                 logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +

@@ -62,7 +62,7 @@ public class TestBlazeMeterBuild {
         String notes="a";
         String sessionProperties="f";
         try {
-            BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
+            BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
                 TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
             FreeStyleProject project = j.createFreeStyleProject();
@@ -115,7 +115,7 @@ public class TestBlazeMeterBuild {
         try {
             j.getInstance().proxy=new ProxyConfiguration("",0);
             j.getInstance().proxy.save();
-            BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,
+            BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL,
                 TestConstants.MOCK_INVALID_ID,
                 TestConstants.MOCK_INVALID_DESCRIPTION,
                 TestConstants.MOCK_INVALID_USER,

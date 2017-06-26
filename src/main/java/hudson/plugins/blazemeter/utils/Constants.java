@@ -25,11 +25,14 @@ public interface Constants {
     String SPACE_THREE_DOTS = " ...";
     String NO_CREDENTIALS = "No Credentials";
     String UNKNOWN_TYPE = "unknown_type";
-    String CRED_PASS_EMPTY = "Credentials password is empty: please, fix credentials";
+    String CRED_EMPTY = "Credentials are empty: please, fix credentials";
     String A_BLAZEMETER_COM = "https://a.blazemeter.com";
     String CRED_ARE_VALID = "Credentials are valid: user e-mail=";
     String CRED_ARE_NOT_VALID = "Credentials are not valid";
     String NO_TESTS_FOR_CREDENTIALS = "No tests for credentials";
     int ENCRYPT_CHARS_NUM = 3;
     String MASTER_ID = "masterId";
+    String CRED_EMPTY_VALUE = "Basic Og==";
+    String THREE_DOTS = "...";
+    String LEGACY=" - LEGACY KEY(WILL BE DEPRECATED)";
 }

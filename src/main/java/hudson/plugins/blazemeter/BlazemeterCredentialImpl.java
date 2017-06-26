@@ -14,110 +14,55 @@
 
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.BaseCredentials;
+import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
-import hudson.Util;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.util.FormValidation;
-import hudson.util.Secret;
-import java.io.IOException;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import net.sf.json.JSONException;
+import hudson.plugins.blazemeter.utils.Utils;
+import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
-@SuppressWarnings("unused") // read resolved by extension plugins
-public class BlazemeterCredentialImpl extends BaseStandardCredentials implements
-    StandardUsernamePasswordCredentials {
+public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials,BlazemeterCredentials {
+    private static final long serialVersionUID = 1L;
 
-     public static BlazemeterCredentialImpl EMPTY = new BlazemeterCredentialImpl(CredentialsScope.GLOBAL,"","","","");
-    /**
-     * The username.
-     */
-    @NonNull
-    private final String username;
+    private String apiKey =null;
+    private String description=null;
 
-    /**
-     * The password.
-     */
-    @NonNull
-    private final Secret password;
-
-    /**
-     * Constructor.
-     *
-     * @param scope       the credentials scope
-     * @param id          the ID or {@code null} to generate a new one.
-     * @param description the description.
-     * @param username    the username.
-     * @param password    the password.
-     */
     @DataBoundConstructor
-    @SuppressWarnings("unused") // by stapler
-    public   BlazemeterCredentialImpl(@CheckForNull CredentialsScope scope,
-        @CheckForNull String id, @CheckForNull String description,
-        @CheckForNull String username, @CheckForNull String password) {
-        super(scope, id, description);
-        this.username = Util.fixNull(username);
-        this.password = Secret.fromString(password);
+    public BlazemeterCredentialImpl(String apiKey,String description) {
+        super(CredentialsScope.GLOBAL);
+        this.apiKey=apiKey;
+        this.description=description;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    public Secret getPassword() {
-        return password;
+    public String getId() {
+        return Utils.calcLegacyId(this.apiKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NonNull
-    public String getUsername() {
-        return username;
+    public String getApiKey() {
+        return apiKey;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Extension(ordinal = 1)
-    public static class DescriptorImpl extends BaseStandardCredentialsDescriptor {
+    public String getDescription() {
+        return description;
+    }
 
-        /**
-         * {@inheritDoc}
-         */
+
+    @Extension
+    public static class DescriptorImpl extends CredentialsDescriptor {
+
         @Override
         public String getDisplayName() {
-            return Messages.BlazemeterCredential_DisplayName();
+            return Messages.BlazemeterLegacyCredential_DisplayName();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        public String getIconClassName() {
-            return "icon-credentials-userpass";
-        }
-
-        public FormValidation doTestConnection(@QueryParameter("username") final String username, @QueryParameter("password") final String password)
-            throws MessagingException, IOException, JSONException, ServletException {
-            String plainPass = null;
-            Secret decrPassword = Secret.fromString(password);
-            try {
-                plainPass = decrPassword.getPlainText();
-            } catch (NullPointerException npe) {
-                return FormValidation.error("Failed to decrypt password to plain text");
-            }
-            String serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            return JobUtility.validateCredentials(username, plainPass, serverUrl);
+        public ListBoxModel doFillScopeItems() {
+            ListBoxModel m = new ListBoxModel();
+            m.add(CredentialsScope.GLOBAL.getDisplayName(), CredentialsScope.GLOBAL.toString());
+            return m;
         }
 
     }
 }
-

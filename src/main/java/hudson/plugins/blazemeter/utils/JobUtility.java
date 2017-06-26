@@ -39,8 +39,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.mail.MessagingException;
-import okhttp3.Credentials;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.log.AbstractLogger;
@@ -502,16 +500,13 @@ public class JobUtility {
         return props.getProperty(Constants.VERSION);
     }
 
-    public static FormValidation validateCredentials(String username, String password, String blazeMeterUrl) {
-        if (StringUtils.isBlank(password)) {
-            logger.warn(Constants.CRED_PASS_EMPTY);
-            return FormValidation.errorWithMarkup(Constants.CRED_PASS_EMPTY);
+    public static FormValidation validateCredentials(Api api) {
+        if (Constants.CRED_EMPTY_VALUE.equals(api.getCredential())) {
+            logger.warn(Constants.CRED_EMPTY);
+            return FormValidation.errorWithMarkup(Constants.CRED_EMPTY);
         }
         try {
-            logger.info("Validating credentials started: username = " + username + " password = " + password);
-            String bc = Credentials.basic(username, password);
-            Api api = new ApiImpl(bc, blazeMeterUrl);
-            logger.info("Getting user details from server: serverUrl = " + blazeMeterUrl);
+            logger.info("Getting user details from server: serverUrl = " + api.getBlazeMeterURL());
             JSONObject u = api.getUser();
             net.sf.json.JSONObject user = null;
             if (u != null) {
@@ -540,17 +535,10 @@ public class JobUtility {
             logger.warn(e);
             return FormValidation.errorWithMarkup("Credentials are not valid: unexpected exception = " + e.getMessage().toString());
         }
-        logger.warn("Credentials are not valid: username = " + username +
-            ", password = " + password + " blazemeterUrl = " + blazeMeterUrl);
-        logger.warn(" Please, check proxy settings, serverUrl and credentials.");
-        return FormValidation.error("Credentials are not valid: username = " + username + ", password = " + password
-            + " blazemeterUrl = " + blazeMeterUrl +
-            ". Please, check proxy settings, serverUrl and credentials.");
+        return FormValidation.error("");
     }
 
-    public static String getUserEmail(String credential, String blazemeterUrl) {
-        Api api = new ApiImpl(credential, blazemeterUrl);
-
+    public static String getUserEmail(Api api) {
         try {
             net.sf.json.JSONObject user = net.sf.json.JSONObject.fromObject(api.getUser().toString());
             if (user.has(JsonConsts.RESULT)) {
@@ -600,7 +588,7 @@ public class JobUtility {
     public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
         MessagingException {
         boolean testIdExists = false;
-        Api api = new ApiImpl(c, serverUrl);
+        Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
@@ -613,11 +601,10 @@ public class JobUtility {
         return testIdExists;
     }
 
-    public static boolean collection(String testId, String c, String serverUrl) throws Exception {
+    public static boolean collection(String testId, Api api) throws Exception {
         boolean exists = false;
         boolean collection = false;
 
-        Api api = new ApiImpl(c, serverUrl);
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {

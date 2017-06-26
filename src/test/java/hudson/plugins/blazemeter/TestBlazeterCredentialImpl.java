@@ -33,7 +33,7 @@ public class TestBlazeterCredentialImpl {
         String description="vbfgthryfhds";
         String username="vnfhryegdvsfx";
         String password="qwertyuijkmn";
-        BlazemeterCredentialImpl c = new BlazemeterCredentialImpl(scope, id,description,username,password);
+        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(scope, id,description,username,password);
         Assert.assertEquals(scope.getDisplayName(),c.getScope().getDisplayName());
         Assert.assertEquals(id,c.getId());
         Assert.assertEquals(description,c.getDescription());

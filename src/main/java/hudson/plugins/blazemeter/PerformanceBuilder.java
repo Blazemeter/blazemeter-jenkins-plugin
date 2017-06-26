@@ -40,6 +40,8 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class PerformanceBuilder extends Builder{
 
+    private String jobApiKey = "";
+
     private String credentialsId = "";
 
     private String serverUrl = "";
@@ -95,7 +97,10 @@ public class PerformanceBuilder extends Builder{
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
         try {
-            BlazemeterCredentialImpl credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            String credId=(StringUtils.isBlank(this.credentialsId)&&!StringUtils.isBlank(this.jobApiKey))?
+                Utils.calcLegacyId(this.jobApiKey):this.credentialsId;
+
+            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -105,9 +110,16 @@ public class PerformanceBuilder extends Builder{
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            b.setCredential(Credentials.basic(credential.getUsername(), credential.getPassword().getPlainText()));
-            String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            b.setServerUrl(this.serverUrl != null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
+            String buildCr = "";
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+            } else {
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                b.setCredLegacy(true);
+            }
+            b.setCredential(buildCr);
+            b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
@@ -202,6 +214,13 @@ public class PerformanceBuilder extends Builder{
         this.sessionProperties = sessionProperties;
     }
 
+    public String getJobApiKey() {
+        return this.jobApiKey;
+    }
+
+    public void setJobApiKey(final String jobApiKey) {
+        this.jobApiKey = jobApiKey;
+    }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})
