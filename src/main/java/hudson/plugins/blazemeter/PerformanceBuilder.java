@@ -159,7 +159,7 @@ public class PerformanceBuilder extends Builder{
 
 
     public String getCredentialsId() {
-        return credentialsId;
+        return StringUtils.isBlank(this.credentialsId)?this.jobApiKey:this.credentialsId;
     }
 
     public void setCredentialsId(String credentialsId) {

@@ -23,6 +23,7 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -97,6 +98,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 credential = c;
             }
         }
+        for (BlazemeterCredentials c : creds) {
+            if (c.getId().equals(Utils.calcLegacyId(crid))) {
+                credential = c;
+            }
+        }
+
         Api api=null;
         if (credential instanceof BlazemeterCredentialsBAImpl) {
             String bc = null;
@@ -157,7 +164,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             while (iterator.hasNext()) {
                 ListBoxModel.Option option = iterator.next();
                 try {
-                    option.selected = StringUtils.isBlank(credentialsId)||credentialsId.equals(option.value);
+                    option.selected = StringUtils.isBlank(credentialsId) || credentialsId.equals(option.value);
+                    if (!option.selected) {
+                        String lid = Utils.calcLegacyId(credentialsId);
+                        option.selected = lid.equals(option.value);
+                    }
                 } catch (Exception e) {
                     option.selected = false;
                 }
