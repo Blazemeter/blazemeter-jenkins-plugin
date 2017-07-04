@@ -34,5 +34,5 @@ public interface Constants {
     String MASTER_ID = "masterId";
     String CRED_EMPTY_VALUE = "Basic Og==";
     String THREE_DOTS = "...";
-    String LEGACY=" - LEGACY KEY(WILL BE DEPRECATED)";
+    String LEGACY=" - LEGACY KEY(DEPRECATED)";
 }
