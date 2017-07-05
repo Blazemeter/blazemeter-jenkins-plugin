@@ -458,7 +458,7 @@ public class MockedAPI {
 
     public static void getReportUrl() throws IOException {
         String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ID + "/publicToken";
+        String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ID + "/public-token";
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
         String getReportUrl = FileUtils.readFileToString(jsonFile);
         mockServer.when(
@@ -684,7 +684,7 @@ public class MockedAPI {
     public static void publicToken() throws IOException {
         String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         String expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
-            TestConstants.TEST_MASTER_ID + "/publicToken";
+            TestConstants.TEST_MASTER_ID + "/public-token";
 
         File jf = new File(TestConstants.RESOURCES + "/publicToken.json");
         String jo = FileUtils.readFileToString(jf);

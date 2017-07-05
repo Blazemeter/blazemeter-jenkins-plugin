@@ -198,7 +198,7 @@ public class UrlManagerV3Impl implements UrlManager {
             return NO_URL;
         }
         generatePublicToken = serverUrl + V4 + MASTERS + "/" + masterId +
-            "/publicToken?app_key=" + appKey + CLIENT_IDENTIFICATION;
+            "/public-token?app_key=" + appKey + CLIENT_IDENTIFICATION;
 
         return generatePublicToken;
     }
