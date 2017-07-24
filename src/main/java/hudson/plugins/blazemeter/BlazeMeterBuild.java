@@ -183,6 +183,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 throw new NumberFormatException(startTestResp.get(JsonConsts.ERROR));
             }
             masterId=startTestResp.get(JsonConsts.ID);
+            File mf = new File(ld,masterId);
+            FileUtils.touch(mf);
             Integer.parseInt(masterId);
         } catch (JSONException e) {
             lentry.append("Unable to start test: check userKey, testId, server url.");

@@ -13,6 +13,7 @@
  */
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -21,11 +22,13 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
-import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.Utils;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -202,17 +205,29 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            Api api = new ApiImpl(this.credentialsId, this.serverUrl,/*TODO*/false);
-            if (api.active(this.testId)) {
-                String jobName = this.v.get("JOB_NAME");
-                String buildId = this.v.get("BUILD_ID");
-                String masterId = this.v.get(jobName + "-" + buildId + "-" + Constants.MASTER_ID);
-                if (!StringUtils.isBlank(masterId)) {
-                    JobUtility.stopMaster(api, masterId);
+            BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            String buildCr = "";
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+            }
+            Api api = new ApiImpl(buildCr, this.serverUrl, false);
+            String masterId = null;
+            FilePath fp = this.context.get(FilePath.class);
+            String buildId = this.v.get("BUILD_ID");
+            FilePath ld = new FilePath(fp, buildId);
+            List<FilePath> ldfp = ld.list();
+            for (FilePath p : ldfp) {
+                if (p.getBaseName().matches("\\d+")) {
+                    masterId = p.getBaseName();
+                    p.delete();
+                    break;
                 }
             }
+            if (!StringUtils.isBlank(masterId)) {
+                JobUtility.stopMaster(api, masterId);
+            }
         }
-
     }
 
     @Extension
