@@ -116,6 +116,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
             api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
+        if (credential == null){
+            items.add(Constants.NO_SUCH_CREDENTIALS, "-1");
+            return items;
+        }
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap();
             if (testList == null) {

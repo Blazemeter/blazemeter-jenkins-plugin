@@ -29,6 +29,7 @@ public interface Constants {
     String A_BLAZEMETER_COM = "https://a.blazemeter.com";
     String CRED_ARE_VALID = "Credentials are valid: user e-mail=";
     String CRED_ARE_NOT_VALID = "Credentials are not valid";
+    String NO_SUCH_CREDENTIALS = "No such credentials in store, re-check";
     String NO_TESTS_FOR_CREDENTIALS = "No tests for credentials";
     int ENCRYPT_CHARS_NUM = 3;
     String MASTER_ID = "masterId";
