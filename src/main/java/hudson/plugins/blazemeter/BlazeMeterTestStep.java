@@ -36,8 +36,11 @@ import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 public class BlazeMeterTestStep extends Step {
+
+    private String jobApiKey ="";
 
     private String credentialsId = "";
 
@@ -58,8 +61,7 @@ public class BlazeMeterTestStep extends Step {
     private boolean getJunit = false;
 
     @DataBoundConstructor
-    public BlazeMeterTestStep(String credentialsId,
-        String serverUrl,
+    public BlazeMeterTestStep(
         String testId,
         String notes,
         String sessionProperties,
@@ -69,8 +71,6 @@ public class BlazeMeterTestStep extends Step {
         boolean getJunit
 
     ) {
-        this.credentialsId = credentialsId;
-        this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
         this.junitPath = junitPath;
@@ -78,8 +78,23 @@ public class BlazeMeterTestStep extends Step {
         this.getJunit = getJunit;
         this.notes = notes;
         this.sessionProperties = sessionProperties;
-
     }
+
+    @DataBoundSetter
+    public void setServerUrl(final String serverUrl) {
+        this.serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+    }
+
+    @DataBoundSetter
+    public void setCredentialsId(final String credentialsId) {
+        this.credentialsId = credentialsId;
+    }
+
+    @DataBoundSetter
+    public void setJobApiKey(final String jobApiKey) {
+        this.credentialsId = Utils.calcLegacyId(jobApiKey);
+    }
+
 
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {
