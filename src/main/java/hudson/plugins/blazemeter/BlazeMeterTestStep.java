@@ -72,6 +72,7 @@ public class BlazeMeterTestStep extends Step {
 
     ) {
         this.testId = testId;
+        this.serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         this.jtlPath = jtlPath;
         this.junitPath = junitPath;
         this.getJtl = getJtl;
@@ -226,6 +227,7 @@ public class BlazeMeterTestStep extends Step {
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
             }
+
             Api api = new ApiImpl(buildCr, this.serverUrl, false);
             String masterId = null;
             FilePath fp = this.context.get(FilePath.class);
