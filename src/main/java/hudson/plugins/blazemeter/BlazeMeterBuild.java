@@ -104,10 +104,21 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String userEmail = JobUtility.getUserEmail(api);
         if (userEmail.isEmpty()) {
             lentry.append("Please, check that credentials are valid.");
+            bzmLog.info(lentry.toString());
+            consLog.info(lentry.toString());
+            lentry.setLength(0);
             lentry.append("Please, check that settings(credentials & serverUrl) are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+            try {
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+                ((HttpLogger) httpLogger).close();
+            } catch (Exception e) {
+                lentry.append(e);
+                bzmLog.info(lentry.toString());
+            }
 
             ProxyConfiguration proxy = ProxyConfiguration.load();
             if (proxy != null) {
@@ -133,7 +144,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 consLog.info(lentry.toString());
                 lentry.setLength(0);
             }
-            ((HttpLogger) httpLogger).close();
             return Result.FAILURE;
         }
 
