@@ -277,6 +277,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
             result = Result.ABORTED;
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             return result;
         } catch (Exception e) {
             lentry.append("Job was stopped due to unknown reason");
