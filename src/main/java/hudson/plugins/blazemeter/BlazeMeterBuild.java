@@ -100,6 +100,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
+        File mf = null;
         Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,this.credLegacy);
         String userEmail = JobUtility.getUserEmail(api);
         if (userEmail.isEmpty()) {
@@ -193,7 +194,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 throw new NumberFormatException(startTestResp.get(JsonConsts.ERROR));
             }
             masterId=startTestResp.get(JsonConsts.ID);
-            File mf = new File(ld,masterId);
+            mf = new File(ld,masterId);
             FileUtils.touch(mf);
             Integer.parseInt(masterId);
         } catch (JSONException e) {
@@ -201,12 +202,16 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.warn(lentry.toString()+e.getMessage());
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             return Result.FAILURE;
         }catch (NumberFormatException e) {
             lentry.append("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             throw new Exception("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
         }
         catch (Exception e) {
@@ -214,9 +219,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.warn(lentry.toString()+e.getMessage());
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
-            return Result.FAILURE;
-        }finally {
             ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
+            return Result.FAILURE;
         }
 
 
@@ -323,6 +328,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             }
              console_logger.close();
             ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
 
         }
     }
