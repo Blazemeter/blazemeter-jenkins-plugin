@@ -23,7 +23,10 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
@@ -31,6 +34,7 @@ import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
+import java.util.List;
 import javax.annotation.Nonnull;
 import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
@@ -96,9 +100,11 @@ public class PerformanceBuilder extends Builder{
         Result r = null;
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
+        String buildCr = "";
+        boolean legacy=false;
         try {
-            String credId=(StringUtils.isBlank(this.credentialsId)&&!StringUtils.isBlank(this.jobApiKey))?
-                Utils.calcLegacyId(this.jobApiKey):this.credentialsId;
+            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
+                Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
 
             BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
@@ -110,13 +116,14 @@ public class PerformanceBuilder extends Builder{
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            String buildCr = "";
             if (credential instanceof BlazemeterCredentialsBAImpl) {
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+                legacy=false;
             } else {
                 buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                 b.setCredLegacy(true);
+                legacy = true;
             }
             b.setCredential(buildCr);
             String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
@@ -143,6 +150,25 @@ public class PerformanceBuilder extends Builder{
             r = c.call(b);
         } catch (InterruptedException e) {
             r = Result.ABORTED;
+            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+            String masterId = null;
+            String buildId = run.getId();
+            FilePath ld = new FilePath(workspace, buildId);
+            List<FilePath> ldfp = ld.list();
+            for (FilePath p : ldfp) {
+                if (p.getBaseName().matches("\\d+")) {
+                    masterId = p.getBaseName();
+                    p.delete();
+                    break;
+                }
+            }
+            if (!StringUtils.isBlank(masterId)) {
+                try {
+                    JobUtility.stopMaster(api, masterId);
+                } catch (Exception e1) {
+                    listener.error("Failure while stopping master session = " + e1);
+                }
+            }
         } catch (Exception e) {
             r = Result.FAILURE;
         } finally {
