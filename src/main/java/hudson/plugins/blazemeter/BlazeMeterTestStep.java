@@ -223,12 +223,16 @@ public class BlazeMeterTestStep extends Step {
             this.context.onFailure(cause);
             BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
             String buildCr = "";
+            boolean legacy = false;
             if (credential instanceof BlazemeterCredentialsBAImpl) {
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+            } else {
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                legacy = true;
             }
 
-            Api api = new ApiImpl(buildCr, this.serverUrl, false);
+            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
             String masterId = null;
             FilePath fp = this.context.get(FilePath.class);
             String buildId = this.v.get("BUILD_ID");
