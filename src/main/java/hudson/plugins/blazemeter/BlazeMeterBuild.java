@@ -102,6 +102,18 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
         File mf = null;
         Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,this.credLegacy);
+        if (this.credLegacy) {
+            lentry.append("YOU'RE CURRENTLY USING LEGACY KEY WHICH IS DEPRECATED.");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("PLEASE, FOLLOW THE LINK FROM BELOW AND MIGRATE TO NEW API KEY.");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+        }
+
         String userEmail = JobUtility.getUserEmail(api);
         if (userEmail.isEmpty()) {
             lentry.append("Please, check that credentials are valid.");
