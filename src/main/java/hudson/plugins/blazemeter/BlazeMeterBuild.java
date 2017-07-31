@@ -103,6 +103,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         File mf = null;
         Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,this.credLegacy);
         if (this.credLegacy) {
+            lentry.append("==================================================================================================================================================");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
             lentry.append("YOU'RE CURRENTLY USING LEGACY KEY WHICH IS DEPRECATED.");
             consLog.debug(lentry.toString());
             lentry.setLength(0);
@@ -110,6 +113,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.debug(lentry.toString());
             lentry.setLength(0);
             lentry.append("https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("==================================================================================================================================================");
             consLog.debug(lentry.toString());
             lentry.setLength(0);
         }
