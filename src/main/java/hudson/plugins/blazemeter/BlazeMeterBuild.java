@@ -203,7 +203,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         try {
             startTestResp = api.startTest(testId_num, collection);
             if (startTestResp.size()==0) {
-                lentry.append("Unable to start test: possible reasion - test with non-existent OPL");
+                lentry.append("Server returned status = 500 while trying to start test.");
                 consLog.warn(lentry.toString());
                 lentry.setLength(0);
                 return Result.FAILURE;
