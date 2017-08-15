@@ -185,6 +185,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn(lentry.toString());
             consLog.warn(lentry.toString());
             lentry.setLength(0);
+//          return Result.FAILURE;
         }
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
