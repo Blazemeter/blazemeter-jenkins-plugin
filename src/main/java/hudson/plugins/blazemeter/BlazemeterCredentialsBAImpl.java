@@ -17,8 +17,9 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
+import javax.validation.constraints.NotNull;
+import hudson.Extension;
 import hudson.Extension;
 import hudson.Util;
 import hudson.plugins.blazemeter.api.Api;
@@ -41,13 +42,13 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
     /**
      * The username.
      */
-    @NonNull
+    @NotNull
     private final String username;
 
     /**
      * The password.
      */
-    @NonNull
+    @NotNull
     private final Secret password;
 
     /**
@@ -72,7 +73,7 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
     /**
      * {@inheritDoc}
      */
-    @NonNull
+    @NotNull
     public Secret getPassword() {
         return password;
     }
@@ -80,7 +81,7 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
     /**
      * {@inheritDoc}
      */
-    @NonNull
+    @NotNull
     public String getUsername() {
         return username;
     }
