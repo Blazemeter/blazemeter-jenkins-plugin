@@ -46,24 +46,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class ApiV3Impl implements Api {
+public class ApiImpl implements Api {
 
     private StdErrLog bzmLog = null;
     private Proxy proxy = null;
     private Authenticator auth = null;
-    private final String apiKey;
+    private final String credential;
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
+    private boolean legacy=false;
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl){
-        this(apiKey, blazeMeterUrl,new HttpLoggingInterceptor(),null);
+    public ApiImpl(String c, String blazeMeterUrl,boolean legacy){
+        this(c, blazeMeterUrl,new HttpLoggingInterceptor(),null,legacy);
     }
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog,StdErrLog bzmLog) {
-        this.apiKey = apiKey;
+    public ApiImpl(String c, String blazeMeterUrl,
+                     HttpLoggingInterceptor httpLog,StdErrLog bzmLog,
+                     boolean legacy) {
+        this.legacy=legacy;
+        this.credential = c;
         this.bzmLog = (bzmLog!=null?bzmLog:new StdErrLog(Constants.BZM_JEN));
-        urlManager = new UrlManagerV3Impl(blazeMeterUrl);
+        this.urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.proxy = Proxy.NO_PROXY;
@@ -71,7 +74,6 @@ public class ApiV3Impl implements Api {
             ProxyConfiguration proxyConf=null;
             try{
                 proxyConf=ProxyConfiguration.load();
-
             }catch (NullPointerException e){
                 this.bzmLog.info("Failed to load proxy configuration");
             }
@@ -96,12 +98,13 @@ public class ApiV3Impl implements Api {
                     };
                 }
             }
-            okhttp = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(httpLog).proxy(this.proxy)
-                    .addInterceptor(new RetryInterceptor(bzmLog))
-                    .proxyAuthenticator(this.auth).build();
+            this.okhttp = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(httpLog).proxy(this.proxy)
+                .addInterceptor(new RetryInterceptor(bzmLog))
+                .proxyAuthenticator(this.auth)
+                .build();
         } catch (Exception ex) {
             this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
@@ -111,14 +114,11 @@ public class ApiV3Impl implements Api {
     @Override
     public int getTestMasterStatusCode(String id) {
         int statusCode = 0;
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(id)) {
-            return statusCode;
-        }
         try {
             String url = this.urlManager.masterStatus(APP_KEY, id);
             Request r = new Request.Builder().url(url).get()
-                .addHeader(X_API_KEY, apiKey)
                 .addHeader(ACCEPT, APP_JSON)
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
@@ -136,17 +136,12 @@ public class ApiV3Impl implements Api {
     public TestStatus getTestStatus(String id) {
         TestStatus testStatus = null;
 
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(id)) {
-            testStatus = TestStatus.NotFound;
-            return testStatus;
-        }
-
         try {
             String url = this.urlManager.masterStatus(APP_KEY, id);
             Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
-            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
+                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConsts.RESULT);
             if (result.has(JsonConsts.DATA_URL) && result.get(JsonConsts.DATA_URL) == null) {
@@ -174,7 +169,6 @@ public class ApiV3Impl implements Api {
     @Override
     public synchronized HashMap<String, String> startTest(String testId, boolean collection) throws JSONException,
             IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         HashMap<String, String> startResp = new HashMap<String, String>();
         if(collection){
@@ -184,13 +178,12 @@ public class ApiV3Impl implements Api {
         }
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
-            .addHeader(X_API_KEY, apiKey)
             .addHeader(ACCEPT, APP_JSON)
-                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
+            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         Response rp = okhttp.newCall(r).execute();
         if (rp.code() == 500) {
             bzmLog.info("Server returned status = 500 while trying to start test.");
-            bzmLog.info("Make sure that you're not trying to start test with non-existent OPL");
             return startResp;
         }
         JSONObject jo = new JSONObject(rp.body().string());
@@ -240,13 +233,12 @@ public class ApiV3Impl implements Api {
 
     @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
-        if (StringUtils.isBlank(apiKey)) return 0;
         String url = this.urlManager.tests(APP_KEY);
 
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
-                .addHeader(X_API_KEY, apiKey)
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             if (jo == null) {
@@ -261,17 +253,19 @@ public class ApiV3Impl implements Api {
         } catch (RuntimeException e) {
             bzmLog.warn("Error getting response from server: ", e);
             return -1;
+        } catch (Exception e) {
+            bzmLog.warn("Error getting response from server: ", e);
+            return -1;
         }
     }
 
     @Override
     public JSONObject stopTest(String testId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = this.urlManager.testStop(APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -279,12 +273,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public void terminateTest(String testId) throws IOException{
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return;
         String url = this.urlManager.testTerminate(APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         okhttp.newCall(r).execute();
         return;
@@ -293,7 +286,6 @@ public class ApiV3Impl implements Api {
 
    @Override
     public JSONObject testReport(String reportId) {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, reportId);
         JSONObject summary = null;
@@ -301,7 +293,7 @@ public class ApiV3Impl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
-                .addHeader(X_API_KEY, apiKey)
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
             summary = (JSONObject) result.getJSONArray("summary")
@@ -323,21 +315,18 @@ public class ApiV3Impl implements Api {
     public LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
-        if (StringUtils.isBlank(apiKey)) {
-            return null;
-        } else {
             String url = this.urlManager.tests(APP_KEY);
             bzmLog.info("Getting testList with URL=" + url.substring(0, url.indexOf("?") + 14));
             try {
                 Request r = new Request.Builder().url(url).get()
                     .addHeader(ACCEPT, APP_JSON)
-                    .addHeader(X_API_KEY, apiKey)
+                    .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                     .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 JSONArray result = null;
 
                 if (jo.has(JsonConsts.ERROR) && (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) &&
-                        (((JSONObject) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401)) {
+                        (((JSONObject   ) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401)) {
                     return testListOrdered;
                 }
                 if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
@@ -385,30 +374,27 @@ public class ApiV3Impl implements Api {
             } finally {
                 return testListOrdered;
             }
-
-        }
     }
 
     @Override
     public JSONObject getUser() throws IOException,JSONException {
-        if (StringUtils.isBlank(apiKey)) return null;
         String url = this.urlManager.getUser(APP_KEY);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .build();
+
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
 
     @Override
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException, IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         bzmLog.info("Trying to get JTLZIP url for the sessionId = " + sessionId);
         String url = this.urlManager.getCIStatus(APP_KEY, sessionId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
         return jo;
@@ -422,11 +408,10 @@ public class ApiV3Impl implements Api {
 
     @Override
     public String retrieveJUNITXML(String masterId) throws IOException{
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return null;
         String url = this.urlManager.retrieveJUNITXML(APP_KEY, masterId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         String xmlJunit = okhttp.newCall(r).execute().body().string();
         return xmlJunit;
@@ -434,13 +419,12 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         bzmLog.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
         String url = this.urlManager.retrieveJTLZIP(APP_KEY, sessionId);
         bzmLog.info("Trying to retrieve JTLZIP json for the sessionId = " + sessionId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jtlzip = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jtlzip;
@@ -448,13 +432,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject generatePublicToken(String sessionId) throws IOException,JSONException{
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
-
         String url = this.urlManager.generatePublicToken(APP_KEY, sessionId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
             .addHeader(ACCEPT, APP_JSON)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo=new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -466,8 +448,8 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.listOfSessionIds(APP_KEY, masterId);
         Request r = new Request.Builder().url(url).get()
             .addHeader(ACCEPT, APP_JSON)
-        .addHeader(X_API_KEY, apiKey)
-        .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
+            .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
 
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -493,7 +475,7 @@ public class ApiV3Impl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                 .addHeader(ACCEPT, APP_JSON)
-                .addHeader(X_API_KEY, apiKey)
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                 .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = null;
@@ -531,7 +513,7 @@ public class ApiV3Impl implements Api {
         boolean ping=false;
         try{
             Request r = new Request.Builder().url(url).get()
-                .addHeader(X_API_KEY, apiKey)
+                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
                 .addHeader(ACCEPT, APP_JSON).build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             ping=jo.isNull(JsonConsts.ERROR);
@@ -544,13 +526,12 @@ public class ApiV3Impl implements Api {
 
     @Override
     public boolean notes(String note, String masterId) throws Exception {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
         String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
         String url = this.urlManager.masterId(APP_KEY, masterId);
         JSONObject noteJson = new JSONObject(noteEsc);
         RequestBody body = RequestBody.create(TEXT,noteJson.toString());
         Request r = new Request.Builder().url(url).patch(body)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -565,11 +546,10 @@ public class ApiV3Impl implements Api {
 
     @Override
     public boolean properties(JSONArray properties, String sessionId) throws Exception {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return false;
         String url = this.urlManager.properties(APP_KEY, sessionId);
         RequestBody body = RequestBody.create(JSON,properties.toString());
         Request r = new Request.Builder().url(url).post(body)
-            .addHeader(X_API_KEY, apiKey)
+            .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
             .build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -582,4 +562,35 @@ public class ApiV3Impl implements Api {
         return true;
     }
 
+    @Override
+    public String getCredential() {
+        return this.credential;
+    }
+    @Override
+    public JSONObject funcReport(final String masterId) throws Exception {
+
+        String url = this.urlManager.masterId(APP_KEY, masterId);
+        JSONObject fSummary = null;
+        JSONObject result = null;
+        try {
+            Request r = new Request.Builder().url(url).get()
+                .addHeader(ACCEPT, APP_JSON)
+                .addHeader(Api.AUTHORIZATION, this.credential)
+                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
+            if (result.has("functionalSummary")) {
+                fSummary = result.getJSONObject("functionalSummary");
+            }
+        } catch (JSONException je) {
+            bzmLog.warn("Functional report(result object): " + result);
+            bzmLog.warn("Error while parsing functional report: check common jenkins log and make sure that functional report" +
+                "is valid/not empty.", je);
+        } catch (Exception e) {
+            bzmLog.warn("Functional report(result object): " + result);
+            bzmLog.warn("Error while parsing functional report summary: check common jenkins log and make sure that functional report" +
+                "is valid/not empty.", e);
+        } finally {
+            return fSummary;
+        }
+    }
 }

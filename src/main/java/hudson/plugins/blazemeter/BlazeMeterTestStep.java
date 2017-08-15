@@ -13,6 +13,7 @@
  */
 package hudson.plugins.blazemeter;
 
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -20,12 +21,14 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
-import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.JobUtility;
+import hudson.plugins.blazemeter.utils.Utils;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -33,10 +36,13 @@ import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 public class BlazeMeterTestStep extends Step {
 
-    private String jobApiKey = "";
+    private String jobApiKey ="";
+
+    private String credentialsId = "";
 
     private String serverUrl = "";
 
@@ -55,8 +61,7 @@ public class BlazeMeterTestStep extends Step {
     private boolean getJunit = false;
 
     @DataBoundConstructor
-    public BlazeMeterTestStep(String jobApiKey,
-        String serverUrl,
+    public BlazeMeterTestStep(
         String testId,
         String notes,
         String sessionProperties,
@@ -66,21 +71,35 @@ public class BlazeMeterTestStep extends Step {
         boolean getJunit
 
     ) {
-        this.jobApiKey = jobApiKey;
-        this.serverUrl = serverUrl;
         this.testId = testId;
+        this.serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         this.jtlPath = jtlPath;
         this.junitPath = junitPath;
         this.getJtl = getJtl;
         this.getJunit = getJunit;
         this.notes = notes;
         this.sessionProperties = sessionProperties;
-
     }
+
+    @DataBoundSetter
+    public void setServerUrl(final String serverUrl) {
+        this.serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+    }
+
+    @DataBoundSetter
+    public void setCredentialsId(final String credentialsId) {
+        this.credentialsId = credentialsId;
+    }
+
+    @DataBoundSetter
+    public void setJobApiKey(final String jobApiKey) {
+        this.credentialsId = Utils.calcLegacyId(jobApiKey);
+    }
+
 
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {
-        return new BlazeMeterTestExecution(stepContext, this.jobApiKey,
+        return new BlazeMeterTestExecution(stepContext, this.credentialsId,
             this.serverUrl,
             this.testId,
             this.notes,
@@ -91,8 +110,8 @@ public class BlazeMeterTestStep extends Step {
             this.getJunit);
     }
 
-    public String getJobApiKey() {
-        return this.jobApiKey;
+    public String getCredentialsId() {
+        return this.credentialsId;
     }
 
     public String getServerUrl() {
@@ -131,7 +150,7 @@ public class BlazeMeterTestStep extends Step {
 
         private static final long serialVersionUID = 1L;
 
-        private String jobApiKey = "";
+        private String credentialsId = "";
 
         private String serverUrl = "";
 
@@ -155,7 +174,7 @@ public class BlazeMeterTestStep extends Step {
         private EnvVars v=null;
 
         protected BlazeMeterTestExecution(@Nonnull final StepContext context,
-            @Nonnull final String jobApiKey,
+            @Nonnull final String credentialsId,
             @Nonnull final String serverUrl,
             @Nonnull final String testId,
             @Nonnull final String notes,
@@ -166,7 +185,7 @@ public class BlazeMeterTestStep extends Step {
             @Nonnull final boolean getJunit) {
             super(context);
             this.context = context;
-            this.jobApiKey = jobApiKey;
+            this.credentialsId = credentialsId;
             this.serverUrl = serverUrl;
             this.testId = testId;
             this.notes = notes;
@@ -179,7 +198,7 @@ public class BlazeMeterTestStep extends Step {
 
         @Override
         protected Void run() throws Exception {
-            PerformanceBuilder pb = new PerformanceBuilder(this.jobApiKey,
+            PerformanceBuilder pb = new PerformanceBuilder(this.credentialsId,
                 this.serverUrl,
                 this.testId,
                 this.notes,
@@ -202,17 +221,34 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            Api api = new ApiV3Impl(this.jobApiKey, this.serverUrl);
-            if (api.active(this.testId)) {
-                String jobName = this.v.get("JOB_NAME");
-                String buildId = this.v.get("BUILD_ID");
-                String masterId = this.v.get(jobName + "-" + buildId + "-" + Constants.MASTER_ID);
-                if (!StringUtils.isBlank(masterId)) {
-                    JobUtility.stopMaster(api, masterId);
+            BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            String buildCr = "";
+            boolean legacy = false;
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+            } else {
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                legacy = true;
+            }
+
+            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+            String masterId = null;
+            FilePath fp = this.context.get(FilePath.class);
+            String buildId = this.v.get("BUILD_ID");
+            FilePath ld = new FilePath(fp, buildId);
+            List<FilePath> ldfp = ld.list();
+            for (FilePath p : ldfp) {
+                if (p.getBaseName().matches("\\d+")) {
+                    masterId = p.getBaseName();
+                    p.delete();
+                    break;
                 }
             }
+            if (!StringUtils.isBlank(masterId)) {
+                JobUtility.stopMaster(api, masterId);
+            }
         }
-
     }
 
     @Extension

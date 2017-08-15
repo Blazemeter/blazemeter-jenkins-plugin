@@ -22,8 +22,7 @@ public interface UrlManager {
     String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
             + JobUtility.version();
 
-    String LATEST="/api/latest";
-    String TESTS="/tests";
+    String V4 ="/api/v4";
     String MASTERS="/masters";
     String SESSIONS="/sessions";
     String WEB="/web";
@@ -63,5 +62,6 @@ public interface UrlManager {
     String version(String appKey);
 
     String properties(String appKey, String sessionId);
+
 }
 

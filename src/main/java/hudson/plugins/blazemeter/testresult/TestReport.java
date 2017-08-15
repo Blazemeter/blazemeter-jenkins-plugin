@@ -17,14 +17,14 @@ import org.json.JSONObject;
  * limitations under the License.
  */
 
-public class AgrReport {
+public class TestReport {
     public double average;
     public double min;
     public double max;
     public double errorPercentage;
     public double hits;
 
-    public AgrReport(JSONObject json) throws JSONException {
+    public TestReport(JSONObject json) throws JSONException {
         this.average = json.getDouble("avg");
         this.min = json.getDouble("min");
         this.max = json.getDouble("max");

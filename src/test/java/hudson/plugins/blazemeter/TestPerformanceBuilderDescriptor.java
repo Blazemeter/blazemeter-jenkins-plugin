@@ -15,8 +15,6 @@
 package hudson.plugins.blazemeter;
 
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,30 +34,4 @@ public class TestPerformanceBuilderDescriptor {
         Assert.assertEquals(Constants.A_BLAZEMETER_COM + 123, bd.getBlazeMeterURL());
 
     }
-
-    @Test
-    public void no_api_key() {
-       BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-        try {
-            ListBoxModel lbm = bd.doFillTestIdItems(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.TEST_5039530_ID);
-            Assert.assertTrue(lbm.size()==1);
-            Assert.assertEquals(lbm.get(0).name,Constants.NO_API_KEY);
-        } catch (FormValidation formValidation) {
-            formValidation.printStackTrace();
-        }
-    }
-
-    @Test
-    public void do_fill_api_key_items() {
-        BlazeMeterPerformanceBuilderDescriptor bd = new BlazeMeterPerformanceBuilderDescriptor();
-        try {
-            bd.setBlazeMeterURL(TestConstants.mockedApiUrl);
-            ListBoxModel itemds=bd.doFillJobApiKeyItems(TestConstants.MOCKED_USER_KEY_VALID);
-            Assert.assertEquals(0,itemds.size());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }

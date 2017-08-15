@@ -23,7 +23,10 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.blazemeter.api.Api;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
@@ -31,7 +34,10 @@ import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
+import java.util.List;
 import javax.annotation.Nonnull;
+import okhttp3.Credentials;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -39,6 +45,8 @@ import org.kohsuke.stapler.StaplerRequest;
 public class PerformanceBuilder extends Builder{
 
     private String jobApiKey = "";
+
+    private String credentialsId = "";
 
     private String serverUrl = "";
 
@@ -58,7 +66,7 @@ public class PerformanceBuilder extends Builder{
 
 
     @DataBoundConstructor
-    public PerformanceBuilder(String jobApiKey,
+    public PerformanceBuilder(String credentialsId,
                               String serverUrl,
                               String testId,
                               String notes,
@@ -68,7 +76,7 @@ public class PerformanceBuilder extends Builder{
                               boolean getJtl,
                               boolean getJunit
     ) {
-        this.jobApiKey = jobApiKey;
+        this.credentialsId = credentialsId;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
@@ -91,17 +99,35 @@ public class PerformanceBuilder extends Builder{
         EnvVars v) throws InterruptedException, IOException {
         Result r = null;
         BuildReporter br = new BuildReporter();
+        boolean credentialsPresent = false;
+        String buildCr = "";
+        boolean legacy=false;
         try {
-            boolean valid = Utils.credPresent(this.jobApiKey, CredentialsScope.GLOBAL);
-            if (!valid) {
-                listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0, 3) + "... is absent in credentials store.");
+            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
+                Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
+
+            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
+            credentialsPresent = !StringUtils.isBlank(credential.getId());
+
+            if (!credentialsPresent) {
+                listener.error("Can not start build: userKey=" + this.credentialsId + "... is absent in credentials store.");
                 r = Result.NOT_BUILT;
                 run.setResult(r);
                 return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
-            b.setJobApiKey(this.jobApiKey);
-            b.setServerUrl(this.serverUrl != null ? this.serverUrl : Constants.A_BLAZEMETER_COM);
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+                legacy=false;
+            } else {
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                b.setCredLegacy(true);
+                legacy = true;
+            }
+            b.setCredential(buildCr);
+            String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+            b.setServerUrl(this.serverUrl != null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
@@ -124,6 +150,25 @@ public class PerformanceBuilder extends Builder{
             r = c.call(b);
         } catch (InterruptedException e) {
             r = Result.ABORTED;
+            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+            String masterId = null;
+            String buildId = run.getId();
+            FilePath ld = new FilePath(workspace, buildId);
+            List<FilePath> ldfp = ld.list();
+            for (FilePath p : ldfp) {
+                if (p.getBaseName().matches("\\d+")) {
+                    masterId = p.getBaseName();
+                    p.delete();
+                    break;
+                }
+            }
+            if (!StringUtils.isBlank(masterId)) {
+                try {
+                    JobUtility.stopMaster(api, masterId);
+                } catch (Exception e1) {
+                    listener.error("Failure while stopping master session = " + e1);
+                }
+            }
         } catch (Exception e) {
             r = Result.FAILURE;
         } finally {
@@ -140,12 +185,12 @@ public class PerformanceBuilder extends Builder{
     }
 
 
-    public String getJobApiKey() {
-        return jobApiKey;
+    public String getCredentialsId() {
+        return StringUtils.isBlank(this.credentialsId)?this.jobApiKey:this.credentialsId;
     }
 
-    public void setJobApiKey(String jobApiKey) {
-        this.jobApiKey = jobApiKey;
+    public void setCredentialsId(String credentialsId) {
+        this.credentialsId = credentialsId;
     }
 
     public String getTestId() {
@@ -196,6 +241,13 @@ public class PerformanceBuilder extends Builder{
         this.sessionProperties = sessionProperties;
     }
 
+    public String getJobApiKey() {
+        return this.jobApiKey;
+    }
+
+    public void setJobApiKey(final String jobApiKey) {
+        this.jobApiKey = jobApiKey;
+    }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})

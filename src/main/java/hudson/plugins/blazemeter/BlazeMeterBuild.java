@@ -20,7 +20,7 @@ import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiV3Impl;
+import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.api.HttpLogger;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -44,7 +44,10 @@ import org.json.JSONException;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
-    private String jobApiKey = "";
+
+    private boolean credLegacy=false;
+
+    private String credential = null;
 
     private String serverUrl = "";
 
@@ -97,20 +100,44 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         HttpLoggingInterceptor.Logger httpLogger = new HttpLogger(httpLog_f.getAbsolutePath());
         HttpLoggingInterceptor httpLog = new HttpLoggingInterceptor(httpLogger);
 
-        Api api = new ApiV3Impl(this.jobApiKey,this.serverUrl,httpLog,bzmLog);
+        File mf = null;
+        Api api = new ApiImpl(this.credential, this.serverUrl, httpLog, bzmLog,this.credLegacy);
+        if (this.credLegacy) {
+            lentry.append("==================================================================================================================================================");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("YOU'RE CURRENTLY USING LEGACY KEY WHICH IS DEPRECATED.");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("PLEASE, FOLLOW THE LINK FROM BELOW AND MIGRATE TO NEW API KEY.");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+            lentry.append("==================================================================================================================================================");
+            consLog.debug(lentry.toString());
+            lentry.setLength(0);
+        }
 
-        String userEmail = JobUtility.getUserEmail(this.jobApiKey, this.serverUrl);
-        String apiKeyTrimmed = this.jobApiKey.substring(0, ENCRYPT_CHARS_NUM)+"...";
+        String userEmail = JobUtility.getUserEmail(api);
         if (userEmail.isEmpty()) {
-            lentry.append("Please, check that settings are valid.");
+            lentry.append("Please, check that credentials are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
-
-            lentry.append("UserKey = " + apiKeyTrimmed + ", serverUrl = " + this.serverUrl);
+            lentry.append("Please, check that settings(credentials & serverUrl) are valid.");
             bzmLog.info(lentry.toString());
             consLog.info(lentry.toString());
             lentry.setLength(0);
+            try {
+                bzmLog.info(lentry.toString());
+                lentry.setLength(0);
+                ((HttpLogger) httpLogger).close();
+            } catch (Exception e) {
+                lentry.append(e);
+                bzmLog.info(lentry.toString());
+            }
 
             ProxyConfiguration proxy = ProxyConfiguration.load();
             if (proxy != null) {
@@ -136,16 +163,10 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 consLog.info(lentry.toString());
                 lentry.setLength(0);
             }
-            ((HttpLogger) httpLogger).close();
             return Result.FAILURE;
         }
 
         lentry.append("BlazeMeter plugin version = " + JobUtility.version());
-        bzmLog.info(lentry.toString());
-        consLog.info(lentry.toString());
-        lentry.setLength(0);
-
-        lentry.append("User key = " + apiKeyTrimmed + " is valid with " + this.serverUrl);
         bzmLog.info(lentry.toString());
         consLog.info(lentry.toString());
         lentry.setLength(0);
@@ -158,12 +179,13 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String testId_num = Utils.getTestId(this.testId);
         boolean collection = false;
         try {
-            collection = JobUtility.collection(testId_num, this.jobApiKey, this.serverUrl);
+            collection = JobUtility.collection(testId_num, api);
         } catch (Exception e) {
             lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
             consLog.warn(lentry.toString());
             lentry.setLength(0);
+//          return Result.FAILURE;
         }
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
@@ -182,7 +204,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         try {
             startTestResp = api.startTest(testId_num, collection);
             if (startTestResp.size()==0) {
-                lentry.append("Unable to start test: possible reasion - test with non-existent OPL");
+                lentry.append("Server returned status = 500 while trying to start test.");
                 consLog.warn(lentry.toString());
                 lentry.setLength(0);
                 return Result.FAILURE;
@@ -191,18 +213,24 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
                 throw new NumberFormatException(startTestResp.get(JsonConsts.ERROR));
             }
             masterId=startTestResp.get(JsonConsts.ID);
+            mf = new File(ld,masterId);
+            FileUtils.touch(mf);
             Integer.parseInt(masterId);
         } catch (JSONException e) {
             lentry.append("Unable to start test: check userKey, testId, server url.");
             consLog.warn(lentry.toString()+e.getMessage());
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             return Result.FAILURE;
         }catch (NumberFormatException e) {
             lentry.append("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
             consLog.warn(lentry.toString());
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             throw new Exception("Error while starting BlazeMeter Test: "+masterId+" "+e.getMessage());
         }
         catch (Exception e) {
@@ -210,9 +238,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             consLog.warn(lentry.toString()+e.getMessage());
             bzmLog.warn(lentry.toString(), e);
             lentry.setLength(0);
-            return Result.FAILURE;
-        }finally {
             ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
+            return Result.FAILURE;
         }
 
 
@@ -268,6 +296,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             bzmLog.warn(lentry.toString());
             lentry.setLength(0);
             result = Result.ABORTED;
+            ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
             return result;
         } catch (Exception e) {
             lentry.append("Job was stopped due to unknown reason");
@@ -319,6 +349,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
             }
              console_logger.close();
             ((HttpLogger) httpLogger).close();
+            FileUtils.forceDelete(mf);
 
         }
     }
@@ -333,8 +364,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
     }
 
 
-    public void setJobApiKey(String jobApiKey) {
-        this.jobApiKey = jobApiKey;
+    public void setCredential(String credential) {
+        this.credential = credential;
     }
 
     public String getTestId() {
@@ -393,5 +424,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     public void setListener(TaskListener listener) {
         this.listener = listener;
+    }
+
+    public void setCredLegacy(final boolean credLegacy) {
+        this.credLegacy = credLegacy;
     }
 }
