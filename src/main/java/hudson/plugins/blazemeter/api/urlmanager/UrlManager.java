@@ -58,5 +58,9 @@ public interface UrlManager {
 
     String properties(String appKey, String sessionId);
 
+    String workspaces(String appKey, int accountId);
+
+    String accounts(String appKey);
+
 }
 

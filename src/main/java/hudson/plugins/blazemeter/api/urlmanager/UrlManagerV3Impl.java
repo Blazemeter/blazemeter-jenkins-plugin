@@ -190,5 +190,25 @@ public class UrlManagerV3Impl implements UrlManager {
         }
         return serverUrl + V4 +UrlManager.SESSIONS+"/"+sessionId+"/properties?target=all&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
+
+    @Override
+    public String workspaces(String appKey, int accountId) {
+        try {
+            appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return serverUrl + V4 + "/workspaces?limit=1000&enabled=true&app_key=" + appKey + "&"+"accountId="+accountId+CLIENT_IDENTIFICATION;
+    }
+
+    @Override
+    public String accounts(String appKey) {
+        try {
+            appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return serverUrl + V4 + "/accounts?app_key=" + appKey + "&" + CLIENT_IDENTIFICATION;
+    }
 }
 

@@ -77,4 +77,9 @@ public interface Api {
     String getCredential();
 
     JSONObject funcReport(String masterId) throws Exception;
+
+    HashMap<Integer, String> accounts();
+
+    HashMap<Integer, String> workspaces();
+
 }

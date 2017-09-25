@@ -27,6 +27,7 @@ import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -69,7 +70,6 @@ public class ApiImpl implements Api {
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.proxy = Proxy.NO_PROXY;
-//            this.auth = Authenticator.NONE;
             ProxyConfiguration proxyConf=null;
             try{
                 proxyConf=ProxyConfiguration.load();
@@ -510,4 +510,77 @@ public class ApiImpl implements Api {
             return fSummary;
         }
     }
+
+
+    @Override
+    public HashMap<Integer,String> accounts() {
+        String url = this.urlManager.accounts(APP_KEY);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+                .addHeader(AUTHORIZATION, this.credential).build();
+        JSONObject jo = null;
+        JSONArray result = null;
+        JSONObject dp = null;
+        HashMap<Integer, String> acs = new HashMap<Integer, String>();
+        try {
+            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+        } catch (Throwable e) {
+            bzmLog.warn("Failed to get accounts: " + e);
+            return acs;
+        }
+        try {
+            result = jo.getJSONArray(JsonConsts.RESULT);
+        } catch (Exception e) {
+            bzmLog.warn("Failed to get accounts: " + e);
+            return acs;
+        }
+        try {
+            for (int i = 0; i < result.length(); i++) {
+                JSONObject a = result.getJSONObject(i);
+                acs.put(a.getInt(JsonConsts.ID),a.getString(JsonConsts.NAME));
+            }
+        } catch (Exception e) {
+            bzmLog.warn("Failed to get accounts: " + e);
+            return acs;
+        }
+        return acs;
+    }
+
+    @Override
+    public HashMap<Integer, String> workspaces() {
+        HashMap<Integer, String> acs = this.accounts();
+        HashMap<Integer, String> ws = new HashMap<Integer, String>();
+
+        Set<Integer> keys = acs.keySet();
+        for (Integer key : keys) {
+            String url = this.urlManager.workspaces(APP_KEY, key);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+                    .addHeader(AUTHORIZATION, this.credential).build();
+            JSONObject jo = null;
+            JSONArray result = null;
+            try {
+                jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+            } catch (Exception ioe) {
+                bzmLog.warn("Failed to get workspaces: " + ioe);
+                return ws;
+            }
+            try {
+                result = jo.getJSONArray(JsonConsts.RESULT);
+            } catch (Exception e) {
+                bzmLog.warn("Failed to get workspaces: " + e);
+                return ws;
+            }
+            try {
+
+                for (int i = 0; i < result.length(); i++) {
+                    JSONObject s = result.getJSONObject(i);
+                    ws.put(s.getInt(JsonConsts.ID), s.getString(JsonConsts.NAME));
+                }
+            } catch (Exception e) {
+                bzmLog.warn("Failed to get workspaces: " + e);
+                return ws;
+            }
+        }
+        return ws;
+    }
+
 }
