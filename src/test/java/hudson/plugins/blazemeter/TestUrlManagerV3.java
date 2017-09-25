@@ -1,5 +1,5 @@
 /**
- Copyright 2016 BlazeMeter Inc.
+ Copyright 2017 BlazeMeter Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestUrlManagerV3 {
-    private String userKey="881a84b35e97c4342bf11";
     private String appKey="jnk100x987c06f4e10c4";
     private String testId="123456789";
     private String masterId ="987654321";
     private String sessionId ="r-v3-57230c5251da9";
-    private String fileName="111111111";
     private UrlManager bmUrlManager=new UrlManagerV3Impl(TestConstants.mockedApiUrl);
 
     @Test
@@ -121,14 +119,6 @@ public class TestUrlManagerV3 {
         String expActiveTests=bmUrlManager.getServerUrl()+UrlManager.V4 +"/web/active?app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
         String actActiveTests=bmUrlManager.activeTests(appKey);
         Assert.assertEquals(expActiveTests,actActiveTests);
-    }
-
-    @Test
-    public void version(){
-        String expVersion=bmUrlManager.getServerUrl()+ UrlManager.V4 +
-                UrlManager.WEB+"/version?app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
-        String actVersion=bmUrlManager.version(appKey);
-        Assert.assertEquals(expVersion,actVersion);
     }
 
     @Test

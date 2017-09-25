@@ -1,5 +1,5 @@
 /**
- Copyright 2016 BlazeMeter Inc.
+ Copyright 2017 BlazeMeter Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -48,13 +48,12 @@ import org.json.JSONObject;
 
 public class ApiImpl implements Api {
 
-    private StdErrLog bzmLog = null;
-    private Proxy proxy = null;
-    private Authenticator auth = null;
+    private StdErrLog bzmLog;
+    private Proxy proxy;
     private final String credential;
     UrlManager urlManager;
-    private OkHttpClient okhttp = null;
-    private boolean legacy=false;
+    private OkHttpClient okhttp;
+    private boolean legacy;
 
     public ApiImpl(String c, String blazeMeterUrl,boolean legacy){
         this(c, blazeMeterUrl,new HttpLoggingInterceptor(),null,legacy);
@@ -70,13 +69,14 @@ public class ApiImpl implements Api {
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.proxy = Proxy.NO_PROXY;
-            this.auth = Authenticator.NONE;
+//            this.auth = Authenticator.NONE;
             ProxyConfiguration proxyConf=null;
             try{
                 proxyConf=ProxyConfiguration.load();
             }catch (NullPointerException e){
                 this.bzmLog.info("Failed to load proxy configuration");
             }
+            Authenticator auth=Authenticator.NONE;
             if (proxyConf != null) {
                 if (!StringUtils.isBlank(proxyConf.name)) {
                     this.proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyConf.name, proxyConf.port));
@@ -84,7 +84,7 @@ public class ApiImpl implements Api {
                 if (!StringUtils.isBlank(proxyConf.getUserName()) && !StringUtils.isBlank(proxyConf.getPassword())) {
                     final String proxyUser = proxyConf.getUserName();
                     final String proxyPass = proxyConf.getPassword();
-                    this.auth = new Authenticator() {
+                    auth = new Authenticator() {
                         @Override
                         public Request authenticate(Route route, Response response) throws IOException {
                             String credential = Credentials.basic(proxyUser, proxyPass);
@@ -103,7 +103,7 @@ public class ApiImpl implements Api {
                 .readTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(httpLog).proxy(this.proxy)
                 .addInterceptor(new RetryInterceptor(bzmLog))
-                .proxyAuthenticator(this.auth)
+                .proxyAuthenticator(auth)
                 .build();
         } catch (Exception ex) {
             this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
@@ -504,24 +504,6 @@ public class ApiImpl implements Api {
             bzmLog.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
             return false;
         }
-    }
-
-    @Override
-    public boolean ping() throws Exception{
-        String url = this.urlManager.version(APP_KEY);
-        JSONObject jo=null;
-        boolean ping=false;
-        try{
-            Request r = new Request.Builder().url(url).get()
-                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
-                .addHeader(ACCEPT, APP_JSON).build();
-            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-            ping=jo.isNull(JsonConsts.ERROR);
-        }catch (Exception e){
-            bzmLog.info("Failed to ping server: "+jo,e);
-            throw e;
-        }
-        return ping;
     }
 
     @Override

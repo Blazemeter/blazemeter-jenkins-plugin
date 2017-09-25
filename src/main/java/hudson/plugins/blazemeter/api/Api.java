@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,6 @@ public interface Api {
     JSONObject generatePublicToken(String sessionId)throws IOException,JSONException;
 
     String getBlazeMeterURL();
-
-    boolean ping() throws Exception;
 
     boolean notes(String note,String masterId)throws Exception;
 

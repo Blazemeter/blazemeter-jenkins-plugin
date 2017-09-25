@@ -1,5 +1,5 @@
 /**
- Copyright 2016 BlazeMeter Inc.
+ Copyright 2017 BlazeMeter Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ public interface UrlManager {
     String V4 ="/api/v4";
     String MASTERS="/masters";
     String SESSIONS="/sessions";
-    String WEB="/web";
     String CI_STATUS="/ci-status";
     String getServerUrl();
 
@@ -58,8 +57,6 @@ public interface UrlManager {
     String generatePublicToken(String appKey, String sessionId);
 
     String listOfSessionIds(String appKey, String masterId);
-
-    String version(String appKey);
 
     String properties(String appKey, String sessionId);
 
