@@ -52,8 +52,6 @@ public class TestApiImpl {
         MockedAPI.userProfile();
         MockedAPI.getMasterStatus();
         MockedAPI.startTest();
-        MockedAPI.active();
-        MockedAPI.ping();
         MockedAPI.getTestReport();
         MockedAPI.getTests();
         MockedAPI.notes();
@@ -93,63 +91,6 @@ public class TestApiImpl {
             TestConstants.mockedApiUrl,/*TODO*/false);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
             "15105877");
-    }
-
-    @Test
-    @Ignore
-    public void active() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
-        boolean active = blazemeterApiV3.active("5133848");
-        Assert.assertTrue(active);
-    }
-
-    @Test
-    @Ignore
-    public void activeNot() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
-        boolean active = blazemeterApiV3.active("51338483");
-        Assert.assertFalse(active);
-    }
-
-    @Test
-    @Ignore
-    public void ping_true() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        Assert.assertTrue(ping);
-    }
-
-    @Test
-    @Ignore
-    public void ping_false() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        blazemeterApiV3 = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.assertFalse(ping);
-        }
     }
 
     @Test

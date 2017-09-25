@@ -115,13 +115,6 @@ public class TestUrlManagerV3 {
     }
 
     @Test
-    public void activeTests(){
-        String expActiveTests=bmUrlManager.getServerUrl()+UrlManager.V4 +"/web/active?app_key="+appKey+ UrlManager.CLIENT_IDENTIFICATION;
-        String actActiveTests=bmUrlManager.activeTests(appKey);
-        Assert.assertEquals(expActiveTests,actActiveTests);
-    }
-
-    @Test
     public void masterId(){
         String expMasterId=bmUrlManager.getServerUrl()+ UrlManager.V4 +UrlManager.MASTERS+"/"+masterId+"?app_key="+appKey+
                 UrlManager.CLIENT_IDENTIFICATION;;

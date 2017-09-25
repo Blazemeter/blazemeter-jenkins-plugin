@@ -190,32 +190,6 @@ public class ApiImpl implements Api {
         if (jo == null) {
             if (bzmLog.isDebugEnabled())
                 bzmLog.debug("Received NULL from server while start operation: will do 5 retries");
-            boolean isActive = this.active(testId);
-            if (!isActive) {
-                int retries = 1;
-                while (retries < 6) {
-                    try {
-                        if (bzmLog.isDebugEnabled())
-                            bzmLog.debug("Trying to repeat start request: " + retries + " retry.");
-                        bzmLog.debug("Pausing thread for " + 10 * retries + " seconds before doing " + retries + " retry.");
-                        Thread.sleep(10000 * retries);
-                        jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-                        if (jo != null) {
-                            break;
-                        }
-                    } catch (InterruptedException ie) {
-                        if (bzmLog.isDebugEnabled())
-                            bzmLog.debug("Start operation was interrupted at pause during " + retries + " request retry.");
-                    } catch (Exception ex) {
-                        if (bzmLog.isDebugEnabled())
-                            bzmLog.debug("Received bad response from server while starting test: " + retries + " retry.");
-                    } finally {
-                        retries++;
-                    }
-                }
-
-
-            }
         }
         JSONObject result = null;
         try {
@@ -464,45 +438,6 @@ public class ApiImpl implements Api {
             bzmLog.info("Failed to get list of sessions from JSONObject " + jo, e);
         } finally {
             return sessionsIds;
-        }
-    }
-
-    @Override
-    public boolean active(String testId) {
-        boolean isActive=false;
-        String url = this.urlManager.activeTests(APP_KEY);
-        JSONObject jo = null;
-        try {
-            Request r = new Request.Builder().url(url).get()
-                .addHeader(ACCEPT, APP_JSON)
-                .addHeader(legacy?X_API_KEY:AUTHORIZATION,this.credential)
-                .addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
-            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-            JSONObject result = null;
-            if (jo.has(JsonConsts.RESULT) && (!jo.get(JsonConsts.RESULT).equals(JSONObject.NULL))) {
-                result = (JSONObject) jo.get(JsonConsts.RESULT);
-                JSONArray tests = (JSONArray) result.get(JsonConsts.TESTS);
-                for(int i=0;i<tests.length();i++){
-                    if(String.valueOf(tests.getInt(i)).equals(testId)){
-                        isActive=true;
-                        return isActive;
-                    }
-                }
-                JSONArray collections = (JSONArray) result.get(JsonConsts.COLLECTIONS);
-                for(int i=0;i<collections.length();i++){
-                    if(String.valueOf(collections.getInt(i)).equals(testId)){
-                        isActive=true;
-                        return isActive;
-                    }
-                }
-            }
-            return isActive;
-        } catch (JSONException je) {
-            bzmLog.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
-            return false;
-        } catch (Exception e) {
-            bzmLog.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
-            return false;
         }
     }
 

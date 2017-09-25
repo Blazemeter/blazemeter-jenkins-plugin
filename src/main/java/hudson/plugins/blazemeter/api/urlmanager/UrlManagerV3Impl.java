@@ -41,7 +41,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             return NO_URL;
         }
-         return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/status?events=false&app_key="+appKey+ CLIENT_IDENTIFICATION;;
+         return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/status?events=false&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             return NO_URL;
         }
-        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/reports/main/summary?app_key="+appKey+ CLIENT_IDENTIFICATION;;
+        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/reports/main/summary?app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -169,18 +169,6 @@ public class UrlManagerV3Impl implements UrlManager {
             return NO_URL;
         }
         return serverUrl + V4 + MASTERS + "/" + masterId + UrlManager.SESSIONS + "?app_key=" + appKey + CLIENT_IDENTIFICATION;
-    }
-
-    @Override
-    public String activeTests(String appKey) {
-        String activeTests=null;
-        try {
-            appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            return NO_URL;
-        }
-        return activeTests= serverUrl + V4 +WEB+"/active?app_key="+appKey+ CLIENT_IDENTIFICATION;
-
     }
 
     @Override

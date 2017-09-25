@@ -60,8 +60,6 @@ public interface Api {
 
     JSONObject getCIStatus(String sessionId) throws JSONException, IOException;
 
-    boolean active(String testId);
-
     String retrieveJUNITXML(String sessionId) throws IOException;
 
     JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException;

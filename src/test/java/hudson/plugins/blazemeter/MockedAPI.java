@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,23 +39,6 @@ public class MockedAPI {
 
     public static void startAPI() {
         mockServer = startClientAndServer(TestConstants.mockedApiPort);
-    }
-
-    public static void ping() throws IOException {
-        File jsonFile = new File(TestConstants.RESOURCES + "/ping_true.json");
-        String ping_true = FileUtils.readFileToString(jsonFile);
-
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(UrlManager.V4 + "/web/version")
-                .withHeader("Accept", "application/json"),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(ping_true));
-
     }
 
     public static void stopMaster() throws IOException {
@@ -553,23 +536,6 @@ public class MockedAPI {
             .respond(
                 response().withHeader("application/json")
                     .withStatusCode(200).withBody(getTests));
-/*
-
-        File returnFile = new File(TestConstants.RESOURCES + "/getTestType.json");
-        String returnStr = FileUtils.readFileToString(returnFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.X_API_KEY, TestConstants.MOCKED_USER_KEY_TEST_TYPE),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(returnStr));
-
-*/
     }
 
 
@@ -787,26 +753,7 @@ public class MockedAPI {
 
     }
 
-
-    public static void active() throws IOException {
-        String credential = Credentials.basic(TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-
-        String expectedPath = UrlManager.V4 + "/web/active";
-        File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
-        String active = FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-            request()
-                .withMethod("GET")
-                .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
-                .withHeader(Api.AUTHORIZATION, credential),
-            unlimited()
-        )
-            .respond(
-                response().withHeader("application/json")
-                    .withStatusCode(200).withBody(active));
-    }
-    public static void stopAPI() {
+     public static void stopAPI() {
         mockServer.reset();
         mockServer.stop();
     }

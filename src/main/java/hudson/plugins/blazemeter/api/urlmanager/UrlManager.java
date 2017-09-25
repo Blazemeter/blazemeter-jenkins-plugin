@@ -32,8 +32,6 @@ public interface UrlManager {
 
     String tests(String appKey);
 
-    String activeTests(String appKey);
-
     String masterId(String appKey, String masterId);
 
     String testStart(String appKey, String testId);
