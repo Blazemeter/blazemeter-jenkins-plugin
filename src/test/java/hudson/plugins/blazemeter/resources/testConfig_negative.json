@@ -1,8 +1,0 @@
-{
-  "error": {
-    "code": 404,
-    "message": "Not Found: Test not found"
-  },
-  "api_version": 2,
-  "result": null
-}

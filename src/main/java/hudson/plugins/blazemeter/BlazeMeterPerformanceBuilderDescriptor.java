@@ -19,6 +19,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
@@ -51,23 +52,23 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
     private String name = "My BlazeMeter Account";
-    private static BlazeMeterPerformanceBuilderDescriptor descriptor=null;
+    private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
-        load();
-        descriptor=this;
+        this.load();
+        BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
     }
 
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
         super(PerformanceBuilder.class);
-        load();
+        this.load();
         this.blazeMeterURL=blazeMeterURL;
-        descriptor=this;
+        BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
     }
 
     public static BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
-        return descriptor;
+        return BlazeMeterPerformanceBuilderDescriptor.descriptor;
     }
 
     @Override
@@ -83,7 +84,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId")String crid,
         @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
+        List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
         BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
             if (creds.size() > 0) {
@@ -130,20 +131,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 Set set = testList.entries();
                 for (Object test : set) {
                     Map.Entry me = (Map.Entry) test;
-                    String testId = String.valueOf(me.getKey() + "(" + me.getValue() + ")");
+                    String testId = (String) me.getValue();
                     items.add(new ListBoxModel.Option(testId, testId, testId.contains(savedTestId)));
                 }
             }
         } catch (Exception e) {
             throw FormValidation.error(e.getMessage(), e);
         }
-        Comparator c = new Comparator<ListBoxModel.Option>() {
-            @Override
-            public int compare(ListBoxModel.Option o1, ListBoxModel.Option o2) {
-                return o1.name.compareToIgnoreCase(o2.name);
-            }
-        };
-        Collections.sort(items, c);
         return items;
     }
 
@@ -211,15 +205,15 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+    public boolean configure(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
         this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
-        save();
+        this.save();
         return true;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -227,7 +221,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public String getBlazeMeterURL() {
-        return blazeMeterURL;
+        return this.blazeMeterURL;
     }
 
     public void setBlazeMeterURL(String blazeMeterURL) {

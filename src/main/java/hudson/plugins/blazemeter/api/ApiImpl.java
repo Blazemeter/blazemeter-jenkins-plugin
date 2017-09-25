@@ -315,7 +315,7 @@ public class ApiImpl implements Api {
                 };
                 wst.entries().stream().sorted(c).
                         forEach(entry -> testListOrdered.put(
-                                entry.getKey(), entry.getValue()));
+                                ((Map.Entry<String, String>) entry).getKey(), ((Map.Entry<String, String>) entry).getValue()));
             } catch (Exception e) {
                 this.bzmLog.warn("Exception while getting tests: ", e);
                 this.bzmLog.warn("Check connection/proxy settings");

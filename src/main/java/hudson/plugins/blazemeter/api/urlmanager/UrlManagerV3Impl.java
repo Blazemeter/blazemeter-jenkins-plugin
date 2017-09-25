@@ -51,7 +51,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             return this.NO_URL;
         }
-        return this.serverUrl + UrlManager.V4 + "/web/tests?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
+        return serverUrl + V4+"/tests?limit=10000&workspaceId="+workspaceId+"&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override

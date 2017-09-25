@@ -20,6 +20,7 @@ import hudson.model.Result;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;

@@ -1,6 +1,6 @@
 /**
  * Copyright 2016 BlazeMeter Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@ import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestReport;
 import hudson.util.FormValidation;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.mail.MessagingException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
@@ -56,7 +58,7 @@ public class JobUtility {
     }
 
     public static void waitForFinish(Api api, String testId, AbstractLogger bzmLog,
-        String masterId) throws InterruptedException {
+                                     String masterId) throws InterruptedException {
         Date start = null;
         long lastPrint = 0;
         while (true) {
@@ -65,8 +67,8 @@ public class JobUtility {
 
             if (!testStatus.equals(TestStatus.Running)) {
                 bzmLog.info("BlazeMeter TestStatus for masterId " +
-                    masterId
-                    + " is not 'Running': finishing build.... ");
+                        masterId
+                        + " is not 'Running': finishing build.... ");
                 bzmLog.info("Timestamp: " + Calendar.getInstance().getTime());
                 break;
             }
@@ -123,10 +125,10 @@ public class JobUtility {
     }
 
     public static void saveReport(String reportName,
-        String report,
-        FilePath filePath,
-        StdErrLog bzmLog,
-        StdErrLog consLog) {
+                                  String report,
+                                  FilePath filePath,
+                                  StdErrLog bzmLog,
+                                  StdErrLog consLog) {
         FilePath junit = null;
         StringBuilder letnry = new StringBuilder();
         letnry.append("ERROR: Failed to save XML report to filepath=");
@@ -301,7 +303,7 @@ public class JobUtility {
     }
 
     public static void downloadJtlReports(HashMap<String, String> jtlUrls, FilePath filePath,
-        StdErrLog bzmBuildLog, StdErrLog consLog) {
+                                          StdErrLog bzmBuildLog, StdErrLog consLog) {
         Set<String> sessionsIds = jtlUrls.keySet();
         for (String s : sessionsIds) {
             FilePath jtl = new FilePath(filePath, s + Constants.BM_ARTEFACTS);
@@ -310,7 +312,7 @@ public class JobUtility {
     }
 
     public static void retrieveJUNITXMLreport(Api api, String masterId,
-        FilePath junitPath, StdErrLog bzmLog, StdErrLog consLog) {
+                                              FilePath junitPath, StdErrLog bzmLog, StdErrLog consLog) {
         String junitReport = "";
         bzmLog.info("Requesting JUNIT report from server, masterId=" + masterId);
         consLog.info("Requesting JUNIT report from server, masterId=" + masterId);
@@ -329,17 +331,17 @@ public class JobUtility {
     }
 
     public static Result postProcess(
-        FilePath workspace,
-        String buildId,
-        Api api,
-        String masterId,
-        EnvVars envVars,
-        boolean isJunit,
-        String junitPathStr,
-        boolean isJtl,
-        String jtlPathStr,
-        StdErrLog bzmLog,
-        StdErrLog consLog) throws InterruptedException {
+            FilePath workspace,
+            String buildId,
+            Api api,
+            String masterId,
+            EnvVars envVars,
+            boolean isJunit,
+            String junitPathStr,
+            boolean isJtl,
+            String jtlPathStr,
+            StdErrLog bzmLog,
+            StdErrLog consLog) throws InterruptedException {
         Thread.sleep(10000); // Wait for the report to generate.
         //get thresholds from server and check if test is success
         Result result;
@@ -384,9 +386,9 @@ public class JobUtility {
                     jtlPath = dfp;
                 }
                 bzmLog.info("Will use the following path for JTL: " +
-                    jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
                 consLog.info("Will use the following path for JTL: " +
-                    jtlPath.getParent().getName() + "/" + jtlPath.getName());
+                        jtlPath.getParent().getName() + "/" + jtlPath.getName());
             }
             JobUtility.downloadJtlReports(jtlUrls, jtlPath, bzmLog, consLog);
         } else {
@@ -401,7 +403,7 @@ public class JobUtility {
             bzmLog.info("Test report is not available after 4 attempts.");
             consLog.info("Test report is not available after 4 attempts.");
             return result;
-        }else{
+        } else {
             bzmLog.info(testReport);
             consLog.info(testReport);
         }
@@ -477,18 +479,18 @@ public class JobUtility {
         return props;
     }
 
-    public static boolean stopMaster(Api api, String masterId) throws Exception{
+    public static boolean stopMaster(Api api, String masterId) throws Exception {
         boolean terminate = false;
-            int statusCode = api.getTestMasterStatusCode(masterId);
-            if (statusCode < 100 & statusCode != 0) {
-                api.terminateTest(masterId);
-                terminate = true;
-            }
-            if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
-                api.stopTest(masterId);
-                terminate = false;
-            }
-            return terminate;
+        int statusCode = api.getTestMasterStatusCode(masterId);
+        if (statusCode < 100 & statusCode != 0) {
+            api.terminateTest(masterId);
+            terminate = true;
+        }
+        if (statusCode >= 100 | statusCode == -1 | statusCode == 0) {
+            api.stopTest(masterId);
+            terminate = false;
+        }
+        return terminate;
     }
 
     public static String version() {
@@ -587,7 +589,7 @@ public class JobUtility {
     }
 
     public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
-        MessagingException {
+            MessagingException {
         boolean testIdExists = false;
         Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
         LinkedHashMultimap tests = api.testsMultiMap();
@@ -609,14 +611,17 @@ public class JobUtility {
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
-            int point = ((String) e.getValue()).indexOf(".");
-            if (testId.equals(((String) e.getValue()).substring(0, point))) {
-                collection = (((String) e.getValue()).substring(point + 1)).contains("multi");
+            StringBuilder key = new StringBuilder();
+            key.append(e.getKey());
+            int point = key.toString().indexOf(".");
+            if (testId.equals(key.toString().substring(0, point))) {
+                collection = (key.toString().substring(point + 1)).contains("multi");
                 exists = true;
             }
             if (collection) {
                 break;
             }
+            key.setLength(0);
         }
         if (!exists) {
             throw new Exception("Test with test id = " + testId + " is not present on server");
