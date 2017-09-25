@@ -23,14 +23,14 @@ import java.net.URLEncoder;
 public class UrlManagerV3Impl implements UrlManager {
 
     private String serverUrl = "";
-    private String NO_URL="";
+    private final String NO_URL = "";
     public UrlManagerV3Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
     }
 
     @Override
     public String getServerUrl() {
-        return serverUrl;
+        return this.serverUrl;
     }
 
     @Override
@@ -39,19 +39,19 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             masterId = URLEncoder.encode(masterId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-         return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/status?events=false&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/status?events=false&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
-    public String tests(String appKey) {
+    public String tests(String appKey, int workspaceId) {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 + "/web/tests?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/web/tests?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -60,9 +60,9 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             testId = URLEncoder.encode(testId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +"/tests/"+testId+"/start?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/tests/" + testId + "/start?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -71,9 +71,9 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             collectionId = URLEncoder.encode(collectionId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +"/collections/"+collectionId+"/start?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/collections/" + collectionId + "/start?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -82,9 +82,9 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             masterId = URLEncoder.encode(masterId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/stop?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/stop?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -93,9 +93,9 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             masterId = URLEncoder.encode(masterId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/terminate?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/terminate?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -104,9 +104,9 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
             masterId = URLEncoder.encode(masterId, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"/reports/main/summary?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/reports/main/summary?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -114,9 +114,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +"/user?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/user?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -124,9 +124,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +MASTERS+"/"+masterId+UrlManager.CI_STATUS+"?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + UrlManager.CI_STATUS + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
 
     }
 
@@ -135,9 +135,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +MASTERS+"/"+masterId+"/reports/thresholds?format=junit&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/reports/thresholds?format=junit&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
 
@@ -146,9 +146,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.SESSIONS+"/"+sessionId+"/reports/logs?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.SESSIONS + "/" + sessionId + "/reports/logs?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -156,9 +156,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 + MASTERS + "/" + masterId + "/public-token?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "/public-token?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -166,9 +166,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 + MASTERS + "/" + masterId + UrlManager.SESSIONS + "?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + UrlManager.SESSIONS + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -176,9 +176,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.MASTERS+"/"+masterId+"?app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.MASTERS + "/" + masterId + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -186,9 +186,9 @@ public class UrlManagerV3Impl implements UrlManager {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            return NO_URL;
+            return this.NO_URL;
         }
-        return serverUrl + V4 +UrlManager.SESSIONS+"/"+sessionId+"/properties?target=all&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + UrlManager.SESSIONS + "/" + sessionId + "/properties?target=all&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -198,7 +198,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/workspaces?limit=1000&enabled=true&app_key=" + appKey + "&"+"accountId="+accountId+CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/workspaces?limit=1000&enabled=true&app_key=" + appKey + "&" + "accountId=" + accountId + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -208,7 +208,18 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/accounts?app_key=" + appKey + "&" + CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/accounts?app_key=" + appKey + "&" + UrlManager.CLIENT_IDENTIFICATION;
     }
+
+    @Override
+    public String multiTests(String appKey, int workspaceId) {
+        try {
+            appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return this.serverUrl + UrlManager.V4 + "/multi-tests?limit=10000&workspaceId=" + workspaceId + "&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
+    }
+
 }
 

@@ -1,7 +1,7 @@
 package hudson.plugins.blazemeter.utils;
 
 /**
- Copyright 2016 BlazeMeter Inc.
+ Copyright 2017 BlazeMeter Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,4 +36,5 @@ public interface Constants {
     String CRED_EMPTY_VALUE = "Basic Og==";
     String THREE_DOTS = "...";
     String LEGACY=" - LEGACY KEY(DEPRECATED)";
+    String CHECK_SETTINGS = "Check blazemeter & proxy-settings";
 }

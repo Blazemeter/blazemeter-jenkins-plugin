@@ -46,8 +46,6 @@ public interface Api {
 
     HashMap<String,String> startTest(String testId, boolean collection) throws JSONException,IOException;
 
-    int getTestCount() throws JSONException, IOException, ServletException;
-
     JSONObject stopTest(String testId) throws IOException, JSONException;
 
     void terminateTest(String testId) throws IOException;
@@ -82,4 +80,5 @@ public interface Api {
 
     HashMap<Integer, String> workspaces();
 
+    LinkedHashMultimap<String, String> collectionsMultiMap(int workspaceId) throws IOException, MessagingException;
 }

@@ -23,14 +23,18 @@ public interface UrlManager {
             + JobUtility.version();
 
     String V4 ="/api/v4";
+
     String MASTERS="/masters";
+
     String SESSIONS="/sessions";
+
     String CI_STATUS="/ci-status";
+
     String getServerUrl();
 
     String masterStatus(String appKey, String testId);
 
-    String tests(String appKey);
+    String tests(String appKey, int workspaceId);
 
     String masterId(String appKey, String masterId);
 
@@ -62,5 +66,6 @@ public interface UrlManager {
 
     String accounts(String appKey);
 
+    String multiTests(String appKey, int workspaceId);
 }
 

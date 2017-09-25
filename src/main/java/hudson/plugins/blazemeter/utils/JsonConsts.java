@@ -1,5 +1,5 @@
 /**
- Copyright 2016 BlazeMeter Inc.
+ Copyright 2017 BlazeMeter Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ public interface JsonConsts {
     String DATA_URL="dataUrl";
     String NAME="name";
     String TYPE="type";
-    String TESTS="tests";
-    String COLLECTIONS="collections";
+    String COLLECTION_TYPE = "collectionType";
     String ID="id";
     String TEST_ID="testId";
     String TEST_COLLECTION_ID="testCollectionId";
