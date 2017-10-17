@@ -1,15 +1,15 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter;
@@ -30,6 +30,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.sf.json.JSONObject;
 import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
@@ -46,11 +48,10 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
 
-
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String blazeMeterURL=Constants.A_BLAZEMETER_COM;
+    private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
@@ -63,7 +64,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
         super(PerformanceBuilder.class);
         this.load();
-        this.blazeMeterURL=blazeMeterURL;
+        this.blazeMeterURL = blazeMeterURL;
         BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
     }
 
@@ -81,8 +82,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
-    public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId")String crid,
-        @QueryParameter("testId") String savedTestId) throws FormValidation {
+    public FormValidation doCheckTestId(@QueryParameter String value) {
+        if (value.contains("======"))
+            return FormValidation.error("Please, select another value. This value cannot be set as testId.");
+        else return FormValidation.ok();
+    }
+
+    public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
+                                          @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
         BlazemeterCredentials credential = null;
@@ -105,7 +112,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
 
-        Api api=null;
+        Api api = null;
         if (credential instanceof BlazemeterCredentialsBAImpl) {
             String bc = null;
             String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
@@ -117,7 +124,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
             api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
-        if (credential == null){
+        if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "-1");
             return items;
         }
@@ -147,16 +154,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
             Item item = Stapler.getCurrentRequest().findAncestorObject(Item.class);
             for (BlazemeterCredentials c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+                    .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
-                    c.getId(),
-                    false));
+                        c.getId(),
+                        false));
             }
             for (BlazemeterCredentials c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-                items.add(new ListBoxModel.Option(c.getDescription()+Constants.LEGACY,
-                    c.getId(),
-                    false));
+                    .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+                items.add(new ListBoxModel.Option(c.getDescription() + Constants.LEGACY,
+                        c.getId(),
+                        false));
             }
             Iterator<ListBoxModel.Option> iterator = items.iterator();
             while (iterator.hasNext()) {
@@ -185,14 +192,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Item item = scope instanceof Item ? (Item) scope : null;
         StringBuilder id = new StringBuilder();
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
-            .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
             id.append(c.getId());
             result.add(c);
             addedCredentials.add(id.toString());
             id.setLength(0);
         }
         for (BlazemeterCredentialImpl c : CredentialsProvider
-            .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
+                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             id.append(c.getId());
             result.add(c);
             addedCredentials.add(id.toString());
@@ -207,7 +214,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
-        this.blazeMeterURL=blazeMeterURL.isEmpty()?Constants.A_BLAZEMETER_COM:blazeMeterURL;
+        this.blazeMeterURL = blazeMeterURL.isEmpty() ? Constants.A_BLAZEMETER_COM : blazeMeterURL;
         this.save();
         return true;
     }
