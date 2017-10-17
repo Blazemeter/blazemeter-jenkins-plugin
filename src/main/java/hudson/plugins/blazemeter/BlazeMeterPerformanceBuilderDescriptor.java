@@ -83,7 +83,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public FormValidation doCheckTestId(@QueryParameter String value) {
-        if (value.contains("======"))
+        if (!Utils.validTestId(value))
             return FormValidation.error("Please, select another value. This value cannot be set as testId.");
         else return FormValidation.ok();
     }
