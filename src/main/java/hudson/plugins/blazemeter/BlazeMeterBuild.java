@@ -49,6 +49,8 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     private String credential = null;
 
+    private String workspaceId = null;
+
     private String serverUrl = "";
 
     private String testId = "";
@@ -179,7 +181,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         String testId_num = Utils.getTestId(this.testId);
         boolean collection = false;
         try {
-            collection = JobUtility.collection(testId_num, api);
+            collection = JobUtility.collection(testId_num, this.workspaceId,api);
         } catch (Exception e) {
             lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
             bzmLog.warn(lentry.toString());
@@ -428,5 +430,9 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
 
     public void setCredLegacy(final boolean credLegacy) {
         this.credLegacy = credLegacy;
+    }
+
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

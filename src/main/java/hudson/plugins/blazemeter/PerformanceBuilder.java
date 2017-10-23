@@ -48,6 +48,8 @@ public class PerformanceBuilder extends Builder{
 
     private String credentialsId = "";
 
+    private String workspaceId = "";
+
     private String serverUrl = "";
 
     private String testId = "";
@@ -67,6 +69,7 @@ public class PerformanceBuilder extends Builder{
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId,
+                              String workspaceId,
                               String serverUrl,
                               String testId,
                               String notes,
@@ -77,6 +80,7 @@ public class PerformanceBuilder extends Builder{
                               boolean getJunit
     ) {
         this.credentialsId = credentialsId;
+        this.workspaceId = workspaceId;
         this.serverUrl = serverUrl;
         this.testId = testId;
         this.jtlPath = jtlPath;
@@ -142,6 +146,7 @@ public class PerformanceBuilder extends Builder{
             b.setGetJunit(this.getJunit);
             b.setListener(listener);
             b.setWs(workspace);
+            b.setWorkspaceId(this.workspaceId);
             String buildId = run.getId();
             b.setBuildId(buildId);
             String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
@@ -252,6 +257,15 @@ public class PerformanceBuilder extends Builder{
 
     public void setJobApiKey(final String jobApiKey) {
         this.jobApiKey = jobApiKey;
+    }
+
+
+    public String getWorkspaceId() {
+        return this.workspaceId;
+    }
+
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.

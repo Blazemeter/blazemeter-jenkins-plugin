@@ -17,6 +17,9 @@ import hudson.plugins.blazemeter.utils.Utils;
 import javaposse.jobdsl.dsl.Context;
 
 public class PerformanceBuilderDSLContext implements Context {
+
+    String workspaceId = "";
+
     String credentialsId = "";
 
     String jobApiKey = "";

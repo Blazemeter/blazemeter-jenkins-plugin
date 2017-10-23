@@ -254,14 +254,10 @@ public class ApiImpl implements Api {
         }
     }
     @Override
-    public LinkedHashMultimap<String, String> testsMultiMap() {
+    public LinkedHashMultimap<String, String> testsMultiMap(int workspaceId) {
         LinkedHashMultimap<String, String> testListOrdered = LinkedHashMultimap.create();
-        HashMap<Integer, String> ws = this.workspaces();
         this.bzmLog.warn("Getting tests...");
-        Set<Integer> wsk = ws.keySet();
-        for (Integer k : wsk) {
-            String wsn = ws.get(k);
-            String url = this.urlManager.tests(Api.APP_KEY, k);
+            String url = this.urlManager.tests(Api.APP_KEY, workspaceId);
             try {
                 Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
                         .addHeader(Api.AUTHORIZATION, this.credential).
@@ -277,10 +273,9 @@ public class ApiImpl implements Api {
                     result = (JSONArray) jo.get(JsonConsts.RESULT);
                 }
                 LinkedHashMultimap<String, String> wst = LinkedHashMultimap.create();
-                LinkedHashMultimap<String, String> wsc = this.collectionsMultiMap(k);
+                LinkedHashMultimap<String, String> wsc = this.collectionsMultiMap(workspaceId);
                 wst.putAll(wsc);
                 if (result != null && result.length() > 0) {
-                    testListOrdered.put(k + "." + "workspace", "========" + wsn + "(" + k + ")========");
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject entry = null;
                         try {
@@ -321,7 +316,6 @@ public class ApiImpl implements Api {
                 this.bzmLog.warn("Check connection/proxy settings");
                 testListOrdered.put(Constants.CHECK_SETTINGS, Constants.CHECK_SETTINGS);
             }
-        }
         return testListOrdered;
     }
 

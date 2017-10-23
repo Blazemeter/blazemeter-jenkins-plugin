@@ -58,7 +58,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                     buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                     api = new ApiImpl(buildCr, serverUrl, true);
                 }
-                LinkedHashMultimap<String, String> tests = api.testsMultiMap();
+                LinkedHashMultimap<String, String> tests = api.testsMultiMap(Integer.valueOf(c.workspaceId));
                 Collection<String> values = tests.values();
                 logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
                     BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
@@ -66,7 +66,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                     for (String v : values) {
                         if (v.contains(c.testId)) {
                             logger.info("Test with " + c.testId + " exists on server.");
-                            pb = new PerformanceBuilder(c.credentialsId, serverUrl,
+                            pb = new PerformanceBuilder(c.workspaceId,c.credentialsId, serverUrl,
                                 v, c.notes, c.sessionProperties,
                                 c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
 

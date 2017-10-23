@@ -44,6 +44,8 @@ public class BlazeMeterTestStep extends Step {
 
     private String credentialsId = "";
 
+    private String workspaceId = "";
+
     private String serverUrl = "";
 
     private String testId = "";
@@ -100,6 +102,7 @@ public class BlazeMeterTestStep extends Step {
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {
         return new BlazeMeterTestExecution(stepContext, this.credentialsId,
+                this.workspaceId,
             this.serverUrl,
             this.testId,
             this.notes,
@@ -152,6 +155,8 @@ public class BlazeMeterTestStep extends Step {
 
         private String credentialsId = "";
 
+        private String workspaceId = "";
+
         private String serverUrl = "";
 
         private String testId = "";
@@ -175,6 +180,7 @@ public class BlazeMeterTestStep extends Step {
 
         protected BlazeMeterTestExecution(@Nonnull final StepContext context,
             @Nonnull final String credentialsId,
+            @Nonnull final String workspaceId,
             @Nonnull final String serverUrl,
             @Nonnull final String testId,
             @Nonnull final String notes,
@@ -185,6 +191,7 @@ public class BlazeMeterTestStep extends Step {
             @Nonnull final boolean getJunit) {
             super(context);
             this.context = context;
+            this.workspaceId = workspaceId;
             this.credentialsId = credentialsId;
             this.serverUrl = serverUrl;
             this.testId = testId;
@@ -198,7 +205,9 @@ public class BlazeMeterTestStep extends Step {
 
         @Override
         protected Void run() throws Exception {
-            PerformanceBuilder pb = new PerformanceBuilder(this.credentialsId,
+            PerformanceBuilder pb = new PerformanceBuilder(
+                    this.credentialsId,
+                    this.workspaceId,
                 this.serverUrl,
                 this.testId,
                 this.notes,

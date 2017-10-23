@@ -34,6 +34,7 @@ import hudson.util.ListBoxModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -89,6 +90,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
+                                          @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
@@ -129,7 +131,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         try {
-            LinkedHashMultimap<String, String> testList = api.testsMultiMap();
+            LinkedHashMultimap<String, String> testList = api.testsMultiMap(Integer.valueOf(wsid));
             if (testList == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "-1");
             } else if (testList.isEmpty()) {
@@ -140,6 +142,69 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     Map.Entry me = (Map.Entry) test;
                     String testId = (String) me.getValue();
                     items.add(new ListBoxModel.Option(testId, testId, testId.contains(savedTestId)));
+                }
+            }
+        } catch (Exception e) {
+            throw FormValidation.error(e.getMessage(), e);
+        }
+        return items;
+    }
+
+    public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
+                                               @QueryParameter("workspaceId") String swid) throws FormValidation {
+
+        ListBoxModel items = new ListBoxModel();
+        List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
+        BlazemeterCredentials credential = null;
+        if (StringUtils.isBlank(crid)) {
+            if (creds.size() > 0) {
+                crid = creds.get(0).getId();
+            } else {
+                items.add(Constants.NO_CREDENTIALS, "-1");
+                return items;
+            }
+        }
+        for (BlazemeterCredentials c : creds) {
+            if (c.getId().equals(crid)) {
+                credential = c;
+            }
+        }
+        for (BlazemeterCredentials c : creds) {
+            if (c.getId().equals(Utils.calcLegacyId(crid))) {
+                credential = c;
+            }
+        }
+
+        Api api = null;
+
+        if (credential instanceof BlazemeterCredentialsBAImpl) {
+            String bc = null;
+            String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
+            String password = ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText();
+            bc = Credentials.basic(username, password);
+            api = new ApiImpl(bc, this.blazeMeterURL, false);
+        }
+        if (credential instanceof BlazemeterCredentialImpl) {
+            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
+            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
+        }
+        if (credential == null) {
+            items.add(Constants.NO_SUCH_CREDENTIALS, "-1");
+            return items;
+        }
+        try {
+            HashMap<Integer, String> testList = api.workspaces();
+            if (testList == null) {
+                items.add(Constants.CRED_ARE_NOT_VALID, "-1");
+            } else if (testList.isEmpty()) {
+                items.add(Constants.NO_WORKSPACES_FOR_CREDENTIALS, "-1");
+            } else {
+                Set set = testList.entrySet();
+                for (Object test : set) {
+                    Map.Entry me = (Map.Entry) test;
+                    Integer wsid = (Integer) me.getKey();
+                    String wsn = (String) me.getValue();
+                    items.add(new ListBoxModel.Option((String) me.getValue(), String.valueOf(wsid), wsn.equalsIgnoreCase(swid)));
                 }
             }
         } catch (Exception e) {

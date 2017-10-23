@@ -588,11 +588,11 @@ public class JobUtility {
         return p;
     }
 
-    public static boolean testIdExists(String testId, String c, String serverUrl) throws IOException,
+    public static boolean testIdExists(String workspaceId, String testId, String c, String serverUrl) throws IOException,
             MessagingException {
         boolean testIdExists = false;
         Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
-        LinkedHashMultimap tests = api.testsMultiMap();
+        LinkedHashMultimap tests = api.testsMultiMap(Integer.valueOf(workspaceId));
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
             int point = ((String) e.getValue()).indexOf(".");
@@ -604,11 +604,11 @@ public class JobUtility {
         return testIdExists;
     }
 
-    public static boolean collection(String testId, Api api) throws Exception {
+    public static boolean collection(String testId, String workspaceId, Api api) throws Exception {
         boolean exists = false;
         boolean collection = false;
 
-        LinkedHashMultimap tests = api.testsMultiMap();
+        LinkedHashMultimap tests = api.testsMultiMap(Integer.valueOf(workspaceId));
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
             StringBuilder key = new StringBuilder();
