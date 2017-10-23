@@ -279,7 +279,7 @@ public class TestJobUtility {
         ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
 
         try {
-            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,api));
+            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.TEST_WORKSPACE_ID,api));
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {
@@ -301,7 +301,7 @@ public class TestJobUtility {
 
         try {
             ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
-            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,api));
+            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.TEST_WORKSPACE_ID,api));
         } catch (JSONException e) {
             e.printStackTrace();
         }catch (IOException e) {

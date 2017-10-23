@@ -22,7 +22,7 @@ public interface TestConstants {
     int mockedApiPort=1234;
     String mockedApiHost="http://127.0.0.1:";
     String mockedApiUrl=mockedApiHost+mockedApiPort;
-
+    String TEST_WORKSPACE_ID="workspaceId";
     String TEST_MASTER_ID ="testMasterId";
     String TEST_MASTER_WAIT_FOR_FINISH ="testMasterIdWaitForFinish";
     String TEST_MASTER_15102806 ="15102806";
