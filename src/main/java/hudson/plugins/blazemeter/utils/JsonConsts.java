@@ -34,4 +34,6 @@ public interface JsonConsts {
     String STATUS="status";
     String CONFIGURATION="configuration";
     String PUBLIC_TOKEN="publicToken";
+    String PROJECT_ID="projectId";
+    String WORKSPACE_ID="workspaceId";
 }

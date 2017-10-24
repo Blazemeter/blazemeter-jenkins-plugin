@@ -246,4 +246,13 @@ public class TestApiImpl {
         TestStatus testStatus = this.blazemeterApiV3.getTestStatus(TestConstants.TEST_MASTER_NOT_FOUND);
         Assert.assertEquals(testStatus, TestStatus.Error);
     }
+
+    @Test
+    public void projectId(){
+        Assert.fail();
+    }
+    @Test
+    public void workspaceId(){
+        Assert.fail();
+    }
 }

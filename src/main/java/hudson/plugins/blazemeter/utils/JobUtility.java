@@ -588,27 +588,17 @@ public class JobUtility {
         return p;
     }
 
-    public static boolean testIdExists(String workspaceId, String testId, String c, String serverUrl) throws IOException,
-            MessagingException {
-        boolean testIdExists = false;
-        Api api = new ApiImpl(c, serverUrl,/*TODO*/false);
-        LinkedHashMultimap tests = api.testsMultiMap(Integer.valueOf(workspaceId));
-        Set<Map.Entry> entries = tests.entries();
-        for (Map.Entry e : entries) {
-            int point = ((String) e.getValue()).indexOf(".");
-            testIdExists = testId.equals(((String) e.getValue()).substring(0, point));
-            if (testIdExists) {
-                break;
-            }
-        }
-        return testIdExists;
-    }
-
     public static boolean collection(String testId, String workspaceId, Api api) throws Exception {
         boolean exists = false;
         boolean collection = false;
-
-        LinkedHashMultimap tests = api.testsMultiMap(Integer.valueOf(workspaceId));
+        int wsid = 0;
+        try {
+            wsid = Integer.valueOf(workspaceId);
+        } catch (NumberFormatException nfe) {
+            int pid = api.projectId(testId);
+            wsid = api.workspaceId(String.valueOf(pid));
+        }
+        LinkedHashMultimap tests = api.testsMultiMap(wsid);
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
             StringBuilder key = new StringBuilder();

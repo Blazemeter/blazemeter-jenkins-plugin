@@ -115,11 +115,21 @@ public class TestUrlManagerV3 {
     }
 
     @Test
-    public void properties(){
+    public void properties() {
         String expProperties = this.bmUrlManager.getServerUrl() + UrlManager.V4 + "/sessions/" + this.sessionId + "/properties?target=all&app_key=" + this.appKey +
                 UrlManager.CLIENT_IDENTIFICATION;
         String actProperties = this.bmUrlManager.properties(this.appKey, this.sessionId);
-        Assert.assertEquals(expProperties,actProperties);
+        Assert.assertEquals(expProperties, actProperties);
+    }
+
+    @Test
+    public void projectId() {
+        Assert.fail();
+    }
+
+    @Test
+    public void workspaceId() {
+        Assert.fail();
     }
 
 }

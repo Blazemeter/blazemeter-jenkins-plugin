@@ -608,4 +608,62 @@ public class ApiImpl implements Api {
         return ws;
     }
 
+
+    @Override
+    public int projectId(String testId) throws Exception {
+        String url = this.urlManager.testId(Api.APP_KEY, testId);
+        Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
+                .addHeader(Api.AUTHORIZATION, this.credential).build();
+        JSONObject jo = null;
+        JSONObject result = null;
+        int pid = 0;
+        try {
+            jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get projectId: " + e);
+            throw e;
+        }
+        try {
+            result = jo.getJSONObject(JsonConsts.RESULT);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        try {
+            pid = result.getInt(JsonConsts.PROJECT_ID);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        return pid;
+    }
+
+    @Override
+    public int workspaceId(String projectId) throws Exception {
+        String url = this.urlManager.workspaceId(Api.APP_KEY, projectId);
+        Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
+                .addHeader(Api.AUTHORIZATION, this.credential).build();
+        JSONObject jo = null;
+        JSONObject result = null;
+        int wsid = 0;
+        try {
+            jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get projectId: " + e);
+            throw e;
+        }
+        try {
+            result = jo.getJSONObject(JsonConsts.RESULT);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        try {
+            wsid = result.getInt(JsonConsts.WORKSPACE_ID);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        return wsid;
+    }
 }

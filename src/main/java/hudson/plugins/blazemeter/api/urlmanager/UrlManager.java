@@ -67,5 +67,9 @@ public interface UrlManager {
     String accounts(String appKey);
 
     String multiTests(String appKey, int workspaceId);
+
+    String testId(String appKey, String testId);
+
+    String workspaceId(String appKey, String projectId);
 }
 
