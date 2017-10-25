@@ -58,8 +58,12 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                     buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                     api = new ApiImpl(buildCr, serverUrl, true);
                 }
-                int pid = api.projectId(c.testId);
-                int wsid = api.workspaceId(String.valueOf(pid));
+                int wsid=0;
+                if(StringUtils.isBlank(c.workspaceId)){
+                    int pid = api.projectId(c.testId);
+                    wsid = api.workspaceId(String.valueOf(pid));
+                    c.workspaceId=String.valueOf(wsid);
+                }
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap(wsid);
                 Collection<String> values = tests.values();
                 logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
