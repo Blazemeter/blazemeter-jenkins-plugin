@@ -51,24 +51,24 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/terminate")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(terminateTest));
 
         mockServer.when(
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/terminate")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(terminateTest));
 
         jsonFile = new File(TestConstants.RESOURCES + "/stopTest.json");
@@ -77,23 +77,23 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/stop")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(stopTest));
         mockServer.when(
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/stop")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(stopTest));
 
     }
@@ -107,23 +107,23 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_25 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
         mockServer.when(
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_15102806 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             exactly(1)
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
 
@@ -133,12 +133,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_WAIT_FOR_FINISH + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential), exactly(1)
 
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
         jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
@@ -147,12 +147,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_140 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
         jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100_notes.json");
@@ -161,12 +161,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100_notes + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
         jsonFile = new File(TestConstants.RESOURCES + "/not_found.json");
@@ -175,12 +175,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_NOT_FOUND + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
 
@@ -190,12 +190,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_100 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
 
@@ -205,12 +205,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_70 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
 
@@ -221,12 +221,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_0 + "/status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION,credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(testStatus));
 
     }
@@ -241,12 +241,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + "/tests/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(startTest));
 
         jsonFile = new File(TestConstants.RESOURCES + "/startCollection.json");
@@ -255,12 +255,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(UrlManager.V4 + "/collections/" + TestConstants.TEST_MASTER_ID + "/start")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(startCollection));
 }
 
@@ -275,12 +275,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(userProfile));
 
         credential = Credentials.basic(TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
@@ -291,12 +291,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(userProfile));
 
         credential = Credentials.basic(TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
@@ -307,12 +307,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + "/user")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(userProfile));
 
     }
@@ -325,36 +325,36 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ID + "/reports/main/summary")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTestReport));
 
         mockServer.when(
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_FAILURE + "/reports/main/summary")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTestReport));
 
         mockServer.when(
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_15102806 + "/reports/main/summary")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTestReport));
 
     }
@@ -369,12 +369,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_FAILURE + UrlManager.CI_STATUS)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(returnStr));
 
         returnFile = new File(TestConstants.RESOURCES + "/getCIStatus_success.json");
@@ -383,12 +383,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_SUCCESS + "/ci-status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(returnStr));
 
         returnFile = new File(TestConstants.RESOURCES + "/getCIStatus_error_61700.json");
@@ -398,12 +398,12 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ERROR_61700
                     + UrlManager.CI_STATUS)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(returnStr));
 
         returnFile = new File(TestConstants.RESOURCES + "/getCIStatus_error_0.json");
@@ -412,12 +412,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ERROR_0 + "/ci-status")
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(returnStr));
 
         returnFile = new File(TestConstants.RESOURCES + "/getCIStatus_error_70404.json");
@@ -427,12 +427,12 @@ public class MockedAPI {
                 .withMethod("GET")
                 .withPath(UrlManager.V4 + UrlManager.MASTERS + "/" + TestConstants.TEST_MASTER_ERROR_70404 +
                     UrlManager.CI_STATUS)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(returnStr));
 
     }
@@ -448,12 +448,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getReportUrl));
 
         credential = Credentials.basic(TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
@@ -463,12 +463,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getReportUrl));
 
     }
@@ -489,7 +489,7 @@ public class MockedAPI {
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTests));
 
         credential = Credentials.basic(TestConstants.MOCK_1_TEST_USER, TestConstants.MOCK_1_TEST_PASSWORD);
@@ -499,12 +499,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTests));
 
         credential = Credentials.basic(TestConstants.MOCK_0_TEST_USER, TestConstants.MOCK_0_TEST_PASSWORD);
@@ -514,12 +514,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTests));
 
         credential = Credentials.basic(TestConstants.MOCK_5_TEST_USER, TestConstants.MOCK_5_TEST_PASSWORD);
@@ -529,12 +529,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(getTests));
     }
 
@@ -551,12 +551,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jtl));
     }
 
@@ -588,12 +588,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
         expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -603,12 +603,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
     }
 
@@ -623,12 +623,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(xml));
 
         expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -638,12 +638,12 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(xml));
     }
 
@@ -658,12 +658,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
         expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -673,12 +673,12 @@ public class MockedAPI {
             request()
                 .withMethod("POST")
                 .withPath(expectedPath)
-                .withHeader("Accept", "application/json")
+                .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, credential),
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
     }
@@ -703,7 +703,41 @@ public class MockedAPI {
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
+                    .withStatusCode(200).withBody(jo));
+    }
+
+    public static void projectId() throws IOException {
+        String expectedPath = UrlManager.V4+"/tests/"+TestConstants.TEST_ID;
+
+        File jf = new File(TestConstants.RESOURCES + "/projectId.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader(Api.AUTHORIZATION, TestConstants.MOCK_VALID_CR),
+            unlimited()
+        )
+            .respond(
+                response().withHeader(Api.APP_JSON)
+                    .withStatusCode(200).withBody(jo));
+    }
+
+    public static void workspaceId() throws IOException {
+        String expectedPath = UrlManager.V4+"/projects/"+TestConstants.TEST_PROJECT_ID;
+
+        File jf = new File(TestConstants.RESOURCES + "/workspaceId.json");
+        String jo = FileUtils.readFileToString(jf);
+        mockServer.when(
+            request()
+                .withMethod("GET")
+                .withPath(expectedPath)
+                .withHeader(Api.AUTHORIZATION, TestConstants.MOCK_VALID_CR),
+            unlimited()
+        )
+            .respond(
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
     }
 
@@ -722,7 +756,7 @@ public class MockedAPI {
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
         expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -735,7 +769,7 @@ public class MockedAPI {
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
         expectedPath = UrlManager.V4 + UrlManager.MASTERS + "/" +
@@ -748,7 +782,7 @@ public class MockedAPI {
             unlimited()
         )
             .respond(
-                response().withHeader("application/json")
+                response().withHeader(Api.APP_JSON)
                     .withStatusCode(200).withBody(jo));
 
     }

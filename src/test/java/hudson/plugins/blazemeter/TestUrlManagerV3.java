@@ -124,12 +124,18 @@ public class TestUrlManagerV3 {
 
     @Test
     public void projectId() {
-        Assert.fail();
+        String exp = this.bmUrlManager.getServerUrl() + UrlManager.V4 + "/tests/" + this.testId + "?app_key=" + this.appKey +
+                UrlManager.CLIENT_IDENTIFICATION;
+        String act = this.bmUrlManager.testId(this.appKey, this.testId);
+        Assert.assertEquals(exp, act);
     }
 
     @Test
     public void workspaceId() {
-        Assert.fail();
+        String exp = this.bmUrlManager.getServerUrl() + UrlManager.V4 + "/projects/" + "" + "?app_key=" + this.appKey +
+                UrlManager.CLIENT_IDENTIFICATION;
+        String act = this.bmUrlManager.workspaceId(this.appKey, "");
+        Assert.assertEquals(exp, act);
     }
 
 }

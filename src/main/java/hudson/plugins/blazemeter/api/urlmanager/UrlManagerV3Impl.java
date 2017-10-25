@@ -228,7 +228,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return this.serverUrl + UrlManager.V4 + "/tests/" + testId + "&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/tests/" + testId + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -238,6 +238,6 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return this.serverUrl + UrlManager.V4 + "/projects/" + projectId + "&app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
+        return this.serverUrl + UrlManager.V4 + "/projects/" + projectId + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
     }
 }

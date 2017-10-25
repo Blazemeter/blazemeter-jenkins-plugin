@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
@@ -41,16 +40,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.Mockito;
 
-@Ignore("Junit tests are hanging")
+@Ignore("Junit tests are hanging.JobUtility.java refactoring is needed")
 public class TestJobUtility {
     private static StdErrLog stdErrLog = Mockito.mock(StdErrLog.class);
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -78,31 +73,21 @@ public class TestJobUtility {
 
     @Test
     public void getUserEmail_positive() throws IOException, JSONException {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        ApiImpl api = new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
         String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "dzmitry.kashlach@blazemeter.com");
     }
 
     @Test
     public void getUserEmail_negative() throws IOException, JSONException {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
-            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        ApiImpl api = new ApiImpl(TestConstants.MOCK_INVALID_CR,TestConstants.mockedApiUrl,false);
         String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "");
     }
 
     @Test
     public void getUserEmail_exception() throws IOException, JSONException {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL,
-            TestConstants.MOCK_EXCEPTION_ID,
-            TestConstants.MOCK_EXCEPTION_DESCRIPTION, TestConstants.MOCK_EXCEPTION_USER, TestConstants.MOCK_EXCEPTION_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        ApiImpl api = new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        ApiImpl api = new ApiImpl(TestConstants.MOCK_EXCEPTION_CR,TestConstants.mockedApiUrl,false);
         String email = JobUtility.getUserEmail(api);
         Assert.assertEquals(email, "");
     }
@@ -155,11 +140,7 @@ public class TestJobUtility {
 
     @Test
     public void stopMaster(){
-      BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-          TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         try{
 
         boolean terminate = JobUtility.stopMaster(api, TestConstants.TEST_MASTER_25);
@@ -179,11 +160,7 @@ public class TestJobUtility {
 
     @Test
     public void getCIStatus_success(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_SUCCESS, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.success,ciStatus);
     }
@@ -192,10 +169,7 @@ public class TestJobUtility {
 
     @Test
     public void getCIStatus_failure(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_FAILURE, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
@@ -204,10 +178,7 @@ public class TestJobUtility {
 
     @Test
     public void getCIStatus_error_61700(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_61700, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.errors,ciStatus);
     }
@@ -216,32 +187,23 @@ public class TestJobUtility {
 
     @Test
     public void getCIStatus_error_0(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         CIStatus ciStatus= JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_0, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures,ciStatus);
     }
 
     @Test
     public void getCIStatus_error_70404() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         CIStatus ciStatus = JobUtility.validateCIStatus(api, TestConstants.TEST_MASTER_ERROR_70404, stdErrLog, stdErrLog);
         Assert.assertEquals(CIStatus.failures, ciStatus);
     }
 
     @Test
     public void getReportUrl_pos(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
 
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         String actReportUrl= null;
         try {
             actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
@@ -255,12 +217,8 @@ public class TestJobUtility {
 
     @Test
     public void getReportUrl_neg(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_INVALID_ID,
-            TestConstants.MOCK_INVALID_DESCRIPTION, TestConstants.MOCK_INVALID_USER, TestConstants.MOCK_INVALID_PASSWORD);
-
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/#masters/testMasterId/summary";
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_INVALID_CR, TestConstants.mockedApiUrl,false);
         String actReportUrl= null;
         try {
             actReportUrl = JobUtility.getReportUrl(api, TestConstants.TEST_MASTER_ID, stdErrLog);
@@ -273,10 +231,7 @@ public class TestJobUtility {
 
     @Test
     public void collection_true(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+        ApiImpl api=new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
 
         try {
             Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.TEST_WORKSPACE_ID,api));
@@ -295,12 +250,8 @@ public class TestJobUtility {
 
     @Test
     public void collection_false(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
         try {
-            ApiImpl api=new ApiImpl(bc,TestConstants.mockedApiUrl,false);
+            ApiImpl api=new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
             Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.TEST_WORKSPACE_ID,api));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -361,30 +312,21 @@ public class TestJobUtility {
 
     @Test
     public void notes(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         boolean notes=JobUtility.notes(api,TestConstants.TEST_MASTER_100_notes,"bbbbbbbbbbbbbbbbbbbbb",stdErrLog);
         Assert.assertTrue(notes);
     }
 
     @Test
     public void agReport() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         String ar = JobUtility.requestReport(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertTrue(ar.length() == 105);
     }
 
     @Test
     public void jtlUrls() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         HashMap<String, String> sessions = JobUtility.jtlUrls(api, TestConstants.TEST_MASTER_ID, stdErrLog, stdErrLog);
         Assert.assertTrue(sessions.size() == 1);
         Assert.assertEquals(sessions.get(TestConstants.MOCKED_SESSION), TestConstants.JTL_URL);
@@ -393,10 +335,7 @@ public class TestJobUtility {
 
     @Test
     public void retrieveJUNITXMLreport() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/junit"));
         try {
             fp.mkdirs();
@@ -434,11 +373,7 @@ public class TestJobUtility {
 
     @Test
     public void properties() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         String prps = "v=r,v=i";
         JSONArray arr=null;
         try {
@@ -454,12 +389,8 @@ public class TestJobUtility {
 
     @Test
     public void postProcess_success(){
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         try {
             Result r=JobUtility.postProcess(fp,"1",api,TestConstants.TEST_MASTER_SUCCESS,new EnvVars(),false,"",false,"",stdErrLog,stdErrLog);
             Assert.assertEquals(Result.SUCCESS,r);
@@ -470,11 +401,8 @@ public class TestJobUtility {
 
     @Test
     public void postProcess_failure() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         try {
             Result r = JobUtility.postProcess(fp, "1", api, TestConstants.TEST_MASTER_FAILURE, new EnvVars(), false, "", false, "", stdErrLog, stdErrLog);
             Assert.assertEquals(Result.FAILURE, r);
@@ -485,11 +413,8 @@ public class TestJobUtility {
 
     @Test
     public void postProcess_failure_junit() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         try {
             Result r = JobUtility.postProcess(fp, "1", api, TestConstants.TEST_MASTER_FAILURE, new EnvVars(), true, "junit", false, "", stdErrLog, stdErrLog);
             Assert.assertEquals(Result.FAILURE, r);
@@ -506,11 +431,8 @@ public class TestJobUtility {
 
     @Test
     public void postProcess_success_jtl() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-        String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
         FilePath fp = new FilePath(new File(System.getProperty("user.dir") + "/jtl"));
-        Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
         try {
             Result r = JobUtility.postProcess(fp, "1", api, TestConstants.TEST_MASTER_SUCCESS, new EnvVars(), false, "", true, "jtl", stdErrLog, stdErrLog);
             Assert.assertEquals(Result.SUCCESS, r);
@@ -528,13 +450,9 @@ public class TestJobUtility {
 
     @Test
     public void waitForFinish() {
-        BlazemeterCredentialsBAImpl c = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, TestConstants.MOCK_VALID_ID,
-            TestConstants.MOCK_VALID_DESCRIPTION, TestConstants.MOCK_VALID_USER, TestConstants.MOCK_VALID_PASSWORD);
-
         Date start = Calendar.getInstance().getTime();
         try {
-            String bc = Credentials.basic(c.getUsername(), c.getPassword().getPlainText());
-            Api api = new ApiImpl(bc, TestConstants.mockedApiUrl,/*TODO*/false);
+            Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
             JobUtility.waitForFinish(api, "1", stdErrLog, TestConstants.TEST_MASTER_WAIT_FOR_FINISH);
             long after = Calendar.getInstance().getTime().getTime();
             long diffInSec = (after - start.getTime()) / 1000;

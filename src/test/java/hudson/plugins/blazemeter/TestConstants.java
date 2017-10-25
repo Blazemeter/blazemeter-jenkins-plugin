@@ -14,6 +14,8 @@
 
 package hudson.plugins.blazemeter;
 
+import okhttp3.Credentials;
+
 public interface TestConstants {
     String RESOURCES = System.getProperty("user.dir")+"/src/test/java/hudson/plugins/blazemeter/resources";
 
@@ -23,6 +25,8 @@ public interface TestConstants {
     String mockedApiHost="http://127.0.0.1:";
     String mockedApiUrl=mockedApiHost+mockedApiPort;
     String TEST_WORKSPACE_ID="workspaceId";
+    String TEST_PROJECT_ID="workspaceId";
+    String TEST_ID ="testId";
     String TEST_MASTER_ID ="testMasterId";
     String TEST_MASTER_WAIT_FOR_FINISH ="testMasterIdWaitForFinish";
     String TEST_MASTER_15102806 ="15102806";
@@ -45,19 +49,12 @@ public interface TestConstants {
     String MOCKED_NOTE = "bbbbbbbbbbbbbbbbbbbbb";
     String JTL_URL = mockedApiUrl+"/users/1689/tests/5283127/reports/r-v3-585114ca535ed/jtls_and_more.zip?" +
         "AWSAccessKeyId=AKIAJPZOF6U7I33QK2CQ&Expires=1481718157&Signature=lwSzIQtbopufhiExFwmEUheCah8%3D";
-
     String MOCK_EMPTY_USER="";
     String MOCK_EMPTY_PASSWORD="";
     String MOCK_EXCEPTION_USER="exceptionUser";
-    String MOCK_EXCEPTION_ID="exceptionId";
-    String MOCK_EXCEPTION_DESCRIPTION="exceptionDescription";
     String MOCK_EXCEPTION_PASSWORD="exceptionPassword";
-    String MOCK_INVALID_ID="invalidId";
-    String MOCK_INVALID_DESCRIPTION="invalidDescription";
     String MOCK_INVALID_USER="invalidUser";
     String MOCK_INVALID_PASSWORD="invalidPassword";
-    String MOCK_VALID_ID="validId";
-    String MOCK_VALID_DESCRIPTION="validDescription";
     String MOCK_VALID_USER="validUser";
     String MOCK_VALID_PASSWORD="validPassword";
     String MOCK_1_TEST_USER ="1-test-user";
@@ -66,4 +63,8 @@ public interface TestConstants {
     String MOCK_0_TEST_PASSWORD ="0-test-password";
     String MOCK_5_TEST_USER ="5-test-user";
     String MOCK_5_TEST_PASSWORD ="5-test-password";
+    String MOCK_VALID_CR= Credentials.basic(MOCK_VALID_USER, MOCK_VALID_PASSWORD);
+    String MOCK_INVALID_CR= Credentials.basic(MOCK_INVALID_USER, MOCK_INVALID_PASSWORD);
+    String MOCK_EXCEPTION_CR= Credentials.basic(MOCK_EXCEPTION_USER, MOCK_EXCEPTION_PASSWORD);
+
 }
