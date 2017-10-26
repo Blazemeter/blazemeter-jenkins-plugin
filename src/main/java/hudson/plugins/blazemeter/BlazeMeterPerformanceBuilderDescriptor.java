@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     Map.Entry me = (Map.Entry) test;
                     Integer wsid = (Integer) me.getKey();
                     String wsn = (String) me.getValue();
-                    items.add(new ListBoxModel.Option((String) me.getValue(), String.valueOf(wsid), wsn.equalsIgnoreCase(swid)));
+                    items.add(new ListBoxModel.Option(wsn+"("+wsid+")", String.valueOf(wsid), wsn.equalsIgnoreCase(swid)));
                 }
             }
         } catch (Exception e) {
