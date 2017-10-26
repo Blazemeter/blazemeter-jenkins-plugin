@@ -131,7 +131,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         try {
-            LinkedHashMultimap<String, String> testList = api.testsMultiMap(Integer.valueOf(wsid));
+            LinkedHashMultimap<String, String> testList=null;
+            if(StringUtils.isBlank(wsid)){
+                HashMap<Integer,String> wss = api.workspaces();
+                testList = api.testsMultiMap((Integer) wss.keySet().toArray()[0]);
+
+            }else {
+                testList = api.testsMultiMap(Integer.valueOf(wsid));
+            }
             if (testList == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "");
             } else if (testList.isEmpty()) {
@@ -147,9 +154,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 }
             }
         } catch (Exception e) {
-            throw FormValidation.error(e.getMessage(), e);
+            items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
+        }finally {
+            return items;
         }
-        return items;
     }
 
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
@@ -162,7 +170,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             if (creds.size() > 0) {
                 crid = creds.get(0).getId();
             } else {
-                items.add(Constants.NO_CREDENTIALS, "-1");
+                items.add(Constants.NO_CREDENTIALS, "");
                 return items;
             }
         }
@@ -191,15 +199,15 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
         if (credential == null) {
-            items.add(Constants.NO_SUCH_CREDENTIALS, "-1");
+            items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
         try {
             HashMap<Integer, String> testList = api.workspaces();
             if (testList == null) {
-                items.add(Constants.CRED_ARE_NOT_VALID, "-1");
+                items.add(Constants.CRED_ARE_NOT_VALID, "");
             } else if (testList.isEmpty()) {
-                items.add(Constants.NO_WORKSPACES_FOR_CREDENTIALS, "-1");
+                items.add(Constants.NO_WORKSPACES_FOR_CREDENTIALS, "");
             } else {
                 Set set = testList.entrySet();
                 for (Object test : set) {
