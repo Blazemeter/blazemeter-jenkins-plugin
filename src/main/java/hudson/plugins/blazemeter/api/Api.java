@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import okhttp3.MediaType;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,5 +83,5 @@ public interface Api {
 
     int projectId(String testId) throws Exception;
 
-    int workspaceId(String projectId) throws Exception;
+    int workspaceId(String testId) throws Exception;
 }

@@ -19,7 +19,6 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.CIStatus;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.testresult.TestReport;
@@ -39,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.mail.MessagingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -600,8 +598,7 @@ public class JobUtility {
         try {
             wsid = Integer.valueOf(workspaceId);
         } catch (NumberFormatException nfe) {
-            int pid = api.projectId(testId);
-            wsid = api.workspaceId(String.valueOf(pid));
+            wsid = api.workspaceId(testId);
         }
         LinkedHashMultimap tests = api.testsMultiMap(wsid);
         Set<Map.Entry> entries = tests.entries();

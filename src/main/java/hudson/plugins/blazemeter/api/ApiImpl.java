@@ -639,8 +639,9 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public int workspaceId(String projectId) throws Exception {
-        String url = this.urlManager.workspaceId(Api.APP_KEY, projectId);
+    public int workspaceId(String testId) throws Exception {
+        int pid=this.projectId(testId);
+        String url = this.urlManager.workspaceId(Api.APP_KEY, String.valueOf(pid));
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(Api.AUTHORIZATION, this.credential).build();
         JSONObject jo = null;
