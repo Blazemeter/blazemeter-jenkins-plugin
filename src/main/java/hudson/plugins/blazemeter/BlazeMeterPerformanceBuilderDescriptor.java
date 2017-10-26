@@ -127,21 +127,23 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
         if (credential == null) {
-            items.add(Constants.NO_SUCH_CREDENTIALS, "-1");
+            items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
         try {
             LinkedHashMultimap<String, String> testList = api.testsMultiMap(Integer.valueOf(wsid));
             if (testList == null) {
-                items.add(Constants.CRED_ARE_NOT_VALID, "-1");
+                items.add(Constants.CRED_ARE_NOT_VALID, "");
             } else if (testList.isEmpty()) {
-                items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "-1");
+                items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
             } else {
                 Set set = testList.entries();
+                boolean selected=false;
                 for (Object test : set) {
                     Map.Entry me = (Map.Entry) test;
                     String testId = (String) me.getValue();
-                    items.add(new ListBoxModel.Option(testId, testId, testId.contains(savedTestId)));
+                    items.add(new ListBoxModel.Option(testId, testId, !selected?testId.contains(savedTestId):false));
+                    selected=testId.contains(savedTestId);
                 }
             }
         } catch (Exception e) {
