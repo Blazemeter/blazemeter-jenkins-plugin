@@ -193,10 +193,4 @@ public class TestApiImpl {
         Assert.assertTrue(id == 11715);
 
     }
-    @Test
-    public void workspaceId() throws Exception{
-        this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,false);
-        int id = this.blazemeterApiV3.workspaceId(TestConstants.TEST_PROJECT_ID);
-        Assert.assertTrue(id == 784);
-    }
 }
