@@ -260,8 +260,8 @@ public class ApiImpl implements Api {
             String url = this.urlManager.tests(Api.APP_KEY, workspaceId);
             try {
                 Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                        .addHeader(Api.AUTHORIZATION, this.credential).
-                                addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
+                        .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                        .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
                 JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
                 JSONArray result = null;
                 this.bzmLog.warn("Received json: " + jo.toString());
@@ -327,8 +327,8 @@ public class ApiImpl implements Api {
         String url = this.urlManager.multiTests(Api.APP_KEY, workspaceId);
         try {
             Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                    .addHeader(Api.AUTHORIZATION, this.credential).
-                            addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
+                    .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                    .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
             JSONArray result = null;
             this.bzmLog.warn("Received json: " + jo.toString());
@@ -517,7 +517,7 @@ public class ApiImpl implements Api {
         try {
             Request r = new Request.Builder().url(url).get()
                     .addHeader(Api.ACCEPT, Api.APP_JSON)
-                .addHeader(Api.AUTHORIZATION, this.credential)
+                    .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
                     .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
             result = new JSONObject(this.okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConsts.RESULT);
             if (result.has("functionalSummary")) {
@@ -541,7 +541,8 @@ public class ApiImpl implements Api {
     public HashMap<Integer,String> accounts() {
         String url = this.urlManager.accounts(Api.APP_KEY);
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                .addHeader(Api.AUTHORIZATION, this.credential).build();
+                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                .build();
         JSONObject jo = null;
         JSONArray result = null;
         JSONObject dp = null;
@@ -579,7 +580,8 @@ public class ApiImpl implements Api {
         for (Integer key : keys) {
             String url = this.urlManager.workspaces(Api.APP_KEY, key);
             Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                    .addHeader(Api.AUTHORIZATION, this.credential).build();
+                    .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                    .build();
             JSONObject jo = null;
             JSONArray result = null;
             try {
@@ -613,7 +615,8 @@ public class ApiImpl implements Api {
     public int projectId(String testId) throws Exception {
         String url = this.urlManager.testId(Api.APP_KEY, testId);
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                .addHeader(Api.AUTHORIZATION, this.credential).build();
+                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                .build();
         JSONObject jo = null;
         JSONObject result = null;
         int pid = 0;
@@ -643,7 +646,8 @@ public class ApiImpl implements Api {
         int pid=this.projectId(testId);
         String url = this.urlManager.workspaceId(Api.APP_KEY, String.valueOf(pid));
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                .addHeader(Api.AUTHORIZATION, this.credential).build();
+                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                .build();
         JSONObject jo = null;
         JSONObject result = null;
         int wsid = 0;
