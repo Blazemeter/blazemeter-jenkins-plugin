@@ -101,11 +101,6 @@ public class PerformanceBuilder extends Builder{
         @Nonnull final Launcher launcher,
         @Nonnull final TaskListener listener,
         EnvVars v) throws InterruptedException, IOException {
-        if (!Utils.validTestId(this.testId)) {
-            listener.error("Wrong testId! Please, re-configure job select another value as testId.");
-            run.setResult(Result.NOT_BUILT);
-            return;
-        }
         Result r = null;
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
@@ -268,6 +263,11 @@ public class PerformanceBuilder extends Builder{
         this.workspaceId = workspaceId;
     }
 
+
+    public String legacy(){
+        return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
+                "Please, select another key and re-save job.";
+    }
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})
     public static final class DescriptorImpl

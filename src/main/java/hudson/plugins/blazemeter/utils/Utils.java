@@ -102,8 +102,4 @@ public class Utils {
     public static String calcLegacyId(String jobApiKey) {
         return StringUtils.left(jobApiKey, 4) + Constants.THREE_DOTS + StringUtils.right(jobApiKey, 4);
     }
-
-    public static boolean validTestId(String testId){
-        return !testId.contains("========");
-    }
 }

@@ -13,11 +13,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
     -->
-
-    <f:entry title="${%Credentials ID:}" field="credentialsId">
+    <j:set var="legacy" value="${instance.credentialsId.contains('...')}"/>
+    <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
         <f:select style="width:32em;"/>
     </f:entry>
-    <j:set var="legacy" value="${instance.credentialsId.contains('...')}"/>
     <j:if test="${!legacy}">
         <f:entry title="${%BlazeMeter Test}:" field="testId">
             <f:select style="width:32em;"/>
