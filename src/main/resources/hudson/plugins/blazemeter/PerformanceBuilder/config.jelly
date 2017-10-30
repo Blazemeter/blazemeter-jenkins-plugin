@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <!--
-     Copyright 2016 BlazeMeter Inc.
+     Copyright 2017 BlazeMeter Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,14 +17,25 @@
     <f:entry title="${%Credentials ID:}" field="credentialsId">
         <f:select style="width:32em;"/>
     </f:entry>
-    <f:entry title="${%Workspace ID:}" field="workspaceId">
-        <f:select style="width:32em;"/>
-    </f:entry>
-    <f:entry title="${%BlazeMeter Test}:" field="testId">
-        <f:select style="width:32em;"/>
-    </f:entry>
+    <j:set var="legacy" value="${instance.credentialsId.contains('...')}"/>
+    <j:if test="${!legacy}">
+        <f:entry title="${%BlazeMeter Test}:" field="testId">
+            <f:select style="width:32em;"/>
+        </f:entry>
+        <f:entry title="${%Workspace ID:}" field="workspaceId">
+            <f:select style="width:32em;"/>
+        </f:entry>
+    </j:if>
+    <j:if test="${legacy}">
+        <f:entry title="${%BlazeMeter Test}:" field="testId">
+            <f:textbox disabled="true" style="width:32em;"/>
+        </f:entry>
+        <f:entry title="${%Workspace ID}:" field="workspaceId">
+            <f:textbox disabled="true" style="width:32em;"/>
+        </f:entry>
+    </j:if>
     <f:entry title="${%Server url:}">
-        <f:textbox  disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
+        <f:textbox disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
