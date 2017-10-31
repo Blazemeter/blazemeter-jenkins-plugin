@@ -13,26 +13,15 @@
      See the License for the specific language governing permissions and
      limitations under the License.
     -->
-    <j:set var="legacy" value="${instance.credentialsId.contains('...')}"/>
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
         <f:select style="width:32em;"/>
     </f:entry>
-    <j:if test="${!legacy}">
-        <f:entry title="${%BlazeMeter Test}:" field="testId">
-            <f:select style="width:32em;"/>
-        </f:entry>
-        <f:entry title="${%Workspace ID:}" field="workspaceId">
-            <f:select style="width:32em;"/>
-        </f:entry>
-    </j:if>
-    <j:if test="${legacy}">
-        <f:entry title="${%BlazeMeter Test}:" field="testId">
-            <f:textbox disabled="true" style="width:32em;"/>
-        </f:entry>
-        <f:entry title="${%Workspace ID}:" field="workspaceId">
-            <f:textbox disabled="true" style="width:32em;"/>
-        </f:entry>
-    </j:if>
+    <f:entry title="${%BlazeMeter Test}:" field="testId">
+        <f:select style="width:32em;"/>
+    </f:entry>
+    <f:entry title="${%Workspace ID:}" field="workspaceId">
+        <f:select style="width:32em;"/>
+    </f:entry>
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>

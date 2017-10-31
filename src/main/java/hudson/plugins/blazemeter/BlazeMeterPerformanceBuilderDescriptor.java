@@ -85,7 +85,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public FormValidation doCheckCredentialsId(@QueryParameter String value) {
         if (value.contains(Constants.THREE_DOTS)){
-            return FormValidation.errorWithMarkup("Please, re-save job with NON-LEGACY key to continue.");
+            return FormValidation.errorWithMarkup("Please, select NON-LEGACY key for job re-configuration.");
         }    else return FormValidation.ok();
     }
 
@@ -123,8 +123,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
-            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
+            items.add(savedTestId,savedTestId);
+            return items;
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
@@ -195,8 +195,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
-            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
+            items.add(swid,swid);
+            return items;
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
