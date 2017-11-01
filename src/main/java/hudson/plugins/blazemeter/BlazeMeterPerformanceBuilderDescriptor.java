@@ -123,8 +123,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            items.add(savedTestId,savedTestId);
-            return items;
+            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
+            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
@@ -195,8 +195,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            items.add(swid,swid);
-            return items;
+            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
+            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
