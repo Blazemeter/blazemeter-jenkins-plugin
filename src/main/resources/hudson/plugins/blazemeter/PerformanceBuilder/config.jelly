@@ -16,10 +16,10 @@
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
         <f:select style="width:32em;"/>
     </f:entry>
-    <f:entry title="${%BlazeMeter Test}:" field="testId">
+    <f:entry title="${%Workspace ID:}" field="workspaceId">
         <f:select style="width:32em;"/>
     </f:entry>
-    <f:entry title="${%Workspace ID:}" field="workspaceId">
+    <f:entry title="${%BlazeMeter Test}:" field="testId">
         <f:select style="width:32em;"/>
     </f:entry>
     <f:entry title="${%Server url:}">

@@ -123,20 +123,19 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
-            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
+            return new ListBoxModel();
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
         try {
-            LinkedHashMultimap<String, String> testList=null;
-            if(StringUtils.isBlank(wsid)){
-                HashMap<Integer,String> wss = api.workspaces();
+            LinkedHashMultimap<String, String> testList = null;
+            if (StringUtils.isBlank(wsid)) {
+                HashMap<Integer, String> wss = api.workspaces();
                 testList = api.testsMultiMap((Integer) wss.keySet().toArray()[0]);
 
-            }else {
+            } else {
                 testList = api.testsMultiMap(Integer.valueOf(wsid));
             }
             if (testList == null) {
@@ -145,17 +144,17 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
             } else {
                 Set set = testList.entries();
-                boolean selected=false;
+                boolean selected = false;
                 for (Object test : set) {
                     Map.Entry me = (Map.Entry) test;
                     String testId = (String) me.getValue();
-                    items.add(new ListBoxModel.Option(testId, testId, !selected?testId.contains(savedTestId):false));
-                    selected=testId.contains(savedTestId);
+                    items.add(new ListBoxModel.Option(testId, testId, !selected ? testId.contains(savedTestId) : false));
+                    selected = testId.contains(savedTestId);
                 }
             }
         } catch (Exception e) {
             items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
-        }finally {
+        } finally {
             return items;
         }
     }
@@ -195,8 +194,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential instanceof BlazemeterCredentialImpl) {
-            String apiKey = ((BlazemeterCredentialImpl) credential).getApiKey();
-            api = new ApiImpl(apiKey, this.blazeMeterURL, true);
+            return new ListBoxModel();
+
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
@@ -214,7 +213,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     Map.Entry me = (Map.Entry) test;
                     Integer wsid = (Integer) me.getKey();
                     String wsn = (String) me.getValue();
-                    items.add(new ListBoxModel.Option(wsn+"("+wsid+")", String.valueOf(wsid), wsn.equalsIgnoreCase(swid)));
+                    items.add(new ListBoxModel.Option(wsn + "(" + wsid + ")", String.valueOf(wsid), wsn.equalsIgnoreCase(swid)));
                 }
             }
         } catch (Exception e) {
