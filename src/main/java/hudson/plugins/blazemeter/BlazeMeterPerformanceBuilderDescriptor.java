@@ -85,7 +85,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public FormValidation doCheckCredentialsId(@QueryParameter String value) {
         if (value.contains(Constants.THREE_DOTS)){
-            return FormValidation.errorWithMarkup("Please, select NON-LEGACY key for job re-configuration.");
+            return FormValidation.errorWithMarkup("'Workspace ID' & 'Test ID' are empty because you've selected LEGACY key.</br>" +
+                    "Please, select NON-LEGACY key for job re-configuration");
         }    else return FormValidation.ok();
     }
 
