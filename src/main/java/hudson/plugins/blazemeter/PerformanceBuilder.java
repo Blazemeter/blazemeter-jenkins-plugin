@@ -102,6 +102,14 @@ public class PerformanceBuilder extends Builder{
         @Nonnull final TaskListener listener,
         EnvVars v) throws InterruptedException, IOException {
         Result r = null;
+        if(StringUtils.isBlank(this.workspaceId)&&StringUtils.isBlank(this.testId)){
+            listener.error("Please,reconfigure job and select valid credentials, workspace, test");
+            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+            r=Result.FAILURE;
+            run.setResult(r);
+            return;
+        }
+
         BuildReporter br = new BuildReporter();
         boolean credentialsPresent = false;
         String buildCr = "";
