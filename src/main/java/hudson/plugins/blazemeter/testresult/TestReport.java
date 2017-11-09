@@ -21,29 +21,35 @@ public class TestReport {
     public double average;
     public int min;
     public int max;
+    public int tp90;
+    public double avgthrpt;
     public double errorPercentage;
     public int hits;
 
     public TestReport(JSONObject json) throws JSONException {
-        this.average = Math.round(json.getDouble("avg")*100)/100;
+        this.average = Math.round(json.getDouble("avg")*100.0)/100.0;
         this.min = json.getInt("min");
         this.max = json.getInt("max");
+        this.tp90 = json.getInt("tp90");
         this.errorPercentage = Math.round((json.getDouble("failed") / json.getDouble("hits") * 100)*100)/100;
         this.hits = json.getInt("hits");
+        this.avgthrpt = Math.round(this.hits/(json.getDouble("last")-json.getDouble("first"))*100.0)/100.0;
     }
 
     @Override
     public String toString() {
-        String hits = String.valueOf(this.hits);
-        String errorPercentage = String.valueOf(this.errorPercentage);
-        String average = String.valueOf(this.average);
-        String min = String.valueOf(this.min);
-        String max = String.valueOf(this.max);
+        String hits = Integer.toString(this.hits);
+        String errorPercentage = Double.toString(this.errorPercentage);
+        String average = Double.toString(this.average);
+        String min = Integer.toString(this.min);
+        String max = Integer.toString(this.max);
         return "AggregateTestResult ->" +
-            " hits=" + hits +
-            ", errors percentage=" + errorPercentage +
-            ", average=" + average +
-            ", min=" + min +
-            ", max=" + max;
+            " hits = " + hits +
+            " hits, errors = " + errorPercentage +
+            " %, average = " + average +
+            " ms, min = " + min +
+            " ms, max = " + max +
+            " ms, average throughput = "+this.avgthrpt+
+            " hits/s, 90% Response Time = "+this.tp90+" s.";
     }
 }
