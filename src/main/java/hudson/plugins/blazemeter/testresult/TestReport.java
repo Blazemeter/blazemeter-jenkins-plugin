@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@ import org.json.JSONObject;
 
 public class TestReport {
     public double average;
-    public double min;
-    public double max;
+    public int min;
+    public int max;
     public double errorPercentage;
-    public double hits;
+    public int hits;
 
     public TestReport(JSONObject json) throws JSONException {
-        this.average = json.getDouble("avg");
-        this.min = json.getDouble("min");
-        this.max = json.getDouble("max");
-        this.errorPercentage = json.getDouble("failed") / json.getDouble("hits") * 100;
-        this.hits = json.getDouble("hits");
+        this.average = Math.round(json.getDouble("avg")*100)/100;
+        this.min = json.getInt("min");
+        this.max = json.getInt("max");
+        this.errorPercentage = Math.round((json.getDouble("failed") / json.getDouble("hits") * 100)*100)/100;
+        this.hits = json.getInt("hits");
     }
 
     @Override
