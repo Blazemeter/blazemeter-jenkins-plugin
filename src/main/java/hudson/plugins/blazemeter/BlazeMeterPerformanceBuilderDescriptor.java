@@ -203,13 +203,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         try {
-            HashMap<Integer, String> testList = api.workspaces();
-            if (testList == null) {
+            HashMap<Integer, String> wsl = api.workspaces();
+            if (wsl == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "");
-            } else if (testList.isEmpty()) {
+            } else if (wsl.isEmpty()) {
                 items.add(Constants.NO_WORKSPACES_FOR_CREDENTIALS, "");
+                return items;
             } else {
-                Set set = testList.entrySet();
+                Set set = wsl.entrySet();
                 for (Object test : set) {
                     Map.Entry me = (Map.Entry) test;
                     Integer wsid = (Integer) me.getKey();
@@ -244,16 +245,23 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             while (iterator.hasNext()) {
                 ListBoxModel.Option option = iterator.next();
                 try {
-                    option.selected = StringUtils.isBlank(credentialsId) || credentialsId.equals(option.value);
-                    if (!option.selected) {
-                        String lid = Utils.calcLegacyId(credentialsId);
-                        option.selected = lid.equals(option.value);
+                    if (StringUtils.isBlank(credentialsId)) {
+                        option.selected = true;
+                        break;
+                    }
+                    if (option.value.equals(Utils.calcLegacyId(credentialsId))) {
+                        option.selected = true;
+                        break;
+                    }
+                    if (credentialsId.equals(option.value)) {
+                        option.selected = true;
+                        break;
                     }
                 } catch (Exception e) {
                     option.selected = false;
                 }
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception npe) {
 
         } finally {
             return items;
