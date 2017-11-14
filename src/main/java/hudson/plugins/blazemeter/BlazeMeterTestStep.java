@@ -98,6 +98,8 @@ public class BlazeMeterTestStep extends Step {
         this.credentialsId = Utils.calcLegacyId(jobApiKey);
     }
 
+    @DataBoundSetter
+    public void setWorkspaceId(final String workspaceId){this.workspaceId = workspaceId;}
 
     @Override
     public StepExecution start(final StepContext stepContext) throws Exception {

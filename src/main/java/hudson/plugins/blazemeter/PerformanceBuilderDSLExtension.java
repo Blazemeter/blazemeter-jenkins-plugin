@@ -61,7 +61,8 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                 int wsid=0;
                 if(StringUtils.isBlank(c.workspaceId)){
                     wsid = api.workspaceId(c.testId);
-                    c.workspaceId=String.valueOf(wsid);
+                }else {
+                    wsid = Integer.valueOf(c.workspaceId);
                 }
                 LinkedHashMultimap<String, String> tests = api.testsMultiMap(wsid);
                 Collection<String> values = tests.values();

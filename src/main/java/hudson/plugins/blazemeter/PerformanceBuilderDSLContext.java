@@ -71,7 +71,13 @@ public class PerformanceBuilderDSLContext implements Context {
         this.getJunit = getJunit;
     }
 
+    public void workspaceId(String  workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     public void jobApiKey(final String jobApiKey) {
         this.credentialsId= Utils.calcLegacyId(jobApiKey);
     }
+
+
 }
