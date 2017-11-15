@@ -189,7 +189,7 @@ public class TestApiImpl {
     @Test
     public void projectId() throws Exception{
         this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,false);
-        int id = this.blazemeterApiV3.projectId(TestConstants.TEST_ID);
+        int id = this.blazemeterApiV3.projectIdTest(TestConstants.TEST_ID);
         Assert.assertTrue(id == 11715);
 
     }

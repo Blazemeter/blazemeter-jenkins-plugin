@@ -658,7 +658,7 @@ public class ApiImpl implements Api {
 
 
     @Override
-    public int projectId(String testId) throws Exception {
+    public int projectIdTest(String testId) throws Exception {
         String url = this.urlManager.testId(Api.APP_KEY, testId);
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
@@ -688,9 +688,38 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public int workspaceId(String testId) throws Exception {
-        int pid=this.projectId(testId);
-        String url = this.urlManager.workspaceId(Api.APP_KEY, String.valueOf(pid));
+    public int projectIdCollection(String testId) throws Exception {
+        String url = this.urlManager.collectionId(Api.APP_KEY, testId);
+        Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
+                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                .build();
+        JSONObject jo = null;
+        JSONObject result = null;
+        int pid = 0;
+        try {
+            jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get projectId: " + e);
+            throw e;
+        }
+        try {
+            result = jo.getJSONObject(JsonConsts.RESULT);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        try {
+            pid = result.getInt(JsonConsts.PROJECT_ID);
+        } catch (Exception e) {
+            this.bzmLog.warn("Failed to get result: " + e);
+            throw e;
+        }
+        return pid;
+    }
+
+    @Override
+    public int workspaceId(String projectId) throws Exception {
+        String url = this.urlManager.workspaceId(Api.APP_KEY, projectId);
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
                 .build();
@@ -716,5 +745,23 @@ public class ApiImpl implements Api {
             throw e;
         }
         return wsid;
+    }
+
+    @Override
+    public int projectId(String testId) {
+        int pid = 0;
+        try {
+            pid = this.projectIdTest(testId);
+        } catch (Exception e) {
+            this.bzmLog.info("Failed to find a project for single test with id = " + testId);
+        }
+        if (pid == 0) {
+            try {
+                pid = this.projectIdCollection(testId);
+            } catch (Exception e) {
+                this.bzmLog.info("Failed to find a project for collection with id = " + testId);
+            }
+        }
+        return pid;
     }
 }

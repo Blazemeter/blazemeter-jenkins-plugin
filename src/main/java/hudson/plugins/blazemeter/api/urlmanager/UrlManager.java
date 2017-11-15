@@ -70,6 +70,8 @@ public interface UrlManager {
 
     String testId(String appKey, String testId);
 
+    String collectionId(String appKey, String testId);
+
     String workspaceId(String appKey, String projectId);
 }
 

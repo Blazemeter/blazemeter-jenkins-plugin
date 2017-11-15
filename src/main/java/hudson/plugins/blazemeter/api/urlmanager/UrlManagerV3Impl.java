@@ -232,6 +232,16 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
+    public String collectionId(String appKey, String testId) {
+        try {
+            appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return this.serverUrl + UrlManager.V4 + "/collections/" + testId + "?app_key=" + appKey + UrlManager.CLIENT_IDENTIFICATION;
+    }
+
+    @Override
     public String workspaceId(String appKey, String projectId) {
         try {
             appKey = URLEncoder.encode(appKey, Charsets.UTF_8.name());

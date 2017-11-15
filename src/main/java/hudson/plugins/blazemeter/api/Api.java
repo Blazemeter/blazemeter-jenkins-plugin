@@ -87,7 +87,11 @@ public interface Api {
 
     LinkedHashMultimap<String, String> collectionsMultiMap(int workspaceId) throws IOException, MessagingException;
 
-    int projectId(String testId) throws Exception;
+    int projectIdTest(String testId) throws Exception;
 
     int workspaceId(String testId) throws Exception;
+
+    int projectId(String testId);
+
+    int projectIdCollection(String testId) throws Exception;
 }

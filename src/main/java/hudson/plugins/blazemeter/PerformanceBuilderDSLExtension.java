@@ -1,27 +1,26 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.google.common.collect.LinkedHashMultimap;
 import hudson.Extension;
 import hudson.plugins.blazemeter.api.Api;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
-import java.util.Collection;
+
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
@@ -52,39 +51,28 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             if (credentialsPresent) {
                 if (credential instanceof BlazemeterCredentialsBAImpl) {
                     buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
-                        ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+                            ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
                     api = new ApiImpl(buildCr, serverUrl, false);
                 } else {
                     buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
                     api = new ApiImpl(buildCr, serverUrl, true);
                 }
-                int wsid=0;
-                if(StringUtils.isBlank(c.workspaceId)){
-                    wsid = api.workspaceId(c.testId);
-                }else {
-                    wsid = Integer.valueOf(c.workspaceId);
-                }
-                LinkedHashMultimap<String, String> tests = api.testsMultiMap(wsid);
-                Collection<String> values = tests.values();
-                logger.info(c.credentialsId + " is " + (values.size() > 0 ? "" : "not") + " valid for " +
-                    BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL());
-                if (values.size() > 0) {
-                    for (String v : values) {
-                        if (v.contains(c.testId)) {
-                            logger.info("Test with " + c.testId + " exists on server.");
-                            pb = new PerformanceBuilder(c.credentialsId,c.workspaceId, serverUrl,
-                                v, c.notes, c.sessionProperties,
-                                c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
-
-                            break;
-                        }
+                int pid=api.projectId(c.testId);
+                if (pid>0) {
+                    try {
+                        c.workspaceId = String.valueOf(api.workspaceId(String.valueOf(pid)));
+                    } catch (Exception e) {
+                        logger.info("Failed to find workspace for testId = " + c.testId);
                     }
+                    pb = new PerformanceBuilder(c.credentialsId, c.workspaceId, serverUrl,
+                            c.testId, c.notes, c.sessionProperties,
+                            c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
                 }
             }
 
         } catch (Exception e) {
             logger.warn("Failed to create PerformanceBuilder object from Job DSL description: credentialsId=" + c.credentialsId +
-                ", testId =" + c.testId + ", serverUrl=" + serverUrl);
+                    ", testId =" + c.testId + ", serverUrl=" + serverUrl);
         } finally {
             return pb;
         }
