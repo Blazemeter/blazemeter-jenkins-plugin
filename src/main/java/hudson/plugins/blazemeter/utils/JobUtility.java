@@ -590,35 +590,4 @@ public class JobUtility {
         }
         return p;
     }
-
-    public static boolean collection(String testId, String workspaceId, Api api) throws Exception {
-        boolean exists = false;
-        boolean collection = false;
-        int wsid = 0;
-        try {
-            wsid = Integer.valueOf(workspaceId);
-        } catch (NumberFormatException nfe) {
-            wsid = api.workspaceId(testId);
-        }
-        LinkedHashMultimap tests = api.testsMultiMap(wsid);
-        Set<Map.Entry> entries = tests.entries();
-        for (Map.Entry e : entries) {
-            StringBuilder key = new StringBuilder();
-            key.append(e.getKey());
-            int point = key.toString().indexOf(".");
-            if (testId.equals(key.toString().substring(0, point))) {
-                collection = (key.toString().substring(point + 1)).contains("multi");
-                exists = true;
-            }
-            if (collection) {
-                break;
-            }
-            key.setLength(0);
-        }
-        if (!exists) {
-            throw new Exception("Test with test id = " + testId + " is not present on server");
-        }
-        return collection;
-    }
-
 }

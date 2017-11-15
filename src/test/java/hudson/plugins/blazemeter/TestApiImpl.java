@@ -63,14 +63,14 @@ public class TestApiImpl {
     @Test
     public void startTest_single() throws JSONException, IOException {
         this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-        Assert.assertEquals(this.blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, false).get(JsonConsts.ID),
+        Assert.assertEquals(this.blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID).get(JsonConsts.ID),
             "15102806");
     }
 
     @Test
     public void startTest_collection() throws JSONException, IOException {
         this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-        Assert.assertEquals(this.blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConsts.ID),
+        Assert.assertEquals(this.blazemeterApiV3.startCollection(TestConstants.TEST_MASTER_ID).get(JsonConsts.ID),
             "15105877");
     }
 

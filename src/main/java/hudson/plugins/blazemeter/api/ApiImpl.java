@@ -165,15 +165,10 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public synchronized HashMap<String, String> startTest(String testId, boolean collection) throws JSONException,
-            IOException {
-        String url = "";
+    public HashMap<String, String> startTest(String testId) throws JSONException, IOException {
+        String url = this.urlManager.testStart(Api.APP_KEY, testId);
         HashMap<String, String> startResp = new HashMap<String, String>();
-        if(collection){
-            url = this.urlManager.collectionStart(Api.APP_KEY, testId);
-        }else {
-            url = this.urlManager.testStart(Api.APP_KEY, testId);
-        }
+
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
                 .addHeader(Api.ACCEPT, Api.APP_JSON)
@@ -193,13 +188,64 @@ public class ApiImpl implements Api {
         try {
             result = (JSONObject) jo.get(JsonConsts.RESULT);
             startResp.put(JsonConsts.ID, result.getString(JsonConsts.ID));
-            startResp.put(JsonConsts.TEST_ID, result.getString(collection ? JsonConsts.TEST_COLLECTION_ID : JsonConsts.TEST_ID));
+            startResp.put(JsonConsts.TEST_ID, result.getString(JsonConsts.TEST_ID));
             startResp.put(JsonConsts.NAME, result.getString(JsonConsts.NAME));
         } catch (Exception e) {
             startResp.put(JsonConsts.ERROR, jo.get(JsonConsts.ERROR).toString());
         } finally {
             return startResp;
         }
+    }
+
+    @Override
+    public HashMap<String, String> startCollection(String testId) throws JSONException, IOException {
+        String url = this.urlManager.collectionStart(Api.APP_KEY, testId);
+        HashMap<String, String> startResp = new HashMap<String, String>();
+
+        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
+        Request r = new Request.Builder().url(url).post(emptyBody)
+                .addHeader(Api.ACCEPT, Api.APP_JSON)
+                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
+        Response rp = this.okhttp.newCall(r).execute();
+        if (rp.code() == 500) {
+            this.bzmLog.info("Server returned status = 500 while trying to start test.");
+            return startResp;
+        }
+        JSONObject jo = new JSONObject(rp.body().string());
+        if (jo == null) {
+            if (this.bzmLog.isDebugEnabled())
+                this.bzmLog.debug("Received NULL from server while start operation: will do 5 retries");
+        }
+        JSONObject result = null;
+        try {
+            result = (JSONObject) jo.get(JsonConsts.RESULT);
+            startResp.put(JsonConsts.ID, result.getString(JsonConsts.ID));
+            startResp.put(JsonConsts.TEST_ID, result.getString(JsonConsts.TEST_COLLECTION_ID));
+            startResp.put(JsonConsts.NAME, result.getString(JsonConsts.NAME));
+        } catch (Exception e) {
+            startResp.put(JsonConsts.ERROR, jo.get(JsonConsts.ERROR).toString());
+        } finally {
+            return startResp;
+        }}
+
+    @Override
+    public synchronized HashMap<String, String> startMaster(String testId) throws JSONException,
+            IOException {
+        HashMap<String, String> startResp = new HashMap<>();
+        try {
+            startResp = this.startTest(testId);
+        } catch (Exception e) {
+            this.bzmLog.info("Failed to start test with id = " + testId);
+        }
+        if (startResp.containsKey(JsonConsts.ERROR)) {
+            try {
+                startResp = this.startCollection(testId);
+            } catch (Exception e) {
+                this.bzmLog.info("Failed to start collection with id = " + testId);
+            }
+        }
+        return startResp;
     }
 
     @Override

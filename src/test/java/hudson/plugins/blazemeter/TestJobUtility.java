@@ -228,6 +228,7 @@ public class TestJobUtility {
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
+/*
 
     @Test
     public void collection_true(){
@@ -264,6 +265,7 @@ public class TestJobUtility {
         }
     }
 
+*/
 
 
     @Test

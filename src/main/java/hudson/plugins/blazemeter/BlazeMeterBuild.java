@@ -179,16 +179,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         String testId_num = Utils.getTestId(this.testId);
-        boolean collection = false;
-        try {
-            collection = JobUtility.collection(testId_num, this.workspaceId,api);
-        } catch (Exception e) {
-            lentry.append("Failed to find testId = "+testId_num+" on server: " + e);
-            bzmLog.warn(lentry.toString());
-            consLog.warn(lentry.toString());
-            lentry.setLength(0);
-//          return Result.FAILURE;
-        }
 
         HashMap<String,String> startTestResp=new HashMap<String, String>();
         String masterId = "";
@@ -204,7 +194,7 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         try {
-            startTestResp = api.startTest(testId_num, collection);
+            startTestResp = api.startMaster(testId_num);
             if (startTestResp.size()==0) {
                 lentry.append("Server returned status = 500 while trying to start test.");
                 consLog.warn(lentry.toString());

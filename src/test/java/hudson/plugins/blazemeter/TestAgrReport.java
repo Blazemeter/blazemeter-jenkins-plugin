@@ -29,12 +29,12 @@ public class TestAgrReport {
         File jf = new File(TestConstants.RESOURCES + "/agreport.json");
         String jo = FileUtils.readFileToString(jf);
         TestReport r = new TestReport(new JSONObject(jo));
-        Assert.assertTrue(r.average==6.0520833333333);
+        Assert.assertTrue(r.average==6.05);
         Assert.assertTrue(r.min==0);
         Assert.assertTrue(r.max==172);
         Assert.assertTrue(r.hits==96);
         Assert.assertTrue(r.errorPercentage==100);
-        String arStr="AggregateTestResult -> hits=96.0, errors percentage=100.0, average=6.0520833333333, min=0.0, max=172.0";
+        String arStr="AggregateTestResult -> hits = 96 hits, errors = 100.0 %, average = 6.05 ms, min = 0 ms, max = 172 ms, average throughput = 0.4 hits/s, 90% Response Time = 3 s.";
         Assert.assertEquals(arStr,r.toString());
     }
 }
