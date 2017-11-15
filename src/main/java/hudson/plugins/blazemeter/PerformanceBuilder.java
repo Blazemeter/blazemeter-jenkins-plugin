@@ -139,7 +139,7 @@ public class PerformanceBuilder extends Builder{
             }
             b.setCredential(buildCr);
             String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            b.setServerUrl(this.serverUrl != null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
+            b.setServerUrl(serverUrlConfig!=null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
             b.setTestId(this.testId);
             b.setNotes(this.notes);
             b.setSessionProperties(this.sessionProperties);
