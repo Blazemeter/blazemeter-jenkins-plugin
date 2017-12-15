@@ -40,8 +40,6 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 public class BlazeMeterTestStep extends Step {
 
-    private String jobApiKey ="";
-
     private String credentialsId = "";
 
     private String workspaceId = "";
@@ -91,11 +89,6 @@ public class BlazeMeterTestStep extends Step {
     @DataBoundSetter
     public void setCredentialsId(final String credentialsId) {
         this.credentialsId = credentialsId;
-    }
-
-    @DataBoundSetter
-    public void setJobApiKey(final String jobApiKey) {
-        this.credentialsId = Utils.calcLegacyId(jobApiKey);
     }
 
     @DataBoundSetter

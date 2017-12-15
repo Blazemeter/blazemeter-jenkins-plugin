@@ -83,13 +83,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
-    public FormValidation doCheckCredentialsId(@QueryParameter String value) {
-        if (value.contains(Constants.THREE_DOTS)){
-            return FormValidation.errorWithMarkup("'Workspace ID' & 'Test ID' are empty because you've selected LEGACY key.</br>" +
-                    "Please, select NON-LEGACY key for job re-configuration");
-        }    else return FormValidation.ok();
-    }
-
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
@@ -106,11 +99,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
         for (BlazemeterCredentials c : creds) {
             if (c.getId().equals(crid)) {
-                credential = c;
-            }
-        }
-        for (BlazemeterCredentials c : creds) {
-            if (c.getId().equals(Utils.calcLegacyId(crid))) {
                 credential = c;
             }
         }
@@ -176,11 +164,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 credential = c;
             }
         }
-        for (BlazemeterCredentials c : creds) {
-            if (c.getId().equals(Utils.calcLegacyId(crid))) {
-                credential = c;
-            }
-        }
 
         Api api = null;
 
@@ -233,10 +216,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 ListBoxModel.Option option = iterator.next();
                 try {
                     if (StringUtils.isBlank(credentialsId)) {
-                        option.selected = true;
-                        break;
-                    }
-                    if (option.value.equals(Utils.calcLegacyId(credentialsId))) {
                         option.selected = true;
                         break;
                     }

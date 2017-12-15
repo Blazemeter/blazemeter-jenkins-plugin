@@ -39,12 +39,9 @@ import javax.annotation.Nonnull;
 import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 
 
 public class PerformanceBuilder extends Builder{
-
-    private String jobApiKey = "";
 
     private String credentialsId = "";
 
@@ -115,10 +112,8 @@ public class PerformanceBuilder extends Builder{
         String buildCr = "";
         boolean legacy=false;
         try {
-            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
-                Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
 
-            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -194,10 +189,6 @@ public class PerformanceBuilder extends Builder{
     }
 
 
-    public String getCredentialsId() {
-        return StringUtils.isBlank(this.credentialsId)?this.jobApiKey:this.credentialsId;
-    }
-
     public void setCredentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
     }
@@ -250,15 +241,6 @@ public class PerformanceBuilder extends Builder{
         this.sessionProperties = sessionProperties;
     }
 
-    public String getJobApiKey() {
-        return this.jobApiKey;
-    }
-
-    public void setJobApiKey(final String jobApiKey) {
-        this.jobApiKey = jobApiKey;
-    }
-
-
     public String getWorkspaceId() {
         return this.workspaceId;
     }
@@ -267,19 +249,4 @@ public class PerformanceBuilder extends Builder{
         this.workspaceId = workspaceId;
     }
 
-
-    public String legacy(){
-        return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
-                "Please, select another key and re-save job.";
-    }
-    // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static final class DescriptorImpl
-            extends BlazeMeterPerformanceBuilderDescriptor {
-
-        @Override
-        public boolean configure(StaplerRequest req, net.sf.json.JSONObject formData) throws FormException {
-            return super.configure(req, formData);
-        }
-    }
 }
