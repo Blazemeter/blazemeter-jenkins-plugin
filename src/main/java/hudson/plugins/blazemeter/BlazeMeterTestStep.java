@@ -238,9 +238,6 @@ public class BlazeMeterTestStep extends Step {
             if (credential instanceof BlazemeterCredentialsBAImpl) {
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
-            } else {
-                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                legacy = true;
             }
 
             Api api = new ApiImpl(buildCr, this.serverUrl, legacy);

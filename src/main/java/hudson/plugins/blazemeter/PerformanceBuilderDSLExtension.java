@@ -53,9 +53,6 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                     buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                             ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
                     api = new ApiImpl(buildCr, serverUrl, false);
-                } else {
-                    buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                    api = new ApiImpl(buildCr, serverUrl, true);
                 }
                 int pid=api.projectId(c.testId);
                 if (pid>0) {

@@ -123,9 +123,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             bc = Credentials.basic(username, password);
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
-        if (credential instanceof BlazemeterCredentialImpl) {
-            return new ListBoxModel();
-        }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
@@ -194,10 +191,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             bc = Credentials.basic(username, password);
             api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
-        if (credential instanceof BlazemeterCredentialImpl) {
-            return new ListBoxModel();
-
-        }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
@@ -232,12 +225,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             for (BlazemeterCredentials c : CredentialsProvider
                     .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
                 items.add(new ListBoxModel.Option(c.getDescription(),
-                        c.getId(),
-                        false));
-            }
-            for (BlazemeterCredentials c : CredentialsProvider
-                    .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-                items.add(new ListBoxModel.Option(c.getDescription() + Constants.LEGACY,
                         c.getId(),
                         false));
             }
@@ -276,13 +263,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         StringBuilder id = new StringBuilder();
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
-            id.append(c.getId());
-            result.add(c);
-            addedCredentials.add(id.toString());
-            id.setLength(0);
-        }
-        for (BlazemeterCredentialImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             id.append(c.getId());
             result.add(c);
             addedCredentials.add(id.toString());

@@ -132,10 +132,6 @@ public class PerformanceBuilder extends Builder{
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
                 legacy=false;
-            } else {
-                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                b.setCredLegacy(true);
-                legacy = true;
             }
             b.setCredential(buildCr);
             String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();

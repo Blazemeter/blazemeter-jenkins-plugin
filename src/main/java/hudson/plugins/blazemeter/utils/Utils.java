@@ -18,7 +18,6 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
 import hudson.plugins.blazemeter.BlazemeterCredentials;
 import hudson.plugins.blazemeter.BlazemeterCredentialsBAImpl;
 import hudson.security.ACL;
@@ -70,14 +69,6 @@ public class Utils {
         Item item = scope instanceof Item ? (Item) scope : null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
-                result.add(c);
-                apiKeys.add(id);
-            }
-        }
-        for (BlazemeterCredentials c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
             String id = c.getId();
             if (!apiKeys.contains(id)) {
                 result.add(c);
