@@ -1,4 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/github/Blazemeter/blazemeter-jenkins-plugin/badge.svg?branch=master)](https://coveralls.io/github/Blazemeter/blazemeter-jenkins-plugin?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/18958ed195bf4df2817516b81670d951)](https://www.codacy.com/app/dzmitrykashlach/blazemeter-jenkins-plugin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Blazemeter/blazemeter-jenkins-plugin&amp;utm_campaign=Badge_Grade)
 #### 1. What's this?
 
