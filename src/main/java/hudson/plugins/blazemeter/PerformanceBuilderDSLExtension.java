@@ -14,28 +14,22 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
-import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.Utils;
 
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.log.StdErrLog;
 
 
 @Extension(optional = true)
 public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
-    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
+//    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
 
     @DslExtensionMethod(context = StepContext.class)
     public Object blazeMeterTest(Runnable closure) {
-        logger.info("Running 'blazeMeterTest' method from JOB DSL plugin...");
+//        logger.info("Running 'blazeMeterTest' method from JOB DSL plugin...");
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure, c);
         boolean credentialsPresent = false;
@@ -43,34 +37,34 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            BlazemeterCredentials credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential=null;// = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
             credentialsPresent = !StringUtils.isBlank(credential.getId());
-            logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
+//         TODO   logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
             String buildCr = "";
-            Api api = null;
+//            Api api = null;
             if (credentialsPresent) {
                 if (credential instanceof BlazemeterCredentialsBAImpl) {
                     buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                             ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
-                    api = new ApiImpl(buildCr, serverUrl, false);
+//                    api = new ApiImpl(buildCr, serverUrl, false);
                 }
-                int pid=api.projectId(c.testId);
-                if (pid>0) {
+//                int pid=api.projectId(c.testId);
+                /*if (pid>0) {
                     try {
                         c.workspaceId = String.valueOf(api.workspaceId(String.valueOf(pid)));
                     } catch (Exception e) {
-                        logger.info("Failed to find workspace for testId = " + c.testId);
+//               TODO         logger.info("Failed to find workspace for testId = " + c.testId);
                     }
                     pb = new PerformanceBuilder(c.credentialsId, c.workspaceId, serverUrl,
                             c.testId, c.notes, c.sessionProperties,
                             c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
-                }
+                }*/
             }
 
         } catch (Exception e) {
-            logger.warn("Failed to create PerformanceBuilder object from Job DSL description: credentialsId=" + c.credentialsId +
+         /*TODO   logger.warn("Failed to create PerformanceBuilder object from Job DSL description: credentialsId=" + c.credentialsId +
                     ", testId =" + c.testId + ", serverUrl=" + serverUrl);
-        } finally {
+        */} finally {
             return pb;
         }
     }

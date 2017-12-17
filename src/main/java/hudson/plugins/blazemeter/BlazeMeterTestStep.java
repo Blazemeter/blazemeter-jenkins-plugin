@@ -13,17 +13,12 @@
  */
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.Utils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -225,7 +220,9 @@ public class BlazeMeterTestStep extends Step {
         @Override
         public void stop(Throwable cause) throws Exception {
             this.context.onFailure(cause);
-            BlazemeterCredentials credential = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+//            BlazemeterCredentials credential //= Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential=null;
+            // = Utils.findCredentials(this.credentialsId, CredentialsScope.GLOBAL);
             String buildCr = "";
             boolean legacy = false;
             if (credential instanceof BlazemeterCredentialsBAImpl) {
@@ -233,7 +230,7 @@ public class BlazeMeterTestStep extends Step {
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
             }
 
-            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+//            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
             String masterId = null;
             FilePath fp = this.context.get(FilePath.class);
             String buildId = this.v.get("BUILD_ID");
@@ -247,7 +244,7 @@ public class BlazeMeterTestStep extends Step {
                 }
             }
             if (!StringUtils.isBlank(masterId)) {
-                JobUtility.stopMaster(api, masterId);
+//                JobUtility.stopMaster(api, masterId);
             }
         }
     }

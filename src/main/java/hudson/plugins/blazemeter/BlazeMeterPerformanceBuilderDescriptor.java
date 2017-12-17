@@ -21,10 +21,7 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -32,8 +29,6 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -87,7 +82,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
+        List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
         BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
             if (creds.size() > 0) {
@@ -103,13 +98,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
 
-        Api api = null;
+//        Api api = null;
         if (credential instanceof BlazemeterCredentialsBAImpl) {
             String bc = null;
             String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
             String password = ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText();
             bc = Credentials.basic(username, password);
-            api = new ApiImpl(bc, this.blazeMeterURL, false);
+//            api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
@@ -118,11 +113,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         try {
             LinkedHashMultimap<String, String> testList = null;
             if (StringUtils.isBlank(wsid)) {
-                HashMap<Integer, String> wss = api.workspaces();
-                testList = api.testsMultiMap((Integer) wss.keySet().toArray()[0]);
+                HashMap<Integer, String> wss = null; //api.workspaces();
+                testList = null;//api.testsMultiMap((Integer) wss.keySet().toArray()[0]);
 
             } else {
-                testList = api.testsMultiMap(Integer.valueOf(wsid));
+                testList = null;// api.testsMultiMap(Integer.valueOf(wsid));
             }
             if (testList == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "");
@@ -165,21 +160,21 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
 
-        Api api = null;
+//        Api api = null;
 
         if (credential instanceof BlazemeterCredentialsBAImpl) {
             String bc = null;
             String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
             String password = ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText();
             bc = Credentials.basic(username, password);
-            api = new ApiImpl(bc, this.blazeMeterURL, false);
+//            api = new ApiImpl(bc, this.blazeMeterURL, false);
         }
         if (credential == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
         try {
-            HashMap<Integer, String> wsl = api.workspaces();
+            HashMap<Integer, String> wsl =  null;//api.workspaces();
             if (wsl == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "");
             } else if (wsl.isEmpty()) {
@@ -234,22 +229,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
     }
 
-    public List<BlazemeterCredentials> getCredentials(Object scope) {
-        List<BlazemeterCredentials> result = new ArrayList<BlazemeterCredentials>();
-        Set<String> addedCredentials = new HashSet<String>();
-
-        Item item = scope instanceof Item ? (Item) scope : null;
-        StringBuilder id = new StringBuilder();
-        for (BlazemeterCredentialsBAImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
-            id.append(c.getId());
-            result.add(c);
-            addedCredentials.add(id.toString());
-            id.setLength(0);
-        }
-        return result;
-    }
-
     // Used by global.jelly to authenticate User key
 
 
@@ -260,6 +239,36 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.save();
         return true;
     }
+
+    public static List<BlazemeterCredentials> getCredentials(Object scope) {
+        List<BlazemeterCredentials> result = new ArrayList<BlazemeterCredentials>();
+        Set<String> apiKeys = new HashSet<String>();
+        Item item = scope instanceof Item ? (Item) scope : null;
+        for (BlazemeterCredentialsBAImpl c : CredentialsProvider
+                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+            String id = c.getId();
+            if (!apiKeys.contains(id)) {
+                result.add(c);
+                apiKeys.add(id);
+            }
+        }
+        return result;
+    }
+
+    /*
+    TODO
+    public static BlazemeterCredentials findCredentials(String credentialsId, Object scope) {
+        List<BlazemeterCredentials> creds = getCredentials(scope);
+        BlazemeterCredentials cred = BlazemeterCredentialsBAImpl.EMPTY;
+
+        for (BlazemeterCredentials c : creds) {
+            if (c.getId().equals(credentialsId)) {
+                cred = c;
+            }
+        }
+        return cred;
+    }
+*/
 
     public String getName() {
         return this.name;

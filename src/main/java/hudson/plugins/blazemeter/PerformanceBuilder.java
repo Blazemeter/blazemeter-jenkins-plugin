@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -23,11 +22,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
@@ -113,7 +108,8 @@ public class PerformanceBuilder extends Builder{
         boolean legacy=false;
         try {
 
-            BlazemeterCredentials credential = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
+//            BlazemeterCredentials credential = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential = null;
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -154,7 +150,7 @@ public class PerformanceBuilder extends Builder{
             r = c.call(b);
         } catch (InterruptedException e) {
             r = Result.ABORTED;
-            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+//            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
             String masterId = null;
             String buildId = run.getId();
             FilePath ld = new FilePath(workspace, buildId);
@@ -168,7 +164,7 @@ public class PerformanceBuilder extends Builder{
             }
             if (!StringUtils.isBlank(masterId)) {
                 try {
-                    JobUtility.stopMaster(api, masterId);
+//                    JobUtility.stopMaster(api, masterId);
                 } catch (Exception e1) {
                     listener.error("Failure while stopping master session = " + e1);
                 }
