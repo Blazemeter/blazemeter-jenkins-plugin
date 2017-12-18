@@ -98,6 +98,15 @@ public class BlazeMeterTestStep extends Step {
         this.credentialsId = Utils.calcLegacyId(jobApiKey);
     }
 
+
+    public String getJobApiKey() {
+        return jobApiKey;
+    }
+
+    public String getWorkspaceId() {
+        return workspaceId;
+    }
+
     @DataBoundSetter
     public void setWorkspaceId(final String workspaceId){this.workspaceId = workspaceId;}
 
