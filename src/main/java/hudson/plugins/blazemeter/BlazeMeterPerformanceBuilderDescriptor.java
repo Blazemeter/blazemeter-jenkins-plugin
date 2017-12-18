@@ -14,6 +14,10 @@
 
 package hudson.plugins.blazemeter;
 
+import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.logging.Logger;
+import com.blazemeter.api.logging.UserNotifier;
+import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.google.common.collect.LinkedHashMultimap;
@@ -21,6 +25,8 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
+import hudson.plugins.blazemeter.logging.ServerLogger;
+import hudson.plugins.blazemeter.logging.ServerUserNotifier;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -81,7 +87,18 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
-        ListBoxModel items = new ListBoxModel();
+
+
+        UserNotifier serverUserNotifier = new ServerUserNotifier();
+        Logger logger = new ServerLogger();
+        BlazeMeterUtils utils = new BlazeMeterUtils("", "", blazeMeterURL, blazeMeterURL, serverUserNotifier, logger);
+
+        try {
+            User.getUser(utils);
+        }catch (Exception e){
+            serverUserNotifier.notifyInfo("Failed to authenticate.");
+        }
+            ListBoxModel items = new ListBoxModel();
         List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
         BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
