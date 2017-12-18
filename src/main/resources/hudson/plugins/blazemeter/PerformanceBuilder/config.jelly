@@ -23,7 +23,7 @@
         <f:select style="width:32em;"/>
     </f:entry>
     <f:entry title="${%Server url:}">
-        <f:textbox disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
+        <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
