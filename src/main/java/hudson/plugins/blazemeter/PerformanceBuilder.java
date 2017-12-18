@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -23,11 +22,7 @@ import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JobUtility;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.report.BuildReporter;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
@@ -39,12 +34,9 @@ import javax.annotation.Nonnull;
 import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 
 
 public class PerformanceBuilder extends Builder{
-
-    private String jobApiKey = "";
 
     private String credentialsId = "";
 
@@ -115,10 +107,9 @@ public class PerformanceBuilder extends Builder{
         String buildCr = "";
         boolean legacy=false;
         try {
-            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
-                Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
 
-            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
+//            BlazemeterCredentials credential = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
+            BlazemeterCredentials credential = null;
             credentialsPresent = !StringUtils.isBlank(credential.getId());
 
             if (!credentialsPresent) {
@@ -132,10 +123,6 @@ public class PerformanceBuilder extends Builder{
                 buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
                     ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
                 legacy=false;
-            } else {
-                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                b.setCredLegacy(true);
-                legacy = true;
             }
             b.setCredential(buildCr);
             String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
@@ -163,7 +150,7 @@ public class PerformanceBuilder extends Builder{
             r = c.call(b);
         } catch (InterruptedException e) {
             r = Result.ABORTED;
-            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+//            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
             String masterId = null;
             String buildId = run.getId();
             FilePath ld = new FilePath(workspace, buildId);
@@ -177,7 +164,7 @@ public class PerformanceBuilder extends Builder{
             }
             if (!StringUtils.isBlank(masterId)) {
                 try {
-                    JobUtility.stopMaster(api, masterId);
+//                    JobUtility.stopMaster(api, masterId);
                 } catch (Exception e1) {
                     listener.error("Failure while stopping master session = " + e1);
                 }
@@ -197,10 +184,6 @@ public class PerformanceBuilder extends Builder{
         return !build.getResult().equals(Result.FAILURE);
     }
 
-
-    public String getCredentialsId() {
-        return StringUtils.isBlank(this.credentialsId)?this.jobApiKey:this.credentialsId;
-    }
 
     public void setCredentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
@@ -254,15 +237,6 @@ public class PerformanceBuilder extends Builder{
         this.sessionProperties = sessionProperties;
     }
 
-    public String getJobApiKey() {
-        return this.jobApiKey;
-    }
-
-    public void setJobApiKey(final String jobApiKey) {
-        this.jobApiKey = jobApiKey;
-    }
-
-
     public String getWorkspaceId() {
         return this.workspaceId;
     }
@@ -271,19 +245,4 @@ public class PerformanceBuilder extends Builder{
         this.workspaceId = workspaceId;
     }
 
-
-    public String legacy(){
-        return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
-                "Please, select another key and re-save job.";
-    }
-    // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
-    @SuppressWarnings({"UnusedDeclaration"})
-    public static final class DescriptorImpl
-            extends BlazeMeterPerformanceBuilderDescriptor {
-
-        @Override
-        public boolean configure(StaplerRequest req, net.sf.json.JSONObject formData) throws FormException {
-            return super.configure(req, formData);
-        }
-    }
 }

@@ -20,11 +20,7 @@ import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
 import javax.annotation.CheckForNull;
 import javax.validation.constraints.NotNull;
 import hudson.Extension;
-import hudson.Extension;
 import hudson.Util;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import java.io.IOException;
@@ -120,8 +116,9 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
             String serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
             String cred = "";
             cred = Credentials.basic(username, plainPass);
-            Api api = new ApiImpl(cred, serverUrl, false);
-            return JobUtility.validateCredentials(api);
+            // TODO
+            // testConnection
+            return FormValidation.error("Not implemented");
         }
 
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,29 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package hudson.plugins.blazemeter.logging;
 
-package hudson.plugins.blazemeter.utils;
+import com.blazemeter.api.logging.UserNotifier;
 
-
-import hudson.util.FormValidation;
-
-import java.io.IOException;
-import java.util.Properties;
-
-
-public class Utils {
-
-    private Utils() {
+public class ServerUserNotifier implements UserNotifier {
+    @Override
+    public void notifyInfo(String info) {
     }
 
-    public static String version() {
-        Properties props = new Properties();
-        try {
-            props.load(Utils.class.getResourceAsStream("version.properties"));
-        } catch (IOException ex) {
-            props.setProperty(Constants.VERSION, "N/A");
-        }
-        return props.getProperty(Constants.VERSION);
+    @Override
+    public void notifyWarning(String warn) {
     }
 
+    @Override
+    public void notifyError(String error) {
+    }
 }
