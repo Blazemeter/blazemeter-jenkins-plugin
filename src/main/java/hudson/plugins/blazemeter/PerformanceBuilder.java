@@ -36,20 +36,27 @@ import hudson.tasks.Builder;
 import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nonnull;
+
+import jenkins.tasks.SimpleBuildStep;
 import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 
-public class PerformanceBuilder extends Builder{
+public class PerformanceBuilder extends Builder implements SimpleBuildStep {
 
+    @Deprecated
     private String jobApiKey = "";
 
     private String credentialsId = "";
 
     private String workspaceId = "";
 
+    @Deprecated
     private String serverUrl = "";
 
     private String testId = "";
@@ -68,6 +75,14 @@ public class PerformanceBuilder extends Builder{
 
 
     @DataBoundConstructor
+    public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
+        this.credentialsId = credentialsId;
+        this.workspaceId = workspaceId;
+        this.testId = testId;
+    }
+
+
+    @Restricted(NoExternalUse.class)
     public PerformanceBuilder(String credentialsId,
                               String workspaceId,
                               String serverUrl,
@@ -199,9 +214,10 @@ public class PerformanceBuilder extends Builder{
 
 
     public String getCredentialsId() {
-        return StringUtils.isBlank(this.credentialsId)?this.jobApiKey:this.credentialsId;
+        return StringUtils.isBlank(this.credentialsId) ? this.jobApiKey : this.credentialsId;
     }
 
+    @DataBoundSetter
     public void setCredentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
     }
@@ -210,6 +226,7 @@ public class PerformanceBuilder extends Builder{
         return testId;
     }
 
+    @DataBoundSetter
     public void setTestId(String testId) {
         this.testId = testId;
     }
@@ -226,6 +243,7 @@ public class PerformanceBuilder extends Builder{
         return notes;
     }
 
+    @DataBoundSetter
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -238,6 +256,7 @@ public class PerformanceBuilder extends Builder{
         return jtlPath;
     }
 
+    @DataBoundSetter
     public void setJtlPath(String jtlPath) {
         this.jtlPath = jtlPath;
     }
@@ -246,18 +265,23 @@ public class PerformanceBuilder extends Builder{
         return junitPath;
     }
 
+    @DataBoundSetter
     public void setJunitPath(String junitPath) {
         this.junitPath = junitPath;
     }
 
+    @DataBoundSetter
     public void setSessionProperties(String sessionProperties) {
         this.sessionProperties = sessionProperties;
     }
 
+    @Deprecated
     public String getJobApiKey() {
         return this.jobApiKey;
     }
 
+    @Deprecated
+    @DataBoundSetter
     public void setJobApiKey(final String jobApiKey) {
         this.jobApiKey = jobApiKey;
     }
@@ -267,15 +291,42 @@ public class PerformanceBuilder extends Builder{
         return this.workspaceId;
     }
 
+    @DataBoundSetter
     public void setWorkspaceId(String workspaceId) {
         this.workspaceId = workspaceId;
     }
 
+    @Deprecated
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    @Deprecated
+    @DataBoundSetter
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
+
+    @DataBoundSetter
+    public void setGetJtl(boolean getJtl) {
+        this.getJtl = getJtl;
+    }
+
+    @DataBoundSetter
+    public void setGetJunit(boolean getJunit) {
+        this.getJunit = getJunit;
+    }
 
     public String legacy(){
         return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
                 "Please, select another key and re-save job.";
     }
+
+    @Override
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+
+    }
+
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
     @SuppressWarnings({"UnusedDeclaration"})
     public static final class DescriptorImpl
