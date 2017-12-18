@@ -15,6 +15,8 @@
 package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.explorer.Workspace;
+import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
@@ -35,6 +37,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +57,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
+    private String NOT_DEFINED = "not defined";
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
@@ -88,68 +92,19 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
 
-
-        UserNotifier serverUserNotifier = new ServerUserNotifier();
-        Logger logger = new ServerLogger();
-        BlazeMeterUtils utils = new BlazeMeterUtils("", "", blazeMeterURL, blazeMeterURL, serverUserNotifier, logger);
-
-        try {
-            User.getUser(utils);
-        }catch (Exception e){
-            serverUserNotifier.notifyInfo("Failed to authenticate.");
-        }
-            ListBoxModel items = new ListBoxModel();
-        List<BlazemeterCredentials> creds = getCredentials(CredentialsScope.GLOBAL);
+        ListBoxModel items = new ListBoxModel();
+        BlazeMeterUtils utils = getBlazeMeterUtils(CredentialsScope.GLOBAL, crid);
         BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
-            if (creds.size() > 0) {
-                crid = creds.get(0).getId();
-            } else {
-                items.add(Constants.NO_CREDENTIALS, "-1");
-                return items;
-            }
+            items.add(Constants.NO_CREDENTIALS, "");
         }
-        for (BlazemeterCredentials c : creds) {
-            if (c.getId().equals(crid)) {
-                credential = c;
-            }
-        }
-
-//        Api api = null;
-        if (credential instanceof BlazemeterCredentialsBAImpl) {
-            String bc = null;
-            String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
-            String password = ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText();
-            bc = Credentials.basic(username, password);
-//            api = new ApiImpl(bc, this.blazeMeterURL, false);
-        }
-        if (credential == null) {
+        if (utils == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
+        Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
-            LinkedHashMultimap<String, String> testList = null;
-            if (StringUtils.isBlank(wsid)) {
-                HashMap<Integer, String> wss = null; //api.workspaces();
-                testList = null;//api.testsMultiMap((Integer) wss.keySet().toArray()[0]);
-
-            } else {
-                testList = null;// api.testsMultiMap(Integer.valueOf(wsid));
-            }
-            if (testList == null) {
-                items.add(Constants.CRED_ARE_NOT_VALID, "");
-            } else if (testList.isEmpty()) {
-                items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
-            } else {
-                Set set = testList.entries();
-                boolean selected = false;
-                for (Object test : set) {
-                    Map.Entry me = (Map.Entry) test;
-                    String testId = (String) me.getValue();
-                    items.add(new ListBoxModel.Option(testId, testId, !selected ? testId.contains(savedTestId) : false));
-                    selected = testId.contains(savedTestId);
-                }
-            }
+            items = testsList(workspace, savedTestId);
         } catch (Exception e) {
             items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
         } finally {
@@ -161,7 +116,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
 
         ListBoxModel items = new ListBoxModel();
-        List<BlazemeterCredentials> creds = this.getCredentials(CredentialsScope.GLOBAL);
+        BlazeMeterUtils utils = getBlazeMeterUtils(CredentialsScope.GLOBAL, crid);
+/*
+        List<BlazemeterCredentials> creds = this.getBlazeMeterUtils(CredentialsScope.GLOBAL);
         BlazemeterCredentials credential = null;
         if (StringUtils.isBlank(crid)) {
             if (creds.size() > 0) {
@@ -177,8 +134,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
 
-//        Api api = null;
-
         if (credential instanceof BlazemeterCredentialsBAImpl) {
             String bc = null;
             String username = ((BlazemeterCredentialsBAImpl) credential).getUsername();
@@ -191,7 +146,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         try {
-            HashMap<Integer, String> wsl =  null;//api.workspaces();
+
+            HashMap<Integer, String> wsl = null;//api.workspaces();
             if (wsl == null) {
                 items.add(Constants.CRED_ARE_NOT_VALID, "");
             } else if (wsl.isEmpty()) {
@@ -209,6 +165,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         } catch (Exception e) {
             throw FormValidation.error(e.getMessage(), e);
         }
+*/
         return items;
     }
 
@@ -257,25 +214,32 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public static List<BlazemeterCredentials> getCredentials(Object scope) {
-        List<BlazemeterCredentials> result = new ArrayList<BlazemeterCredentials>();
-        Set<String> apiKeys = new HashSet<String>();
+    public BlazeMeterUtils getBlazeMeterUtils(Object scope, String credentialsId) {
+        BlazeMeterUtils utils = null;
         Item item = scope instanceof Item ? (Item) scope : null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
-                result.add(c);
-                apiKeys.add(id);
+            if (c.getId().equals(credentialsId)) {
+                UserNotifier serverUserNotifier = new ServerUserNotifier();
+                Logger logger = new ServerLogger();
+                utils = new BlazeMeterUtils(c.getUsername(), c.getPassword().getPlainText(),
+                        blazeMeterURL, blazeMeterURL, serverUserNotifier, logger);
+                try {
+                    User.getUser(utils);
+                } catch (Exception e) {
+                    //TODO
+                    //Notify user about invalid credentials in drop-down list
+                    logger.error("Failed to find user for provided credentials = " + c.getId(), e);
+                }
             }
         }
-        return result;
+        return utils;
     }
 
     /*
     TODO
-    public static BlazemeterCredentials findCredentials(String credentialsId, Object scope) {
-        List<BlazemeterCredentials> creds = getCredentials(scope);
+    public static BlazemeterCredentials findCredentials(String credentialsId, Object scyope) {
+        List<BlazemeterCredentials> creds = getBlazeMeterUtils(scope);
         BlazemeterCredentials cred = BlazemeterCredentialsBAImpl.EMPTY;
 
         for (BlazemeterCredentials c : creds) {
@@ -286,6 +250,29 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return cred;
     }
 */
+
+
+    private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
+        LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
+        ListBoxModel sortedTests = new ListBoxModel();
+        List<AbstractTest> tests = new ArrayList<>();
+        tests.addAll(workspace.getMultiTests());
+        tests.addAll(workspace.getSingleTests());
+        Comparator c = new Comparator<AbstractTest>() {
+            @Override
+            public int compare(AbstractTest t1, AbstractTest t2) {
+                return t1.getName().compareToIgnoreCase(t2.getName());
+            }
+        };
+        tests.sort(c);
+        boolean selected = false;
+        for (AbstractTest t : tests) {
+            sortedTests.add(new ListBoxModel.Option(t.getId(), t.getId(), !selected ? t.getId().contains(savedTest) : false));
+            testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+            selected = t.getId().contains(savedTest);
+        }
+        return sortedTests;
+    }
 
     public String getName() {
         return this.name;
