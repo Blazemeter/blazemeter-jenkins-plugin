@@ -18,8 +18,6 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -110,108 +108,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
-
-    public void perform(@Nonnull final Run<?, ?> run,
-        @Nonnull final FilePath workspace,
-        @Nonnull final Launcher launcher,
-        @Nonnull final TaskListener listener,
-        EnvVars v) throws InterruptedException, IOException {
-        Result r = null;
-        if(StringUtils.isBlank(this.workspaceId)&&StringUtils.isBlank(this.testId)){
-            listener.error("Please,reconfigure job and select valid credentials, workspace, test");
-            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
-            r=Result.FAILURE;
-            run.setResult(r);
-            return;
-        }
-
-        BuildReporter br = new BuildReporter();
-        boolean credentialsPresent = false;
-        String buildCr = "";
-        boolean legacy=false;
-        try {
-            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
-                Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
-
-            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
-            credentialsPresent = !StringUtils.isBlank(credential.getId());
-
-            if (!credentialsPresent) {
-                listener.error("Can not start build: userKey=" + this.credentialsId + "... is absent in credentials store.");
-                r = Result.NOT_BUILT;
-                run.setResult(r);
-                return;
-            }
-            BlazeMeterBuild b = new BlazeMeterBuild();
-            if (credential instanceof BlazemeterCredentialsBAImpl) {
-                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
-                    ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
-                legacy=false;
-            } else {
-                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                b.setCredLegacy(true);
-                legacy = true;
-            }
-            b.setCredential(buildCr);
-            String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            b.setServerUrl(serverUrlConfig!=null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
-            b.setTestId(this.testId);
-            b.setNotes(this.notes);
-            b.setSessionProperties(this.sessionProperties);
-            b.setJtlPath(this.jtlPath);
-            b.setJunitPath(this.junitPath);
-            b.setGetJtl(this.getJtl);
-            b.setGetJunit(this.getJunit);
-            b.setListener(listener);
-            b.setWs(workspace);
-            b.setWorkspaceId(this.workspaceId);
-            String buildId = run.getId();
-            b.setBuildId(buildId);
-            String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
-            b.setJobName(jobName);
-            VirtualChannel c = launcher.getChannel();
-            EnvVars ev = v == null ? run.getEnvironment(listener) : v;
-            b.setEv(ev);
-            ReportUrlTask rugt = new ReportUrlTask(run, jobName, c);
-            br = new BuildReporter();
-            br.run(rugt);
-            r = c.call(b);
-        } catch (InterruptedException e) {
-            r = Result.ABORTED;
-            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
-            String masterId = null;
-            String buildId = run.getId();
-            FilePath ld = new FilePath(workspace, buildId);
-            List<FilePath> ldfp = ld.list();
-            for (FilePath p : ldfp) {
-                if (p.getBaseName().matches("\\d+")) {
-                    masterId = p.getBaseName();
-                    p.delete();
-                    break;
-                }
-            }
-            if (!StringUtils.isBlank(masterId)) {
-                try {
-                    JobUtility.stopMaster(api, masterId);
-                } catch (Exception e1) {
-                    listener.error("Failure while stopping master session = " + e1);
-                }
-            }
-        } catch (Exception e) {
-            r = Result.FAILURE;
-        } finally {
-            br.stop();
-            run.setResult(r);
-        }
-    }
-
-    @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-        BuildListener listener) throws InterruptedException, IOException {
-        this.perform(build, build.getWorkspace(), launcher, listener,null);
-        return !build.getResult().equals(Result.FAILURE);
-    }
-
 
     public String getCredentialsId() {
         return StringUtils.isBlank(this.credentialsId) ? this.jobApiKey : this.credentialsId;
@@ -324,7 +220,92 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+        Result result = null;
+        if (StringUtils.isBlank(testId)) {
+            listener.error("Please, reconfigure job and select valid credentials and test");
+            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+            run.setResult(Result.FAILURE);
+            return;
+        }
 
+        BuildReporter reporter = new BuildReporter();
+        boolean credentialsPresent = false;
+        String buildCr = "";
+        boolean legacy=false;
+        try {
+            String credId = (StringUtils.isBlank(this.credentialsId) && !StringUtils.isBlank(this.jobApiKey)) ?
+                    Utils.calcLegacyId(this.jobApiKey) : this.credentialsId;
+
+            BlazemeterCredentials credential = Utils.findCredentials(credId, CredentialsScope.GLOBAL);
+            credentialsPresent = !StringUtils.isBlank(credential.getId());
+
+            if (!credentialsPresent) {
+                listener.error("Can not start build: userKey=" + this.credentialsId + "... is absent in credentials store.");
+                result = Result.NOT_BUILT;
+                run.setResult(result);
+                return;
+            }
+            BlazeMeterBuild bzmBuild = new BlazeMeterBuild();
+            if (credential instanceof BlazemeterCredentialsBAImpl) {
+                buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
+                        ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
+                legacy = false;
+            } else {
+                buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
+                bzmBuild.setCredLegacy(true);
+                legacy = true;
+            }
+            bzmBuild.setCredential(buildCr);
+            String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+            bzmBuild.setServerUrl(serverUrlConfig!=null ? serverUrlConfig : Constants.A_BLAZEMETER_COM);
+            bzmBuild.setTestId(this.testId);
+            bzmBuild.setNotes(this.notes);
+            bzmBuild.setSessionProperties(this.sessionProperties);
+            bzmBuild.setJtlPath(this.jtlPath);
+            bzmBuild.setJunitPath(this.junitPath);
+            bzmBuild.setGetJtl(this.getJtl);
+            bzmBuild.setGetJunit(this.getJunit);
+            bzmBuild.setListener(listener);
+            bzmBuild.setWs(workspace);
+            bzmBuild.setWorkspaceId(this.workspaceId);
+            String buildId = run.getId();
+            bzmBuild.setBuildId(buildId);
+            String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
+            bzmBuild.setJobName(jobName);
+            VirtualChannel channel = launcher.getChannel();
+            EnvVars ev = run.getEnvironment(listener);
+            bzmBuild.setEv(ev);
+            ReportUrlTask rugt = new ReportUrlTask(run, jobName, channel);
+            reporter = new BuildReporter();
+            reporter.run(rugt);
+            result = channel.call(bzmBuild);
+        } catch (InterruptedException e) {
+            result = Result.ABORTED;
+            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+            String masterId = null;
+            String buildId = run.getId();
+            FilePath ld = new FilePath(workspace, buildId);
+            List<FilePath> ldfp = ld.list();
+            for (FilePath p : ldfp) {
+                if (p.getBaseName().matches("\\d+")) {
+                    masterId = p.getBaseName();
+                    p.delete();
+                    break;
+                }
+            }
+            if (!StringUtils.isBlank(masterId)) {
+                try {
+                    JobUtility.stopMaster(api, masterId);
+                } catch (Exception e1) {
+                    listener.error("Failure while stopping master session = " + e1);
+                }
+            }
+        } catch (Exception e) {
+            result = Result.FAILURE;
+        } finally {
+            reporter.stop();
+            run.setResult(result);
+        }
     }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
