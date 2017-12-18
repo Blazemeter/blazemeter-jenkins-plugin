@@ -281,7 +281,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
             result = channel.call(bzmBuild);
         } catch (InterruptedException e) {
             result = Result.ABORTED;
-            Api api = new ApiImpl(buildCr, this.serverUrl, legacy);
+            Api api = new ApiImpl(buildCr, BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL() , legacy);
             String masterId = null;
             String buildId = run.getId();
             FilePath ld = new FilePath(workspace, buildId);
