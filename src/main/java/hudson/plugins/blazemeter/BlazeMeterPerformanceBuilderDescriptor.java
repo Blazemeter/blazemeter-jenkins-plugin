@@ -48,11 +48,12 @@ import java.util.Set;
 import net.sf.json.JSONObject;
 import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
-
+@Symbol({"blazeMeterTest"})
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
