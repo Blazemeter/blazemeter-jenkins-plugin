@@ -23,6 +23,7 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+@Deprecated
 public class BlazemeterCredentialImpl extends BaseCredentials implements StandardCredentials,BlazemeterCredentials {
     private static final long serialVersionUID = 1L;
 
