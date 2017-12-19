@@ -29,6 +29,7 @@ import hudson.model.Descriptor;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.logging.ServerLogger;
 import hudson.plugins.blazemeter.logging.ServerUserNotifier;
+import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -89,7 +90,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
 
         ListBoxModel items = new ListBoxModel();
-        BlazeMeterUtils utils = getBlazeMeterUtils(CredentialsScope.GLOBAL, crid);
+        BlazeMeterUtils utils = getBzmUtils(CredentialsScope.GLOBAL, crid);
         if (StringUtils.isBlank(crid)) {
             items.add(Constants.NO_CREDENTIALS, "");
         }
@@ -110,7 +111,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        BlazeMeterUtils utils = getBlazeMeterUtils(CredentialsScope.GLOBAL, crid);
+        BlazeMeterUtils utils = getBzmUtils(CredentialsScope.GLOBAL, crid);
         if (StringUtils.isBlank(crid)) {
             items.add(Constants.NO_CREDENTIALS, "");
         }
@@ -172,16 +173,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public BlazeMeterUtils getBlazeMeterUtils(Object scope, String credentialsId) {
-        BlazeMeterUtils utils = null;
+    public BzmUtils getBzmUtils(Object scope, String credentialsId) {
+        BzmUtils utils = null;
         Item item = scope instanceof Item ? (Item) scope : null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
             if (c.getId().equals(credentialsId)) {
                 UserNotifier serverUserNotifier = new ServerUserNotifier();
                 Logger logger = new ServerLogger();
-                utils = new BlazeMeterUtils(c.getUsername(), c.getPassword().getPlainText(),
-                        blazeMeterURL, blazeMeterURL, serverUserNotifier, logger);
+                utils = new BzmUtils(c.getUsername(), c.getPassword().getPlainText(),
+                        blazeMeterURL, serverUserNotifier, logger);
                 try {
                     User.getUser(utils);
                 } catch (Exception e) {
