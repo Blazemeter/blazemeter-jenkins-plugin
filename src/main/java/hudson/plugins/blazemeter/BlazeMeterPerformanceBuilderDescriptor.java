@@ -194,22 +194,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return utils;
     }
 
-    /*
-    TODO
-    public static BlazemeterCredentials findCredentials(String credentialsId, Object scyope) {
-        List<BlazemeterCredentials> creds = getBlazeMeterUtils(scope);
-        BlazemeterCredentials cred = BlazemeterCredentialsBAImpl.EMPTY;
-
-        for (BlazemeterCredentials c : creds) {
-            if (c.getId().equals(credentialsId)) {
-                cred = c;
-            }
-        }
-        return cred;
-    }
-*/
-
-
     private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
         ListBoxModel sortedTests = new ListBoxModel();
         List<AbstractTest> tests = new ArrayList<>();
