@@ -254,7 +254,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
 
     private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
-        LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
         ListBoxModel sortedTests = new ListBoxModel();
         List<AbstractTest> tests = new ArrayList<>();
         tests.addAll(workspace.getMultiTests());
@@ -268,8 +267,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         tests.sort(c);
         boolean selected = false;
         for (AbstractTest t : tests) {
-            sortedTests.add(new ListBoxModel.Option(t.getId(), t.getId(), !selected ? t.getId().contains(savedTest) : false));
-            testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+            String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
+            sortedTests.add(new ListBoxModel.Option(testName, t.getId()
+                    , !selected ? t.getId().contains(savedTest) : false));
             selected = t.getId().contains(savedTest);
         }
         return sortedTests;
