@@ -219,7 +219,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private ListBoxModel workspacesList(BlazeMeterUtils utils, String savedWorkspace) throws Exception {
         ListBoxModel workspacesList = new ListBoxModel();
-        List<AbstractTest> tests = new ArrayList<>();
         User user = User.getUser(utils);
         List<Account> accounts = user.getAccounts();
         for (Account a : accounts) {
