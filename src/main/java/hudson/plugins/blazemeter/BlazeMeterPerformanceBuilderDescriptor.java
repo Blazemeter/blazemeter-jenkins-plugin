@@ -27,10 +27,10 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.logging.ServerLogger;
-import hudson.plugins.blazemeter.logging.ServerUserNotifier;
 import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
+import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -179,8 +179,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
             if (c.getId().equals(credentialsId)) {
-                UserNotifier serverUserNotifier = new ServerUserNotifier();
-                Logger logger = new ServerLogger();
+                UserNotifier serverUserNotifier = new BzmServerNotifier();
+                Logger logger = new BzmServerLogger();
                 utils = new BzmUtils(c.getUsername(), c.getPassword().getPlainText(),
                         blazeMeterURL, serverUserNotifier, logger);
                 try {
