@@ -225,7 +225,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace ws : workspaces) {
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
-                        "(" + ws.getId() + "", ws.getId(), ws.getId().equals(savedWorkspace)
+                        "(" + ws.getId() + ")", ws.getId(), ws.getId().equals(savedWorkspace)
                 );
                 workspacesList.add(wso);
             }
