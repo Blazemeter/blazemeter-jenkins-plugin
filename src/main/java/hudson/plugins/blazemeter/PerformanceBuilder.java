@@ -18,6 +18,7 @@ import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Result;
@@ -245,7 +246,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace, run);
         BzmUtils utils = createBzmUtils((BlazemeterCredentialsBAImpl) credential, listener, createLogFile(wsp));
-        CiBuild build = createCiBuild(utils, wsp);
+        CiBuild build = createCiBuild(utils, wsp, run.getEnvironment(listener));
 
         Master master = null;
         try {
@@ -336,12 +337,12 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
                 new BzmJobLogger(logFile));
     }
 
-    private CiBuild createCiBuild(BzmUtils utils, FilePath workspace) {
-        return new CiBuild(utils, Utils.getTestId(testId), sessionProperties, notes, createCiPostProcess(utils, workspace));
+    private CiBuild createCiBuild(BzmUtils utils, FilePath workspace, EnvVars envVars) {
+        return new CiBuild(utils, Utils.getTestId(testId), envVars.expand(sessionProperties), envVars.expand(notes), createCiPostProcess(utils, workspace, envVars));
     }
 
-    private BzmPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace) {
-        return new BzmPostProcess(getJtl, getJunit, jtlPath, junitPath, workspace, utils.getNotifier(), utils.getLogger());
+    private BzmPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace, EnvVars envVars) {
+        return new BzmPostProcess(getJtl, getJunit, envVars.expand(jtlPath), envVars.expand(junitPath), workspace, utils.getNotifier(), utils.getLogger());
     }
 
     private boolean validateCredentials(BlazemeterCredentials credential) {
