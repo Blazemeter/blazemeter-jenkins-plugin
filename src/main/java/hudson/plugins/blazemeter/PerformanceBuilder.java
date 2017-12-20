@@ -112,7 +112,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
     }
 
     public String getCredentialsId() {
-        return StringUtils.isBlank(this.credentialsId) ? this.jobApiKey : this.credentialsId;
+        return credentialsId;
     }
 
     @DataBoundSetter
@@ -215,7 +215,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
         this.getJunit = getJunit;
     }
 
-    public String legacy(){
+    public String legacy() {
         return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
                 "Please, select another key and re-save job.";
     }
@@ -235,9 +235,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
         BlazemeterCredentials credential = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
         boolean isValidCredentials = validateCredentials(credential);
         if (!isValidCredentials) {
-            // TODO: Invalid credentials
-            listener.error("Can not start build: Invalid credentials=" + credentialsId + "... is deprecated.");
-//                listener.error("Can not start build: Invalid credentials=" + credentialsId + "... is absent in credentials store.");
+            listener.error("Can not start build: Invalid credentials=" + credentialsId + "... is deprecated or absent in credentials store.");
             result = Result.NOT_BUILT;
             run.setResult(result);
             return;
