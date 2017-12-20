@@ -1,6 +1,6 @@
 /**
  * Copyright 2016 BlazeMeter Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
+import com.blazemeter.api.explorer.User;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
@@ -21,13 +22,9 @@ import javax.annotation.CheckForNull;
 import javax.validation.constraints.NotNull;
 import hudson.Extension;
 import hudson.Util;
+import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
-import java.io.IOException;
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import net.sf.json.JSONException;
-import okhttp3.Credentials;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -59,8 +56,8 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
     @DataBoundConstructor
     @SuppressWarnings("unused") // by stapler
     public BlazemeterCredentialsBAImpl(@CheckForNull CredentialsScope scope,
-        @CheckForNull String id, @CheckForNull String description,
-        @CheckForNull String username, @CheckForNull String password) {
+                                       @CheckForNull String id, @CheckForNull String description,
+                                       @CheckForNull String username, @CheckForNull String password) {
         super(scope, id, description);
         this.username = Util.fixNull(username);
         this.password = Secret.fromString(password);
@@ -104,22 +101,18 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
             return "icon-credentials-userpass";
         }
 
-        public FormValidation doTestConnection(@QueryParameter("username") final String username, @QueryParameter("password") final String password)
-            throws MessagingException, IOException, JSONException, ServletException {
-            String plainPass = null;
-            Secret decrPassword = Secret.fromString(password);
+        public FormValidation doValidate(@QueryParameter("username") final String username,
+                                         @QueryParameter("password") final String password) {
+            String decryptedPassword = Secret.fromString(password).getPlainText();
+            BzmUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
             try {
-                plainPass = decrPassword.getPlainText();
-            } catch (NullPointerException npe) {
-                return FormValidation.error("Failed to decrypt password to plain text");
+                User.getUser(utils);
+                return FormValidation.ok("Successfully validated credentials.");
+            } catch (Exception e) {
+                return FormValidation.error(e.getMessage());
             }
-            String serverUrl = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-            String cred = "";
-            cred = Credentials.basic(username, plainPass);
-            // TODO
-            // testConnection
-            return FormValidation.error("Not implemented");
         }
+
 
     }
 }

@@ -99,13 +99,17 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
-        BlazeMeterUtils utils = getBzmUtils(credentials);
+        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
+        if (utils == null) {
+            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
+            return items;
+        }
 
         Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
             items = testsList(workspace, savedTestId);
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "",true));
+            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
         } finally {
             return items;
         }
@@ -123,11 +127,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, ""));
             return items;
         }
-        BlazeMeterUtils utils = getBzmUtils(credentials);
-        if (StringUtils.isBlank(crid)) {
-            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, "", true));
-            return items;
-        }
+        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
         if (utils == null) {
             items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
             return items;
@@ -200,19 +200,15 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
 
-    public BzmUtils getBzmUtils(BlazemeterCredentialsBAImpl credentials) {
+    public static BzmUtils getBzmUtils(String username, String password) {
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
-        BzmUtils utils = new BzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText(),
-                blazeMeterURL, serverUserNotifier, logger);
+        BzmUtils utils = new BzmUtils(username, password,
+                BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
 
         return utils;
     }
-/*
-    public FormValidation validate(@QueryParameter("username") String username,
-                                   @QueryParameter("password") String password) {
 
-    }*/
 
     private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
         ListBoxModel sortedTests = new ListBoxModel();
