@@ -257,6 +257,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
             logger.println("Build has been interrupted");
             interrupt(build, master, logger);
             run.setResult(Result.ABORTED);
+            utils.closeLogger();
             return;
         } catch (Exception e) {
             utils.getLogger().warn("Caught exception while waiting for build", e);
@@ -268,6 +269,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
             BuildResult buildResult = build.doPostProcess(master);
             run.setResult(mappedBuildResult(buildResult));
         }
+        utils.closeLogger();
+
 
 
 //        BuildReporter reporter = new BuildReporter();
