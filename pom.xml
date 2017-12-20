@@ -38,8 +38,8 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <licenses>
         <license>
@@ -127,6 +127,17 @@
                 <exclusion>
                     <artifactId>hamcrest-core</artifactId>
                     <groupId>org.hamcrest</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.blazemeter</groupId>
+            <artifactId>blazemeter-api-client</artifactId>
+            <version>1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -264,5 +275,3 @@
     </pluginRepositories>
 
 </project>
-
-

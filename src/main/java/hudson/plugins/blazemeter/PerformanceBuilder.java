@@ -213,11 +213,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
         this.getJunit = getJunit;
     }
 
-    public String legacy(){
-        return "Drop-downs are disabled \n because you've selected legacy user-key which is deprecated" +
-                "Please, select another key and re-save job.";
-    }
-
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         Result result = null;
