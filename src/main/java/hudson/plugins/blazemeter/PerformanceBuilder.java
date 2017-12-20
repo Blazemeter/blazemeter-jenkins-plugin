@@ -380,8 +380,15 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
             }
         }
     }
-    private void addReportAction(Run<?, ?> run, CiBuild build) {
 
+    // Link to BlazeMeter report to each build
+    private void addReportAction(Run<?, ?> run, CiBuild build) {
+        String url = build.getPublicReport();
+        if (!StringUtils.isBlank(url)) {
+            PerformanceBuildAction action = new PerformanceBuildAction(run);
+            action.setReportUrl(url);
+            run.addAction(action);
+        }
     }
 
     private String createLogFile(FilePath workspace) throws IOException {
