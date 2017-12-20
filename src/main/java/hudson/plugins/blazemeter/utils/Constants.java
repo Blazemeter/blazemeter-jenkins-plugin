@@ -30,12 +30,11 @@ public interface Constants {
     String CRED_ARE_VALID = "Credentials are valid: user e-mail=";
     String CRED_ARE_NOT_VALID = "Credentials are not valid";
     String NO_SUCH_CREDENTIALS = "No such credentials in store, re-check";
-    String NO_TESTS_FOR_CREDENTIALS = "No tests for credentials";
-    String NO_WORKSPACES_FOR_CREDENTIALS = "No workspaces for credentials";
+    String NO_TESTS = "No tests";
+    String NO_WORKSPACES = "No workspaces";
     int ENCRYPT_CHARS_NUM = 3;
     String MASTER_ID = "masterId";
     String CRED_EMPTY_VALUE = "Basic Og==";
     String THREE_DOTS = "...";
-    String LEGACY=" - LEGACY KEY(DEPRECATED)";
     String CHECK_SETTINGS = "Check blazemeter & proxy-settings";
 }

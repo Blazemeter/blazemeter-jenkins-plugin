@@ -22,7 +22,6 @@ import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
@@ -42,6 +41,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -90,19 +90,22 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
 
         ListBoxModel items = new ListBoxModel();
-        BlazeMeterUtils utils = getBzmUtils(CredentialsScope.GLOBAL, crid);
         if (StringUtils.isBlank(crid)) {
             items.add(Constants.NO_CREDENTIALS, "");
+            return items;
         }
-        if (utils == null) {
+        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+        if (credentials == null) {
             items.add(Constants.NO_SUCH_CREDENTIALS, "");
             return items;
         }
+        BlazeMeterUtils utils = getBzmUtils(credentials);
+
         Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
             items = testsList(workspace, savedTestId);
         } catch (Exception e) {
-            items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
+            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "",true));
         } finally {
             return items;
         }
@@ -111,18 +114,29 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        BlazeMeterUtils utils = getBzmUtils(CredentialsScope.GLOBAL, crid);
         if (StringUtils.isBlank(crid)) {
-            items.add(Constants.NO_CREDENTIALS, "");
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, "", true));
+            return items;
+        }
+        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+        if (credentials == null) {
+            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, ""));
+            return items;
+        }
+        BlazeMeterUtils utils = getBzmUtils(credentials);
+        if (StringUtils.isBlank(crid)) {
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, "", true));
+            return items;
         }
         if (utils == null) {
-            items.add(Constants.NO_SUCH_CREDENTIALS, "");
+            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
             return items;
         }
         try {
             items = workspacesList(utils, swid);
         } catch (Exception e) {
-            items.add(Constants.NO_TESTS_FOR_CREDENTIALS, "");
+            items.add(new ListBoxModel.Option(Constants.NO_WORKSPACES, "", true));
+            return items;
         } finally {
             return items;
         }
@@ -173,27 +187,32 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return true;
     }
 
-    public BzmUtils getBzmUtils(Object scope, String credentialsId) {
-        BzmUtils utils = null;
-        Item item = scope instanceof Item ? (Item) scope : null;
+    public BlazemeterCredentialsBAImpl findCredentials(String credentialsId) {
+        BlazemeterCredentialsBAImpl foundCredentials = null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialsBAImpl.class, item, ACL.SYSTEM)) {
+                .lookupCredentials(BlazemeterCredentialsBAImpl.class, Jenkins.getInstance(), ACL.SYSTEM)) {
             if (c.getId().equals(credentialsId)) {
-                UserNotifier serverUserNotifier = new BzmServerNotifier();
-                Logger logger = new BzmServerLogger();
-                utils = new BzmUtils(c.getUsername(), c.getPassword().getPlainText(),
-                        blazeMeterURL, serverUserNotifier, logger);
-                try {
-                    User.getUser(utils);
-                } catch (Exception e) {
-                    //TODO
-                    //Notify user about invalid credentials in drop-down list
-                    logger.error("Failed to find user for provided credentials = " + c.getId(), e);
-                }
+                foundCredentials = c;
+                break;
             }
         }
+        return foundCredentials;
+    }
+
+
+    public BzmUtils getBzmUtils(BlazemeterCredentialsBAImpl credentials) {
+        UserNotifier serverUserNotifier = new BzmServerNotifier();
+        Logger logger = new BzmServerLogger();
+        BzmUtils utils = new BzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText(),
+                blazeMeterURL, serverUserNotifier, logger);
+
         return utils;
     }
+/*
+    public FormValidation validate(@QueryParameter("username") String username,
+                                   @QueryParameter("password") String password) {
+
+    }*/
 
     private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
         ListBoxModel sortedTests = new ListBoxModel();
