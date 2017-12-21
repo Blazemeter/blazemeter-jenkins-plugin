@@ -243,7 +243,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         VirtualChannel channel = launcher.getChannel();
 
-        listener.error("jobName " + jobName);
         ReportUrlTask rugt = new ReportUrlTask(run, jobName, channel);
         BuildReporter reporter = new BuildReporter();
 

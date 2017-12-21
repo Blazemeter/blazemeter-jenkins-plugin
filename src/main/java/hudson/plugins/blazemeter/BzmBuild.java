@@ -73,7 +73,6 @@ public class BzmBuild implements Callable<Result, Exception> {
             }
         } catch (InterruptedException e) {
             utils.getLogger().warn("Wait for finish has been interrupted", e);
-            logger.println("Build has been interrupted");
             interrupt(build, master, logger);
             utils.closeLogger();
             return Result.ABORTED;
