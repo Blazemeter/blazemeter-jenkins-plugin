@@ -4,11 +4,11 @@ package hudson.plugins.blazemeter;
 import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
+import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.BzmPostProcess;
 import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
@@ -111,6 +111,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         if (build != null && master != null) {
             try {
                 logger.println("Build has been interrupted");
+                new RuntimeException().printStackTrace(logger);
                 boolean hasReport = build.interrupt(master);
                 if (hasReport) {
                     logger.println("Get reports after interrupt");
@@ -146,13 +147,13 @@ public class BzmBuild implements Callable<Result, Exception> {
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
-                createCiPostProcess(utils, workspace));
+                createCiPostProcess(utils));
     }
 
-    private BzmPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace) {
-        return new BzmPostProcess(builder.isGetJtl(), builder.isGetJunit(),
+    private CiPostProcess createCiPostProcess(BzmUtils utils) {
+        return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
-                workspace, utils.getNotifier(), utils.getLogger());
+                workspace.getRemote(), utils.getNotifier(), utils.getLogger());
     }
 
     @Override
