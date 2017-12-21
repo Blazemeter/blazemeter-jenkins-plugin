@@ -23,6 +23,8 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
+import hudson.plugins.blazemeter.utils.report.BuildReporter;
+import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -233,16 +235,22 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         BlazemeterCredentialsBAImpl credentialsBA = (BlazemeterCredentialsBAImpl) credentials;
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+        String jobName = run.getFullDisplayName();
 
         BzmBuild bzmBuild = new BzmBuild(this, credentialsBA.getUsername(), credentialsBA.getPassword().getPlainText(),
-                run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
+                jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
                 run.getEnvironment(listener), workspace, listener);
 
         VirtualChannel channel = launcher.getChannel();
+
+        listener.error("jobName " + jobName);
+        ReportUrlTask rugt = new ReportUrlTask(run, jobName, channel);
+        BuildReporter reporter = new BuildReporter();
+
         try {
+            reporter.run(rugt);
             Result result = channel.call(bzmBuild);
             run.setResult(result);
-            addReportAction(run, bzmBuild.getBuild());
         } catch (InterruptedException e) {
             bzmBuild.interrupt();
             run.setResult(Result.ABORTED);
@@ -250,21 +258,10 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             listener.getLogger().println("Failure with exception: " + e.getMessage());
             e.printStackTrace(listener.getLogger());
             run.setResult(Result.FAILURE);
+        } finally {
+            reporter.stop();
         }
     }
-
-    // Link to BlazeMeter report to each build
-    private void addReportAction(Run<?, ?> run, CiBuild build) {
-        if (build != null) {
-            String url = build.getPublicReport();
-            if (!StringUtils.isBlank(url)) {
-                PerformanceBuildAction action = new PerformanceBuildAction(run);
-                action.setReportUrl(url);
-                run.addAction(action);
-            }
-        }
-    }
-
 
     private boolean validateCredentials(BlazemeterCredentials credential) {
         return !StringUtils.isBlank(credential.getId()) && credential instanceof BlazemeterCredentialsBAImpl;

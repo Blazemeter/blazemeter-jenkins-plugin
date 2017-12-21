@@ -24,10 +24,15 @@ import java.io.PrintStream;
 public class BzmBuild implements Callable<Result, Exception> {
 
     private PerformanceBuilder builder;
+
+    private String jobName;
+    private String buildId;
+
     private String apiId;
     private String apiSecret;
-    private String buildId;
     private String serverURL;
+
+
     private EnvVars envVars;
     private FilePath workspace;
     private TaskListener listener;
@@ -36,11 +41,12 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiBuild build;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
-                    String buildId, String serverURL,
+                    String jobName, String buildId, String serverURL,
                     EnvVars envVars, FilePath workspace, TaskListener listener) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
+        this.jobName = jobName;
         this.buildId = buildId;
         this.serverURL = serverURL;
         this.envVars = envVars;
@@ -58,6 +64,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         try {
             master = build.start();
             if (master != null) {
+                EnvVars.masterEnvVars.put(jobName + "-" + buildId, build.getPublicReport());
                 build.waitForFinish(master);
             } else {
                 listener.error("Failed to start test");
