@@ -222,14 +222,28 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         };
         tests.sort(c);
-        boolean selected = false;
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
-            sortedTests.add(new ListBoxModel.Option(testName, t.getId()
-                    , !selected ? t.getId().contains(savedTest) : false));
-            selected = t.getId().contains(savedTest);
+            sortedTests.add(new ListBoxModel.Option(testName, testName, false));
+            setSelected(sortedTests,savedTest);
         }
         return sortedTests;
+    }
+
+    private ListBoxModel setSelected(ListBoxModel box,String savedValue){
+        int boxSize=box.size();
+        boolean valueWasSelected=false;
+        for(int i=0;i<boxSize;i++){
+            ListBoxModel.Option option = box.get(i);
+            if(option.value.equals(savedValue)){
+                box.get(i).selected=true;
+                return box;
+            }
+            if(!valueWasSelected){
+                box.get(0).selected=true;
+            }
+        }
+        return box;
     }
 
     private ListBoxModel workspacesList(BlazeMeterUtils utils, String savedWorkspace) throws Exception {
@@ -240,9 +254,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace ws : workspaces) {
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
-                        "(" + ws.getId() + ")", ws.getId(), ws.getId().equals(savedWorkspace)
-                );
+                        "(" + ws.getId() + ")", ws.getId(), false);
                 workspacesList.add(wso);
+                setSelected(workspacesList,savedWorkspace);
             }
         }
         return workspacesList;
