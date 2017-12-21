@@ -312,10 +312,10 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-    private String createLogFile(FilePath workspace) throws IOException {
-        File logFile = new File(workspace.getRemote(), Constants.BZM_LOG);
-        FileUtils.touch(logFile);
-        return logFile.getAbsolutePath();
+    private String createLogFile(FilePath workspace) throws IOException, InterruptedException {
+        FilePath logFile =  workspace.child(Constants.BZM_LOG);
+        logFile.touch(System.currentTimeMillis());
+        return logFile.getRemote();
     }
 
     private FilePath createWorkspaceDir(FilePath workspace, Run<?, ?> run) throws IOException, InterruptedException {
