@@ -21,6 +21,7 @@ import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
+import com.blazemeter.ciworkflow.TestsListFlow;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.model.AbstractProject;
@@ -28,6 +29,8 @@ import hudson.model.Descriptor;
 import hudson.model.Item;
 import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
@@ -36,7 +39,6 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -212,9 +214,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private ListBoxModel testsList(Workspace workspace, String savedTest) throws Exception {
         ListBoxModel sortedTests = new ListBoxModel();
-        List<AbstractTest> tests = new ArrayList<>();
-        tests.addAll(workspace.getMultiTests());
-        tests.addAll(workspace.getSingleTests());
+        JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(workspace.getUtils());
+        List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator c = new Comparator<AbstractTest>() {
             @Override
             public int compare(AbstractTest t1, AbstractTest t2) {
@@ -225,22 +226,22 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
             sortedTests.add(new ListBoxModel.Option(testName, testName, false));
-            setSelected(sortedTests,savedTest);
+            setSelected(sortedTests, savedTest);
         }
         return sortedTests;
     }
 
-    private ListBoxModel setSelected(ListBoxModel box,String savedValue){
-        int boxSize=box.size();
-        boolean valueWasSelected=false;
-        for(int i=0;i<boxSize;i++){
+    private ListBoxModel setSelected(ListBoxModel box, String savedValue) {
+        int boxSize = box.size();
+        boolean valueWasSelected = false;
+        for (int i = 0; i < boxSize; i++) {
             ListBoxModel.Option option = box.get(i);
-            if(option.value.equals(savedValue)){
-                box.get(i).selected=true;
+            if (option.value.equals(savedValue)) {
+                box.get(i).selected = true;
                 return box;
             }
-            if(!valueWasSelected){
-                box.get(0).selected=true;
+            if (!valueWasSelected) {
+                box.get(0).selected = true;
             }
         }
         return box;
@@ -256,7 +257,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
                         "(" + ws.getId() + ")", ws.getId(), false);
                 workspacesList.add(wso);
-                setSelected(workspacesList,savedWorkspace);
+                setSelected(workspacesList, savedWorkspace);
             }
         }
         return workspacesList;
