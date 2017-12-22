@@ -21,16 +21,14 @@ import org.kohsuke.stapler.StaplerProxy;
 
 
 public class PerformanceBuildAction implements Action, StaplerProxy {
-    private final Run run;
 
+    private final Run run;
     private String reportUrl;
     private PerformanceReportMap m = null;
 
     public PerformanceBuildAction(Run run) {
         this.run = run;
     }
-
-
 
     public String getDisplayName() {
         return Messages.BuildAction_DisplayName();

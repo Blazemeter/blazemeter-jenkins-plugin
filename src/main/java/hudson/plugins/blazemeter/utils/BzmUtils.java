@@ -17,6 +17,9 @@ package hudson.plugins.blazemeter.utils;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
+import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
+
+import java.io.IOException;
 
 public class BzmUtils extends BlazeMeterUtils {
 
@@ -36,5 +39,11 @@ public class BzmUtils extends BlazeMeterUtils {
         return url.contains("?") ?
                 (url + '&' + JENKINS_PLUGIN_INFO) :
                 (url + '?' + JENKINS_PLUGIN_INFO);
+    }
+
+    public void closeLogger() throws IOException, InterruptedException {
+        if (logger != null && logger instanceof BzmJobLogger) {
+            ((BzmJobLogger) logger).close();
+        }
     }
 }
