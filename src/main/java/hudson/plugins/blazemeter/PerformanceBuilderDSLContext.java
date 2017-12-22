@@ -13,7 +13,6 @@
  */
 package hudson.plugins.blazemeter;
 
-import hudson.plugins.blazemeter.utils.Utils;
 import javaposse.jobdsl.dsl.Context;
 
 public class PerformanceBuilderDSLContext implements Context {
@@ -21,8 +20,6 @@ public class PerformanceBuilderDSLContext implements Context {
     String workspaceId = "";
 
     String credentialsId = "";
-
-    String jobApiKey = "";
 
     String testId = "";
 
@@ -74,10 +71,5 @@ public class PerformanceBuilderDSLContext implements Context {
     public void workspaceId(String  workspaceId) {
         this.workspaceId = workspaceId;
     }
-
-    public void jobApiKey(final String jobApiKey) {
-        this.credentialsId= Utils.calcLegacyId(jobApiKey);
-    }
-
 
 }
