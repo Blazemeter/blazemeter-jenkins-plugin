@@ -19,6 +19,8 @@ import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 
+import java.io.IOException;
+
 public class BzmUtils extends BlazeMeterUtils {
 
     private static final String APP_KEY = "app_key=jnk100x987c06f4e10c4";
@@ -39,7 +41,7 @@ public class BzmUtils extends BlazeMeterUtils {
                 (url + '?' + JENKINS_PLUGIN_INFO);
     }
 
-    public void closeLogger() {
+    public void closeLogger() throws IOException, InterruptedException {
         if (logger != null && logger instanceof BzmJobLogger) {
             ((BzmJobLogger) logger).close();
         }

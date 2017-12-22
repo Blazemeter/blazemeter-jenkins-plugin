@@ -1,31 +1,35 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter;
 
+import com.blazemeter.api.explorer.Master;
+import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.blazemeter.utils.BzmPostProcessor;
+import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
-import hudson.plugins.blazemeter.utils.report.BuildReporter;
-import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
-import hudson.remoting.VirtualChannel;
+import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
+import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import jenkins.tasks.SimpleBuildStep;
@@ -37,7 +41,9 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Serializable;
 
 
@@ -234,36 +240,120 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         }
 
         BlazemeterCredentialsBAImpl credentialsBA = (BlazemeterCredentialsBAImpl) credentials;
-        String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
-        String jobName = run.getFullDisplayName();
 
-        BzmBuild bzmBuild = new BzmBuild(this, credentialsBA.getUsername(), credentialsBA.getPassword().getPlainText(),
-                jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener);
-
-        VirtualChannel channel = launcher.getChannel();
-
-        ReportUrlTask rugt = new ReportUrlTask(run, jobName, channel);
-        BuildReporter reporter = new BuildReporter();
-
+        PrintStream logger = listener.getLogger();
+        EnvVars envVars = run.getEnvironment(listener);
+        FilePath wsp = createWorkspaceDir(workspace, run);
+        BzmUtils utils = createBzmUtils(credentialsBA, listener, createLogFile(wsp));
         try {
-            reporter.run(rugt);
-            Result result = channel.call(bzmBuild);
-            run.setResult(result);
-        } catch (InterruptedException e) {
-            bzmBuild.interrupt();
-            run.setResult(Result.ABORTED);
-        } catch (Exception e) {
-            listener.getLogger().println("Failure with exception: " + e.getMessage());
-            e.printStackTrace(listener.getLogger());
-            run.setResult(Result.FAILURE);
+            CiBuild build = createCiBuild(utils, wsp, envVars);
+            Master master = null;
+            try {
+                master = build.start();
+                if (master != null) {
+                    addReportUrl(run, build);
+                    build.waitForFinish(master);
+                } else {
+                    listener.error("Failed to start test");
+                    run.setResult(Result.FAILURE);
+                    return;
+                }
+            } catch (InterruptedException e) {
+                utils.getLogger().warn("Wait for finish has been interrupted", e);
+                interrupt(build, master, logger);
+                run.setResult(Result.ABORTED);
+                return;
+            } catch (Exception e) {
+                utils.getLogger().warn("Caught exception while waiting for build", e);
+                run.setResult(Result.FAILURE);
+                return;
+            }
+
+            BuildResult buildResult = build.doPostProcess(master);
+            run.setResult(mappedBuildResult(buildResult));
         } finally {
-            reporter.stop();
+            utils.closeLogger();
+        }
+    }
+
+    private FilePath createLogFile(FilePath workspace) throws IOException, InterruptedException {
+        FilePath logFile =  workspace.child(Constants.BZM_LOG);
+        logFile.touch(System.currentTimeMillis());
+        return logFile;
+    }
+
+    private void addReportUrl(Run<?, ?> run, CiBuild build) {
+        String reportUrl = build.getPublicReport();
+        if (!StringUtils.isBlank(reportUrl)) {
+            PerformanceBuildAction action = new PerformanceBuildAction(run);
+            action.setReportUrl(reportUrl);
+            run.addAction(action);
         }
     }
 
     private boolean validateCredentials(BlazemeterCredentials credential) {
         return !StringUtils.isBlank(credential.getId()) && credential instanceof BlazemeterCredentialsBAImpl;
+    }
+
+    private Result mappedBuildResult(BuildResult buildResult) {
+        switch (buildResult) {
+            case SUCCESS:
+                return Result.SUCCESS;
+            case ABORTED:
+                return Result.ABORTED;
+            case ERROR:
+                return Result.FAILURE;
+            case FAILED:
+                return Result.UNSTABLE;
+            default:
+                return Result.NOT_BUILT;
+        }
+    }
+
+    public void interrupt(CiBuild build, Master master, PrintStream logger) {
+        if (build != null && master != null) {
+            try {
+                logger.println("Build has been interrupted" + Thread.currentThread().getName());
+                boolean hasReport = build.interrupt(master);
+                if (hasReport) {
+                    logger.println("Get reports after interrupt");
+                    build.doPostProcess(master);
+                }
+            } catch (IOException e) {
+                logger.println("Failed to interrupt build " + e.getMessage());
+            }
+        }
+    }
+
+    private FilePath createWorkspaceDir(FilePath workspace, Run<?, ?> run) throws IOException, InterruptedException {
+        FilePath wsp = new FilePath(workspace.getChannel(),
+                workspace.getRemote() + File.separator + run.getId());
+        wsp.mkdirs();
+        return wsp;
+    }
+
+    private BzmUtils createBzmUtils(BlazemeterCredentialsBAImpl credential, TaskListener listener, FilePath logFile) {
+        String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+
+        return new BzmUtils(credential.getUsername(),
+                credential.getPassword().getPlainText(),
+                StringUtils.isBlank(credential.getId()) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
+                new BzmJobNotifier(listener),
+                new BzmJobLogger(logFile));
+    }
+
+    private CiBuild createCiBuild(BzmUtils utils, FilePath workspace, EnvVars envVars) {
+        return new CiBuild(utils,
+                Utils.getTestId(testId),
+                envVars.expand(sessionProperties),
+                envVars.expand(notes),
+                createCiPostProcess(utils, workspace, envVars));
+    }
+
+    private BzmPostProcessor createCiPostProcess(BzmUtils utils, FilePath workspace, EnvVars envVars) {
+        return new BzmPostProcessor(getJtl, getJunit,
+                envVars.expand(jtlPath), envVars.expand(junitPath),
+                workspace, utils.getNotifier(), utils.getLogger());
     }
 
     // The descriptor has been moved but we need to maintain the old descriptor for backwards compatibility reasons.
