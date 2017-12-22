@@ -18,8 +18,6 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.BlazemeterCredentialImpl;
-import hudson.plugins.blazemeter.BlazemeterCredentials;
 import hudson.plugins.blazemeter.BlazemeterCredentialsBAImpl;
 import hudson.security.ACL;
 
@@ -64,8 +62,8 @@ public class Utils {
         return fp;
     }
 
-    public static List<BlazemeterCredentials> getCredentials(Object scope) {
-        List<BlazemeterCredentials> result = new ArrayList<BlazemeterCredentials>();
+    public static List<BlazemeterCredentialsBAImpl> getCredentials(Object scope) {
+        List<BlazemeterCredentialsBAImpl> result = new ArrayList<>();
         Set<String> apiKeys = new HashSet<String>();
         Item item = scope instanceof Item ? (Item) scope : null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
@@ -76,22 +74,14 @@ public class Utils {
                 apiKeys.add(id);
             }
         }
-        for (BlazemeterCredentials c : CredentialsProvider
-                .lookupCredentials(BlazemeterCredentialImpl.class, item, ACL.SYSTEM)) {
-            String id = c.getId();
-            if (!apiKeys.contains(id)) {
-                result.add(c);
-                apiKeys.add(id);
-            }
-        }
+
         return result;
     }
 
-    public static BlazemeterCredentials findCredentials(String credentialsId, Object scope) {
-        List<BlazemeterCredentials> creds = getCredentials(scope);
-        BlazemeterCredentials cred = BlazemeterCredentialsBAImpl.EMPTY;
-
-        for (BlazemeterCredentials c : creds) {
+    public static BlazemeterCredentialsBAImpl findCredentials(String credentialsId, Object scope) {
+        List<BlazemeterCredentialsBAImpl> creds = getCredentials(scope);
+        BlazemeterCredentialsBAImpl cred = BlazemeterCredentialsBAImpl.EMPTY;
+        for (BlazemeterCredentialsBAImpl c : creds) {
             if (c.getId().equals(credentialsId)) {
                 cred = c;
             }

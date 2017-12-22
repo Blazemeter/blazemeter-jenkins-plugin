@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,60 +14,69 @@
 
 package hudson.plugins.blazemeter;
 
+import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.explorer.Workspace;
+import com.blazemeter.api.explorer.test.AbstractTest;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
-import hudson.plugins.blazemeter.api.Api;
-import hudson.plugins.blazemeter.api.ApiImpl;
-import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
 import hudson.plugins.blazemeter.utils.Utils;
 
+import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
+import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
-import okhttp3.Credentials;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.log.StdErrLog;
+
+import java.util.List;
 
 
 @Extension(optional = true)
 public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
-    private StdErrLog logger = new StdErrLog(Constants.BZM_JEN);
-
     @DslExtensionMethod(context = StepContext.class)
     public Object blazeMeterTest(Runnable closure) {
+        BzmServerLogger logger = new BzmServerLogger();
+        BzmServerNotifier notifier = new BzmServerNotifier();
         logger.info("Running 'blazeMeterTest' method from JOB DSL plugin...");
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure, c);
-        boolean credentialsPresent = false;
         PerformanceBuilder pb = null;
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {
-            BlazemeterCredentials credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
-            credentialsPresent = !StringUtils.isBlank(credential.getId());
-            logger.info(c.credentialsId + " is " + (credentialsPresent ? "" : "not") + " present in credentials");
-            String buildCr = "";
-            Api api = null;
-            if (credentialsPresent) {
-                if (credential instanceof BlazemeterCredentialsBAImpl) {
-                    buildCr = Credentials.basic(((BlazemeterCredentialsBAImpl) credential).getUsername(),
-                            ((BlazemeterCredentialsBAImpl) credential).getPassword().getPlainText());
-                    api = new ApiImpl(buildCr, serverUrl, false);
-                } else {
-                    buildCr = ((BlazemeterCredentialImpl) credential).getApiKey();
-                    api = new ApiImpl(buildCr, serverUrl, true);
+            BlazemeterCredentialsBAImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
+            BzmUtils bzmUtils = null;
+            if (!StringUtils.isBlank(credential.getId())) {
+                logger.info("Credentials with id = " + c.credentialsId + " are present in credentials.");
+                bzmUtils = new BzmUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
+                User user = null;
+                try {
+                    user = User.getUser(bzmUtils);
+                    logger.info("Credentials with id = "+c.credentialsId+" are valid.");
+                } catch (Exception e) {
+                    logger.error("Credentials with credentialsId = " + c.credentialsId + " are invalid.");
+                    return pb;
                 }
-                int pid=api.projectId(c.testId);
-                if (pid>0) {
-                    try {
-                        c.workspaceId = String.valueOf(api.workspaceId(String.valueOf(pid)));
-                    } catch (Exception e) {
-                        logger.info("Failed to find workspace for testId = " + c.testId);
+                JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(bzmUtils);
+                List<Workspace> workspaces = jenkinsTestListFlow.getWorkspacesForUser(user);
+                List<AbstractTest> tests = null;
+                for (Workspace workspace : workspaces) {
+                    tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
+                    for (AbstractTest t : tests) {
+                        if (t.getId().equals(c.testId)) {
+                            pb = new PerformanceBuilder(c.credentialsId, workspace.getId(), serverUrl,
+                                    c.testId, c.notes, c.sessionProperties,
+                                    c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
+                            logger.info("PerformanceBuilder was successfully created for test = " + c.testId + " in workspace = " + workspace.getId());
+
+                        }
                     }
-                    pb = new PerformanceBuilder(c.credentialsId, c.workspaceId, serverUrl,
-                            c.testId, c.notes, c.sessionProperties,
-                            c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
                 }
+            } else {
+                logger.info(c.credentialsId + " is not present in credentials");
+                return pb;
             }
 
         } catch (Exception e) {
