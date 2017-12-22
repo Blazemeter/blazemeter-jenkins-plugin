@@ -225,10 +225,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             run.setResult(Result.FAILURE);
             return;
         }
-
-        // TODO: if credentialsId==null ???
         BlazemeterCredentials credentials = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
-        boolean isValidCredentials = validateCredentials(credentials);
+        boolean isValidCredentials = !StringUtils.isBlank(credentialsId)&&validateCredentials(credentials);
         if (!isValidCredentials) {
             listener.error("Can not start build: Invalid credentials=" + credentialsId + "... is deprecated or absent in credentials store.");
             run.setResult(Result.NOT_BUILT);
