@@ -49,11 +49,12 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
             BlazemeterCredentialsBAImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
             BzmUtils bzmUtils = null;
             if (!StringUtils.isBlank(credential.getId())) {
-                logger.info(c.credentialsId + " is present in credentials");
+                logger.info("Credentials with id = " + c.credentialsId + " are present in credentials.");
                 bzmUtils = new BzmUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
                 User user = null;
                 try {
                     user = User.getUser(bzmUtils);
+                    logger.info("Credentials with id = "+c.credentialsId+" are valid.");
                 } catch (Exception e) {
                     logger.error("Credentials with credentialsId = " + c.credentialsId + " are invalid.");
                     return pb;

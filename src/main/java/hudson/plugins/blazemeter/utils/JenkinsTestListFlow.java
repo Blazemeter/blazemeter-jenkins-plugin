@@ -60,6 +60,7 @@ public class JenkinsTestListFlow extends TestsListFlow {
                 getUtils().getNotifier().notifyError("Failed to get workspaces for account with id = " + account.getId() + ". Reason is: " + e.getMessage());
             }
         }
+        getUtils().getNotifier().notifyInfo("Got " + workspaces.size() + " workspaces from server.");
         return workspaces;
     }
 
