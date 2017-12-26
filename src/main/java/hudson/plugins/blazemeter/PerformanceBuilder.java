@@ -229,8 +229,6 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             return;
         }
 
-        PrintStream logger = listener.getLogger();
-
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         String jobName = run.getFullDisplayName();
 
