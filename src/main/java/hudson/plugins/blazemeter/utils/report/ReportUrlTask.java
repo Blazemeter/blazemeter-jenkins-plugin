@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 BlazeMeter Inc.
+ * Copyright 2017 BlazeMeter Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package hudson.plugins.blazemeter.utils.report;
 
 import hudson.EnvVars;
@@ -18,17 +19,20 @@ import hudson.model.Run;
 import hudson.plugins.blazemeter.PerformanceBuildAction;
 import hudson.remoting.VirtualChannel;
 
-import java.io.IOException;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+public class ReportUrlTask extends TimerTask {
 
-public class ReportUrlTask implements Runnable {
+    protected Logger logger = Logger.getLogger(ReportUrlTask.class.getName());
+
+    protected String jobName;
 
     private VirtualChannel channel;
     private Run run;
 
-    public boolean reportUrl;
-    public String jobName;
-
+    protected boolean isDone;
 
     public ReportUrlTask(Run run, String jobName, VirtualChannel channel) {
         this.run = run;
@@ -39,7 +43,8 @@ public class ReportUrlTask implements Runnable {
     @Override
     public void run() {
         try {
-            if (reportUrl) {
+            logger.log(Level.SEVERE, "CALL ReportUrlTask");
+            if (isDone) {
                 return;
             }
             EnvVars ev = EnvVars.getRemote(channel);
@@ -48,10 +53,16 @@ public class ReportUrlTask implements Runnable {
                 PerformanceBuildAction a = new PerformanceBuildAction(run);
                 a.setReportUrl(ev.get(ruId, ""));
                 run.addAction(a);
-                this.reportUrl = true;
+                isDone = true;
+                super.cancel();
+                logger.log(Level.SEVERE, "ReportUrlTask, set finished");
             }
         } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to get report URL", e);
         }
     }
-}
 
+    public boolean isDone() {
+        return isDone;
+    }
+}
