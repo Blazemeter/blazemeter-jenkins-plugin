@@ -14,34 +14,32 @@
 
 package hudson.plugins.blazemeter.utils.logger;
 
-import hudson.FilePath;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 public class BzmJobLogger implements com.blazemeter.api.logging.Logger {
 
     private Logger logger = Logger.getLogger(BzmJobLogger.class.getName());
     private Logger fileLogger = Logger.getLogger("bzm-log");
+    private FileHandler fileHandler;
 
-    private FilePath logFile;
-    private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    private final StreamHandler handler = new StreamHandler(baos, new SimpleFormatter());
-
-    public BzmJobLogger(FilePath logFile) {
-        this.logFile = logFile;
-        fileLogger.addHandler(handler);
+    public BzmJobLogger(String logFile) {
+        try {
+            fileHandler = new FileHandler(logFile);
+        } catch (IOException ex) {
+            throw new RuntimeException("Cannot create file handler for log file", ex);
+        }
+        fileHandler.setFormatter(new SimpleFormatter());
+        fileLogger.addHandler(fileHandler);
+        fileLogger.setUseParentHandlers(false);
+        fileLogger.setLevel(Level.FINE);
     }
 
-    public void close() throws IOException, InterruptedException {
-        handler.flush();
-        baos.flush();
-        logFile.copyFrom(new ByteArrayInputStream(baos.toByteArray()));
+    public void close() {
+        fileHandler.close();
     }
 
     @Override
