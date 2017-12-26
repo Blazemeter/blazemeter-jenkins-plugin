@@ -157,10 +157,10 @@ public class BzmBuild implements Callable<Result, Exception> {
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
-                createCiPostProcess(utils));
+                createCiPostProcess(utils, workspace));
     }
 
-    private CiPostProcess createCiPostProcess(BzmUtils utils) {
+    private CiPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
                 workspace.getRemote(), utils.getNotifier(), utils.getLogger());
