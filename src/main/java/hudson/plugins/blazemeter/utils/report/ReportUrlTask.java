@@ -43,7 +43,6 @@ public class ReportUrlTask extends TimerTask {
     @Override
     public void run() {
         try {
-            logger.log(Level.SEVERE, "CALL ReportUrlTask");
             if (isDone) {
                 return;
             }
@@ -55,7 +54,6 @@ public class ReportUrlTask extends TimerTask {
                 run.addAction(a);
                 isDone = true;
                 super.cancel();
-                logger.log(Level.SEVERE, "ReportUrlTask, set finished");
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to get report URL", e);
