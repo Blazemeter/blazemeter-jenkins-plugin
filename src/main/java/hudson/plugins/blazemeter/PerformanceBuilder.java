@@ -14,23 +14,15 @@
 
 package hudson.plugins.blazemeter;
 
-import com.blazemeter.api.explorer.Master;
-import com.blazemeter.ciworkflow.BuildResult;
-import com.blazemeter.ciworkflow.CiBuild;
 import com.cloudbees.plugins.credentials.CredentialsScope;
-import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.BzmPostProcessor;
-import hudson.plugins.blazemeter.utils.BzmUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
-import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
-import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
-import hudson.plugins.blazemeter.utils.report.BuildReporter;
+import hudson.plugins.blazemeter.utils.interrupt.InterruptListenerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
@@ -44,10 +36,10 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.Timer;
 
 
 public class PerformanceBuilder extends Builder implements SimpleBuildStep, Serializable {
@@ -248,22 +240,27 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         VirtualChannel channel = launcher.getChannel();
 
-        ReportUrlTask rugt = new ReportUrlTask(run, jobName, channel);
-        BuildReporter reporter = new BuildReporter();
+        ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
 
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(reportUrlTask, 20 * 1000, 10 * 1000);
         try {
-            reporter.run(rugt);
             Result result = channel.call(bzmBuild);
             run.setResult(result);
         } catch (InterruptedException e) {
-            // start new task
+            // start new task for wait Slave
+            InterruptListenerTask interrupt = new InterruptListenerTask(run, jobName, channel);
+            interrupt.start();
+            interrupt.join();
             run.setResult(Result.ABORTED);
         } catch (Exception e) {
             listener.getLogger().println("Failure with exception: " + e.getMessage());
             e.printStackTrace(listener.getLogger());
             run.setResult(Result.FAILURE);
         } finally {
-            reporter.stop();
+            reportUrlTask.cancel();
+            timer.cancel();
+            timer.purge();
         }
     }
 
