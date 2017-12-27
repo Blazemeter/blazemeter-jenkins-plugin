@@ -15,26 +15,12 @@ package hudson.plugins.blazemeter.utils;
  */
 
 public interface Constants {
-    String BZM_JEN = "BZM-JEN";
-    String HTTP_LOG = "http-log";
     String BZM_LOG = "bzm-log";
-    String BM_TRESHOLDS = "bm-thresholds.xml";
-    String BM_KPIS = "bm-kpis.jtl";
-    String BM_ARTEFACTS = "-bm-artefacts";
     String VERSION = "version";
-    String SPACE_THREE_DOTS = " ...";
     String NO_CREDENTIALS = "No Credentials";
-    String UNKNOWN_TYPE = "unknown_type";
-    String CRED_EMPTY = "Credentials are empty: please, fix credentials";
     String A_BLAZEMETER_COM = "https://a.blazemeter.com";
-    String CRED_ARE_VALID = "Credentials are valid: user e-mail=";
-    String CRED_ARE_NOT_VALID = "Credentials are not valid";
     String NO_SUCH_CREDENTIALS = "No such credentials in store, re-check";
     String NO_TESTS = "No tests";
     String NO_WORKSPACES = "No workspaces";
-    int ENCRYPT_CHARS_NUM = 3;
-    String MASTER_ID = "masterId";
-    String CRED_EMPTY_VALUE = "Basic Og==";
     String THREE_DOTS = "...";
-    String CHECK_SETTINGS = "Check blazemeter & proxy-settings";
 }

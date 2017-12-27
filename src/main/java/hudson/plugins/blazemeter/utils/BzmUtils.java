@@ -26,7 +26,7 @@ public class BzmUtils extends BlazeMeterUtils {
     private static final String APP_KEY = "app_key=jnk100x987c06f4e10c4";
 
     private static final String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
-            + JobUtility.version();
+            + Utils.version();
 
     public static String JENKINS_PLUGIN_INFO = APP_KEY + CLIENT_IDENTIFICATION;
 

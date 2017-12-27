@@ -21,9 +21,11 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.BlazemeterCredentialsBAImpl;
 import hudson.security.ACL;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,24 +45,6 @@ public class Utils {
         }
     }
 
-    public static FilePath resolvePath(FilePath workspace, String path, EnvVars vars) throws Exception {
-        FilePath fp = null;
-        StrSubstitutor strSubstr = new StrSubstitutor(vars);
-        String resolvedPath = strSubstr.replace(path);
-        if (resolvedPath.startsWith("/") | resolvedPath.matches("(^[a-zA-Z][:][\\\\].+)")) {
-            fp = new FilePath(workspace.getChannel(), resolvedPath);
-        } else {
-            fp = new FilePath(workspace, resolvedPath);
-        }
-        if (!fp.exists()) {
-            try {
-                fp.mkdirs();
-            } catch (Exception e) {
-                throw new Exception("Failed to find filepath = " + fp.getName());
-            }
-        }
-        return fp;
-    }
 
     public static List<BlazemeterCredentialsBAImpl> getCredentials(Object scope) {
         List<BlazemeterCredentialsBAImpl> result = new ArrayList<>();
@@ -91,5 +75,15 @@ public class Utils {
 
     public static String calcLegacyId(String jobApiKey) {
         return StringUtils.left(jobApiKey, 4) + Constants.THREE_DOTS + StringUtils.right(jobApiKey, 4);
+    }
+
+    public static String version() {
+        Properties props = new Properties();
+        try {
+            props.load(Utils.class.getResourceAsStream("version.properties"));
+        } catch (IOException ex) {
+            props.setProperty(Constants.VERSION, "N/A");
+        }
+        return props.getProperty(Constants.VERSION);
     }
 }
