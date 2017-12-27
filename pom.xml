@@ -15,7 +15,7 @@
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT-${jenkins.build.number}</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -221,11 +221,10 @@
                                 </outputDirectory>
                                 <resources>
                                     <resource>
-                                        <directory>${basedir}/src/main/java/hudson/plugins/blazemeter/utils</directory>
+                                        <directory>${basedir}/src/main/resources</directory>
                                         <filtering>true</filtering>
                                         <includes>
                                             <include>version.properties</include>
-                                            <include>emptyBody.json</include>
                                         </includes>
                                     </resource>
                                 </resources>
