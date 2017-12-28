@@ -33,24 +33,6 @@ public class JenkinsTestListFlow extends TestsListFlow {
         super(utils);
     }
 
-    private List<SingleTest> getSingleTestsForWorkspace(Workspace workspace) {
-        try {
-            return workspace.getSingleTests();
-        } catch (IOException e) {
-            getUtils().getNotifier().notifyError("Failed to get single tests for workspace id =" + workspace.getId() + ". Reason is: " + e.getMessage());
-        }
-        return Collections.emptyList();
-    }
-
-    private List<MultiTest> getMultiTestsForWorkspace(Workspace workspace) {
-        try {
-            return workspace.getMultiTests();
-        } catch (IOException e) {
-            getUtils().getNotifier().notifyError("Failed to get multi tests for workspace id =" + workspace.getId() + ". Reason is: " + e.getMessage());
-        }
-        return Collections.emptyList();
-    }
-
     public List<AbstractTest> getAllTestsForWorkspace(Workspace workspace) {
         List<AbstractTest> tests = new ArrayList<>();
         tests.addAll(getSingleTestsForWorkspace(workspace));
