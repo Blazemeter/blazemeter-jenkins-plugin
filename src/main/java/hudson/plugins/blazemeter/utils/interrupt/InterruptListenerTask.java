@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 public class InterruptListenerTask extends Thread {
 
     protected Logger logger = Logger.getLogger(InterruptListenerTask.class.getName());
-    private final int ATTEMPT_COUNT = Integer.parseInt(System.getProperty("bzm.interrupt.attemptCount", "60"));
-    private final long RETRY_DELAY = 5000;
+    private final int ATTEMPT_COUNT = Integer.parseInt(System.getProperty("bzm.interrupt.attemptCount", "45"));
+    private final long RETRY_DELAY = Long.parseLong(System.getProperty("bzm.checkTimeout", "10000"));;
 
     protected String jobName;
 
