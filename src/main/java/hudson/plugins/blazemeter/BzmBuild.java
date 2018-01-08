@@ -22,7 +22,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
@@ -71,7 +71,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     public Result call() throws Exception {
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
-        BzmUtils utils = createBzmUtils(createLogFile(wsp));
+        JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
         try {
             build = createCiBuild(utils, wsp);
 
@@ -146,13 +146,13 @@ public class BzmBuild implements Callable<Result, Exception> {
         return wsp;
     }
 
-    private BzmUtils createBzmUtils(String logFile) {
-        return new BzmUtils(apiId, apiSecret, serverURL,
+    private JenkinsBlazeMeterUtils createBzmUtils(String logFile) {
+        return new JenkinsBlazeMeterUtils(apiId, apiSecret, serverURL,
                 new BzmJobNotifier(listener),
                 new BzmJobLogger(logFile));
     }
 
-    private CiBuild createCiBuild(BzmUtils utils, FilePath workspace) {
+    private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
@@ -160,7 +160,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                 createCiPostProcess(utils, workspace));
     }
 
-    private CiPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace) {
+    private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
                 workspace.getRemote(), utils.getNotifier(), utils.getLogger());

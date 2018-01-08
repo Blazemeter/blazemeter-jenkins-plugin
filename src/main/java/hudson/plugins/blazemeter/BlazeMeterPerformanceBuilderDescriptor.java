@@ -21,16 +21,14 @@ import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.ciworkflow.TestsListFlow;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
-import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
@@ -202,10 +200,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
 
-    public static BzmUtils getBzmUtils(String username, String password) {
+    public static JenkinsBlazeMeterUtils getBzmUtils(String username, String password) {
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
-        BzmUtils utils = new BzmUtils(username, password,
+        JenkinsBlazeMeterUtils utils = new JenkinsBlazeMeterUtils(username, password,
                 BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
 
         return utils;

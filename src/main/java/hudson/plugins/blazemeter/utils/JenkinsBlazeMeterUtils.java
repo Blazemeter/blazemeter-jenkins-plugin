@@ -21,7 +21,7 @@ import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 
 import java.io.IOException;
 
-public class BzmUtils extends BlazeMeterUtils {
+public class JenkinsBlazeMeterUtils extends BlazeMeterUtils {
 
     private static final String APP_KEY = "app_key=jnk100x987c06f4e10c4";
 
@@ -30,7 +30,7 @@ public class BzmUtils extends BlazeMeterUtils {
 
     public static String JENKINS_PLUGIN_INFO = APP_KEY + CLIENT_IDENTIFICATION;
 
-    public BzmUtils(String apiKeyId, String apiKeySecret, String address, UserNotifier notifier, Logger logger) {
+    public JenkinsBlazeMeterUtils(String apiKeyId, String apiKeySecret, String address, UserNotifier notifier, Logger logger) {
         super(apiKeyId, apiKeySecret, address, "", notifier, logger);
     }
 
