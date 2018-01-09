@@ -19,7 +19,7 @@ import com.blazemeter.api.explorer.Workspace;
 import com.blazemeter.api.explorer.test.AbstractTest;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.Extension;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
 import hudson.plugins.blazemeter.utils.Utils;
 
@@ -47,10 +47,10 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         String serverUrl = desc.getBlazeMeterURL();
         try {
             BlazemeterCredentialsBAImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
-            BzmUtils bzmUtils = null;
+            JenkinsBlazeMeterUtils bzmUtils = null;
             if (!StringUtils.isBlank(credential.getId())) {
                 logger.info("Credentials with id = " + c.credentialsId + " are present in credentials.");
-                bzmUtils = new BzmUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
+                bzmUtils = new JenkinsBlazeMeterUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
                 User user = null;
                 try {
                     user = User.getUser(bzmUtils);
