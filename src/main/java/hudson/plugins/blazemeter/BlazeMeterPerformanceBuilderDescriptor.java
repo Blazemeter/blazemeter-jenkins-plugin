@@ -214,12 +214,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         ListBoxModel sortedTests = new ListBoxModel();
         JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(workspace.getUtils());
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
-        Comparator c = new Comparator<AbstractTest>() {
-            @Override
-            public int compare(AbstractTest t1, AbstractTest t2) {
-                return t1.getName().compareToIgnoreCase(t2.getName());
-            }
-        };
+        Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
+        if (tests.isEmpty()) {
+            sortedTests.add(new ListBoxModel.Option("no-tests", "No tests in workspace",true));
+            return sortedTests;
+        }
         tests.sort(c);
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
