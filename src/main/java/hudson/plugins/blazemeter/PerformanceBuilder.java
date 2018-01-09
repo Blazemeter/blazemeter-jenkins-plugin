@@ -210,13 +210,24 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
     }
 
+    private boolean validateTestId(TaskListener listener) {
+        if (StringUtils.isBlank(testId)) {
+            listener.error("Please, reconfigure job and select valid credentials and test");
+            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+            return false;
+        }
+        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.NO_TESTS)) {
+            listener.error("Selected workspace does not contain tests: please, select another one.");
+            return false;
+        }
+        return true;
+
+    }
 
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
 
-        if (StringUtils.isBlank(testId)) {
-            listener.error("Please, reconfigure job and select valid credentials and test");
-            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+        if (!validateTestId(listener)) {
             run.setResult(Result.FAILURE);
             return;
         }

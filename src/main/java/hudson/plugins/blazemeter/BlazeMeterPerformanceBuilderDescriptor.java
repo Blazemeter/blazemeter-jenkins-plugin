@@ -58,6 +58,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
+    public static String NO_TESTS = "no-tests";
+
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         this.load();
@@ -216,7 +218,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
         if (tests.isEmpty()) {
-            sortedTests.add(new ListBoxModel.Option("no-tests", "No tests in workspace",true));
+            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS,true));
             return sortedTests;
         }
         tests.sort(c);
