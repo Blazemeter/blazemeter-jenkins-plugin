@@ -14,6 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
+import com.blazemeter.api.exception.UnexpectedResponseException;
 import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.explorer.Workspace;
@@ -52,6 +53,9 @@ import org.kohsuke.stapler.StaplerRequest;
 @Symbol({"blazeMeterTest"})
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
+
+    private String NO_WORKSPACES = "No workspaces";
+    private String CHECK_CREDENTIALS_PROXY = "Please, check credentials and/or proxy settings";
 
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String NOT_DEFINED = "not defined";
@@ -110,6 +114,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
             items = testsList(workspace, savedTestId);
+        } catch (UnexpectedResponseException e) {
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, "", true));
+//            return items;
         } catch (Exception e) {
             items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
         } finally {
@@ -136,9 +143,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
         try {
             items = workspacesList(utils, swid);
+        } catch (UnexpectedResponseException e) {
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, "", true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_WORKSPACES, "", true));
-            return items;
+            items.add(new ListBoxModel.Option(NO_WORKSPACES, "", true));
         } finally {
             return items;
         }
@@ -218,7 +226,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
         if (tests.isEmpty()) {
-            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS,true));
+            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
             return sortedTests;
         }
         tests.sort(c);

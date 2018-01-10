@@ -73,9 +73,6 @@ public class Utils {
         return cred;
     }
 
-    public static String calcLegacyId(String jobApiKey) {
-        return StringUtils.left(jobApiKey, 4) + Constants.THREE_DOTS + StringUtils.right(jobApiKey, 4);
-    }
 
     public static String version() {
         Properties props = new Properties();

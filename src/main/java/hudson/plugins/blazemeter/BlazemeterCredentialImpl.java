@@ -21,6 +21,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import hudson.Extension;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.util.ListBoxModel;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 @Deprecated
@@ -38,7 +39,7 @@ public class BlazemeterCredentialImpl extends BaseCredentials implements Standar
     }
 
     public String getId() {
-        return Utils.calcLegacyId(this.apiKey);
+        return calcLegacyId(this.apiKey);
     }
 
     public String getApiKey() {
@@ -47,6 +48,10 @@ public class BlazemeterCredentialImpl extends BaseCredentials implements Standar
 
     public String getDescription() {
         return description;
+    }
+
+    private String calcLegacyId(String jobApiKey) {
+        return StringUtils.left(jobApiKey, 4) + "..." + StringUtils.right(jobApiKey, 4);
     }
 
 
