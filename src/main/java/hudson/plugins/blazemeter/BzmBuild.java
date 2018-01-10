@@ -71,6 +71,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     public Result call() throws Exception {
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
+        logger.println("BlazemeterJenkins plugin v." + Utils.version());
         JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
         try {
             build = createCiBuild(utils, wsp);
