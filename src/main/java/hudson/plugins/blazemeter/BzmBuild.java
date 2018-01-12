@@ -111,9 +111,9 @@ public class BzmBuild implements Callable<Result, Exception> {
             case ABORTED:
                 return Result.ABORTED;
             case ERROR:
-                return Result.FAILURE;
-            case FAILED:
                 return Result.UNSTABLE;
+            case FAILED:
+                return Result.FAILURE;
             default:
                 return Result.NOT_BUILT;
         }
