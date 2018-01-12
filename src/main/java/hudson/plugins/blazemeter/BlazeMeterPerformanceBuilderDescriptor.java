@@ -101,22 +101,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        if (credentials == null) {
-            items.add(Constants.NO_SUCH_CREDENTIALS, "");
-            return items;
-        }
         BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-        if (utils == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
-            return items;
-        }
 
         Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
             items = testsList(workspace, savedTestId);
         } catch (UnexpectedResponseException e) {
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, "", true));
-//            return items;
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
             items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
         } finally {
@@ -132,19 +124,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return items;
         }
         BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        if (credentials == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, ""));
-            return items;
-        }
         BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-        if (utils == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
-            return items;
-        }
         try {
             items = workspacesList(utils, swid);
         } catch (UnexpectedResponseException e) {
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, "", true));
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
             items.add(new ListBoxModel.Option(NO_WORKSPACES, "", true));
         } finally {
