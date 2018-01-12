@@ -120,7 +120,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
         if (StringUtils.isBlank(crid)) {
-            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, "", true));
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, Constants.NO_CREDENTIALS, true));
             return items;
         }
         BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
@@ -131,7 +131,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.clear();
             items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(NO_WORKSPACES, "", true));
+            items.add(new ListBoxModel.Option(NO_WORKSPACES, NO_WORKSPACES, true));
         } finally {
             return items;
         }
