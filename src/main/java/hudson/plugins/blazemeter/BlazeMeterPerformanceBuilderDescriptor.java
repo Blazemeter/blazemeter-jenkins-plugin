@@ -218,8 +218,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
             sortedTests.add(new ListBoxModel.Option(testName, testName, false));
-            setSelected(sortedTests, savedTest);
         }
+        setSelected(sortedTests, savedTest);
         return sortedTests;
     }
 
@@ -228,7 +228,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         boolean valueWasSelected = false;
         for (int i = 0; i < boxSize; i++) {
             ListBoxModel.Option option = box.get(i);
-            if (option.value.equals(savedValue)) {
+            if (option.value.contains(savedValue)) {
                 box.get(i).selected = true;
                 return box;
             }
@@ -249,8 +249,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
                         "(" + ws.getId() + ")", ws.getId(), false);
                 workspacesList.add(wso);
-                setSelected(workspacesList, savedWorkspace);
             }
+            setSelected(workspacesList, savedWorkspace);
         }
         return workspacesList;
     }
