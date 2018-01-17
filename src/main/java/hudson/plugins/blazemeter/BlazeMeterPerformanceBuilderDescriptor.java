@@ -217,7 +217,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         tests.sort(c);
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
-            sortedTests.add(new ListBoxModel.Option(testName, testName, false));
+            sortedTests.add(new ListBoxModel.Option(testName, t.getId()+"." + t.getTestType(), false));
         }
         setSelected(sortedTests, savedTest);
         return sortedTests;
