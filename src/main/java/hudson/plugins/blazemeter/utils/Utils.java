@@ -83,4 +83,16 @@ public class Utils {
         }
         return props.getProperty(Constants.VERSION);
     }
+
+    public static String resolveTestId(String savedTestId) {
+        try {
+            int startIndex = savedTestId.lastIndexOf("(") + 1;
+            int endIndex = savedTestId.lastIndexOf(")");
+            String resolvedTestId = savedTestId.substring(startIndex, endIndex);
+            return resolvedTestId;
+        } catch (Exception e) {
+            return savedTestId;
+        }
+    }
+
 }

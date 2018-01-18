@@ -30,6 +30,7 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
+import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
@@ -94,7 +95,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
-
+        String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
         if (StringUtils.isBlank(crid)) {
             items.add(Constants.NO_CREDENTIALS, "");
@@ -105,7 +106,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
         Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
-            items = testsList(workspace, savedTestId);
+            items = testsList(workspace, resolvedTestId);
         } catch (UnexpectedResponseException e) {
             items.clear();
             items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
@@ -217,7 +218,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         tests.sort(c);
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
-            sortedTests.add(new ListBoxModel.Option(testName, t.getId()+"." + t.getTestType(), false));
+            sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
         }
         setSelected(sortedTests, savedTest);
         return sortedTests;
@@ -232,12 +233,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 box.get(i).selected = true;
                 return box;
             }
-            if (!valueWasSelected) {
-                box.get(0).selected = true;
-            }
+        }
+        if (!valueWasSelected) {
+            box.get(0).selected = true;
         }
         return box;
     }
+
 
     private ListBoxModel workspacesList(BlazeMeterUtils utils, String savedWorkspace) throws Exception {
         ListBoxModel workspacesList = new ListBoxModel();
