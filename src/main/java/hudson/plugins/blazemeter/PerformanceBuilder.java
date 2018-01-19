@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Result;
@@ -39,6 +40,8 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 
 
@@ -231,7 +234,15 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             run.setResult(Result.FAILURE);
             return;
         }
+        listener.getLogger().println("Performance builder EnvVars");
+        listener.getLogger().println("#############################");
+        EnvVars envVars = run.getEnvironment(listener);
 
+        Set<Map.Entry<String,String>> entries;
+        entries = envVars.entrySet();
+        for(Map.Entry<String,String> e:entries){
+            listener.getLogger().println(e.getKey()+" -> "+e.getValue());
+        }
         BlazemeterCredentialsBAImpl credentials = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
         boolean isValidCredentials = !StringUtils.isBlank(credentialsId) && validateCredentials(credentials);
         if (!isValidCredentials) {
