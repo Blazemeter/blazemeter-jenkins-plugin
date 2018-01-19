@@ -40,7 +40,6 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import jenkins.model.Jenkins;
@@ -101,11 +100,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(Constants.NO_CREDENTIALS, "");
             return items;
         }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-
-        Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
+        String strippedCrid = StringUtils.strip(crid);
         try {
+            BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
+            Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
             items = testsList(workspace, resolvedTestId);
         } catch (UnexpectedResponseException e) {
             items.clear();
@@ -124,9 +123,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, Constants.NO_CREDENTIALS, true));
             return items;
         }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
+        String strippedCrid = StringUtils.strip(crid);
         try {
+            BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
         } catch (UnexpectedResponseException e) {
             items.clear();
@@ -149,22 +149,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                         c.getId(),
                         false));
             }
-            Iterator<ListBoxModel.Option> iterator = items.iterator();
-            while (iterator.hasNext()) {
-                ListBoxModel.Option option = iterator.next();
-                try {
-                    if (StringUtils.isBlank(credentialsId)) {
-                        option.selected = true;
-                        break;
-                    }
-                    if (credentialsId.equals(option.value)) {
-                        option.selected = true;
-                        break;
-                    }
-                } catch (Exception e) {
-                    option.selected = false;
-                }
-            }
+            setSelected(items, StringUtils.strip(credentialsId));
         } catch (Exception npe) {
 
         } finally {
