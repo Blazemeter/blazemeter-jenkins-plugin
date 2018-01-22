@@ -14,16 +14,16 @@
      limitations under the License.
     -->
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
-        <f:select style="width:32em;"/>
+        <f:select style="width:40em;"/>
     </f:entry>
     <f:entry title="${%Workspace ID:}" field="workspaceId">
-        <f:select style="width:32em;"/>
+        <f:select style="width:40em;"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
-        <f:select style="width:32em;"/>
+        <f:select style="width:40em;"/>
     </f:entry>
     <f:entry title="${%Server url:}">
-        <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
+        <f:textbox disabled="true" style="width:40em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>

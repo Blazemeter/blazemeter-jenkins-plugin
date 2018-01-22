@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import com.blazemeter.api.exception.UnexpectedResponseException;
 import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.explorer.Workspace;
@@ -54,15 +53,15 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String NO_WORKSPACES = "No workspaces";
-    private String CHECK_CREDENTIALS_PROXY = "Please, check credentials and/or proxy settings";
+    private String NOT_FOUND = " is not found.";
 
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String NOT_DEFINED = "not defined";
+    private String WORKSPACE_ID = "Workspace ID";
     private String name = "My BlazeMeter Account";
-    private static BlazeMeterPerformanceBuilderDescriptor descriptor;
-
     public static String NO_TESTS = "no-tests";
+
+    private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
@@ -93,46 +92,39 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
                                           @QueryParameter("workspaceId") String wsid,
-                                          @QueryParameter("testId") String savedTestId) throws FormValidation {
+                                          @QueryParameter("testId") String savedTestId) {
         String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(Constants.NO_CREDENTIALS, "");
-            return items;
-        }
         String strippedCrid = StringUtils.strip(crid);
         try {
             BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            if (credentials == null) {
+                return items;
+            }
+
             BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
             items = testsList(workspace, resolvedTestId);
-        } catch (UnexpectedResponseException e) {
-            items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
+            items.clear();
         } finally {
             return items;
         }
     }
 
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
-                                               @QueryParameter("workspaceId") String swid) throws FormValidation {
+                                               @QueryParameter("workspaceId") String swid) {
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, Constants.NO_CREDENTIALS, true));
-            return items;
-        }
         String strippedCrid = StringUtils.strip(crid);
         try {
             BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            if (credentials == null) {
+                return items;
+            }
             BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
-        } catch (UnexpectedResponseException e) {
-            items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(NO_WORKSPACES, NO_WORKSPACES, true));
+            items.clear();
         } finally {
             return items;
         }
@@ -149,7 +141,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                         c.getId(),
                         false));
             }
-            setSelected(items, StringUtils.strip(credentialsId));
+            setSelected(items, StringUtils.strip(credentialsId), "Credentials ID");
         } catch (Exception npe) {
 
         } finally {
@@ -197,7 +189,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
         if (tests.isEmpty()) {
-            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
             return sortedTests;
         }
         tests.sort(c);
@@ -205,11 +196,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
             sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
         }
-        setSelected(sortedTests, savedTest);
+        setSelected(sortedTests, savedTest, "Test ID");
         return sortedTests;
     }
 
-    private ListBoxModel setSelected(ListBoxModel box, String savedValue) {
+    private ListBoxModel setSelected(ListBoxModel box, String savedValue, String message) {
         int boxSize = box.size();
         boolean valueWasSelected = false;
         for (int i = 0; i < boxSize; i++) {
@@ -220,6 +211,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
         if (!valueWasSelected) {
+            box.add(0, new ListBoxModel.Option(message + "(" + savedValue + ")" + NOT_FOUND,
+                    savedValue));
             box.get(0).selected = true;
         }
         return box;
@@ -237,7 +230,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                         "(" + ws.getId() + ")", ws.getId(), false);
                 workspacesList.add(wso);
             }
-            setSelected(workspacesList, savedWorkspace);
+            setSelected(workspacesList, savedWorkspace, WORKSPACE_ID);
         }
         return workspacesList;
     }
