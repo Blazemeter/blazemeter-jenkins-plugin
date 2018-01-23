@@ -20,7 +20,16 @@
         <f:select style="width:32em;"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
-        <f:select style="width:32em;"/>
+        <div id="testDiv">
+            <f:select onchange="onChangeSelectHandler()" style="width:32em;"/>
+            <div id="newSelectDiv">
+                <div id="result" onclick="onClickResultHandler()" class="setting-input">Default value</div>
+                <div id="hiddenSelect">
+                    <div id="searchInputDiv"/>
+                    <div id="generatedUlDiv"/>
+                </div>
+            </div>
+        </div>
     </f:entry>
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
@@ -46,4 +55,7 @@
             <f:textbox field="sessionProperties"></f:textbox>
         </f:entry>
     </f:advanced>
+
+    <link rel="stylesheet" href="${resURL}/plugin/BlazeMeterJenkinsPlugin/css/myStyle.css"/>
+    <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
 </j:jelly>
