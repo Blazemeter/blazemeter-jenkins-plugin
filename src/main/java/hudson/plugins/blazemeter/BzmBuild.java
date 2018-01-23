@@ -18,6 +18,7 @@ import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
@@ -28,6 +29,9 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
+import hudson.remoting.Channel;
+import hudson.remoting.LocalChannel;
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.File;
@@ -50,12 +54,13 @@ public class BzmBuild implements Callable<Result, Exception> {
     private FilePath workspace;
     private TaskListener listener;
 
+    private boolean applyJenkinsProxy;
     private Master master;
     private JenkinsCiBuild build;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyJenkinsProxy) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -65,10 +70,12 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.envVars = envVars;
         this.workspace = workspace;
         this.listener = listener;
+        this.applyJenkinsProxy = applyJenkinsProxy;
     }
 
     @Override
     public Result call() throws Exception {
+        applyProxySettings(applyJenkinsProxy);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println("BlazemeterJenkins plugin v." + Utils.version());
@@ -174,5 +181,20 @@ public class BzmBuild implements Callable<Result, Exception> {
 
     public JenkinsCiBuild getBuild() {
         return build;
+    }
+
+    private void applyProxySettings(boolean applyJenkinsProxy) {
+        if (applyJenkinsProxy) {
+            try {
+                ProxyConfiguration proxyConfiguration = ProxyConfiguration.load();
+                System.setProperty("http.proxyHost", proxyConfiguration.name);
+                System.setProperty("http.proxyPort", String.valueOf(proxyConfiguration.port));
+                System.setProperty("http.proxyUser", proxyConfiguration.getUserName());
+                System.setProperty("http.proxyPass", proxyConfiguration.getPassword());
+            } catch (Exception e) {
+                listener.getLogger().println("Failed to apply proxy settings to blazemeter-api-client.");
+            }
+
+        }
     }
 }

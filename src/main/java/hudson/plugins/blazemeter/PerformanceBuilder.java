@@ -24,6 +24,7 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.interrupt.InterruptListenerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
+import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -242,12 +243,12 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         String jobName = run.getFullDisplayName();
+        VirtualChannel channel = launcher.getChannel();
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener);
+                run.getEnvironment(listener), workspace, listener,channel instanceof LocalChannel);
 
-        VirtualChannel channel = launcher.getChannel();
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
 
