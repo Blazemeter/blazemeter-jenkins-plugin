@@ -35,7 +35,6 @@ import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.util.Comparator;
@@ -43,7 +42,6 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
@@ -95,9 +93,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("testId") String savedTestId) {
         String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
-        String strippedCrid = StringUtils.strip(crid);
         try {
-            BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
             if (credentials == null) {
                 return items;
             }
@@ -115,9 +112,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
                                                @QueryParameter("workspaceId") String swid) {
         ListBoxModel items = new ListBoxModel();
-        String strippedCrid = StringUtils.strip(crid);
         try {
-            BlazemeterCredentialsBAImpl credentials = findCredentials(strippedCrid);
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
             if (credentials == null) {
                 return items;
             }
@@ -141,7 +137,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                         c.getId(),
                         false));
             }
-            setSelected(items, StringUtils.strip(credentialsId), "Credentials ID");
+            setSelected(items, credentialsId, "Credentials ID");
         } catch (Exception npe) {
 
         } finally {
