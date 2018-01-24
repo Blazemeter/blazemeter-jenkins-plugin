@@ -3,12 +3,22 @@
   position: absolute;
  // top: 39px;
  // left: 0;
-  border: 1px solid #000000;
+  border: 1px solid 	#1E90FF;
   //border-top: transparent;
   width: 100%;
   box-sizing: border-box;
   background-color: white;
   z-index: 1010;
+}
+
+#result {
+    border-radius: 0;
+    height: 2.25em;
+}
+
+#searchInput {
+    border-radius: 0;
+    height: 2.25em;
 }
 
 #searchInput{
@@ -17,7 +27,6 @@
 }
 
 #newSelectDiv{
-  //  border: 1px solid #000000;
     width: 32em;
   //  padding: 10px;
     box-sizing: border-box;
@@ -32,10 +41,10 @@
   height: 0;
   display: inline-block;
   border-top: 6px solid #000000;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
+  border-left: 2.5px solid transparent;
+  border-right: 2.5px solid transparent;
   position: absolute;
-  right: 10px;
+  right: 6px;
   top: 15px;
 }
 
@@ -50,6 +59,6 @@
 }
 
 #generatedUl li:hover{
-  background: blue;
+  background: 	#1E90FF;
   color: #ffffff;
 }
