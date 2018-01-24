@@ -23,7 +23,7 @@
         <div id="testDiv">
             <f:select onchange="onChangeSelectHandler()" style="width:32em;"/>
             <div id="newSelectDiv">
-                <div id="result" onclick="onClickResultHandler()" class="setting-input">Default value</div>
+                <div id="result" onclick="onClickResultHandler()" class="setting-input select">Select test</div>
                 <div id="hiddenSelect">
                     <div id="searchInputDiv"/>
                     <div id="generatedUlDiv"/>

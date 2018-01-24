@@ -1,5 +1,4 @@
 function onChangeSelectHandler() {
-    console.log("works really fine");
     var testDivEl = document.getElementById("testDiv");
     var selectEl = testDiv.getElementsByTagName("select")[0];
 
@@ -10,7 +9,9 @@ function onChangeSelectHandler() {
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
     var generatedUl = '<ul id="generatedUl">';
     for (i = 0; i < options.length; i++) {
-        generatedUl += '<li onclick="onClickListElementHandler(this)" data-value="' + options[i].value + '" >' + options[i].label + '</li>';
+        generatedUl += '<li onclick="onClickListElementHandler(this)" data-value="' + options[i].value
+                    + '" data-index="' + i
+                    + '" >' + options[i].label + '</li>';
     }
     generatedUl += '</ul>';
     generatedUlDivEl.innerHTML = generatedUl;
@@ -22,11 +23,7 @@ function onChangeSelectHandler() {
 var testDivEl = document.getElementById("testDiv");
 var selectEl = testDiv.getElementsByTagName("select")[0];
 setNameToResult(selectEl.getAttribute("value"));
-selectEl.onmessage = function onLoad() {
-    console.log("aaaa Load!!");
-};
-
-function onLoad123() {
+selectEl.ondataavailable = function onLoad() {
     console.log("aaaa Load!!");
 };
 
@@ -34,7 +31,6 @@ function onLoad123() {
 
 function onClickResultHandler() {
     var toggleEl = document.getElementById("hiddenSelect");
-    //console.log("click!", toggleEl.style.display);
     if (toggleEl.style.display === "block") {
         toggleEl.style.display = "none";
     } else {
@@ -44,6 +40,8 @@ function onClickResultHandler() {
 };
 
 function onClickListElementHandler(li) {
+    setNameToResult(li.innerHTML);
+    setValueToSelect(li);
     console.log("click li ", li.dataset.value);
     console.log("click li ", li.innerHTML);
 }
@@ -53,6 +51,13 @@ document.onclick = function(event) {
         var toggleEl = document.getElementById("hiddenSelect");
         toggleEl.style.display = "none";
     }
+}
+
+function setValueToSelect(li) {
+    var testDivEl = document.getElementById("testDiv");
+    var selectEl = testDiv.getElementsByTagName("select")[0];
+    selectEl.setAttribute("value", li.dataset.value);
+    selectEl.options[li.dataset.index].selected = true;
 }
 
 function setNameToResult(name) {
