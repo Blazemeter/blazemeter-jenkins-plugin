@@ -3,9 +3,6 @@ function onChangeSelectHandler() {
     var selectEl = testDiv.getElementsByTagName("select")[0];
 
     var options = selectEl.options;
-    console.log("selectEl", selectEl);
-    console.log("selectEl.value= ", selectEl.getAttribute("value"));
-
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
     var generatedUl = '<ul id="generatedUl">';
     for (i = 0; i < options.length; i++) {
@@ -16,8 +13,8 @@ function onChangeSelectHandler() {
     generatedUl += '</ul>';
     generatedUlDivEl.innerHTML = generatedUl;
 
-    var searchInputEl = document.getElementById("searchInputDiv");
-    searchInputEl.innerHTML = '<input type="text" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+    var searchInputDivEl = document.getElementById("searchInputDiv");
+    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
 };
 
 var testDivEl = document.getElementById("testDiv");
@@ -27,7 +24,18 @@ selectEl.ondataavailable = function onLoad() {
     console.log("aaaa Load!!");
 };
 
-
+function onKeyUpSearch() {
+    var searchInputEl = document.getElementById("searchInput");
+    var text = searchInputEl.value;
+    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    for (i = 0; i < liList.length; i++) {
+        if (!liList[i].innerHTML.includes(text)) {
+            liList[i].style.display = "none";
+        } else {
+            liList[i].style.display = "";
+        }
+    }
+};
 
 function onClickResultHandler() {
     var toggleEl = document.getElementById("hiddenSelect");
@@ -42,25 +50,23 @@ function onClickResultHandler() {
 function onClickListElementHandler(li) {
     setNameToResult(li.innerHTML);
     setValueToSelect(li);
-    console.log("click li ", li.dataset.value);
-    console.log("click li ", li.innerHTML);
-}
+};
 
 document.onclick = function(event) {
     if (event.target.id != "result" && event.target.id != "searchInput") {
         var toggleEl = document.getElementById("hiddenSelect");
         toggleEl.style.display = "none";
     }
-}
+};
 
 function setValueToSelect(li) {
     var testDivEl = document.getElementById("testDiv");
     var selectEl = testDiv.getElementsByTagName("select")[0];
     selectEl.setAttribute("value", li.dataset.value);
     selectEl.options[li.dataset.index].selected = true;
-}
+};
 
 function setNameToResult(name) {
     var resultDivEl = document.getElementById("result");
     resultDivEl.innerHTML = name;
-}
+};
