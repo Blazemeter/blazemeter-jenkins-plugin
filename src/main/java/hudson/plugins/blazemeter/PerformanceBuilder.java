@@ -38,7 +38,6 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Timer;
 
@@ -217,7 +216,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
             return false;
         }
-        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.NO_TESTS)) {
+        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.CHECK_SETTINGS_TESTS)) {
             listener.error("Selected workspace does not contain tests: please, select another one.");
             return false;
         }

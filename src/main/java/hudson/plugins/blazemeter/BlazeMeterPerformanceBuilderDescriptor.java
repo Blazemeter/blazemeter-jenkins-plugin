@@ -37,6 +37,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -57,7 +58,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String NOT_DEFINED = "not defined";
     private String WORKSPACE_ID = "Workspace ID";
     private String name = "My BlazeMeter Account";
-    public static String NO_TESTS = "no-tests";
+    public static String CHECK_SETTINGS_TESTS = "Check that workspace has tests and credentials/proxy are valid";
+    public static String CHECK_CREDENTIALS = "Check that credentials/proxy are valid";
 
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
@@ -94,6 +96,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
         try {
+            ProxyConfigurator.updateProxySettings(true);
             BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
             if (credentials == null) {
                 return items;
@@ -113,14 +116,19 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                                @QueryParameter("workspaceId") String swid) {
         ListBoxModel items = new ListBoxModel();
         try {
+            ProxyConfigurator.updateProxySettings(true);
             BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
             if (credentials == null) {
                 return items;
             }
             BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
+        } catch (IOException e) {
+            items.clear();
+            items.add(new ListBoxModel.Option(e.getMessage(), e.getMessage(), true));
         } catch (Exception e) {
             items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS, CHECK_CREDENTIALS, true));
         } finally {
             return items;
         }
@@ -185,6 +193,8 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
         if (tests.isEmpty()) {
+            sortedTests.clear();
+            sortedTests.add(new ListBoxModel.Option(CHECK_SETTINGS_TESTS, CHECK_SETTINGS_TESTS, true));
             return sortedTests;
         }
         tests.sort(c);
@@ -206,7 +216,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 return box;
             }
         }
-        if (!valueWasSelected) {
+        if (!valueWasSelected & !savedValue.contains(CHECK_CREDENTIALS) & !savedValue.contains(CHECK_SETTINGS_TESTS)) {
             box.add(0, new ListBoxModel.Option(message + "(" + savedValue + ")" + NOT_FOUND,
                     savedValue));
             box.get(0).selected = true;

@@ -18,7 +18,6 @@ import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
 import hudson.EnvVars;
 import hudson.FilePath;
-import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
@@ -29,9 +28,6 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
-import hudson.remoting.Channel;
-import hudson.remoting.LocalChannel;
-import hudson.remoting.VirtualChannel;
 import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.File;
@@ -75,7 +71,7 @@ public class BzmBuild implements Callable<Result, Exception> {
 
     @Override
     public Result call() throws Exception {
-        applyProxySettings(applyJenkinsProxy);
+        ProxyConfigurator.updateProxySettings(applyJenkinsProxy);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println("BlazemeterJenkins plugin v." + Utils.version());
@@ -107,6 +103,7 @@ public class BzmBuild implements Callable<Result, Exception> {
             BuildResult buildResult = build.doPostProcess(master);
             return mappedBuildResult(buildResult);
         } finally {
+//            ProxyConfigurator.clearProxySettings(applyJenkinsProxy);
             utils.closeLogger();
         }
     }
@@ -183,18 +180,5 @@ public class BzmBuild implements Callable<Result, Exception> {
         return build;
     }
 
-    private void applyProxySettings(boolean applyJenkinsProxy) {
-        if (applyJenkinsProxy) {
-            try {
-                ProxyConfiguration proxyConfiguration = ProxyConfiguration.load();
-                System.setProperty("http.proxyHost", proxyConfiguration.name);
-                System.setProperty("http.proxyPort", String.valueOf(proxyConfiguration.port));
-                System.setProperty("http.proxyUser", proxyConfiguration.getUserName());
-                System.setProperty("http.proxyPass", proxyConfiguration.getPassword());
-            } catch (Exception e) {
-                listener.getLogger().println("Failed to apply proxy settings to blazemeter-api-client.");
-            }
 
-        }
-    }
 }
