@@ -13,6 +13,7 @@
     height: 2.25em;
     padding: 6px 10px;
     color: #000000;
+    position: relative;
 }
 
 #searchInput {
@@ -61,4 +62,35 @@
 #generatedUl li:hover {
     background: #1E90FF;
     color: #ffffff;
+}
+
+@media screen and (-moz-device-pixel-ratio) {
+    #newSelectDiv::before {
+        content: '';
+        display: inline-block;
+        border-top: 2px solid #ffffff;
+        width: 18px;
+        height: 30px;
+        position: absolute;
+        right: 1px;
+        top: 1px;
+        background: #f3f3f3;
+        border-left: 2px solid #ffffff;
+        border-bottom: 2px solid #848485;
+        border-right: 2px solid #848485;
+    }
+
+    #newSelectDiv::after {
+        content: '';
+        width: 0;
+        height: 0;
+        display: inline-block;
+        border-top: 4px solid #000000;
+        border-left: 3.5px solid transparent;
+        border-right: 3.5px solid transparent;
+        position: absolute;
+        right: 6px;
+        top: 15px;
+        display: inline-block;
+    }
 }
