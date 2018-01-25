@@ -53,9 +53,11 @@ public class BzmBuild implements Callable<Result, Exception> {
     private Master master;
     private JenkinsCiBuild build;
 
+    private boolean applyProxy;
+
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -65,17 +67,18 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.envVars = envVars;
         this.workspace = workspace;
         this.listener = listener;
+        this.applyProxy = applyProxy;
     }
 
     @Override
     public Result call() throws Exception {
+        ProxyConfigurator.updateProxySettings(applyProxy);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println("BlazemeterJenkins plugin v." + Utils.version());
         JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
         try {
             build = createCiBuild(utils, wsp);
-
             try {
                 master = build.start();
                 if (master != null) {

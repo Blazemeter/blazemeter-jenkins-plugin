@@ -104,8 +104,8 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
         public FormValidation doValidate(@QueryParameter("username") final String username,
                                          @QueryParameter("password") final String password) {
             String decryptedPassword = Secret.fromString(password).getPlainText();
-            JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
             try {
+                JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
                 User.getUser(utils);
                 return FormValidation.ok("Successfully validated credentials.");
             } catch (Exception e) {

@@ -56,7 +56,8 @@ import org.kohsuke.stapler.StaplerRequest;
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
     private String NO_WORKSPACES = "No workspaces";
-    private String CHECK_CREDENTIALS_PROXY = "Please, check credentials and/or proxy settings";
+    private String CHECK_CREDENTIALS_PROXY_TESTS = "Check credentials, proxy settings, tests in workspace";
+    private String CHECK_CREDENTIALS_PROXY_WORKSPACES = "Check credentials, proxy settings, workspaces in account";
 
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String NOT_DEFINED = "not defined";
@@ -95,23 +96,21 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String crid,
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
+
         String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
         if (StringUtils.isBlank(crid)) {
             items.add(Constants.NO_CREDENTIALS, "");
             return items;
         }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-
-        Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
         try {
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
+            Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
             items = testsList(workspace, resolvedTestId);
-        } catch (UnexpectedResponseException e) {
-            items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY_TESTS, CHECK_CREDENTIALS_PROXY_TESTS, true));
         } finally {
             return items;
         }
@@ -124,15 +123,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, Constants.NO_CREDENTIALS, true));
             return items;
         }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
         try {
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
-        } catch (UnexpectedResponseException e) {
-            items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, CHECK_CREDENTIALS_PROXY, true));
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(NO_WORKSPACES, NO_WORKSPACES, true));
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY_WORKSPACES, CHECK_CREDENTIALS_PROXY_WORKSPACES, true));
         } finally {
             return items;
         }
@@ -196,9 +193,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
 
-    public static JenkinsBlazeMeterUtils getBzmUtils(String username, String password) {
+    public static JenkinsBlazeMeterUtils getBzmUtils(String username, String password) throws Exception {
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
+        ProxyConfigurator.updateProxySettings(true);
         JenkinsBlazeMeterUtils utils = new JenkinsBlazeMeterUtils(username, password,
                 BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
 
@@ -212,7 +210,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
         if (tests.isEmpty()) {
-            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
+//            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
             return sortedTests;
         }
         tests.sort(c);
@@ -252,6 +250,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                         "(" + ws.getId() + ")", ws.getId(), false);
                 workspacesList.add(wso);
             }
+            if (workspacesList.isEmpty()) {
+                workspacesList.add(new ListBoxModel.Option("No workspaces in account", "No workspaces in account", true));
+                return workspacesList;
+            }
+
             setSelected(workspacesList, savedWorkspace);
         }
         return workspacesList;
