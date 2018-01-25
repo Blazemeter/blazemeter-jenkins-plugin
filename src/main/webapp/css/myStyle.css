@@ -1,11 +1,7 @@
 #hiddenSelect{
   display: none;
   position: absolute;
- // top: 39px;
- // left: 0;
-    border: 1px solid #1E90FF;
-    border-top: none;
-  //border-top: transparent;
+  border: 1px solid #1E90FF;
   width: 100%;
   box-sizing: border-box;
   background-color: white;
@@ -19,10 +15,6 @@
     color: #000000;
 }
 
-#newSelectDiv:focus {
-    border: 1px solid #1E90FF;
-}
-
 #searchInput{
   width: 100%;
   box-sizing: border-box;
@@ -32,7 +24,6 @@
 
 #newSelectDiv{
     width: 32em;
-  //  padding: 10px;
     box-sizing: border-box;
     cursor: pointer;
     position: relative;
