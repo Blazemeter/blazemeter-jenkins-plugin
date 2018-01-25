@@ -11,7 +11,7 @@
 #result {
     border-radius: 0;
     height: 2.25em;
-    padding: 6px;
+    padding: 6px 10px;
     color: #000000;
 }
 
@@ -54,7 +54,7 @@
 
 #generatedUl li{
   cursor: pointer;
-  padding: 0 6px;
+  padding: 0 10px;
 }
 
 #generatedUl li:hover{
