@@ -20,6 +20,7 @@
   box-sizing: border-box;
   border-radius: 0 !important;
   outline: none;
+  padding: 0 10px !important;
 }
 
 #newSelectDiv{
