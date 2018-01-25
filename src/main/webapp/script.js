@@ -3,12 +3,18 @@ function onChangeSelectHandler() {
     var selectEl = testDiv.getElementsByTagName("select")[0];
 
     var options = selectEl.options;
+
+
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
     var generatedUl = '<ul id="generatedUl">';
     for (i = 0; i < options.length; i++) {
         generatedUl += '<li onclick="onClickListElementHandler(this)" data-value="' + options[i].value
                     + '" data-index="' + i
                     + '" >' + options[i].label + '</li>';
+
+        if (options[i].selected) {
+            setNameToResult(options[i].label);
+        }
     }
     generatedUl += '</ul>';
     generatedUlDivEl.innerHTML = generatedUl;
@@ -26,10 +32,10 @@ selectEl.ondataavailable = function onLoad() {
 
 function onKeyUpSearch() {
     var searchInputEl = document.getElementById("searchInput");
-    var text = searchInputEl.value;
+    var text = searchInputEl.value.toLowerCase();
     var liList = document.getElementById("generatedUl").getElementsByTagName("li");
     for (i = 0; i < liList.length; i++) {
-        if (!liList[i].innerHTML.includes(text)) {
+        if (!liList[i].innerHTML.toLowerCase().includes(text)) {
             liList[i].style.display = "none";
         } else {
             liList[i].style.display = "";
