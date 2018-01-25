@@ -3,7 +3,8 @@
   position: absolute;
  // top: 39px;
  // left: 0;
-  border: 1px solid 	#1E90FF;
+    border: 1px solid #1E90FF;
+    border-top: none;
   //border-top: transparent;
   width: 100%;
   box-sizing: border-box;
@@ -14,11 +15,19 @@
 #result {
     border-radius: 0;
     height: 2.25em;
+    padding: 6px;
+    color: #000000;
+}
+
+#newSelectDiv:focus {
+    border: 1px solid #1E90FF;
 }
 
 #searchInput{
   width: 100%;
   box-sizing: border-box;
+  border-radius: 0 !important;
+  outline: none;
 }
 
 #newSelectDiv{
@@ -47,10 +56,14 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  color: #000000;
+  max-height: 17em;
+  overflow: auto;
 }
 
 #generatedUl li{
   cursor: pointer;
+  padding: 0 6px;
 }
 
 #generatedUl li:hover{
