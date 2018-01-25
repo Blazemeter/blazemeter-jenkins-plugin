@@ -4,11 +4,10 @@ function onChangeSelectHandler() {
 
     var options = selectEl.options;
 
-
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
     var generatedUl = '<ul id="generatedUl">';
     for (i = 0; i < options.length; i++) {
-        generatedUl += '<li onclick="onClickListElementHandler(this)" data-value="' + options[i].value
+        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" data-value="' + options[i].value
                     + '" data-index="' + i
                     + '" >' + options[i].label + '</li>';
 
@@ -26,9 +25,6 @@ function onChangeSelectHandler() {
 var testDivEl = document.getElementById("testDiv");
 var selectEl = testDiv.getElementsByTagName("select")[0];
 setNameToResult(selectEl.getAttribute("value"));
-selectEl.ondataavailable = function onLoad() {
-    console.log("aaaa Load!!");
-};
 
 function onKeyUpSearch() {
     var searchInputEl = document.getElementById("searchInput");
@@ -56,12 +52,17 @@ function onClickResultHandler() {
 function onClickListElementHandler(li) {
     setNameToResult(li.innerHTML);
     setValueToSelect(li);
+    var toggleEl = document.getElementById("hiddenSelect");
+    toggleEl.style.display = "none";
 };
 
-document.onclick = function(event) {
-    if (event.target.id != "result" && event.target.id != "searchInput") {
-        var toggleEl = document.getElementById("hiddenSelect");
-        toggleEl.style.display = "none";
+document.onmousedown = function(event) {
+    if (event.target.id != "result"
+        && event.target.id != "generatedUl"
+        && event.target.getAttribute("class") != "generatedLi"
+        && event.target.id != "searchInput") {
+            var toggleEl = document.getElementById("hiddenSelect");
+            toggleEl.style.display = "none";
     }
 };
 
