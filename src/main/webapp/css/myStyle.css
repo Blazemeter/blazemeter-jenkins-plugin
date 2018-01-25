@@ -1,11 +1,11 @@
-#hiddenSelect{
-  display: none;
-  position: absolute;
-  border: 1px solid #1E90FF;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: white;
-  z-index: 1010;
+#hiddenSelect {
+    display: none;
+    position: absolute;
+    border: 1px solid #1E90FF;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+    z-index: 1010;
 }
 
 #result {
@@ -15,15 +15,15 @@
     color: #000000;
 }
 
-#searchInput{
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 0 !important;
-  outline: none;
-  padding: 0 10px !important;
+#searchInput {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0 !important;
+    outline: none;
+    padding: 0 10px !important;
 }
 
-#newSelectDiv{
+#newSelectDiv {
     width: 32em;
     box-sizing: border-box;
     cursor: pointer;
@@ -31,34 +31,34 @@
     background-color: white;
 }
 
-#newSelectDiv:after{
-  content:'';
-  width: 0;
-  height: 0;
-  display: inline-block;
-  border-top: 6px solid #000000;
-  border-left: 2.5px solid transparent;
-  border-right: 2.5px solid transparent;
-  position: absolute;
-  right: 6px;
-  top: 15px;
+#newSelectDiv:after {
+    content:'';
+    width: 0;
+    height: 0;
+    display: inline-block;
+    border-top: 6px solid #000000;
+    border-left: 2.5px solid transparent;
+    border-right: 2.5px solid transparent;
+    position: absolute;
+    right: 6px;
+    top: 15px;
 }
 
-#generatedUl{
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  color: #000000;
-  max-height: 17em;
-  overflow: auto;
+#generatedUl {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #000000;
+    max-height: 17em;
+    overflow: auto;
 }
 
-#generatedUl li{
-  cursor: pointer;
-  padding: 0 10px;
+#generatedUl li {
+    cursor: pointer;
+    padding: 0 10px;
 }
 
-#generatedUl li:hover{
-  background: 	#1E90FF;
-  color: #ffffff;
+#generatedUl li:hover {
+    background: #1E90FF;
+    color: #ffffff;
 }
