@@ -24,7 +24,6 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.interrupt.InterruptListenerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
-import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -38,6 +37,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Timer;
 
@@ -216,7 +216,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
             return false;
         }
-        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.CHECK_SETTINGS_TESTS)) {
+        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.NO_TESTS)) {
             listener.error("Selected workspace does not contain tests: please, select another one.");
             return false;
         }
@@ -242,12 +242,12 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         String jobName = run.getFullDisplayName();
-        VirtualChannel channel = launcher.getChannel();
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener,channel instanceof LocalChannel);
+                run.getEnvironment(listener), workspace, listener);
 
+        VirtualChannel channel = launcher.getChannel();
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
 
