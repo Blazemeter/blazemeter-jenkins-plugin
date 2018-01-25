@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter;
 
-import com.blazemeter.api.exception.UnexpectedResponseException;
 import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.explorer.Workspace;
@@ -218,22 +217,24 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
             sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
         }
-        setSelected(sortedTests, savedTest);
+        setSelected(sortedTests, savedTest, workspace.getUtils().getLogger());
         return sortedTests;
     }
 
-    private ListBoxModel setSelected(ListBoxModel box, String savedValue) {
+    private ListBoxModel setSelected(ListBoxModel box, String savedValue, Logger logger) {
         int boxSize = box.size();
         boolean valueWasSelected = false;
         for (int i = 0; i < boxSize; i++) {
             ListBoxModel.Option option = box.get(i);
             if (option.value.contains(savedValue)) {
                 box.get(i).selected = true;
+                logger.info(box.get(i).name + " - " + box.get(i).value + " was selected.");
                 return box;
             }
         }
         if (!valueWasSelected) {
             box.get(0).selected = true;
+            logger.info(box.get(0).name + " - " + box.get(0).value + " was selected.");
         }
         return box;
     }
@@ -255,7 +256,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 return workspacesList;
             }
 
-            setSelected(workspacesList, savedWorkspace);
+            setSelected(workspacesList, savedWorkspace, utils.getLogger());
         }
         return workspacesList;
     }
