@@ -14,7 +14,6 @@
 
 package hudson.plugins.blazemeter.utils;
 
-import com.google.common.collect.LinkedHashMultimap;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
@@ -35,7 +34,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -482,9 +480,13 @@ public class JobUtility {
         jenBuildLog.info("Prepared JSONArray of jmeter properties: " + props.toString());
         JSONObject remoteControl = new JSONObject();
         remoteControl.put("remoteControl", props);
+        JSONObject plugins = new JSONObject();
+        plugins.put("plugins",remoteControl);
         JSONObject configuration = new JSONObject();
-        configuration.put("configuration", remoteControl);
-        RequestBody body = RequestBody.create(Api.JSON, configuration.toString());
+        configuration.put("configuration", plugins);
+        JSONObject data = new JSONObject();
+        data.put("data",configuration);
+        RequestBody body = RequestBody.create(Api.JSON, data.toString());
         return body;
     }
 
