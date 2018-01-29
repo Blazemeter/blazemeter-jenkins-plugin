@@ -34,6 +34,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.HashMap;
+
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +43,7 @@ import org.eclipse.jetty.util.log.StdErrLog;
 import org.jenkinsci.remoting.RoleChecker;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class BlazeMeterBuild implements Callable<Result, Exception> {
@@ -194,7 +197,11 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         lentry.setLength(0);
 
         try {
-            startTestResp = api.startMaster(testId_num);
+            RequestBody body = RequestBody.create(null, new byte[0]);
+            if (!StringUtils.isBlank(this.sessionProperties)) {
+                body = JobUtility.prepareSessionProperties(this.sessionProperties, this.ev, bzmLog);
+            }
+            startTestResp = api.startMaster(testId_num,body);
             if (startTestResp.size()==0) {
                 lentry.append("Server returned status = 500 while trying to start test.");
                 consLog.warn(lentry.toString());
@@ -260,10 +267,6 @@ public class BlazeMeterBuild implements Callable<Result, Exception> {
         EnvVars.masterEnvVars.put(this.jobName+"-"+this.buildId,reportUrl);
         JobUtility.notes(api, masterId, this.notes, bzmLog);
         try {
-            if (!StringUtils.isBlank(this.sessionProperties)) {
-                JSONArray props = JobUtility.prepareSessionProperties(this.sessionProperties, this.ev, bzmLog);
-                JobUtility.properties(api, props, masterId, bzmLog);
-            }
             JobUtility.waitForFinish(api, testId_num, bzmLog, masterId);
             lentry.append("BlazeMeter test# " + testId_num + " ended at " + Calendar.getInstance().getTime());
             consLog.info(lentry.toString());

@@ -14,16 +14,13 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.EnvVars;
 import hudson.plugins.blazemeter.api.ApiImpl;
 import hudson.plugins.blazemeter.entities.TestStatus;
-import hudson.plugins.blazemeter.utils.JobUtility;
 import hudson.plugins.blazemeter.utils.JsonConsts;
 import java.io.IOException;
 import java.util.List;
 import okhttp3.Credentials;
 import org.eclipse.jetty.util.log.StdErrLog;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -61,20 +58,6 @@ public class TestApiImpl {
     }
 
     @Test
-    public void startTest_single() throws JSONException, IOException {
-        this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-        Assert.assertEquals(this.blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID).get(JsonConsts.ID),
-            "15102806");
-    }
-
-    @Test
-    public void startTest_collection() throws JSONException, IOException {
-        this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-        Assert.assertEquals(this.blazemeterApiV3.startCollection(TestConstants.TEST_MASTER_ID).get(JsonConsts.ID),
-            "15105877");
-    }
-
-    @Test
     public void getTestReport() {
         this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,false);
         JSONObject testReport = this.blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
@@ -86,15 +69,6 @@ public class TestApiImpl {
         this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,false);
         boolean notes = this.blazemeterApiV3.notes(TestConstants.MOCKED_NOTE, TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(notes);
-    }
-
-    @Test
-    public void properties_true() throws Exception {
-        this.blazemeterApiV3 = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,false);
-        String prps = "v=r,v=i";
-        JSONArray arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), TestApiImpl.stdErrLog);
-        boolean properties = this.blazemeterApiV3.properties(arr, TestConstants.MOCKED_SESSION);
-        Assert.assertTrue(properties);
     }
 
     @Test

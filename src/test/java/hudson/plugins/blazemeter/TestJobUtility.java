@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import javax.mail.MessagingException;
 import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -228,46 +227,6 @@ public class TestJobUtility {
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
-/*
-
-    @Test
-    public void collection_true(){
-        ApiImpl api=new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-
-        try {
-            Assert.assertTrue(JobUtility.collection(TestConstants.TEST_5039530_ID,TestConstants.TEST_WORKSPACE_ID,api));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }catch (MessagingException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    @Test
-    public void collection_false(){
-        try {
-            ApiImpl api=new ApiImpl(TestConstants.MOCK_VALID_CR,TestConstants.mockedApiUrl,false);
-            Assert.assertFalse(JobUtility.collection(TestConstants.TEST_5075679_ID,TestConstants.TEST_WORKSPACE_ID,api));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }catch (MessagingException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-*/
-
-
     @Test
     public void getSessionId() throws JSONException, IOException {
         File getSessionId_v3=new File(TestConstants.RESOURCES+"/getSessionId_v3.json");
@@ -302,14 +261,6 @@ public class TestJobUtility {
         JSONArray error_json=new JSONArray(error_str);
         Assert.assertFalse(JobUtility.errorsFailed(error_json));
     }
-
-    @Test
-    public void prepareProps() throws JSONException {
-        String prps = "v=r,v=i";
-        JSONArray arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
-        Assert.assertTrue(arr.length()==2);
-    }
-
 
 
     @Test
@@ -370,22 +321,6 @@ public class TestJobUtility {
         } catch (InterruptedException ie) {
             Assert.fail();
         }
-
-    }
-
-    @Test
-    public void properties() {
-        Api api = new ApiImpl(TestConstants.MOCK_VALID_CR, TestConstants.mockedApiUrl,/*TODO*/false);
-        String prps = "v=r,v=i";
-        JSONArray arr=null;
-        try {
-            arr = JobUtility.prepareSessionProperties(prps, new EnvVars(), stdErrLog);
-            boolean submit=JobUtility.properties(api,arr,TestConstants.TEST_MASTER_ID,stdErrLog);
-            Assert.assertTrue(submit);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
 
     }
 

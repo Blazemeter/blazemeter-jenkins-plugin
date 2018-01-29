@@ -1,15 +1,15 @@
 /**
- Copyright 2017 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2017 BlazeMeter Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package hudson.plugins.blazemeter.api;
@@ -21,6 +21,7 @@ import hudson.plugins.blazemeter.api.urlmanager.UrlManagerV3Impl;
 import hudson.plugins.blazemeter.entities.TestStatus;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JsonConsts;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -56,27 +58,27 @@ public class ApiImpl implements Api {
     private OkHttpClient okhttp;
     private final boolean legacy;
 
-    public ApiImpl(String c, String blazeMeterUrl,boolean legacy){
-        this(c, blazeMeterUrl,new HttpLoggingInterceptor(),null,legacy);
+    public ApiImpl(String c, String blazeMeterUrl, boolean legacy) {
+        this(c, blazeMeterUrl, new HttpLoggingInterceptor(), null, legacy);
     }
 
     public ApiImpl(String c, String blazeMeterUrl,
-                     HttpLoggingInterceptor httpLog,StdErrLog bzmLog,
-                     boolean legacy) {
-        this.legacy=legacy;
+                   HttpLoggingInterceptor httpLog, StdErrLog bzmLog,
+                   boolean legacy) {
+        this.legacy = legacy;
         this.credential = c;
         this.bzmLog = bzmLog != null ? bzmLog : new StdErrLog(Constants.BZM_JEN);
         this.urlManager = new UrlManagerV3Impl(blazeMeterUrl);
         try {
             httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
             this.proxy = Proxy.NO_PROXY;
-            ProxyConfiguration proxyConf=null;
-            try{
-                proxyConf=ProxyConfiguration.load();
-            }catch (NullPointerException e){
+            ProxyConfiguration proxyConf = null;
+            try {
+                proxyConf = ProxyConfiguration.load();
+            } catch (NullPointerException e) {
                 this.bzmLog.info("Failed to load proxy configuration");
             }
-            Authenticator auth=Authenticator.NONE;
+            Authenticator auth = Authenticator.NONE;
             if (proxyConf != null) {
                 if (!StringUtils.isBlank(proxyConf.name)) {
                     this.proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyConf.name, proxyConf.port));
@@ -99,12 +101,12 @@ public class ApiImpl implements Api {
                 }
             }
             this.okhttp = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(httpLog).proxy(this.proxy)
-                .addInterceptor(new RetryInterceptor(bzmLog))
-                .proxyAuthenticator(auth)
-                .build();
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(httpLog).proxy(this.proxy)
+                    .addInterceptor(new RetryInterceptor(bzmLog))
+                    .proxyAuthenticator(auth)
+                    .build();
         } catch (Exception ex) {
             this.bzmLog.warn("ERROR Instantiating HTTPClient. Exception received: ", ex);
         }
@@ -165,12 +167,11 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public HashMap<String, String> startTest(String testId) throws JSONException, IOException {
+    public HashMap<String, String> startTest(String testId, RequestBody body) throws JSONException, IOException {
         String url = this.urlManager.testStart(Api.APP_KEY, testId);
         HashMap<String, String> startResp = new HashMap<String, String>();
 
-        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody)
+        Request r = new Request.Builder().url(url).post(body)
                 .addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
                 .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
@@ -198,12 +199,11 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public HashMap<String, String> startCollection(String testId) throws JSONException, IOException {
+    public HashMap<String, String> startCollection(String testId, RequestBody body) throws JSONException, IOException {
         String url = this.urlManager.collectionStart(Api.APP_KEY, testId);
         HashMap<String, String> startResp = new HashMap<String, String>();
 
-        RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody)
+        Request r = new Request.Builder().url(url).post(body)
                 .addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
                 .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
@@ -227,20 +227,21 @@ public class ApiImpl implements Api {
             startResp.put(JsonConsts.ERROR, jo.get(JsonConsts.ERROR).toString());
         } finally {
             return startResp;
-        }}
+        }
+    }
 
     @Override
-    public synchronized HashMap<String, String> startMaster(String testId) throws JSONException,
+    public synchronized HashMap<String, String> startMaster(String testId, RequestBody body) throws JSONException,
             IOException {
         HashMap<String, String> startResp = new HashMap<>();
         try {
-            startResp = this.startTest(testId);
+            startResp = this.startTest(testId, body);
         } catch (Exception e) {
             this.bzmLog.info("Failed to start test with id = " + testId);
         }
         if (startResp.containsKey(JsonConsts.ERROR)) {
             try {
-                startResp = this.startCollection(testId);
+                startResp = this.startCollection(testId, body);
             } catch (Exception e) {
                 this.bzmLog.info("Failed to start collection with id = " + testId);
             }
@@ -261,7 +262,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void terminateTest(String testId) throws IOException{
+    public void terminateTest(String testId) throws IOException {
         String url = this.urlManager.testTerminate(Api.APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
@@ -273,10 +274,10 @@ public class ApiImpl implements Api {
     }
 
 
-   @Override
+    @Override
     public JSONObject testReport(String reportId) {
 
-       String url = this.urlManager.testReport(Api.APP_KEY, reportId);
+        String url = this.urlManager.testReport(Api.APP_KEY, reportId);
         JSONObject summary = null;
         JSONObject result = null;
         try {
@@ -299,69 +300,70 @@ public class ApiImpl implements Api {
             return summary;
         }
     }
+
     @Override
     public LinkedHashMultimap<String, String> testsMultiMap(int workspaceId) {
         LinkedHashMultimap<String, String> testListOrdered = LinkedHashMultimap.create();
         this.bzmLog.warn("Getting tests...");
-            String url = this.urlManager.tests(Api.APP_KEY, workspaceId);
-            try {
-                Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
-                        .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
-                        .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
-                JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
-                JSONArray result = null;
-                this.bzmLog.warn("Received json: " + jo.toString());
-                if (jo.has(JsonConsts.ERROR) && jo.get(JsonConsts.RESULT).equals(JSONObject.NULL) &&
-                        ((JSONObject) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401) {
-                    return testListOrdered;
-                }
-                if (jo.has(JsonConsts.RESULT) && !jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) {
-                    result = (JSONArray) jo.get(JsonConsts.RESULT);
-                }
-                LinkedHashMultimap<String, String> wst = LinkedHashMultimap.create();
-                LinkedHashMultimap<String, String> wsc = this.collectionsMultiMap(workspaceId);
-                wst.putAll(wsc);
-                if (result != null && result.length() > 0) {
-                    for (int i = 0; i < result.length(); i++) {
-                        JSONObject entry = null;
-                        try {
-                            entry = result.getJSONObject(i);
-                        } catch (JSONException e) {
-                            this.bzmLog.warn("JSONException while getting tests: " + e);
-                        }
-                        String id;
-                        String name;
-                        try {
-                            if (entry != null) {
-                                id = String.valueOf(entry.get(JsonConsts.ID));
-                                name = entry.has(JsonConsts.NAME) ? entry.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
-                                String testType = null;
-                                try {
-                                    testType = entry.getJSONObject(JsonConsts.CONFIGURATION).getString(JsonConsts.TYPE);
-                                } catch (Exception e) {
-                                    testType = Constants.UNKNOWN_TYPE;
-                                }
-                                wst.put(id + "." + testType, name + "(" + id + "." + testType + ")");
-                            }
-                        } catch (JSONException ie) {
-                            this.bzmLog.warn("JSONException while getting tests: " + ie);
-                        }
-                    }
-                }
-                Comparator c = new Comparator<Map.Entry<String, String>>() {
-                    @Override
-                    public int compare(Map.Entry<String, String> e1, Map.Entry<String, String> e2) {
-                        return e1.getValue().compareToIgnoreCase(e2.getValue());
-                    }
-                };
-                wst.entries().stream().sorted(c).
-                        forEach(entry -> testListOrdered.put(
-                                ((Map.Entry<String, String>) entry).getKey(), ((Map.Entry<String, String>) entry).getValue()));
-            } catch (Exception e) {
-                this.bzmLog.warn("Exception while getting tests: ", e);
-                this.bzmLog.warn("Check connection/proxy settings");
-                testListOrdered.put(Constants.CHECK_SETTINGS, Constants.CHECK_SETTINGS);
+        String url = this.urlManager.tests(Api.APP_KEY, workspaceId);
+        try {
+            Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
+                    .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
+                    .addHeader(Api.CONTENT_TYPE, Api.APP_JSON_UTF_8).build();
+            JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
+            JSONArray result = null;
+            this.bzmLog.warn("Received json: " + jo.toString());
+            if (jo.has(JsonConsts.ERROR) && jo.get(JsonConsts.RESULT).equals(JSONObject.NULL) &&
+                    ((JSONObject) jo.get(JsonConsts.ERROR)).getInt(JsonConsts.CODE) == 401) {
+                return testListOrdered;
             }
+            if (jo.has(JsonConsts.RESULT) && !jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) {
+                result = (JSONArray) jo.get(JsonConsts.RESULT);
+            }
+            LinkedHashMultimap<String, String> wst = LinkedHashMultimap.create();
+            LinkedHashMultimap<String, String> wsc = this.collectionsMultiMap(workspaceId);
+            wst.putAll(wsc);
+            if (result != null && result.length() > 0) {
+                for (int i = 0; i < result.length(); i++) {
+                    JSONObject entry = null;
+                    try {
+                        entry = result.getJSONObject(i);
+                    } catch (JSONException e) {
+                        this.bzmLog.warn("JSONException while getting tests: " + e);
+                    }
+                    String id;
+                    String name;
+                    try {
+                        if (entry != null) {
+                            id = String.valueOf(entry.get(JsonConsts.ID));
+                            name = entry.has(JsonConsts.NAME) ? entry.getString(JsonConsts.NAME).replaceAll("&", "&amp;") : "";
+                            String testType = null;
+                            try {
+                                testType = entry.getJSONObject(JsonConsts.CONFIGURATION).getString(JsonConsts.TYPE);
+                            } catch (Exception e) {
+                                testType = Constants.UNKNOWN_TYPE;
+                            }
+                            wst.put(id + "." + testType, name + "(" + id + "." + testType + ")");
+                        }
+                    } catch (JSONException ie) {
+                        this.bzmLog.warn("JSONException while getting tests: " + ie);
+                    }
+                }
+            }
+            Comparator c = new Comparator<Map.Entry<String, String>>() {
+                @Override
+                public int compare(Map.Entry<String, String> e1, Map.Entry<String, String> e2) {
+                    return e1.getValue().compareToIgnoreCase(e2.getValue());
+                }
+            };
+            wst.entries().stream().sorted(c).
+                    forEach(entry -> testListOrdered.put(
+                            ((Map.Entry<String, String>) entry).getKey(), ((Map.Entry<String, String>) entry).getValue()));
+        } catch (Exception e) {
+            this.bzmLog.warn("Exception while getting tests: ", e);
+            this.bzmLog.warn("Check connection/proxy settings");
+            testListOrdered.put(Constants.CHECK_SETTINGS, Constants.CHECK_SETTINGS);
+        }
         return testListOrdered;
     }
 
@@ -422,12 +424,12 @@ public class ApiImpl implements Api {
 
 
     @Override
-    public JSONObject getUser() throws IOException,JSONException {
+    public JSONObject getUser() throws IOException, JSONException {
         String url = this.urlManager.getUser(Api.APP_KEY);
         Request r = new Request.Builder().url(url).get()
                 .addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
-            .build();
+                .build();
 
         JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
         return jo;
@@ -452,7 +454,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public String retrieveJUNITXML(String masterId) throws IOException{
+    public String retrieveJUNITXML(String masterId) throws IOException {
         String url = this.urlManager.retrieveJUNITXML(Api.APP_KEY, masterId);
         Request r = new Request.Builder().url(url).get()
                 .addHeader(Api.ACCEPT, Api.APP_JSON)
@@ -476,7 +478,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public JSONObject generatePublicToken(String sessionId) throws IOException,JSONException{
+    public JSONObject generatePublicToken(String sessionId) throws IOException, JSONException {
         String url = this.urlManager.generatePublicToken(Api.APP_KEY, sessionId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody)
@@ -514,13 +516,13 @@ public class ApiImpl implements Api {
 
     @Override
     public boolean notes(String note, String masterId) throws Exception {
-        String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConsts.NOTE+"':'"+note+"'}");
+        String noteEsc = StringEscapeUtils.escapeJson("{'" + JsonConsts.NOTE + "':'" + note + "'}");
         String url = this.urlManager.masterId(Api.APP_KEY, masterId);
         JSONObject noteJson = new JSONObject(noteEsc);
         RequestBody body = RequestBody.create(Api.TEXT, noteJson.toString());
         Request r = new Request.Builder().url(url).patch(body)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
-            .build();
+                .build();
         JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
         try {
             if (!jo.get(JsonConsts.ERROR).equals(JSONObject.NULL)) {
@@ -533,27 +535,10 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public boolean properties(JSONArray properties, String sessionId) throws Exception {
-        String url = this.urlManager.properties(Api.APP_KEY, sessionId);
-        RequestBody body = RequestBody.create(Api.JSON, properties.toString());
-        Request r = new Request.Builder().url(url).post(body)
-                .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
-            .build();
-        JSONObject jo = new JSONObject(this.okhttp.newCall(r).execute().body().string());
-        try {
-            if (jo.get(JsonConsts.RESULT).equals(JSONObject.NULL)) {
-                return false;
-            }
-        } catch (Exception e) {
-            throw new Exception("Failed to submit report properties to sessionId = " + sessionId, e);
-        }
-        return true;
-    }
-
-    @Override
     public String getCredential() {
         return this.credential;
     }
+
     @Override
     public JSONObject funcReport(final String masterId) throws Exception {
 
@@ -572,11 +557,11 @@ public class ApiImpl implements Api {
         } catch (JSONException je) {
             this.bzmLog.warn("Functional report(result object): " + result);
             this.bzmLog.warn("Error while parsing functional report: check common jenkins log and make sure that functional report" +
-                "is valid/not empty.", je);
+                    "is valid/not empty.", je);
         } catch (Exception e) {
             this.bzmLog.warn("Functional report(result object): " + result);
             this.bzmLog.warn("Error while parsing functional report summary: check common jenkins log and make sure that functional report" +
-                "is valid/not empty.", e);
+                    "is valid/not empty.", e);
         } finally {
             return fSummary;
         }
@@ -584,7 +569,7 @@ public class ApiImpl implements Api {
 
 
     @Override
-    public HashMap<Integer,String> accounts() {
+    public HashMap<Integer, String> accounts() {
         String url = this.urlManager.accounts(Api.APP_KEY);
         Request r = new Request.Builder().url(url).get().addHeader(Api.ACCEPT, Api.APP_JSON)
                 .addHeader(this.legacy ? Api.X_API_KEY : Api.AUTHORIZATION, this.credential)
@@ -608,7 +593,7 @@ public class ApiImpl implements Api {
         try {
             for (int i = 0; i < result.length(); i++) {
                 JSONObject a = result.getJSONObject(i);
-                acs.put(a.getInt(JsonConsts.ID),a.getString(JsonConsts.NAME));
+                acs.put(a.getInt(JsonConsts.ID), a.getString(JsonConsts.NAME));
             }
         } catch (Exception e) {
             this.bzmLog.warn("Failed to get accounts: " + e);

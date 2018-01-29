@@ -23,7 +23,7 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import okhttp3.MediaType;
-import org.json.JSONArray;
+import okhttp3.RequestBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,11 +45,11 @@ public interface Api {
 
     int getTestMasterStatusCode(String id);
 
-    HashMap<String, String> startMaster(String testId) throws JSONException, IOException;
+    HashMap<String, String> startMaster(String testId, RequestBody body) throws JSONException, IOException;
 
-    HashMap<String, String> startTest(String testId) throws JSONException, IOException;
+    HashMap<String, String> startTest(String testId, RequestBody body) throws JSONException, IOException;
 
-    HashMap<String, String> startCollection(String testId) throws JSONException, IOException;
+    HashMap<String, String> startCollection(String testId, RequestBody body) throws JSONException, IOException;
 
     JSONObject stopTest(String testId) throws IOException, JSONException;
 
@@ -74,8 +74,6 @@ public interface Api {
     String getBlazeMeterURL();
 
     boolean notes(String note, String masterId) throws Exception;
-
-    boolean properties(JSONArray properties, String sessionId) throws Exception;
 
     String getCredential();
 

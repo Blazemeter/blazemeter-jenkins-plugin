@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import okhttp3.RequestBody;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.eclipse.jetty.util.StringUtil;
@@ -460,7 +461,7 @@ public class JobUtility {
         return note;
     }
 
-    public static JSONArray prepareSessionProperties(String sesssionProperties, EnvVars vars, StdErrLog jenBuildLog) throws JSONException {
+    public static RequestBody prepareSessionProperties(String sesssionProperties, EnvVars vars, StdErrLog jenBuildLog) throws JSONException {
         List<String> propList = Arrays.asList(sesssionProperties.split(","));
         JSONArray props = new JSONArray();
         StrSubstitutor strSubstr = new StrSubstitutor(vars);
@@ -479,7 +480,12 @@ public class JobUtility {
             }
         }
         jenBuildLog.info("Prepared JSONArray of jmeter properties: " + props.toString());
-        return props;
+        JSONObject remoteControl = new JSONObject();
+        remoteControl.put("remoteControl", props);
+        JSONObject configuration = new JSONObject();
+        configuration.put("configuration", remoteControl);
+        RequestBody body = RequestBody.create(Api.JSON, configuration.toString());
+        return body;
     }
 
     public static boolean stopMaster(Api api, String masterId) throws Exception {
@@ -556,38 +562,5 @@ public class JobUtility {
         } catch (Exception e) {
             return "";
         }
-    }
-
-
-    public static boolean properties(Api api, JSONArray properties, String masterId, StdErrLog jenBuildLog) {
-        List<String> sessionsIds = null;
-        try {
-            sessionsIds = api.getListOfSessionIds(masterId);
-        } catch (Exception e) {
-            jenBuildLog.info("Failed to get list of sessions for masterId = " + masterId, e);
-
-        }
-        jenBuildLog.info("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
-        boolean p = true;
-        for (String s : sessionsIds) {
-            boolean sp = false;
-            jenBuildLog.info("Submitting jmeter properties to sessionId=" + s);
-            int n = 1;
-            while (!sp && n < 6) {
-                try {
-                    sp = api.properties(properties, s);
-                    if (!sp) {
-                        jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s + " retry # " + n);
-                        Thread.sleep(DELAY);
-                        p = sp;
-                    }
-                } catch (Exception e) {
-                    jenBuildLog.warn("Failed to submit jmeter properties to sessionId=" + s, e);
-                } finally {
-                    n++;
-                }
-            }
-        }
-        return p;
     }
 }
