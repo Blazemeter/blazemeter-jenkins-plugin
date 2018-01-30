@@ -38,6 +38,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -207,12 +208,13 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         ListBoxModel sortedTests = new ListBoxModel();
         JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(workspace.getUtils());
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
-        Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
+        Comparator<AbstractTest> c = new AbstractTestComparator();
         if (tests.isEmpty()) {
 //            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
             return sortedTests;
         }
-        tests.sort(c);
+
+        Collections.sort(tests,c);
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
             sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
