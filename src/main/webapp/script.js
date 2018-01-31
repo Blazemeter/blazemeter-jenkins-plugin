@@ -66,10 +66,11 @@ function onKeyUpSearch() {
 function onClickResultHandler() {
     var toggleEl = document.getElementById("hiddenSelect");
     if (toggleEl.style.display === "block") {
-        toggleEl.style.display = "none";
+       hideHiddenSelect();
     } else {
         onChangeSelectHandler();
         toggleEl.style.display = "block";
+        disableScroll();
     }
 };
 
@@ -89,6 +90,7 @@ function hideHiddenSelect() {
     var toggleEl = document.getElementById("hiddenSelect");
     toggleEl.style.display = "none";
     curFocusedLi = null;
+    enableScroll();
 }
 
 function setValueToSelect(li) {
@@ -121,6 +123,7 @@ document.onkeydown = function(event) {
         } else if (isPressedEnter(charCode)) {
             setCurrentLi();
         }
+        preventDefaultForScrollKeys(event);
     }
 }
 
@@ -144,6 +147,7 @@ function focusLi(li) {
     li.style.color = "#ffffff";
     if (curFocusedLi != null) {
         clearFocusLi(curFocusedLi);
+        curFocusedLi = null;
     }
     curFocusedLi = li;
 }
@@ -152,7 +156,6 @@ function focusLi(li) {
 function clearFocusLi(li) {
     li.style.background = "#ffffff";
     li.style.color = "#000000";
-    curFocusedLi = null;
 }
 
 function selectNextLi() {
@@ -183,7 +186,8 @@ function selectPrevLi() {
         selectLast(liList);
         return;
     }
-    var prevIndex = --curFocusedLi.dataset.displayIndex;
+    var currentIndex = curFocusedLi.dataset.displayIndex;
+    var prevIndex = --currentIndex;
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == prevIndex) {
             focusLi(liList[i]);
@@ -204,4 +208,38 @@ function selectLast(liList) {
 
 function setCurrentLi() {
     console.log("select");
+    if (curFocusedLi == null) {
+
+    }
+}
+
+// left: 37, up: 38, right: 39, down: 40,
+// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+function preventDefault(e) {
+    e = e || window.event;
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    e.returnValue = false;
+}
+
+function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+function disableScroll() {
+    if (window.addEventListener) { // older FF
+        window.addEventListener('DOMMouseScroll', preventDefault, false);
+    }
+}
+
+function enableScroll() {
+    if (window.removeEventListener) {
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    }
 }
