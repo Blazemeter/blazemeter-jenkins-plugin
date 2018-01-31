@@ -59,10 +59,7 @@
     padding: 0 10px;
 }
 
-#generatedUl li:hover {
-    background: #1E90FF;
-    color: #ffffff;
-}
+
 
 @media screen and (-moz-device-pixel-ratio) {
     #newSelectDiv::before {

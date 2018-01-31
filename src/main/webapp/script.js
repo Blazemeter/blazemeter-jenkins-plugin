@@ -5,8 +5,11 @@ function onChangeSelectHandler() {
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
     var generatedUl = '<ul id="generatedUl">';
     for (i = 0; i < options.length; i++) {
-        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" data-value="' + options[i].value
+        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
+                    + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
+                    + 'data-value="' + options[i].value
                     + '" data-index="' + i
+                    + '" data-display-index="' + i
                     + '" >' + options[i].label + '</li>';
 
         if (options[i].selected) {
@@ -47,11 +50,15 @@ function onKeyUpSearch() {
     var searchInputEl = document.getElementById("searchInput");
     var text = searchInputEl.value.toLowerCase();
     var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    var displayIndex = 0;
     for (i = 0; i < liList.length; i++) {
         if (!liList[i].innerHTML.toLowerCase().includes(text)) {
             liList[i].style.display = "none";
+            liList[i].dataset.displayIndex = -1;
         } else {
             liList[i].style.display = "";
+            liList[i].dataset.displayIndex = displayIndex;
+            displayIndex++;
         }
     }
 };
@@ -73,17 +80,15 @@ function onClickListElementHandler(li) {
 };
 
 document.onmousedown = function(event) {
-    if (event.target.id != "result"
-        && event.target.id != "generatedUl"
-        && event.target.getAttribute("class") != "generatedLi"
-        && event.target.id != "searchInput") {
-            hideHiddenSelect();
+    if (!isGeneratedElement(event)) {
+        hideHiddenSelect();
     }
 };
 
 function hideHiddenSelect() {
     var toggleEl = document.getElementById("hiddenSelect");
     toggleEl.style.display = "none";
+    curFocusedLi = null;
 }
 
 function setValueToSelect(li) {
@@ -96,3 +101,107 @@ function setNameToResult(name) {
     var resultDivEl = document.getElementById("result");
     resultDivEl.innerHTML = name;
 };
+
+function isGeneratedElement(event) {
+    return (event.target.id == "result"
+                   || event.target.id == "generatedUl"
+                   || event.target.getAttribute("class") == "generatedLi"
+                   || event.target.id == "searchInput");
+}
+
+document.onkeydown = function(event) {
+    var charCode = event.keyCode;
+    var focusedTag = document.activeElement.tagName;
+    var toggleEl = document.getElementById("hiddenSelect");
+    if (toggleEl.style.display === "block") {
+        if (isPressedDown(charCode)) {
+            selectNextLi();
+        } else if (isPressedUp(charCode)) {
+            selectPrevLi();
+        } else if (isPressedEnter(charCode)) {
+            setCurrentLi();
+        }
+    }
+}
+
+function isPressedDown(charCode) {
+    return (charCode === 40);
+}
+
+function isPressedUp(charCode) {
+    return (charCode === 38);
+}
+
+function isPressedEnter(charCode) {
+    return (charCode === 13);
+}
+
+var curFocusedLi = null;
+
+// set style   background: #1E90FF;  color: #ffffff;
+function focusLi(li) {
+    li.style.background = "#1E90FF";
+    li.style.color = "#ffffff";
+    if (curFocusedLi != null) {
+        clearFocusLi(curFocusedLi);
+    }
+    curFocusedLi = li;
+}
+
+// return default colors
+function clearFocusLi(li) {
+    li.style.background = "#ffffff";
+    li.style.color = "#000000";
+    curFocusedLi = null;
+}
+
+function selectNextLi() {
+    var currentIndex = (curFocusedLi == null) ? -1 : curFocusedLi.dataset.displayIndex;
+    var nextIndex = ++currentIndex;
+    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    for (i = 0; i < liList.length; i++) {
+        if (liList[i].dataset.displayIndex == nextIndex) {
+            focusLi(liList[i]);
+            return;
+        }
+    }
+    selectFirst(liList);
+}
+
+function selectFirst(liList) {
+    for (i = 0; i < liList.length; i++) {
+        if (liList[i].dataset.displayIndex != -1) {
+            focusLi(liList[i]);
+            return;
+        }
+    }
+}
+
+function selectPrevLi() {
+    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    if (curFocusedLi == null || curFocusedLi.dataset.displayIndex <= 0) {
+        selectLast(liList);
+        return;
+    }
+    var prevIndex = --curFocusedLi.dataset.displayIndex;
+    for (i = 0; i < liList.length; i++) {
+        if (liList[i].dataset.displayIndex == prevIndex) {
+            focusLi(liList[i]);
+            return;
+        }
+    }
+    selectLast(liList);
+}
+
+function selectLast(liList) {
+    for (i = liList.length - 1; i >= 0; i--) {
+        if (liList[i].dataset.displayIndex != -1) {
+            focusLi(liList[i]);
+            return;
+        }
+    }
+}
+
+function setCurrentLi() {
+    console.log("select");
+}
