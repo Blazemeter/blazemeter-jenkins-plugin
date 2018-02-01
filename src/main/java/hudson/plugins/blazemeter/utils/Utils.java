@@ -73,9 +73,6 @@ public class Utils {
         return cred;
     }
 
-    public static String calcLegacyId(String jobApiKey) {
-        return StringUtils.left(jobApiKey, 4) + Constants.THREE_DOTS + StringUtils.right(jobApiKey, 4);
-    }
 
     public static String version() {
         Properties props = new Properties();
@@ -86,4 +83,16 @@ public class Utils {
         }
         return props.getProperty(Constants.VERSION);
     }
+
+    public static String resolveTestId(String savedTestId) {
+        try {
+            int startIndex = savedTestId.lastIndexOf("(") + 1;
+            int endIndex = savedTestId.lastIndexOf(")");
+            String resolvedTestId = savedTestId.substring(startIndex, endIndex);
+            return resolvedTestId;
+        } catch (Exception e) {
+            return savedTestId;
+        }
+    }
+
 }

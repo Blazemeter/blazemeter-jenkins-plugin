@@ -22,7 +22,7 @@ import javax.annotation.CheckForNull;
 import javax.validation.constraints.NotNull;
 import hudson.Extension;
 import hudson.Util;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -104,8 +104,8 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
         public FormValidation doValidate(@QueryParameter("username") final String username,
                                          @QueryParameter("password") final String password) {
             String decryptedPassword = Secret.fromString(password).getPlainText();
-            BzmUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
             try {
+                JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
                 User.getUser(utils);
                 return FormValidation.ok("Successfully validated credentials.");
             } catch (Exception e) {

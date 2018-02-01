@@ -18,10 +18,12 @@ import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import java.io.IOException;
 
-public class BzmUtils extends BlazeMeterUtils {
+public class JenkinsBlazeMeterUtils extends BlazeMeterUtils {
 
     private static final String APP_KEY = "app_key=jnk100x987c06f4e10c4";
 
@@ -30,7 +32,7 @@ public class BzmUtils extends BlazeMeterUtils {
 
     public static String JENKINS_PLUGIN_INFO = APP_KEY + CLIENT_IDENTIFICATION;
 
-    public BzmUtils(String apiKeyId, String apiKeySecret, String address, UserNotifier notifier, Logger logger) {
+    public JenkinsBlazeMeterUtils(String apiKeyId, String apiKeySecret, String address, UserNotifier notifier, Logger logger) {
         super(apiKeyId, apiKeySecret, address, "", notifier, logger);
     }
 
@@ -46,4 +48,23 @@ public class BzmUtils extends BlazeMeterUtils {
             ((BzmJobLogger) logger).close();
         }
     }
+
+    // TODO to api-client 1.3
+    @Override
+    protected String extractErrorMessage(String response) {
+        if (response != null && !response.isEmpty()) {
+            try {
+                JSONObject jsonResponse = JSONObject.fromObject(response);
+                JSONObject errorObj = jsonResponse.getJSONObject("error");
+                if (errorObj.containsKey("message")) {
+                    return errorObj.getString("message");
+                }
+            } catch (JSONException ex) {
+                logger.debug("Cannot parse response: " + response, ex);
+                return "Cannot parse response: " + response;
+            }
+        }
+        return null;
+    }
+
 }

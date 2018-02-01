@@ -24,6 +24,7 @@ import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.interrupt.InterruptListenerTask;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
+import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
@@ -210,13 +211,24 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
     }
 
+    private boolean validateTestId(TaskListener listener) {
+        if (StringUtils.isBlank(testId)) {
+            listener.error("Please, reconfigure job and select valid credentials and test");
+            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+            return false;
+        }
+        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.NO_TESTS)) {
+            listener.error("Selected workspace does not contain tests: please, select another one.");
+            return false;
+        }
+        return true;
+
+    }
 
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
 
-        if (StringUtils.isBlank(testId)) {
-            listener.error("Please, reconfigure job and select valid credentials and test");
-            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
+        if (!validateTestId(listener)) {
             run.setResult(Result.FAILURE);
             return;
         }
@@ -231,12 +243,12 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
         String jobName = run.getFullDisplayName();
+        VirtualChannel channel = launcher.getChannel();
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener);
+                run.getEnvironment(listener), workspace, listener,channel instanceof LocalChannel);
 
-        VirtualChannel channel = launcher.getChannel();
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
 

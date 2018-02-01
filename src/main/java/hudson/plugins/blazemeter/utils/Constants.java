@@ -19,8 +19,6 @@ public interface Constants {
     String VERSION = "version";
     String NO_CREDENTIALS = "No Credentials";
     String A_BLAZEMETER_COM = "https://a.blazemeter.com";
-    String NO_SUCH_CREDENTIALS = "No such credentials in store, re-check";
     String NO_TESTS = "No tests";
-    String NO_WORKSPACES = "No workspaces";
-    String THREE_DOTS = "...";
+
 }

@@ -16,14 +16,14 @@ package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
-import com.blazemeter.ciworkflow.CiBuild;
-import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JenkinsCiBuild;
+import hudson.plugins.blazemeter.utils.JenkinsCiPostProcess;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
@@ -51,11 +51,13 @@ public class BzmBuild implements Callable<Result, Exception> {
     private TaskListener listener;
 
     private Master master;
-    private CiBuild build;
+    private JenkinsCiBuild build;
+
+    private boolean applyProxy;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -65,16 +67,18 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.envVars = envVars;
         this.workspace = workspace;
         this.listener = listener;
+        this.applyProxy = applyProxy;
     }
 
     @Override
     public Result call() throws Exception {
+        ProxyConfigurator.updateProxySettings(applyProxy);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
-        BzmUtils utils = createBzmUtils(createLogFile(wsp));
+        logger.println("BlazemeterJenkins plugin v." + Utils.version());
+        JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
         try {
             build = createCiBuild(utils, wsp);
-
             try {
                 master = build.start();
                 if (master != null) {
@@ -110,15 +114,15 @@ public class BzmBuild implements Callable<Result, Exception> {
             case ABORTED:
                 return Result.ABORTED;
             case ERROR:
-                return Result.FAILURE;
-            case FAILED:
                 return Result.UNSTABLE;
+            case FAILED:
+                return Result.FAILURE;
             default:
                 return Result.NOT_BUILT;
         }
     }
 
-    public void interrupt(CiBuild build, Master master, PrintStream logger) {
+    public void interrupt(JenkinsCiBuild build, Master master, PrintStream logger) {
         if (build != null && master != null) {
             try {
                 logger.println("Build has been interrupted");
@@ -146,22 +150,22 @@ public class BzmBuild implements Callable<Result, Exception> {
         return wsp;
     }
 
-    private BzmUtils createBzmUtils(String logFile) {
-        return new BzmUtils(apiId, apiSecret, serverURL,
+    private JenkinsBlazeMeterUtils createBzmUtils(String logFile) {
+        return new JenkinsBlazeMeterUtils(apiId, apiSecret, serverURL,
                 new BzmJobNotifier(listener),
                 new BzmJobLogger(logFile));
     }
 
-    private CiBuild createCiBuild(BzmUtils utils, FilePath workspace) {
-        return new CiBuild(utils,
+    private JenkinsCiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new JenkinsCiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
                 createCiPostProcess(utils, workspace));
     }
 
-    private CiPostProcess createCiPostProcess(BzmUtils utils, FilePath workspace) {
-        return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
+    private JenkinsCiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new JenkinsCiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
                 workspace.getRemote(), utils.getNotifier(), utils.getLogger());
     }
@@ -171,7 +175,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         // NOOP
     }
 
-    public CiBuild getBuild() {
+    public JenkinsCiBuild getBuild() {
         return build;
     }
 }

@@ -21,13 +21,12 @@ import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.ciworkflow.TestsListFlow;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
-import hudson.plugins.blazemeter.utils.BzmUtils;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
 import hudson.plugins.blazemeter.utils.Utils;
@@ -39,6 +38,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -55,10 +55,18 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
+    private String REQUEST_ERROR = "REQUEST_ERROR";
+    private String CHECK_CREDENTIALS_PROXY = "Check credentials, proxy settings";
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String NOT_DEFINED = "not defined";
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
+
+    private static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
+    private static final String INVALID_WORKSPACE = "INVALID_WORKSPACE";
+    private static final String INVALID_TEST = "INVALID_TEST";
+
+    public static String NO_TESTS = "no-tests";
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
@@ -91,27 +99,37 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                                           @QueryParameter("workspaceId") String wsid,
                                           @QueryParameter("testId") String savedTestId) throws FormValidation {
 
+        String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(Constants.NO_CREDENTIALS, "");
-            return items;
-        }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        if (credentials == null) {
-            items.add(Constants.NO_SUCH_CREDENTIALS, "");
-            return items;
-        }
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-        if (utils == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
+        if (StringUtils.isBlank(crid) || crid.startsWith(INVALID_CREDENTIALS)) {
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, savedTestId, true));
             return items;
         }
 
-        Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
+
+        if (StringUtils.isBlank(wsid)
+                || wsid.startsWith(INVALID_WORKSPACE)
+                || wsid.startsWith(INVALID_WORKSPACE) && savedTestId.startsWith(INVALID_TEST)) {
+            items.add(new ListBoxModel.Option("No workspace " + subString(wsid, INVALID_WORKSPACE), subString(savedTestId, INVALID_TEST), true));
+            return items;
+        }
+        if(wsid.startsWith(REQUEST_ERROR)){
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, REQUEST_ERROR, true));
+            return items;
+        }
+        if (StringUtils.isBlank(savedTestId)) {
+            savedTestId = subString(savedTestId, INVALID_TEST);
+            items.add(new ListBoxModel.Option("Test not Found " + savedTestId, savedTestId, true));
+            return items;
+        }
         try {
-            items = testsList(workspace, savedTestId);
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
+            Workspace workspace = new Workspace(utils, wsid, NOT_DEFINED);
+            items = testsList(workspace, resolvedTestId);
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_TESTS, "", true));
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, savedTestId, true));
         } finally {
             return items;
         }
@@ -120,25 +138,24 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, "", true));
+        if (StringUtils.isBlank(crid) || crid.startsWith(INVALID_CREDENTIALS)) {
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, INVALID_WORKSPACE + "_" + subString(swid, INVALID_WORKSPACE), true));
             return items;
         }
-        BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
-        if (credentials == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, ""));
+
+        if (StringUtils.isBlank(swid)) {
+            items.add(new ListBoxModel.Option("Empty workspace id", "EMPTY_WORKSPACE", true));
             return items;
         }
-        BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
-        if (utils == null) {
-            items.add(new ListBoxModel.Option(Constants.NO_SUCH_CREDENTIALS, "", true));
-            return items;
-        }
+
+
         try {
+            BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
+            BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
         } catch (Exception e) {
-            items.add(new ListBoxModel.Option(Constants.NO_WORKSPACES, "", true));
-            return items;
+            items.clear();
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, REQUEST_ERROR, true));
         } finally {
             return items;
         }
@@ -161,21 +178,30 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 try {
                     if (StringUtils.isBlank(credentialsId)) {
                         option.selected = true;
-                        break;
+                        return items;
                     }
                     if (credentialsId.equals(option.value)) {
                         option.selected = true;
-                        break;
+                        return items;
                     }
                 } catch (Exception e) {
                     option.selected = false;
                 }
             }
+
+            credentialsId = subString(credentialsId, INVALID_CREDENTIALS);
+            items.add(0, new ListBoxModel.Option("Credentials not found '" + credentialsId + "'", INVALID_CREDENTIALS + "_" + credentialsId, true));
         } catch (Exception npe) {
 
         } finally {
             return items;
         }
+    }
+
+    private String subString(String credentialsId, String staticMessage) {
+        return credentialsId.startsWith(staticMessage) ?
+                credentialsId.substring(staticMessage.length()+1) :
+                credentialsId;
     }
 
     // Used by global.jelly to authenticate User key
@@ -202,10 +228,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
 
-    public static BzmUtils getBzmUtils(String username, String password) {
+    public static JenkinsBlazeMeterUtils getBzmUtils(String username, String password) throws Exception {
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
-        BzmUtils utils = new BzmUtils(username, password,
+        ProxyConfigurator.updateProxySettings(true);
+        JenkinsBlazeMeterUtils utils = new JenkinsBlazeMeterUtils(username, password,
                 BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
 
         return utils;
@@ -216,50 +243,57 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         ListBoxModel sortedTests = new ListBoxModel();
         JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(workspace.getUtils());
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
-        Comparator c = new Comparator<AbstractTest>() {
-            @Override
-            public int compare(AbstractTest t1, AbstractTest t2) {
-                return t1.getName().compareToIgnoreCase(t2.getName());
-            }
-        };
-        tests.sort(c);
+        Comparator<AbstractTest> c = new AbstractTestComparator();
+        if (tests.isEmpty()) {
+            sortedTests.add(new ListBoxModel.Option("No tests in workspace", "EMPTY_TESTS", true));
+            return sortedTests;
+        }
+
+        Collections.sort(tests, c);
+        boolean isSelected = false;
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
-            sortedTests.add(new ListBoxModel.Option(testName, testName, false));
-            setSelected(sortedTests, savedTest);
+            ListBoxModel.Option testOption = new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false);
+            if (testOption.value.contains(savedTest)) {
+                testOption.selected = true;
+                isSelected = true;
+            }
+            sortedTests.add(testOption);
         }
+
+        if (!isSelected) {
+            savedTest = subString(savedTest, INVALID_TEST);
+            sortedTests.add(0, new ListBoxModel.Option("Test not found '" + savedTest + "'", INVALID_TEST + "_" + savedTest, true));
+        }
+
         return sortedTests;
     }
 
-    private ListBoxModel setSelected(ListBoxModel box, String savedValue) {
-        int boxSize = box.size();
-        boolean valueWasSelected = false;
-        for (int i = 0; i < boxSize; i++) {
-            ListBoxModel.Option option = box.get(i);
-            if (option.value.equals(savedValue)) {
-                box.get(i).selected = true;
-                return box;
-            }
-            if (!valueWasSelected) {
-                box.get(0).selected = true;
-            }
-        }
-        return box;
-    }
 
     private ListBoxModel workspacesList(BlazeMeterUtils utils, String savedWorkspace) throws Exception {
         ListBoxModel workspacesList = new ListBoxModel();
         User user = User.getUser(utils);
         List<Account> accounts = user.getAccounts();
+        boolean isSelected = false;
         for (Account a : accounts) {
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace ws : workspaces) {
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
                         "(" + ws.getId() + ")", ws.getId(), false);
+                if (wso.value.contains(savedWorkspace)) {
+                    wso.selected = true;
+                    isSelected = true;
+                }
                 workspacesList.add(wso);
-                setSelected(workspacesList, savedWorkspace);
             }
         }
+
+        if (!isSelected) {
+            savedWorkspace = subString(savedWorkspace, INVALID_WORKSPACE);
+            workspacesList.add(0, new ListBoxModel.Option("Workspace not found '" + savedWorkspace + "'", INVALID_WORKSPACE + "_" + savedWorkspace, true));
+        }
+
+
         return workspacesList;
     }
 
