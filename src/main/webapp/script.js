@@ -3,7 +3,7 @@ function onChangeSelectHandler() {
     var options = selectEl.options;
 
     var generatedUlDivEl = document.getElementById("generatedUlDiv");
-    var generatedUl = '<ul id="generatedUl">';
+    var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
     for (i = 0; i < options.length; i++) {
         generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
                     + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
@@ -49,7 +49,8 @@ var interval = setInterval(function() {
 function onKeyUpSearch() {
     var searchInputEl = document.getElementById("searchInput");
     var text = searchInputEl.value.toLowerCase();
-    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    var ulEl = document.getElementById("generatedUl");
+    var liList = ulEl.getElementsByTagName("li");
     var displayIndex = 0;
     for (i = 0; i < liList.length; i++) {
         if (!liList[i].innerHTML.toLowerCase().includes(text)) {
@@ -61,6 +62,7 @@ function onKeyUpSearch() {
             displayIndex++;
         }
     }
+    ulEl.dataset.displayElements = displayIndex;
 };
 
 function onClickResultHandler() {
@@ -161,20 +163,39 @@ function clearFocusLi(li) {
 function selectNextLi() {
     var currentIndex = (curFocusedLi == null) ? -1 : curFocusedLi.dataset.displayIndex;
     var nextIndex = ++currentIndex;
-    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    var ulEl = document.getElementById("generatedUl");
+    var liList = ulEl.getElementsByTagName("li");
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == nextIndex) {
             focusLi(liList[i]);
+            moveScroll(nextIndex);
             return;
         }
     }
     selectFirst(liList);
 }
 
+function moveScroll(index) {
+    var ulEl = document.getElementById("generatedUl");
+    var elementsCount = ulEl.dataset.displayElements;
+    var liList = ulEl.getElementsByTagName("li");
+    if (liList.length > 0 && elementsCount > 0) {
+        var liHeight = parseFloat(window.getComputedStyle(liList[0], null).getPropertyValue("height"));
+        var ulHeight = parseFloat(window.getComputedStyle(ulEl, null).getPropertyValue("height"));
+        var median = (ulHeight / liHeight / 2);
+        if (index > median) {
+            ulEl.scrollTop = (liHeight * (index - median));
+        } else {
+            ulEl.scrollTop = 0;
+        }
+    }
+}
+
 function selectFirst(liList) {
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex != -1) {
             focusLi(liList[i]);
+            moveScroll(liList[i].dataset.displayIndex);
             return;
         }
     }
@@ -191,6 +212,7 @@ function selectPrevLi() {
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == prevIndex) {
             focusLi(liList[i]);
+            moveScroll(prevIndex);
             return;
         }
     }
@@ -201,6 +223,7 @@ function selectLast(liList) {
     for (i = liList.length - 1; i >= 0; i--) {
         if (liList[i].dataset.displayIndex != -1) {
             focusLi(liList[i]);
+            moveScroll(liList[i].dataset.displayIndex);
             return;
         }
     }
