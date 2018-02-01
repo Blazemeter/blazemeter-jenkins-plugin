@@ -29,7 +29,7 @@ setNameToResult(selectEl.getAttribute("value"));
 function getSelectEl() {
     var testDivEl = document.getElementById("testDiv");
     return testDiv.getElementsByTagName("select")[0];
-}
+};
 
 // waiting when init state of original <select> will be changed
 var count = 0;
@@ -44,7 +44,7 @@ var interval = setInterval(function() {
         clearInterval(interval);
     }
     count++;
-}, 500)
+}, 500);
 
 function onKeyUpSearch() {
     var searchInputEl = document.getElementById("searchInput");
@@ -63,16 +63,36 @@ function onKeyUpSearch() {
         }
     }
     ulEl.dataset.displayElements = displayIndex;
+    if (curFocusedLi != null && curFocusedLi.dataset.displayIndex == -1) {
+        clearFocusLi(curFocusedLi);
+        curFocusedLi = null;
+        ulEl.scrollTop = 0;
+    }
 };
 
 function onClickResultHandler() {
     var toggleEl = document.getElementById("hiddenSelect");
     if (toggleEl.style.display === "block") {
-       hideHiddenSelect();
+        hideHiddenSelect();
     } else {
         onChangeSelectHandler();
-        toggleEl.style.display = "block";
+        openHiddenSelect(toggleEl);
         disableScroll();
+    }
+};
+
+function openHiddenSelect(toggleEl) {
+    toggleEl.style.display = "block";
+    var searchInputEl = document.getElementById("searchInput");
+    searchInputEl.focus();
+    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    var resultDivEl = document.getElementById("result");
+    for (i = 0; i < liList.length; i++) {
+        if (liList[i].innerHTML == resultDivEl.innerHTML) {
+            focusLi(liList[i]);
+            moveScroll(liList[i].dataset.displayIndex);
+            return;
+        }
     }
 };
 
@@ -93,7 +113,7 @@ function hideHiddenSelect() {
     toggleEl.style.display = "none";
     curFocusedLi = null;
     enableScroll();
-}
+};
 
 function setValueToSelect(li) {
     var selectEl = getSelectEl();
@@ -111,7 +131,7 @@ function isGeneratedElement(event) {
                    || event.target.id == "generatedUl"
                    || event.target.getAttribute("class") == "generatedLi"
                    || event.target.id == "searchInput");
-}
+};
 
 document.onkeydown = function(event) {
     var charCode = event.keyCode;
@@ -127,19 +147,19 @@ document.onkeydown = function(event) {
         }
         preventDefaultForScrollKeys(event);
     }
-}
+};
 
 function isPressedDown(charCode) {
     return (charCode === 40);
-}
+};
 
 function isPressedUp(charCode) {
     return (charCode === 38);
-}
+};
 
 function isPressedEnter(charCode) {
     return (charCode === 13);
-}
+};
 
 var curFocusedLi = null;
 
@@ -152,13 +172,13 @@ function focusLi(li) {
         curFocusedLi = null;
     }
     curFocusedLi = li;
-}
+};
 
 // return default colors
 function clearFocusLi(li) {
     li.style.background = "#ffffff";
     li.style.color = "#000000";
-}
+};
 
 function selectNextLi() {
     var currentIndex = (curFocusedLi == null) ? -1 : curFocusedLi.dataset.displayIndex;
@@ -173,8 +193,10 @@ function selectNextLi() {
         }
     }
     selectFirst(liList);
-}
+};
 
+
+// need use liList[i].dataset.displayIndex
 function moveScroll(index) {
     var ulEl = document.getElementById("generatedUl");
     var elementsCount = ulEl.dataset.displayElements;
@@ -189,7 +211,7 @@ function moveScroll(index) {
             ulEl.scrollTop = 0;
         }
     }
-}
+};
 
 function selectFirst(liList) {
     for (i = 0; i < liList.length; i++) {
@@ -199,7 +221,7 @@ function selectFirst(liList) {
             return;
         }
     }
-}
+};
 
 function selectPrevLi() {
     var liList = document.getElementById("generatedUl").getElementsByTagName("li");
@@ -217,7 +239,7 @@ function selectPrevLi() {
         }
     }
     selectLast(liList);
-}
+};
 
 function selectLast(liList) {
     for (i = liList.length - 1; i >= 0; i--) {
@@ -227,13 +249,13 @@ function selectLast(liList) {
             return;
         }
     }
-}
+};
 
 function setCurrentLi() {
     if (curFocusedLi != null) {
         onClickListElementHandler(curFocusedLi);
     }
-}
+};
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -245,23 +267,23 @@ function preventDefault(e) {
         e.preventDefault();
     }
     e.returnValue = false;
-}
+};
 
 function preventDefaultForScrollKeys(e) {
     if (keys[e.keyCode]) {
         preventDefault(e);
         return false;
     }
-}
+};
 
 function disableScroll() {
     if (window.addEventListener) { // older FF
         window.addEventListener('DOMMouseScroll', preventDefault, false);
     }
-}
+};
 
 function enableScroll() {
     if (window.removeEventListener) {
         window.removeEventListener('DOMMouseScroll', preventDefault, false);
     }
-}
+};
