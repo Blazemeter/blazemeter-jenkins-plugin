@@ -1,5 +1,4 @@
 function onChangeSelectHandler() {
-    console.log("onchange hande!");
     var selectEl = getSelectEl();
     var options = selectEl.options;
 
@@ -24,10 +23,16 @@ function onChangeSelectHandler() {
     searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
 };
 
+// START
 setTimeout(function() {
     var selectEl = getSelectEl();
     setNameToResult(selectEl.getAttribute("value"));
 
+    executeIntervalTask();
+}, 2000);
+// end of START
+
+function executeIntervalTask() {
     // waiting when init state of original <select> will be changed
     var count = 0;
     var interval = setInterval(function() {
@@ -43,8 +48,7 @@ setTimeout(function() {
         }
         count++;
     }, 500);
-}, 2000);
-
+};
 
 function getSelectEl() {
     var testDivEl = document.getElementById("testDiv");
