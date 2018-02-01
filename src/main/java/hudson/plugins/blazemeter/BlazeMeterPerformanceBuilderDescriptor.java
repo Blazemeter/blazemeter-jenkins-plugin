@@ -55,15 +55,16 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-    private String CHECK_CREDENTIALS_PROXY_TESTS = "Check credentials, proxy settings, tests in workspace";
-    private String CHECK_CREDENTIALS_PROXY_WORKSPACES = "Check credentials, proxy settings, workspaces in account";
-    private String INVALID_CREDENTIALS_ID = "INVALID CREDENTIALS ID";
-    private String INVALID_WORKSPACE_ID = "INVALID WORKSPACE ID";
-    private String INVALID_TEST_ID = "INVALID TEST ID";
+    private String REQUEST_ERROR = "REQUEST_ERROR";
+    private String CHECK_CREDENTIALS_PROXY = "Check credentials, proxy settings";
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private String NOT_DEFINED = "not defined";
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
+
+    private static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
+    private static final String INVALID_WORKSPACE = "INVALID_WORKSPACE";
+    private static final String INVALID_TEST = "INVALID_TEST";
 
     public static String NO_TESTS = "no-tests";
 
@@ -100,8 +101,25 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
         String resolvedTestId = Utils.resolveTestId(savedTestId);
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(Constants.NO_CREDENTIALS, "");
+        if (StringUtils.isBlank(crid) || crid.startsWith(INVALID_CREDENTIALS)) {
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, savedTestId, true));
+            return items;
+        }
+
+
+        if (StringUtils.isBlank(wsid)
+                || wsid.startsWith(INVALID_WORKSPACE)
+                || wsid.startsWith(INVALID_WORKSPACE) && savedTestId.startsWith(INVALID_TEST)) {
+            items.add(new ListBoxModel.Option("No workspace " + subString(wsid, INVALID_WORKSPACE), subString(savedTestId, INVALID_TEST), true));
+            return items;
+        }
+        if(wsid.startsWith(REQUEST_ERROR)){
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, REQUEST_ERROR, true));
+            return items;
+        }
+        if (StringUtils.isBlank(savedTestId)) {
+            savedTestId = subString(savedTestId, INVALID_TEST);
+            items.add(new ListBoxModel.Option("Test not Found " + savedTestId, savedTestId, true));
             return items;
         }
         try {
@@ -111,7 +129,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             items = testsList(workspace, resolvedTestId);
         } catch (Exception e) {
             items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY_TESTS, CHECK_CREDENTIALS_PROXY_TESTS, true));
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, savedTestId, true));
         } finally {
             return items;
         }
@@ -120,17 +138,24 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String crid,
                                                @QueryParameter("workspaceId") String swid) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
-        if (StringUtils.isBlank(crid)) {
-            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, Constants.NO_CREDENTIALS, true));
+        if (StringUtils.isBlank(crid) || crid.startsWith(INVALID_CREDENTIALS)) {
+            items.add(new ListBoxModel.Option(Constants.NO_CREDENTIALS, INVALID_WORKSPACE + "_" + subString(swid, INVALID_WORKSPACE), true));
             return items;
         }
+
+        if (StringUtils.isBlank(swid)) {
+            items.add(new ListBoxModel.Option("Empty workspace id", "EMPTY_WORKSPACE", true));
+            return items;
+        }
+
+
         try {
             BlazemeterCredentialsBAImpl credentials = findCredentials(crid);
             BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
             items = workspacesList(utils, swid);
         } catch (Exception e) {
             items.clear();
-            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY_WORKSPACES, CHECK_CREDENTIALS_PROXY_WORKSPACES, true));
+            items.add(new ListBoxModel.Option(CHECK_CREDENTIALS_PROXY, REQUEST_ERROR, true));
         } finally {
             return items;
         }
@@ -163,12 +188,20 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                     option.selected = false;
                 }
             }
-            items.add(0, new ListBoxModel.Option(INVALID_CREDENTIALS_ID, INVALID_CREDENTIALS_ID, true));
+
+            credentialsId = subString(credentialsId, INVALID_CREDENTIALS);
+            items.add(0, new ListBoxModel.Option("Credentials not found '" + credentialsId + "'", INVALID_CREDENTIALS + "_" + credentialsId, true));
         } catch (Exception npe) {
 
         } finally {
             return items;
         }
+    }
+
+    private String subString(String credentialsId, String staticMessage) {
+        return credentialsId.startsWith(staticMessage) ?
+                credentialsId.substring(staticMessage.length()+1) :
+                credentialsId;
     }
 
     // Used by global.jelly to authenticate User key
@@ -212,36 +245,28 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspace(workspace);
         Comparator<AbstractTest> c = new AbstractTestComparator();
         if (tests.isEmpty()) {
-            sortedTests.add(new ListBoxModel.Option("No tests in workspace", NO_TESTS, true));
+            sortedTests.add(new ListBoxModel.Option("No tests in workspace", "EMPTY_TESTS", true));
             return sortedTests;
         }
 
         Collections.sort(tests, c);
+        boolean isSelected = false;
         for (AbstractTest t : tests) {
             String testName = t.getName() + "(" + t.getId() + "." + t.getTestType() + ")";
-            sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
-        }
-        setSelected(sortedTests, savedTest, INVALID_TEST_ID);
-        return sortedTests;
-    }
-
-    private ListBoxModel setSelected(ListBoxModel box, String savedValue, String message) {
-        int boxSize = box.size();
-        boolean valueWasSelected = false;
-        for (int i = 0; i < boxSize; i++) {
-            ListBoxModel.Option option = box.get(i);
-            if (option.value.contains(savedValue)) {
-                box.get(i).selected = true;
-                return box;
+            ListBoxModel.Option testOption = new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false);
+            if (testOption.value.contains(savedTest)) {
+                testOption.selected = true;
+                isSelected = true;
             }
+            sortedTests.add(testOption);
         }
-        if (savedValue.equals(CHECK_CREDENTIALS_PROXY_TESTS) | savedValue.equals(CHECK_CREDENTIALS_PROXY_WORKSPACES)) {
-            box.get(0).selected = true;
+
+        if (!isSelected) {
+            savedTest = subString(savedTest, INVALID_TEST);
+            sortedTests.add(0, new ListBoxModel.Option("Test not found '" + savedTest + "'", INVALID_TEST + "_" + savedTest, true));
         }
-        if (!valueWasSelected) {
-            box.add(0, new ListBoxModel.Option(message, message, true));
-        }
-        return box;
+
+        return sortedTests;
     }
 
 
@@ -249,20 +274,26 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         ListBoxModel workspacesList = new ListBoxModel();
         User user = User.getUser(utils);
         List<Account> accounts = user.getAccounts();
+        boolean isSelected = false;
         for (Account a : accounts) {
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace ws : workspaces) {
                 ListBoxModel.Option wso = new ListBoxModel.Option(ws.getName() +
                         "(" + ws.getId() + ")", ws.getId(), false);
+                if (wso.value.contains(savedWorkspace)) {
+                    wso.selected = true;
+                    isSelected = true;
+                }
                 workspacesList.add(wso);
             }
-            if (workspacesList.isEmpty()) {
-                workspacesList.add(new ListBoxModel.Option("No workspaces in account", "No workspaces in account", true));
-                return workspacesList;
-            }
-
-            setSelected(workspacesList, savedWorkspace, INVALID_WORKSPACE_ID);
         }
+
+        if (!isSelected) {
+            savedWorkspace = subString(savedWorkspace, INVALID_WORKSPACE);
+            workspacesList.add(0, new ListBoxModel.Option("Workspace not found '" + savedWorkspace + "'", INVALID_WORKSPACE + "_" + savedWorkspace, true));
+        }
+
+
         return workspacesList;
     }
 
