@@ -17,8 +17,5 @@ package hudson.plugins.blazemeter.utils;
 public interface Constants {
     String BZM_LOG = "bzm-log";
     String VERSION = "version";
-    String NO_CREDENTIALS = "No Credentials";
     String A_BLAZEMETER_COM = "https://a.blazemeter.com";
-    String NO_TESTS = "No tests";
-
 }

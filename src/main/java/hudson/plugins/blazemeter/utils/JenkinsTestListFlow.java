@@ -17,14 +17,10 @@ import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.explorer.Workspace;
 import com.blazemeter.api.explorer.test.AbstractTest;
-import com.blazemeter.api.explorer.test.MultiTest;
-import com.blazemeter.api.explorer.test.SingleTest;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.ciworkflow.TestsListFlow;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class JenkinsTestListFlow extends TestsListFlow {
@@ -33,12 +29,13 @@ public class JenkinsTestListFlow extends TestsListFlow {
         super(utils);
     }
 
-    public List<AbstractTest> getAllTestsForWorkspace(Workspace workspace) {
+    public List<AbstractTest> getAllTestsForWorkspaceWithException(Workspace workspace) throws Exception{
         List<AbstractTest> tests = new ArrayList<>();
-        tests.addAll(getSingleTestsForWorkspace(workspace));
-        tests.addAll(getMultiTestsForWorkspace(workspace));
+        tests.addAll(workspace.getSingleTests());
+        tests.addAll(workspace.getMultiTests());
         return tests;
     }
+
 
     public List<Workspace> getWorkspacesForUser(User user) {
         List<Account> accounts = null;
