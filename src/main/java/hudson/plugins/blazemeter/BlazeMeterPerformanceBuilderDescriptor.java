@@ -70,6 +70,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     public static String NO_TESTS = "no-tests";
 
+    private boolean checkTestIdIfFound = true;
+    private boolean checkWorkspaceIdIfFound = true;
+    private int fillTestIdrequest = 0;
+    private int fillWorkspaceIdrequest = 0;
+
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         this.load();
@@ -213,7 +218,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         BlazemeterCredentialsBAImpl foundCredentials = null;
         for (BlazemeterCredentialsBAImpl c : CredentialsProvider
                 .lookupCredentials(BlazemeterCredentialsBAImpl.class, Jenkins.getInstance(), ACL.SYSTEM)) {
-            if(StringUtils.isBlank(credentialsId)){
+            if (StringUtils.isBlank(credentialsId)) {
                 return c;
             }
             if (c.getId().equals(credentialsId)) {
@@ -258,13 +263,17 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             sortedTests.add(testOption);
         }
 
-        if (!isSelected & !StringUtils.isBlank(savedTest)) {
+        if (!isSelected & !StringUtils.isBlank(savedTest) & checkTestIdIfFound) {
             savedTest = subString(savedTest, INVALID_TEST);
             sortedTests.add(0, new ListBoxModel.Option("Test not found '" + savedTest + "'", INVALID_TEST + "_" + savedTest, true));
         } else if (StringUtils.isBlank(savedTest)) {
             sortedTests.get(0).selected = true;
         }
-
+        if (fillTestIdrequest == 1) {
+            checkTestIdIfFound = false;
+        } else {
+            fillTestIdrequest++;
+        }
         return sortedTests;
     }
 
@@ -287,11 +296,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             }
         }
 
-        if (!isSelected & !StringUtils.isBlank(savedWorkspace)) {
+        if (!isSelected & !StringUtils.isBlank(savedWorkspace)&checkWorkspaceIdIfFound) {
             savedWorkspace = subString(savedWorkspace, INVALID_WORKSPACE);
             workspacesList.add(0, new ListBoxModel.Option("Workspace not found '" + savedWorkspace + "'", INVALID_WORKSPACE + "_" + savedWorkspace, true));
         } else if (StringUtils.isBlank(savedWorkspace)) {
             workspacesList.get(0).selected = true;
+        }
+        if (fillWorkspaceIdrequest == 1) {
+            checkWorkspaceIdIfFound = false;
+        } else {
+            fillWorkspaceIdrequest++;
         }
 
 
