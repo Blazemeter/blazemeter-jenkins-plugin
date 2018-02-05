@@ -16,13 +16,13 @@ package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
+import com.blazemeter.ciworkflow.CiBuild;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JenkinsCiBuild;
 import hudson.plugins.blazemeter.utils.JenkinsCiPostProcess;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
@@ -51,7 +51,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     private TaskListener listener;
 
     private Master master;
-    private JenkinsCiBuild build;
+    private CiBuild build;
 
     private boolean applyProxy;
 
@@ -122,10 +122,9 @@ public class BzmBuild implements Callable<Result, Exception> {
         }
     }
 
-    public void interrupt(JenkinsCiBuild build, Master master, PrintStream logger) {
+    public void interrupt(CiBuild build, Master master, PrintStream logger) {
         if (build != null && master != null) {
             try {
-                logger.println("Build has been interrupted");
                 boolean hasReport = build.interrupt(master);
                 if (hasReport) {
                     logger.println("Get reports after interrupt");
@@ -156,8 +155,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 new BzmJobLogger(logFile));
     }
 
-    private JenkinsCiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
-        return new JenkinsCiBuild(utils,
+    private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new CiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
@@ -175,7 +174,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         // NOOP
     }
 
-    public JenkinsCiBuild getBuild() {
+    public CiBuild getBuild() {
         return build;
     }
 }
