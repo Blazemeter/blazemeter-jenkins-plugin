@@ -17,13 +17,13 @@ package hudson.plugins.blazemeter;
 import com.blazemeter.api.explorer.Master;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
+import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JenkinsCiPostProcess;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
@@ -163,8 +163,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 createCiPostProcess(utils, workspace));
     }
 
-    private JenkinsCiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
-        return new JenkinsCiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
+    private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
                 workspace.getRemote(), utils.getNotifier(), utils.getLogger());
     }
