@@ -38,12 +38,14 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Timer;
+import java.util.logging.Logger;
 
 
 public class PerformanceBuilder extends Builder implements SimpleBuildStep, Serializable {
+
+    private static final Logger LOGGER = Logger.getLogger(PerformanceBuilder.class.getName());
 
     @Deprecated
     private String jobApiKey = "";
@@ -258,6 +260,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             Result result = channel.call(bzmBuild);
             run.setResult(result);
         } catch (InterruptedException e) {
+            LOGGER.warning("Build has been aborted");
             // start new task for wait Slave
             InterruptListenerTask interrupt = new InterruptListenerTask(run, jobName, channel);
             interrupt.start();
