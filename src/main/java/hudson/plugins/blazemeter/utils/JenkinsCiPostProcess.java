@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class JenkinsCiPostProcess extends CiPostProcess{
+
+
     // TODO to api-client 1.3
     public JenkinsCiPostProcess(boolean isDownloadJtl, boolean isDownloadJunit, String jtlPath, String junitPath, String workspaceDir, UserNotifier notifier, Logger logger) {
         super(isDownloadJtl, isDownloadJunit, jtlPath, junitPath, workspaceDir, notifier, logger);
