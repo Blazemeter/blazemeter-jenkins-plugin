@@ -48,23 +48,4 @@ public class JenkinsBlazeMeterUtils extends BlazeMeterUtils {
             ((BzmJobLogger) logger).close();
         }
     }
-
-    // TODO to api-client 1.3
-    @Override
-    protected String extractErrorMessage(String response) {
-        if (response != null && !response.isEmpty()) {
-            try {
-                JSONObject jsonResponse = JSONObject.fromObject(response);
-                JSONObject errorObj = jsonResponse.getJSONObject("error");
-                if (errorObj.containsKey("message")) {
-                    return errorObj.getString("message");
-                }
-            } catch (JSONException ex) {
-                logger.debug("Cannot parse response: " + response, ex);
-                return "Cannot parse response: " + response;
-            }
-        }
-        return null;
-    }
-
 }
