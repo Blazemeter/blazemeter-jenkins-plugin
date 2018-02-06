@@ -30,7 +30,7 @@ public class JenkinsTestListFlow extends TestsListFlow {
 
     public JenkinsTestListFlow(BlazeMeterUtils utils, String limit) {
         super(utils);
-        this.limit = (!StringUtils.isBlank(limit)&StringUtils.isNumeric(limit)) ? limit : "10000";
+        this.limit = (!StringUtils.isBlank(limit) & StringUtils.isNumeric(limit)) ? limit : "10000";
     }
 
     public List<AbstractTest> getAllTestsForWorkspaceWithException(Workspace workspace) throws Exception {
