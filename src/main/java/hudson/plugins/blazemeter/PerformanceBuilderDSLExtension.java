@@ -54,12 +54,13 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                 User user = null;
                 try {
                     user = User.getUser(bzmUtils);
-                    logger.info("Credentials with id = "+c.credentialsId+" are valid.");
+                    logger.info("Credentials with id = " + c.credentialsId + " are valid.");
                 } catch (Exception e) {
                     logger.error("Credentials with credentialsId = " + c.credentialsId + " are invalid.");
                     return pb;
                 }
-                JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(bzmUtils);
+                String limit = System.getProperty("bzm.limit", "10000");
+                JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(bzmUtils, limit);
                 List<Workspace> workspaces = jenkinsTestListFlow.getWorkspacesForUser(user);
                 List<AbstractTest> tests = null;
                 for (Workspace workspace : workspaces) {
