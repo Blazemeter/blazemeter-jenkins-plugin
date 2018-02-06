@@ -19,20 +19,24 @@ import com.blazemeter.api.explorer.Workspace;
 import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.ciworkflow.TestsListFlow;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JenkinsTestListFlow extends TestsListFlow {
 
-    public JenkinsTestListFlow(BlazeMeterUtils utils) {
+    private String limit;
+
+    public JenkinsTestListFlow(BlazeMeterUtils utils, String limit) {
         super(utils);
+        this.limit = (!StringUtils.isBlank(limit)&StringUtils.isNumeric(limit)) ? limit : "10000";
     }
 
-    public List<AbstractTest> getAllTestsForWorkspaceWithException(Workspace workspace) throws Exception{
+    public List<AbstractTest> getAllTestsForWorkspaceWithException(Workspace workspace) throws Exception {
         List<AbstractTest> tests = new ArrayList<>();
-        tests.addAll(workspace.getSingleTests());
-        tests.addAll(workspace.getMultiTests());
+        tests.addAll(workspace.getSingleTests(limit, "name"));
+        tests.addAll(workspace.getMultiTests(limit, "name"));
         return tests;
     }
 
