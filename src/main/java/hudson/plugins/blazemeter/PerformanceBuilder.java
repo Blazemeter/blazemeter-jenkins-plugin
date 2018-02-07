@@ -291,4 +291,15 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             return super.configure(req, formData);
         }
     }
+
+    /**
+     * This method, invoked after object is resurrected from persistence
+     */
+    public Object readResolve() {
+        // resolve old testId format:  "testLabel(testId.testType)" to new "testId.testType"
+        if (!StringUtils.isBlank(testId) && testId.contains("(")) {
+            testId = Utils.resolveTestId(testId);
+        }
+        return this;
+    }
 }
