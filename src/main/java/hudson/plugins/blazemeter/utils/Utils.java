@@ -88,8 +88,7 @@ public class Utils {
         try {
             int startIndex = savedTestId.lastIndexOf("(") + 1;
             int endIndex = savedTestId.lastIndexOf(")");
-            String resolvedTestId = savedTestId.substring(startIndex, endIndex);
-            return resolvedTestId;
+            return savedTestId.substring(startIndex, endIndex);
         } catch (Exception e) {
             return savedTestId;
         }
