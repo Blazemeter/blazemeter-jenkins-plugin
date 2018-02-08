@@ -14,14 +14,14 @@
      limitations under the License.
     -->
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
-        <f:select style="width:32em;" onchange="executeIntervalTask()"/>
+        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%Workspace ID:}" field="workspaceId">
-        <f:select style="width:32em;" onchange="executeIntervalTask()"/>
+        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
         <div id="testDiv">
-            <f:select onchange="onChangeSelectHandler()" style="width:32em;"/>
+            <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;"/>
             <div id="newSelectDiv">
                 <div id="result" onclick="onClickResultHandler()" class="setting-input select">Select test</div>
                 <div id="hiddenSelect">
