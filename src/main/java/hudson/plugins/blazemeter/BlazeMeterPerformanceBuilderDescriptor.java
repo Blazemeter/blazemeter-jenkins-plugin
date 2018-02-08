@@ -30,7 +30,6 @@ import hudson.model.Item;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JenkinsTestListFlow;
-import hudson.plugins.blazemeter.utils.WorkspaceExt;
 import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmServerNotifier;
 import hudson.security.ACL;
@@ -145,7 +144,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private Workspace getWorkspace(BlazeMeterUtils utils, String workspaceId) throws Exception {
         try {
-            return WorkspaceExt.getWorkspace(utils, workspaceId);
+            return Workspace.getWorkspace(utils, workspaceId);
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "Cannot get workspace with id=" + workspaceId, ex);
             if (ex.getMessage().toLowerCase().contains("not found")) {
