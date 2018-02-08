@@ -13,8 +13,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
     -->
-    <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}" onchange="executeIntervalTask()">
-        <f:select style="width:32em;"/>
+    <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
+        <f:select style="width:32em;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%Workspace ID:}" field="workspaceId">
         <f:select style="width:32em;" onchange="executeIntervalTask()"/>
