@@ -75,7 +75,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         ProxyConfigurator.updateProxySettings(applyProxy);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
-        logger.println("BlazemeterJenkins plugin v." + Utils.version());
+        logger.println(BzmJobNotifier.formatMessage("BlazemeterJenkins plugin v." + Utils.version()));
         JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
         try {
             build = createCiBuild(utils, wsp);
@@ -85,7 +85,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     EnvVars.masterEnvVars.put(jobName + "-" + buildId, build.getPublicReport());
                     build.waitForFinish(master);
                 } else {
-                    listener.error("Failed to start test");
+                    listener.error(BzmJobNotifier.formatMessage("Failed to start test"));
                     return Result.FAILURE;
                 }
             } catch (InterruptedException e) {
@@ -96,7 +96,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                 return Result.ABORTED;
             } catch (Exception e) {
                 utils.getLogger().warn("Caught exception while waiting for build", e);
-                logger.println("Caught exception " + e.getMessage());
+                logger.println(BzmJobNotifier.formatMessage("Caught exception " + e.getMessage()));
                 return Result.FAILURE;
             }
 
@@ -127,11 +127,11 @@ public class BzmBuild implements Callable<Result, Exception> {
             try {
                 boolean hasReport = build.interrupt(master);
                 if (hasReport) {
-                    logger.println("Get reports after interrupt");
+                    logger.println(BzmJobNotifier.formatMessage("Get reports after interrupt"));
                     build.doPostProcess(master);
                 }
             } catch (IOException e) {
-                logger.println("Failed to interrupt build " + e.getMessage());
+                logger.println(BzmJobNotifier.formatMessage("Failed to interrupt build " + e.getMessage()));
             }
         }
     }

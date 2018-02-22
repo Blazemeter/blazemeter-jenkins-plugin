@@ -17,26 +17,37 @@ package hudson.plugins.blazemeter.utils.notifier;
 import com.blazemeter.api.logging.UserNotifier;
 import hudson.model.TaskListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class BzmJobNotifier implements UserNotifier {
 
     private final TaskListener listener;
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
     public BzmJobNotifier(TaskListener listener) {
         this.listener = listener;
     }
 
+    public static String formatMessage(String msg) {
+        Date date = new Date();
+        return "[" + dateFormat.format(date) + "]: " + msg;
+    }
+
     @Override
     public void notifyInfo(String s) {
-        listener.getLogger().println(s);
+        listener.getLogger().println(formatMessage(s));
     }
 
     @Override
     public void notifyWarning(String s) {
-        listener.getLogger().println("WARN: " + s);
+        listener.getLogger().println(formatMessage("WARN: " + s));
     }
 
     @Override
     public void notifyError(String s) {
-        listener.error(s);
+        listener.error(formatMessage(s));
     }
 }
