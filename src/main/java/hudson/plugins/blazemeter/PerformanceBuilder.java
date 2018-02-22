@@ -23,6 +23,7 @@ import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.interrupt.InterruptListenerTask;
+import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.plugins.blazemeter.utils.report.ReportUrlTask;
 import hudson.remoting.LocalChannel;
 import hudson.remoting.VirtualChannel;
@@ -215,16 +216,11 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private boolean validateTestId(TaskListener listener) {
         if (StringUtils.isBlank(testId)) {
-            listener.error("Please, reconfigure job and select valid credentials and test");
-            listener.error("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials.");
-            return false;
-        }
-        if (testId.contains(BlazeMeterPerformanceBuilderDescriptor.NO_TESTS)) {
-            listener.error("Selected workspace does not contain tests: please, select another one.");
+            listener.error(BzmJobNotifier.formatMessage("Please, reconfigure job and select valid credentials and test"));
+            listener.error(BzmJobNotifier.formatMessage("Refer to https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys- for getting new credentials."));
             return false;
         }
         return true;
-
     }
 
     @Override
@@ -238,7 +234,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         BlazemeterCredentialsBAImpl credentials = Utils.findCredentials(credentialsId, CredentialsScope.GLOBAL);
         boolean isValidCredentials = !StringUtils.isBlank(credentialsId) && validateCredentials(credentials);
         if (!isValidCredentials) {
-            listener.error("Can not start build: Invalid credentials=" + credentialsId + "... is deprecated or absent in credentials store.");
+            listener.error(BzmJobNotifier.formatMessage("Can not start build: Invalid credentials=" + credentialsId + "... is deprecated or absent in credentials store."));
             run.setResult(Result.NOT_BUILT);
             return;
         }
@@ -249,7 +245,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener,channel instanceof LocalChannel);
+                run.getEnvironment(listener), workspace, listener, channel instanceof LocalChannel);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
@@ -267,7 +263,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             interrupt.join();
             run.setResult(Result.ABORTED);
         } catch (Exception e) {
-            listener.getLogger().println("Failure with exception: " + e.getMessage());
+            listener.getLogger().println(BzmJobNotifier.formatMessage("Failure with exception: " + e.getMessage()));
             e.printStackTrace(listener.getLogger());
             run.setResult(Result.FAILURE);
         } finally {
