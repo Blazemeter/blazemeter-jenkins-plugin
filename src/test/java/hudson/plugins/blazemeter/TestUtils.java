@@ -1,49 +1,55 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2018 BlazeMeter Inc.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package hudson.plugins.blazemeter;
 
-import hudson.EnvVars;
-import hudson.FilePath;
 import hudson.plugins.blazemeter.utils.Utils;
-import java.io.File;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 
 public class TestUtils {
 
-    @Test
-    public void getTestId_new(){
-        Assert.assertEquals("12345", Utils.getTestId("asdfg(12345.2345)"));
-        Assert.assertEquals("5166480", Utils.getTestId("a - tut.gyt - positive(5166480.http)"));
-        Assert.assertEquals("123452345", Utils.getTestId("123452345"));
 
+    @Test
+    public void resolveId_positive() {
+        String testId = "dddddddddd(1.d)";
+        assertEquals("1.d", Utils.resolveTestId(testId));
     }
 
     @Test
-    public void getTestId_old(){
-        Assert.assertEquals("12345", Utils.getTestId("12345.2345"));
-        Assert.assertEquals("5166480", Utils.getTestId("5166480.http"));
-        Assert.assertEquals("123452345", Utils.getTestId("123452345"));
-
+    public void resolveId_not_changes() {
+        String testId = "1.d";
+        assertEquals("1.d", Utils.resolveTestId(testId));
     }
 
     @Test
-    public void resolveFilePath() throws Exception {
-        FilePath fp = new FilePath(new File(System.getProperty("user.dir")));
-        FilePath rfp=Utils.resolvePath(fp,"vfhtthaha",new EnvVars());
-        Assert.assertTrue(rfp.exists());
-        rfp.delete();
+    public void resolveId_negative() {
+        String testId = "no-test-id";
+        assertEquals("no-test-id", Utils.resolveTestId(testId));
+    }
+
+    @Test
+    public void getTestId() {
+        String testId = "1.d";
+        assertEquals("1", Utils.getTestId(testId));
+    }
+
+    @Test
+    public void version() {
+        assertNotEquals("N/A", Utils.version());
     }
 }

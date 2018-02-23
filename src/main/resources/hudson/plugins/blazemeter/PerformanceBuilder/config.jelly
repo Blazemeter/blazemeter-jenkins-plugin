@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <!--
-     Copyright 2017 BlazeMeter Inc.
+     Copyright 2018 BlazeMeter Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,16 +14,25 @@
      limitations under the License.
     -->
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
-        <f:select style="width:32em;"/>
+        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%Workspace ID:}" field="workspaceId">
-        <f:select style="width:32em;"/>
+        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
-        <f:select style="width:32em;"/>
+        <div id="testDiv">
+            <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
+            <div id="newSelectDiv">
+                <div id="result" onclick="onClickResultHandler()" class="setting-input select">Select test</div>
+                <div id="hiddenSelect">
+                    <div id="searchInputDiv"/>
+                    <div id="generatedUlDiv"/>
+                </div>
+            </div>
+        </div>
     </f:entry>
     <f:entry title="${%Server url:}">
-        <f:textbox disabled="true" style="width:32em;" field="serverUrl" value="${descriptor.getBlazeMeterURL()}"/>
+        <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
@@ -46,4 +55,101 @@
             <f:textbox field="sessionProperties"></f:textbox>
         </f:entry>
     </f:advanced>
+
+     <style type="text/css">
+        #hiddenSelect {
+            display: none;
+            position: absolute;
+            border: 1px solid #1E90FF;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: white;
+            z-index: 1;
+        }
+
+        #result {
+            border-radius: 0;
+            height: 2.25em;
+            padding: 6px 10px;
+            color: #000000;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0 !important;
+            outline: none;
+            padding: 0 10px !important;
+        }
+
+        #newSelectDiv {
+            width: 32em;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            background-color: white;
+        }
+
+        #newSelectDiv:after {
+            content:'';
+            width: 0;
+            height: 0;
+            display: inline-block;
+            border-top: 6px solid #000000;
+            border-left: 2.5px solid transparent;
+            border-right: 2.5px solid transparent;
+            position: absolute;
+            right: 6px;
+            top: 15px;
+        }
+
+        #generatedUl {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #000000;
+            max-height: 17em;
+            overflow: auto;
+        }
+
+        #generatedUl li {
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+
+
+        @media screen and (-moz-device-pixel-ratio) {
+            #newSelectDiv::before {
+                content: '';
+                display: inline-block;
+                border-top: 2px solid #ffffff;
+                width: 18px;
+                height: 30px;
+                position: absolute;
+                right: 1px;
+                top: 1px;
+                background: #f3f3f3;
+                border-left: 2px solid #ffffff;
+                border-bottom: 2px solid #848485;
+                border-right: 2px solid #848485;
+            }
+
+            #newSelectDiv::after {
+                content: '';
+                width: 0;
+                height: 0;
+                display: inline-block;
+                border-top: 4px solid #000000;
+                border-left: 3.5px solid transparent;
+                border-right: 3.5px solid transparent;
+                position: absolute;
+                right: 6px;
+                top: 15px;
+                display: inline-block;
+            }
+        }
+     </style>
+    <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
 </j:jelly>

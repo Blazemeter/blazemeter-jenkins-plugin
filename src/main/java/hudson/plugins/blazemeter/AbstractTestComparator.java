@@ -13,31 +13,14 @@
  */
 package hudson.plugins.blazemeter;
 
-import hudson.model.ModelObject;
-import hudson.model.Run;
+import com.blazemeter.api.explorer.test.AbstractTest;
 
-public class PerformanceReportMap implements ModelObject {
+import java.util.Comparator;
 
-    private transient PerformanceBuildAction buildAction;
-
-    PerformanceReportMap(final PerformanceBuildAction buildAction){
-        this.buildAction = buildAction;
+public class AbstractTestComparator implements Comparator<AbstractTest> {
+    @Override
+    public int compare(AbstractTest t1, AbstractTest t2) {
+        return t1.getName().compareToIgnoreCase(t2.getName());
     }
 
-
-    public Run getRun() {
-        return buildAction.getRun();
-    }
-
-    public String getDisplayName() {
-       return Messages.Report_DisplayName();
-    }
-
-    public String getReportUrl(){
-        return this.buildAction.getReportUrl();
-    }
-
-    public void setReportUrl(String reportUrl){
-        this.buildAction.setReportUrl(reportUrl);
-    }
 }
