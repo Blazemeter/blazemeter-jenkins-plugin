@@ -82,7 +82,8 @@ public class BzmBuild implements Callable<Result, Exception> {
             try {
                 master = build.start();
                 if (master != null) {
-                    EnvVars.masterEnvVars.put(jobName + "-" + buildId, build.getPublicReport());
+                    EnvVars.masterEnvVars.put(jobName + "-" + buildId, master.getId());
+                    EnvVars.masterEnvVars.put(jobName + "-" + buildId + "-" + master.getId(), build.getPublicReport());
                     build.waitForFinish(master);
                 } else {
                     listener.error(BzmJobNotifier.formatMessage("Failed to start test"));

@@ -47,10 +47,11 @@ public class ReportUrlTask extends TimerTask {
                 return;
             }
             EnvVars ev = EnvVars.getRemote(channel);
-            String ruId = jobName + "-" + run.getId();
-            if (ev != null && ev.containsKey(ruId)) {
-                PerformanceBuildAction a = new PerformanceBuildAction(run);
-                a.setReportUrl(ev.get(ruId, ""));
+            String runId = jobName + "-" + run.getId();
+            if (ev != null && ev.containsKey(runId)) {
+                String masterId = ev.get(runId, "");
+                PerformanceBuildAction a = new PerformanceBuildAction(run, masterId);
+                a.setReportUrl(ev.get(runId + "-" + masterId, ""));
                 run.addAction(a);
                 isDone = true;
                 super.cancel();
