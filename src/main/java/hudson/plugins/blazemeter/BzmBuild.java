@@ -54,10 +54,11 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiBuild build;
 
     private boolean applyProxy;
+    private long reportLinkId;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy, long reportLinkId) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -68,6 +69,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.workspace = workspace;
         this.listener = listener;
         this.applyProxy = applyProxy;
+        this.reportLinkId = reportLinkId;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class BzmBuild implements Callable<Result, Exception> {
             try {
                 master = build.start();
                 if (master != null) {
-                    EnvVars.masterEnvVars.put(jobName + "-" + buildId, master.getId());
+                    EnvVars.masterEnvVars.put(jobName + "-" + buildId + "-" + reportLinkId, master.getId());
                     EnvVars.masterEnvVars.put(jobName + "-" + buildId + "-" + master.getId(), build.getPublicReport());
                     build.waitForFinish(master);
                 } else {

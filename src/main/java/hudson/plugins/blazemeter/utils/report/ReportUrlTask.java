@@ -33,11 +33,13 @@ public class ReportUrlTask extends TimerTask {
     private Run run;
 
     protected boolean isDone;
+    protected long reportLinkId;
 
-    public ReportUrlTask(Run run, String jobName, VirtualChannel channel) {
+    public ReportUrlTask(Run run, String jobName, VirtualChannel channel, long reportLinkId) {
         this.run = run;
         this.jobName = jobName;
         this.channel = channel;
+        this.reportLinkId = reportLinkId;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class ReportUrlTask extends TimerTask {
                 return;
             }
             EnvVars ev = EnvVars.getRemote(channel);
-            String runId = jobName + "-" + run.getId();
+            String runId = jobName + "-" + run.getId() + "-" + reportLinkId;
             if (ev != null && ev.containsKey(runId)) {
                 String masterId = ev.get(runId, "");
                 PerformanceBuildAction a = new PerformanceBuildAction(run, masterId);
