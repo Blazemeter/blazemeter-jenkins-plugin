@@ -243,7 +243,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         String jobName = run.getFullDisplayName();
         VirtualChannel channel = launcher.getChannel();
 
-        long reportLinkId = System.currentTimeMillis();
+        final long reportLinkId = System.currentTimeMillis();
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,

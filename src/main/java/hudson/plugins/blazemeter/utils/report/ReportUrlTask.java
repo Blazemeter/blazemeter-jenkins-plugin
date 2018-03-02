@@ -33,7 +33,7 @@ public class ReportUrlTask extends TimerTask {
     private Run run;
 
     protected boolean isDone;
-    protected long reportLinkId;
+    protected final long reportLinkId;
 
     public ReportUrlTask(Run run, String jobName, VirtualChannel channel, long reportLinkId) {
         this.run = run;
