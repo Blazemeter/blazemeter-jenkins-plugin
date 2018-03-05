@@ -141,7 +141,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     }
 
     private String createLogFile(FilePath workspace) throws IOException, InterruptedException {
-        FilePath logFile = workspace.child(Constants.BZM_LOG);
+        FilePath logFile = workspace.child(Constants.BZM_LOG + "-" + System.currentTimeMillis());
         logFile.touch(System.currentTimeMillis());
         return logFile.getRemote();
     }

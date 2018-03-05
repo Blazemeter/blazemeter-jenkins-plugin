@@ -27,6 +27,7 @@ package hudson.plugins.blazemeter.utils.logger;
  * limitations under the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -36,10 +37,12 @@ import java.util.logging.SimpleFormatter;
 public class BzmJobLogger implements com.blazemeter.api.logging.Logger {
 
     private Logger logger = Logger.getLogger(BzmJobLogger.class.getName());
-    private Logger fileLogger = Logger.getLogger("bzm-log");
+    private Logger fileLogger;
     private FileHandler fileHandler;
 
     public BzmJobLogger(String logFile) {
+        File f = new File(logFile);
+        this.fileLogger = Logger.getLogger(f.getName());
         try {
             fileHandler = new FileHandler(logFile);
         } catch (IOException ex) {
