@@ -170,7 +170,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
-                workspace.getRemote(), utils.getNotifier(), utils.getLogger());
+                workspace.getRemote(), utils);
     }
 
     @Override
