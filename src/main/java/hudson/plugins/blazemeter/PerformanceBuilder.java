@@ -243,12 +243,14 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         String jobName = run.getFullDisplayName();
         VirtualChannel channel = launcher.getChannel();
 
+        final long reportLinkId = System.currentTimeMillis();
+
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener, channel instanceof LocalChannel);
+                run.getEnvironment(listener), workspace, listener, channel instanceof LocalChannel, reportLinkId);
 
 
-        ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel);
+        ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);
 
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(reportUrlTask, 20 * 1000, 10 * 1000);

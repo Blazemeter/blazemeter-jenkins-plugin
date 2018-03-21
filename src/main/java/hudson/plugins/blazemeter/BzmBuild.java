@@ -54,10 +54,11 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiBuild build;
 
     private boolean applyProxy;
+    private long reportLinkId;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy, long reportLinkId) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -68,6 +69,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.workspace = workspace;
         this.listener = listener;
         this.applyProxy = applyProxy;
+        this.reportLinkId = reportLinkId;
     }
 
     @Override
@@ -82,7 +84,9 @@ public class BzmBuild implements Callable<Result, Exception> {
             try {
                 master = build.start();
                 if (master != null) {
-                    EnvVars.masterEnvVars.put(jobName + "-" + buildId, build.getPublicReport());
+                    String runId = jobName + "-" + buildId + "-" + reportLinkId;
+                    EnvVars.masterEnvVars.put(runId, master.getId());
+                    EnvVars.masterEnvVars.put(runId + "-" + master.getId(), build.getPublicReport());
                     build.waitForFinish(master);
                 } else {
                     listener.error(BzmJobNotifier.formatMessage("Failed to start test"));
@@ -137,7 +141,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     }
 
     private String createLogFile(FilePath workspace) throws IOException, InterruptedException {
-        FilePath logFile = workspace.child(Constants.BZM_LOG);
+        FilePath logFile = workspace.child(Constants.BZM_LOG + "-" + System.currentTimeMillis());
         logFile.touch(System.currentTimeMillis());
         return logFile.getRemote();
     }
@@ -166,7 +170,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
-                workspace.getRemote(), utils.getNotifier(), utils.getLogger());
+                workspace.getRemote(), utils);
     }
 
     @Override
