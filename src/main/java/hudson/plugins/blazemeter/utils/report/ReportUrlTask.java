@@ -54,6 +54,7 @@ public class ReportUrlTask extends TimerTask {
                 String masterId = ev.get(runId, "");
                 PerformanceBuildAction a = new PerformanceBuildAction(run, masterId);
                 a.setReportUrl(ev.get(runId + "-" + masterId, ""));
+                a.setLinkName(ev.get(runId + "-link-name", "BlazeMeter Report"));
                 run.addAction(a);
                 isDone = true;
                 super.cancel();

@@ -24,6 +24,7 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
 
     private final Run run;
     private String reportUrl;
+    private String linkName;
     private final String masterId;
     private PerformanceReportMap m = null;
 
@@ -33,7 +34,9 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
     }
 
     public String getDisplayName() {
-        return Messages.BuildAction_DisplayName();
+        return (!StringUtils.isBlank(linkName)) ?
+                linkName :
+                "BlazeMeter Report";
     }
 
     public String getIconFileName() {
@@ -63,5 +66,13 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
 
     public void setReportUrl(String reportUrl) {
         this.reportUrl = reportUrl;
+    }
+
+    public String getLinkName() {
+        return linkName;
+    }
+
+    public void setLinkName(String linkName) {
+        this.linkName = linkName;
     }
 }
