@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import hudson.ProxyConfiguration;
+import org.apache.commons.lang.StringUtils;
 
 public class ProxyConfigurator {
     static String PROXY_HOST = "http.proxyHost";
@@ -26,10 +27,18 @@ public class ProxyConfigurator {
         if (updateProxySettings) {
             ProxyConfiguration proxyConfiguration = ProxyConfiguration.load();
             if (proxyConfiguration != null) {
-                System.setProperty(PROXY_HOST, proxyConfiguration.name);
-                System.setProperty(PROXY_PORT, String.valueOf(proxyConfiguration.port));
-                System.setProperty(PROXY_USER, proxyConfiguration.getUserName());
-                System.setProperty(PROXY_PASS, proxyConfiguration.getPassword());
+                if (StringUtils.isNotBlank(proxyConfiguration.name)) {
+                    System.setProperty(PROXY_HOST, proxyConfiguration.name);
+                }
+                if (StringUtils.isNotBlank(String.valueOf(proxyConfiguration.port))) {
+                    System.setProperty(PROXY_PORT, String.valueOf(proxyConfiguration.port));
+                }
+                if (StringUtils.isNotBlank(proxyConfiguration.getUserName())) {
+                    System.setProperty(PROXY_USER, proxyConfiguration.getUserName());
+                }
+                if (StringUtils.isNotBlank(proxyConfiguration.getPassword())) {
+                    System.setProperty(PROXY_PASS, proxyConfiguration.getPassword());
+                }
             } else {
                 System.clearProperty(PROXY_HOST);
                 System.clearProperty(PROXY_PORT);
