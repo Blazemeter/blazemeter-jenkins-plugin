@@ -17,6 +17,7 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -257,7 +258,9 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener, channel instanceof LocalChannel, reportLinkName, reportLinkId);
+                run.getEnvironment(listener), workspace, listener,
+                ProxyConfiguration.load(), !(channel instanceof LocalChannel),
+                reportLinkName, reportLinkId);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);

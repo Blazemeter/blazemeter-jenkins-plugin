@@ -24,6 +24,7 @@ import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
+import hudson.ProxyConfiguration;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Item;
@@ -333,11 +334,9 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public static JenkinsBlazeMeterUtils getBzmUtils(String username, String password) throws Exception {
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
-        ProxyConfigurator.updateProxySettings(true);
-        JenkinsBlazeMeterUtils utils = new JenkinsBlazeMeterUtils(username, password,
+        ProxyConfigurator.updateProxySettings(ProxyConfiguration.load(), false);
+        return new JenkinsBlazeMeterUtils(username, password,
                 BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
-
-        return utils;
     }
 
     public String getName() {

@@ -20,6 +20,7 @@ import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
@@ -58,13 +59,15 @@ public class BzmBuild implements Callable<Result, Exception> {
     private Master master;
     private JenkinsCiBuild build;
 
-    private boolean applyProxy;
+    private boolean isSlave;
+    private ProxyConfiguration proxyConfiguration;
     private long reportLinkId;
     private String reportLinkName;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy,
+                    EnvVars envVars, FilePath workspace, TaskListener listener,
+                    ProxyConfiguration proxyConfiguration, boolean isSlave,
                     String reportLinkName, long reportLinkId) {
         this.builder = builder;
         this.apiId = apiId;
@@ -75,7 +78,9 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.envVars = envVars;
         this.workspace = workspace;
         this.listener = listener;
-        this.applyProxy = applyProxy;
+
+        this.proxyConfiguration = proxyConfiguration;
+        this.isSlave = isSlave;
 
         this.reportLinkName = reportLinkName;
         this.reportLinkId = reportLinkId;
@@ -83,7 +88,7 @@ public class BzmBuild implements Callable<Result, Exception> {
 
     @Override
     public Result call() throws Exception {
-        ProxyConfigurator.updateProxySettings(applyProxy);
+        ProxyConfigurator.updateProxySettings(proxyConfiguration, isSlave);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println(BzmJobNotifier.formatMessage("BlazemeterJenkins plugin v." + Utils.version()));
