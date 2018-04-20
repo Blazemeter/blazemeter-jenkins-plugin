@@ -35,8 +35,11 @@ import org.jenkinsci.remoting.RoleChecker;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.logging.Logger;
 
 public class BzmBuild implements Callable<Result, Exception> {
+
+    private static final Logger LOGGER = Logger.getLogger(BzmBuild.class.getName());
 
     private PerformanceBuilder builder;
 
@@ -130,8 +133,19 @@ public class BzmBuild implements Callable<Result, Exception> {
 
     private int getReportLinkNameLength() {
         try {
-            return Integer.parseInt(System.getProperty("bzm.reportLinkName.length", "35"));
+            String len = this.envVars.get("bzm.reportLinkName.length");
+            if (StringUtils.isBlank(len)) {
+                LOGGER.fine("Property bzm.reportLinkName.length did not find in Jenkins envVars");
+                len = System.getProperty("bzm.reportLinkName.length");
+                if (StringUtils.isBlank(len)) {
+                    LOGGER.fine("Property bzm.reportLinkName.length did not find in System.properties");
+                    len = "35";
+                }
+            }
+            LOGGER.info("Get report link name length = " + len);
+            return Integer.parseInt(len);
         } catch (NumberFormatException ex) {
+            LOGGER.warning("Cannot parse report link name length = " + ex.getMessage());
             return 35;
         }
     }
