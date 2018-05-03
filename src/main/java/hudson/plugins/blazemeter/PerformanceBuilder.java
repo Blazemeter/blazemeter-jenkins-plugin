@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.ProxyConfiguration;
@@ -255,12 +256,13 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         VirtualChannel channel = launcher.getChannel();
 
         final long reportLinkId = System.currentTimeMillis();
+        EnvVars envVars = run.getEnvironment(listener);
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener,
+                envVars, workspace, listener,
                 ProxyConfiguration.load(), !(channel instanceof LocalChannel),
-                reportLinkName, reportLinkId);
+                envVars.expand(reportLinkName), reportLinkId);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);
