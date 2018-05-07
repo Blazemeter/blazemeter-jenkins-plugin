@@ -35,6 +35,8 @@ public class PerformanceBuilderDSLContext implements Context {
 
     boolean getJunit = false;
 
+    String reportLinkName = "";
+
 
     public void credentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
@@ -70,6 +72,10 @@ public class PerformanceBuilderDSLContext implements Context {
 
     public void workspaceId(String  workspaceId) {
         this.workspaceId = workspaceId;
+    }
+
+    public void reportLinkName(String reportLinkName) {
+        this.reportLinkName = reportLinkName;
     }
 
 }
