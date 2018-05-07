@@ -70,6 +70,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                             pb = new PerformanceBuilder(c.credentialsId, workspace.getId(), serverUrl,
                                     c.testId, c.notes, c.sessionProperties,
                                     c.jtlPath, c.junitPath, c.getJtl, c.getJunit);
+                            pb.setReportLinkName(c.reportLinkName);
                             logger.info("PerformanceBuilder was successfully created for test = " + c.testId + " in workspace = " + workspace.getId());
 
                         }
