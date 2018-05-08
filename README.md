@@ -12,6 +12,10 @@ Please, refer to [plugin's wiki](https://guide.blazemeter.com/hc/en-us/articles/
 
 #### [Changelog](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/CHANGELOG.md)
 
+#### [Using pipeline](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/usingPipeline.md)
+
+#### [Using Job DSL](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/usingDSL.md)
+
 #### [Download latest version](https://plugins.jenkins.io/BlazeMeterJenkinsPlugin)
 
 #### License
