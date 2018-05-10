@@ -1,4 +1,4 @@
-#### v4.2 (upcoming)
+#### v4.2 - 10.05.2018
 
 - `FEATURE` - Change BlazeMeter report link name. _By default max report link name length = 35, but you can increase this value using Java System property or Jenkins environment variable "bzm.reportLinkName.length"_
 - `FEATURE` - Improve set up proxy configuration. _By default all slaves will use proxy configuration from Manage Jenkins> Manage Plugins > Advanced. For override proxy setting for any agents need pass Java System property to this agent: -Dproxy.override=true. And if you want use other proxy add -Dhttp.proxyHost=<HOST> -Dhttp.proxyPort=<PORT> -Dhttp.proxyUser=<USER> -Dhttp.proxyPass=<PASSWORD> or nothing more for work without proxy_
