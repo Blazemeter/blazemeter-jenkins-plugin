@@ -15,8 +15,10 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -72,6 +74,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private boolean getJunit = false;
 
+    private String reportLinkName = "";
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -214,6 +217,15 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
     }
 
+    public String getReportLinkName() {
+        return reportLinkName;
+    }
+
+    @DataBoundSetter
+    public void setReportLinkName(String reportLinkName) {
+        this.reportLinkName = reportLinkName;
+    }
+
     private boolean validateTestId(TaskListener listener) {
         if (StringUtils.isBlank(testId)) {
             listener.error(BzmJobNotifier.formatMessage("Please, reconfigure job and select valid credentials and test"));
@@ -244,10 +256,13 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         VirtualChannel channel = launcher.getChannel();
 
         final long reportLinkId = System.currentTimeMillis();
+        EnvVars envVars = run.getEnvironment(listener);
 
         BzmBuild bzmBuild = new BzmBuild(this, credentials.getUsername(), credentials.getPassword().getPlainText(),
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
-                run.getEnvironment(listener), workspace, listener, channel instanceof LocalChannel, reportLinkId);
+                envVars, workspace, listener,
+                ProxyConfiguration.load(), !(channel instanceof LocalChannel),
+                envVars.expand(reportLinkName), reportLinkId);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);

@@ -7,13 +7,18 @@ saved in CVS as a part of configuration.
 
 #### 2. Installation & usage
 
-Please, refer to [plugin's wiki](https://github.com/jenkinsci/blazemeter-plugin/wiki) for further instructions. 
+Please, refer to [plugin's wiki](https://guide.blazemeter.com/hc/en-us/articles/206732669-BlazeMeter-s-Jenkins-Plugin-A-Guide) for further instructions. 
 
-#### 3. Tests
+#### [Changelog](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/CHANGELOG.md)
 
-    mvn test
+#### [Using pipeline](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/usingPipeline.md)
 
-#### 4. License
+#### [Using Job DSL](https://github.com/Blazemeter/blazemeter-jenkins-plugin/blob/master/usingDSL.md)
+
+#### [Download latest version](https://plugins.jenkins.io/BlazeMeterJenkinsPlugin)
+
+#### License
  
     Apache License, Version 2.0
+
 

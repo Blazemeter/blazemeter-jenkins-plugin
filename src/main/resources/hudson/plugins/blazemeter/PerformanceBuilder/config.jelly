@@ -41,18 +41,20 @@
         <f:checkbox/>
     </f:entry>
     <f:advanced>
-        <f:entry title="${%Path to jtl report}:">
+        <f:entry title="${%Path to jtl report}:" field="jtlPath">
             <f:textbox field="jtlPath"></f:textbox>
         </f:entry>
-        <f:entry title="${%Path to junit report}:">
+        <f:entry title="${%Path to junit report}:" field="junitPath">
             <f:textbox field="junitPath"></f:textbox>
         </f:entry>
-        <f:entry title="${%Notes:}">
+        <f:entry title="${%Notes:}" field="notes">
             <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
         </f:entry>
-        <f:entry title="${%Session properties}:"
-                 field="sessionProperties" description="${%SessionProperties}">
+        <f:entry title="${%Session properties}:" field="sessionProperties" description="${%SessionProperties}">
             <f:textbox field="sessionProperties"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Report link name}:" field="reportLinkName">
+            <f:textbox field="reportLinkName"></f:textbox>
         </f:entry>
     </f:advanced>
 

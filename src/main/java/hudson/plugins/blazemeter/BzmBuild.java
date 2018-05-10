@@ -20,21 +20,27 @@ import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JenkinsCiBuild;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.logging.Logger;
 
 public class BzmBuild implements Callable<Result, Exception> {
+
+    private static final Logger LOGGER = Logger.getLogger(BzmBuild.class.getName());
 
     private PerformanceBuilder builder;
 
@@ -51,14 +57,18 @@ public class BzmBuild implements Callable<Result, Exception> {
     private TaskListener listener;
 
     private Master master;
-    private CiBuild build;
+    private JenkinsCiBuild build;
 
-    private boolean applyProxy;
+    private boolean isSlave;
+    private ProxyConfiguration proxyConfiguration;
     private long reportLinkId;
+    private String reportLinkName;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
-                    EnvVars envVars, FilePath workspace, TaskListener listener, boolean applyProxy, long reportLinkId) {
+                    EnvVars envVars, FilePath workspace, TaskListener listener,
+                    ProxyConfiguration proxyConfiguration, boolean isSlave,
+                    String reportLinkName, long reportLinkId) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -68,13 +78,17 @@ public class BzmBuild implements Callable<Result, Exception> {
         this.envVars = envVars;
         this.workspace = workspace;
         this.listener = listener;
-        this.applyProxy = applyProxy;
+
+        this.proxyConfiguration = proxyConfiguration;
+        this.isSlave = isSlave;
+
+        this.reportLinkName = reportLinkName;
         this.reportLinkId = reportLinkId;
     }
 
     @Override
     public Result call() throws Exception {
-        ProxyConfigurator.updateProxySettings(applyProxy);
+        ProxyConfigurator.updateProxySettings(proxyConfiguration, isSlave);
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println(BzmJobNotifier.formatMessage("BlazemeterJenkins plugin v." + Utils.version()));
@@ -87,6 +101,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     String runId = jobName + "-" + buildId + "-" + reportLinkId;
                     EnvVars.masterEnvVars.put(runId, master.getId());
                     EnvVars.masterEnvVars.put(runId + "-" + master.getId(), build.getPublicReport());
+                    putLinkName(runId);
                     build.waitForFinish(master);
                 } else {
                     listener.error(BzmJobNotifier.formatMessage("Failed to start test"));
@@ -109,6 +124,39 @@ public class BzmBuild implements Callable<Result, Exception> {
         } finally {
             utils.closeLogger();
         }
+    }
+
+    private void putLinkName(String runId) {
+        String linkName = (StringUtils.isBlank(reportLinkName)) ?
+                "BlazeMeter report: " + build.getCurrentTest().getName() :
+                reportLinkName;
+
+        EnvVars.masterEnvVars.put(runId + "-link-name",
+                prepareReportLinkName(linkName, getReportLinkNameLength())
+        );
+    }
+
+    private int getReportLinkNameLength() {
+        try {
+            String len = this.envVars.get("bzm.reportLinkName.length");
+            if (StringUtils.isBlank(len)) {
+                LOGGER.fine("Property bzm.reportLinkName.length did not find in Jenkins envVars");
+                len = System.getProperty("bzm.reportLinkName.length");
+                if (StringUtils.isBlank(len)) {
+                    LOGGER.fine("Property bzm.reportLinkName.length did not find in System.properties");
+                    len = "35";
+                }
+            }
+            LOGGER.info("Get report link name length = " + len);
+            return Integer.parseInt(len);
+        } catch (NumberFormatException ex) {
+            LOGGER.warning("Cannot parse report link name length = " + ex.getMessage());
+            return 35;
+        }
+    }
+
+    private String prepareReportLinkName(String name, int lengthLimit) {
+        return name.length() > lengthLimit ? name.substring(0, lengthLimit) + ".." : name;
     }
 
     private Result mappedBuildResult(BuildResult buildResult) {
@@ -159,8 +207,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 new BzmJobLogger(logFile));
     }
 
-    private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
-        return new CiBuild(utils,
+    private JenkinsCiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new JenkinsCiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
