@@ -213,7 +213,12 @@ function onClickListElementHandler(li) {
 document.onmousedown = function(event) {
     if (!isGeneratedElement(event)) {
         console.log("should close select");
-        hideHiddenSelect();
+        var testDivs = getAllTestDivs();
+        for (var i = 0; i < testDivs.length; i++) {
+            var div = testDivs[i];
+            var toggleEl = div.querySelector(".hiddenSelect");
+            hideHiddenSelect(toggleEl);
+        }
     }
 };
 
