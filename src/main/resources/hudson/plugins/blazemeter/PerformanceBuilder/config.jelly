@@ -20,13 +20,13 @@
         <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask()"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
-        <div id="testDiv">
+        <div class="testDiv">
             <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
-            <div id="newSelectDiv">
+            <div class="newSelectDiv">
                 <div id="result" onclick="onClickResultHandler()" class="setting-input select">Select test</div>
-                <div id="hiddenSelect">
-                    <div id="searchInputDiv"/>
-                    <div id="generatedUlDiv"/>
+                <div class="hiddenSelect">
+                    <div class="searchInputDiv"/>
+                    <div class="generatedUlDiv"/>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
     </f:advanced>
 
      <style type="text/css">
-        #hiddenSelect {
+        .hiddenSelect {
             display: none;
             position: absolute;
             border: 1px solid #1E90FF;
@@ -85,7 +85,7 @@
             padding: 0 10px !important;
         }
 
-        #newSelectDiv {
+        .newSelectDiv {
             width: 32em;
             box-sizing: border-box;
             cursor: pointer;
@@ -93,7 +93,7 @@
             background-color: white;
         }
 
-        #newSelectDiv:after {
+        .newSelectDiv:after {
             content:'';
             width: 0;
             height: 0;
@@ -106,7 +106,7 @@
             top: 15px;
         }
 
-        #generatedUl {
+        .generatedUl {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -115,7 +115,7 @@
             overflow: auto;
         }
 
-        #generatedUl li {
+        .generatedUl li {
             cursor: pointer;
             padding: 0 10px;
         }
@@ -123,7 +123,7 @@
 
 
         @media screen and (-moz-device-pixel-ratio) {
-            #newSelectDiv::before {
+            .newSelectDiv::before {
                 content: '';
                 display: inline-block;
                 border-top: 2px solid #ffffff;
@@ -138,7 +138,7 @@
                 border-right: 2px solid #848485;
             }
 
-            #newSelectDiv::after {
+            .newSelectDiv::after {
                 content: '';
                 width: 0;
                 height: 0;

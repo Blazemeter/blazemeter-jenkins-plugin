@@ -23,14 +23,74 @@ function onChangeSelectHandler() {
     searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
 };
 
+function onChangeSelectHandlerForTestDiv(testDiv) {
+    var selectEl = getSelectElForTestDiv(testDiv);
+    var options = selectEl.options;
+
+    var generatedUlDivEl = testDiv.querySelector(".generatedUlDiv");
+    var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
+    for (i = 0; i < options.length; i++) {
+        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
+                    + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
+                    + 'data-value="' + options[i].value
+                    + '" data-index="' + i
+                    + '" data-display-index="' + i
+                    + '" >' + options[i].label + '</li>';
+
+        if (options[i].selected) {
+            setNameToResultFromTestDiv(testDiv, options[i].label);
+        }
+    }
+    generatedUl += '</ul>';
+    generatedUlDivEl.innerHTML = generatedUl;
+
+    var searchInputDivEl = testDiv.querySelector(".searchInputDiv");
+    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+};
+
 // START
 setTimeout(function() {
-    var selectEl = getSelectEl();
-    setNameToResult(selectEl.getAttribute("value"));
+    var testDivs = getAllTestDivs();
+    console.log(testDivs);
+    for (var i = 0; i < testDivs.length; i++) {
+        var div = testDivs[i];
+        console.log(div);
+        setNameToResultFromTestDiv(div, getSelectElForTestDiv(div).getAttribute("value"));
+        executeIntervalTaskForDiv(div);
+    }
 
-    executeIntervalTask();
 }, 2000);
 // end of START
+
+function executeIntervalTaskForDiv(testDiv) {
+    // waiting when init state of original <select> will be changed
+    var count = 0;
+    var interval = setInterval(function() {
+
+        var resultDivEl = testDiv.querySelector("#result");
+        var prevValue = resultDivEl.innerHTML;
+
+        onChangeSelectHandlerForTestDiv(testDiv); // if <select> element filled it will change 'resultDivEl.innerHTML'
+        var curValue = resultDivEl.innerHTML;
+
+        if ((prevValue != curValue) || (count >= 20)) {
+            console.log("stop interval");
+            clearInterval(interval);
+        }
+        count++;
+    }, 500);
+};
+
+function setNameToResultFromTestDiv(testDiv, name) {
+    console.log("set name ");
+    console.log(testDiv);
+    var resultDivEl = testDiv.querySelector("#result");
+    resultDivEl.innerHTML = name;
+};
+
+function getAllTestDivs() {
+    return document.getElementsByClassName("testDiv");
+};
 
 function executeIntervalTask() {
     // waiting when init state of original <select> will be changed
@@ -48,6 +108,11 @@ function executeIntervalTask() {
         }
         count++;
     }, 500);
+};
+
+function getSelectElForTestDiv(testDivEl) {
+
+    return testDivEl.getElementsByTagName("select")[0];
 };
 
 function getSelectEl() {
