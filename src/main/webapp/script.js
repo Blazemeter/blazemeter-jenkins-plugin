@@ -1,26 +1,34 @@
-function onChangeSelectHandler() {
-    var selectEl = getSelectEl();
-    var options = selectEl.options;
+//function onChangeSelectHandler1() {
+//    var selectEl = getSelectEl();
+//    var options = selectEl.options;
+//
+//    var generatedUlDivEl = document.getElementById("generatedUlDiv");
+//    var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
+//    for (i = 0; i < options.length; i++) {
+//        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
+//                    + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
+//                    + 'data-value="' + options[i].value
+//                    + '" data-index="' + i
+//                    + '" data-display-index="' + i
+//                    + '" >' + options[i].label + '</li>';
+//
+//        if (options[i].selected) {
+//            setNameToResult(options[i].label);
+//        }
+//    }
+//    generatedUl += '</ul>';
+//    generatedUlDivEl.innerHTML = generatedUl;
+//
+//    var searchInputDivEl = document.getElementById("searchInputDiv");
+//    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+//};
 
-    var generatedUlDivEl = document.getElementById("generatedUlDiv");
-    var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
-    for (i = 0; i < options.length; i++) {
-        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
-                    + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
-                    + 'data-value="' + options[i].value
-                    + '" data-index="' + i
-                    + '" data-display-index="' + i
-                    + '" >' + options[i].label + '</li>';
-
-        if (options[i].selected) {
-            setNameToResult(options[i].label);
-        }
-    }
-    generatedUl += '</ul>';
-    generatedUlDivEl.innerHTML = generatedUl;
-
-    var searchInputDivEl = document.getElementById("searchInputDiv");
-    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+function onChangeSelectHandler(event) {
+    var target = event.target;
+    var testDivEl = target.closest(".testDiv");
+    console.log("closest ");
+    console.log(testDivEl);
+    onChangeSelectHandlerForTestDiv(testDivEl);
 };
 
 function onChangeSelectHandlerForTestDiv(testDiv) {
@@ -82,8 +90,6 @@ function executeIntervalTaskForDiv(testDiv) {
 };
 
 function setNameToResultFromTestDiv(testDiv, name) {
-    console.log("set name ");
-    console.log(testDiv);
     var resultDivEl = testDiv.querySelector("#result");
     resultDivEl.innerHTML = name;
 };
@@ -92,26 +98,34 @@ function getAllTestDivs() {
     return document.getElementsByClassName("testDiv");
 };
 
-function executeIntervalTask() {
-    // waiting when init state of original <select> will be changed
-    var count = 0;
-    var interval = setInterval(function() {
+function executeIntervalTask(selectEl) {
+    var builderEl = selectEl.closest("div[descriptorid='hudson.plugins.blazemeter.PerformanceBuilder']");
+    console.log(builderEl);
 
-        var resultDivEl = document.getElementById("result");
-        var prevValue = resultDivEl.innerHTML;
-
-        onChangeSelectHandler(); // if <select> element filled it will change 'resultDivEl.innerHTML'
-        var curValue = resultDivEl.innerHTML;
-
-        if ((prevValue != curValue) || (count >= 20)) {
-            clearInterval(interval);
-        }
-        count++;
-    }, 500);
+    var testDivEl = builderEl.querySelector(".testDiv");
+    console.log(testDivEl);
+    executeIntervalTaskForDiv(testDivEl)
 };
 
-function getSelectElForTestDiv(testDivEl) {
+//function executeIntervalTask() {
+//    // waiting when init state of original <select> will be changed
+//    var count = 0;
+//    var interval = setInterval(function() {
+//
+//        var resultDivEl = document.getElementById("result");
+//        var prevValue = resultDivEl.innerHTML;
+//
+//        onChangeSelectHandler(); // if <select> element filled it will change 'resultDivEl.innerHTML'
+//        var curValue = resultDivEl.innerHTML;
+//
+//        if ((prevValue != curValue) || (count >= 20)) {
+//            clearInterval(interval);
+//        }
+//        count++;
+//    }, 500);
+//};
 
+function getSelectElForTestDiv(testDivEl) {
     return testDivEl.getElementsByTagName("select")[0];
 };
 
@@ -145,16 +159,30 @@ function onKeyUpSearch() {
     }
 };
 
-function onClickResultHandler() {
-    var toggleEl = document.getElementById("hiddenSelect");
+function onClickResultHandler(resultDivEl) {
+    var testDivEl = resultDivEl.closest(".testDiv");
+    console.log("closest ");
+    console.log(testDivEl);
+
+    var toggleEl = testDivEl.querySelector(".hiddenSelect");
     if (toggleEl.style.display === "block") {
-        hideHiddenSelect();
+        hideHiddenSelect(toggleEl);
     } else {
-        onChangeSelectHandler();
+        onChangeSelectHandlerForTestDiv(testDivEl);
         openHiddenSelect(toggleEl);
         disableScroll();
     }
 };
+
+function hideHiddenSelect(toggleEl) {
+//    var toggleEl = document.getElementById("hiddenSelect");
+    if (toggleEl != null) {
+        toggleEl.style.display = "none";
+        curFocusedLi = null;
+        enableScroll();
+    }
+};
+
 
 function openHiddenSelect(toggleEl) {
     toggleEl.style.display = "block";
@@ -183,14 +211,6 @@ document.onmousedown = function(event) {
     }
 };
 
-function hideHiddenSelect() {
-    var toggleEl = document.getElementById("hiddenSelect");
-    if (toggleEl != null) {
-        toggleEl.style.display = "none";
-        curFocusedLi = null;
-        enableScroll();
-    }
-};
 
 function setValueToSelect(li) {
     var selectEl = getSelectEl();
