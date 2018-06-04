@@ -26,8 +26,8 @@
 function onChangeSelectHandler(event) {
     var target = event.target;
     var testDivEl = target.closest(".testDiv");
-    console.log("closest ");
-    console.log(testDivEl);
+//    console.log("closest ");
+//    console.log(testDivEl);
     onChangeSelectHandlerForTestDiv(testDivEl);
 };
 
@@ -82,7 +82,9 @@ function executeIntervalTaskForDiv(testDiv) {
         var curValue = resultDivEl.innerHTML;
 
         if ((prevValue != curValue) || (count >= 20)) {
+
             console.log("stop interval");
+
             clearInterval(interval);
         }
         count++;
@@ -100,10 +102,10 @@ function getAllTestDivs() {
 
 function executeIntervalTask(selectEl) {
     var builderEl = selectEl.closest("div[descriptorid='hudson.plugins.blazemeter.PerformanceBuilder']");
-    console.log(builderEl);
+//    console.log(builderEl);
 
     var testDivEl = builderEl.querySelector(".testDiv");
-    console.log(testDivEl);
+//    console.log(testDivEl);
     executeIntervalTaskForDiv(testDivEl)
 };
 
@@ -129,10 +131,10 @@ function getSelectElForTestDiv(testDivEl) {
     return testDivEl.getElementsByTagName("select")[0];
 };
 
-function getSelectEl() {
-    var testDivEl = document.getElementById("testDiv");
-    return testDiv.getElementsByTagName("select")[0];
-};
+//function getSelectEl() {
+//    var testDivEl = document.getElementById("testDiv");
+//    return testDiv.getElementsByTagName("select")[0];
+//};
 
 
 function onKeyUpSearch() {
@@ -161,8 +163,8 @@ function onKeyUpSearch() {
 
 function onClickResultHandler(resultDivEl) {
     var testDivEl = resultDivEl.closest(".testDiv");
-    console.log("closest ");
-    console.log(testDivEl);
+//    console.log("closest ");
+//    console.log(testDivEl);
 
     var toggleEl = testDivEl.querySelector(".hiddenSelect");
     if (toggleEl.style.display === "block") {
@@ -186,42 +188,46 @@ function hideHiddenSelect(toggleEl) {
 
 function openHiddenSelect(toggleEl) {
     toggleEl.style.display = "block";
-    var searchInputEl = document.getElementById("searchInput");
+    var searchInputEl = toggleEl.querySelector("#searchInput");
     searchInputEl.focus();
-    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+    var generatedUlDivEl = toggleEl.querySelector(".generatedUlDiv");
+    var liList = generatedUlDivEl.getElementsByTagName("li");
     var resultDivEl = document.getElementById("result");
     for (i = 0; i < liList.length; i++) {
         if (liList[i].innerHTML == resultDivEl.innerHTML) {
             focusLi(liList[i]);
-            moveScroll(liList[i].dataset.displayIndex);
+            moveScroll(generatedUlDivEl, liList[i].dataset.displayIndex);
             return;
         }
     }
 };
 
 function onClickListElementHandler(li) {
-    setNameToResult(li.innerHTML);
-    setValueToSelect(li);
-    hideHiddenSelect();
+    var testDivEl = li.closest(".testDiv");
+    setNameToResultFromTestDiv(testDivEl, li.innerHTML);
+    setValueToSelect(testDivEl, li);
+    var toggleEl = testDivEl.querySelector(".hiddenSelect");
+    hideHiddenSelect(toggleEl);
 };
 
 document.onmousedown = function(event) {
     if (!isGeneratedElement(event)) {
+        console.log("should close select");
         hideHiddenSelect();
     }
 };
 
 
-function setValueToSelect(li) {
-    var selectEl = getSelectEl();
+function setValueToSelect(testDivEl, li) {
+    var selectEl = getSelectElForTestDiv(testDivEl);
     selectEl.setAttribute("value", li.dataset.value);
     selectEl.options[li.dataset.index].selected = true;
 };
 
-function setNameToResult(name) {
-    var resultDivEl = document.getElementById("result");
-    resultDivEl.innerHTML = name;
-};
+//function setNameToResult(name) {
+//    var resultDivEl = document.getElementById("result");
+//    resultDivEl.innerHTML = name;
+//};
 
 function isGeneratedElement(event) {
     return (event.target.id == "result"
@@ -233,14 +239,17 @@ function isGeneratedElement(event) {
 document.onkeydown = function(event) {
     var charCode = event.keyCode;
     var focusedTag = document.activeElement.tagName;
-    var toggleEl = document.getElementById("hiddenSelect");
-    if (toggleEl.style.display === "block") {
+    console.log(event.target);
+    var targetInputEl = event.target;
+    var toggleEl = targetInputEl.closest(".hiddenSelect");
+    if (toggleEl != null && toggleEl.style.display === "block") {
+        var generatedUlDivEl = toggleEl.querySelector(".generatedUlDiv");
         if (isPressedDown(charCode)) {
-            selectNextLi();
+            selectNextLi(generatedUlDivEl);
         } else if (isPressedUp(charCode)) {
-            selectPrevLi();
+            selectPrevLi(generatedUlDivEl);
         } else if (isPressedEnter(charCode)) {
-            setCurrentLi();
+            setCurrentLi(generatedUlDivEl);
         }
         preventDefaultForScrollKeys(event);
     }
@@ -277,25 +286,25 @@ function clearFocusLi(li) {
     li.style.color = "#000000";
 };
 
-function selectNextLi() {
+function selectNextLi(ulEl) {
     var currentIndex = (curFocusedLi == null) ? -1 : curFocusedLi.dataset.displayIndex;
     var nextIndex = ++currentIndex;
-    var ulEl = document.getElementById("generatedUl");
+//    var ulEl = document.getElementById("generatedUl");
     var liList = ulEl.getElementsByTagName("li");
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == nextIndex) {
             focusLi(liList[i]);
-            moveScroll(nextIndex);
+            moveScroll(ulEl, nextIndex);
             return;
         }
     }
-    selectFirst(liList);
+    selectFirst(ulEl, liList);
 };
 
 
 // need use liList[i].dataset.displayIndex
-function moveScroll(index) {
-    var ulEl = document.getElementById("generatedUl");
+function moveScroll(ulEl, index) {
+//    var ulEl = document.getElementById("generatedUl");
     var elementsCount = ulEl.dataset.displayElements;
     var liList = ulEl.getElementsByTagName("li");
     if (liList.length > 0 && elementsCount > 0) {
@@ -310,20 +319,21 @@ function moveScroll(index) {
     }
 };
 
-function selectFirst(liList) {
+function selectFirst(ulEl, liList) {
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex != -1) {
             focusLi(liList[i]);
-            moveScroll(liList[i].dataset.displayIndex);
+            moveScroll(ulEl, liList[i].dataset.displayIndex);
             return;
         }
     }
 };
 
-function selectPrevLi() {
-    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
+function selectPrevLi(ulEl) {
+    var liList = ulEl.getElementsByTagName("li");
+//    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
     if (curFocusedLi == null || curFocusedLi.dataset.displayIndex <= 0) {
-        selectLast(liList);
+        selectLast(ulEl, liList);
         return;
     }
     var currentIndex = curFocusedLi.dataset.displayIndex;
@@ -331,24 +341,24 @@ function selectPrevLi() {
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == prevIndex) {
             focusLi(liList[i]);
-            moveScroll(prevIndex);
+            moveScroll(ulEl, prevIndex);
             return;
         }
     }
-    selectLast(liList);
+    selectLast(ulEl, liList);
 };
 
-function selectLast(liList) {
+function selectLast(ulEl, liList) {
     for (i = liList.length - 1; i >= 0; i--) {
         if (liList[i].dataset.displayIndex != -1) {
             focusLi(liList[i]);
-            moveScroll(liList[i].dataset.displayIndex);
+            moveScroll(ulEl, liList[i].dataset.displayIndex);
             return;
         }
     }
 };
 
-function setCurrentLi() {
+function setCurrentLi(ulEl) {
     if (curFocusedLi != null) {
         onClickListElementHandler(curFocusedLi);
     }

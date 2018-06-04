@@ -106,7 +106,7 @@
             top: 15px;
         }
 
-        .generatedUl {
+        #generatedUl {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -115,7 +115,7 @@
             overflow: auto;
         }
 
-        .generatedUl li {
+        #generatedUl li {
             cursor: pointer;
             padding: 0 10px;
         }
