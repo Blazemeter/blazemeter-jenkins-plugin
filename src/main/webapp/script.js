@@ -85,13 +85,10 @@ function getSelectElForTestDiv(testDivEl) {
 };
 
 
-//TODO
 function onKeyUpSearch(searchInputEl) {
-    console.log("onKeyUpSearch");
-    console.log(searchInputEl);
-//    var searchInputEl = document.getElementById("searchInput");
     var text = searchInputEl.value.toLowerCase();
-    var ulEl = document.getElementById("generatedUl");
+    var testDivEl = searchInputEl.closest(".testDiv");
+    var ulEl = testDivEl.querySelector("#generatedUl");
     var liList = ulEl.getElementsByTagName("li");
     var displayIndex = 0;
     for (i = 0; i < liList.length; i++) {
