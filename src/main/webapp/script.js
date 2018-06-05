@@ -53,7 +53,7 @@ function onChangeSelectHandlerForTestDiv(testDiv) {
     generatedUlDivEl.innerHTML = generatedUl;
 
     var searchInputDivEl = testDiv.querySelector(".searchInputDiv");
-    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
 };
 
 // START
@@ -136,9 +136,11 @@ function getSelectElForTestDiv(testDivEl) {
 //    return testDiv.getElementsByTagName("select")[0];
 //};
 
-
-function onKeyUpSearch() {
-    var searchInputEl = document.getElementById("searchInput");
+//TODO
+function onKeyUpSearch(searchInputEl) {
+    console.log("onKeyUpSearch");
+    console.log(searchInputEl);
+//    var searchInputEl = document.getElementById("searchInput");
     var text = searchInputEl.value.toLowerCase();
     var ulEl = document.getElementById("generatedUl");
     var liList = ulEl.getElementsByTagName("li");
@@ -171,7 +173,7 @@ function onClickResultHandler(resultDivEl) {
         hideHiddenSelect(toggleEl);
     } else {
         onChangeSelectHandlerForTestDiv(testDivEl);
-        openHiddenSelect(toggleEl);
+        openHiddenSelect(testDivEl, toggleEl);
         disableScroll();
     }
 };
@@ -186,17 +188,17 @@ function hideHiddenSelect(toggleEl) {
 };
 
 
-function openHiddenSelect(toggleEl) {
+function openHiddenSelect(testDivEl, toggleEl) {
     toggleEl.style.display = "block";
     var searchInputEl = toggleEl.querySelector("#searchInput");
     searchInputEl.focus();
-    var generatedUlDivEl = toggleEl.querySelector(".generatedUlDiv");
-    var liList = generatedUlDivEl.getElementsByTagName("li");
-    var resultDivEl = document.getElementById("result");
+    var generatedUlEl = toggleEl.querySelector("#generatedUl");
+    var liList = generatedUlEl.getElementsByTagName("li");
+    var resultDivEl = testDivEl.querySelector("#result");
     for (i = 0; i < liList.length; i++) {
         if (liList[i].innerHTML == resultDivEl.innerHTML) {
             focusLi(liList[i]);
-            moveScroll(generatedUlDivEl, liList[i].dataset.displayIndex);
+            moveScroll(generatedUlEl, liList[i].dataset.displayIndex);
             return;
         }
     }
@@ -212,7 +214,6 @@ function onClickListElementHandler(li) {
 
 document.onmousedown = function(event) {
     if (!isGeneratedElement(event)) {
-        console.log("should close select");
         var testDivs = getAllTestDivs();
         for (var i = 0; i < testDivs.length; i++) {
             var div = testDivs[i];
@@ -229,10 +230,6 @@ function setValueToSelect(testDivEl, li) {
     selectEl.options[li.dataset.index].selected = true;
 };
 
-//function setNameToResult(name) {
-//    var resultDivEl = document.getElementById("result");
-//    resultDivEl.innerHTML = name;
-//};
 
 function isGeneratedElement(event) {
     return (event.target.id == "result"
@@ -244,17 +241,16 @@ function isGeneratedElement(event) {
 document.onkeydown = function(event) {
     var charCode = event.keyCode;
     var focusedTag = document.activeElement.tagName;
-    console.log(event.target);
     var targetInputEl = event.target;
     var toggleEl = targetInputEl.closest(".hiddenSelect");
     if (toggleEl != null && toggleEl.style.display === "block") {
-        var generatedUlDivEl = toggleEl.querySelector(".generatedUlDiv");
+        var generatedUlEl = toggleEl.querySelector("#generatedUl");
         if (isPressedDown(charCode)) {
-            selectNextLi(generatedUlDivEl);
+            selectNextLi(generatedUlEl);
         } else if (isPressedUp(charCode)) {
-            selectPrevLi(generatedUlDivEl);
+            selectPrevLi(generatedUlEl);
         } else if (isPressedEnter(charCode)) {
-            setCurrentLi(generatedUlDivEl);
+            setCurrentLi(generatedUlEl);
         }
         preventDefaultForScrollKeys(event);
     }
@@ -312,6 +308,7 @@ function moveScroll(ulEl, index) {
 //    var ulEl = document.getElementById("generatedUl");
     var elementsCount = ulEl.dataset.displayElements;
     var liList = ulEl.getElementsByTagName("li");
+    console.log(elementsCount);
     if (liList.length > 0 && elementsCount > 0) {
         var liHeight = parseFloat(window.getComputedStyle(liList[0], null).getPropertyValue("height"));
         var ulHeight = parseFloat(window.getComputedStyle(ulEl, null).getPropertyValue("height"));
