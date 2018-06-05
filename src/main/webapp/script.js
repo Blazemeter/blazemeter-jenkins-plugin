@@ -249,7 +249,7 @@ function moveScroll(ulEl, index) {
     var elementsCount = ulEl.dataset.displayElements;
     var liList = ulEl.getElementsByTagName("li");
     if (liList.length > 0 && elementsCount > 0) {
-        var liHeight = parseFloat(window.getComputedStyle(liList[0], null).getPropertyValue("height"));
+        var liHeight = parseFloat(getLiHeight(liList, index));
         var ulHeight = parseFloat(window.getComputedStyle(ulEl, null).getPropertyValue("height"));
         var median = (ulHeight / liHeight / 2);
         if (index > median) {
@@ -257,6 +257,21 @@ function moveScroll(ulEl, index) {
         } else {
             ulEl.scrollTop = 0;
         }
+    }
+};
+
+function getLiHeight(liList, displayIndex) {
+    for (i = 0; i < liList.length; i++) {
+        if (liList[i].dataset.displayIndex == displayIndex) {
+            return liList[i].clientHeight;
+        }
+    }
+
+    var height = window.getComputedStyle(liList[0], null).getPropertyValue("height");
+    if (height == 'auto') {
+        return 19;
+    } else {
+        return height;
     }
 };
 
