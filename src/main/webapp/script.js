@@ -1,33 +1,6 @@
-//function onChangeSelectHandler1() {
-//    var selectEl = getSelectEl();
-//    var options = selectEl.options;
-//
-//    var generatedUlDivEl = document.getElementById("generatedUlDiv");
-//    var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
-//    for (i = 0; i < options.length; i++) {
-//        generatedUl += '<li class="generatedLi" onclick="onClickListElementHandler(this)" '
-//                    + ' onmouseover="focusLi(this)" onmouseout="clearFocusLi(this)" '
-//                    + 'data-value="' + options[i].value
-//                    + '" data-index="' + i
-//                    + '" data-display-index="' + i
-//                    + '" >' + options[i].label + '</li>';
-//
-//        if (options[i].selected) {
-//            setNameToResult(options[i].label);
-//        }
-//    }
-//    generatedUl += '</ul>';
-//    generatedUlDivEl.innerHTML = generatedUl;
-//
-//    var searchInputDivEl = document.getElementById("searchInputDiv");
-//    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch()" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
-//};
-
 function onChangeSelectHandler(event) {
     var target = event.target;
     var testDivEl = target.closest(".testDiv");
-//    console.log("closest ");
-//    console.log(testDivEl);
     onChangeSelectHandlerForTestDiv(testDivEl);
 };
 
@@ -102,39 +75,15 @@ function getAllTestDivs() {
 
 function executeIntervalTask(selectEl) {
     var builderEl = selectEl.closest("div[descriptorid='hudson.plugins.blazemeter.PerformanceBuilder']");
-//    console.log(builderEl);
-
     var testDivEl = builderEl.querySelector(".testDiv");
-//    console.log(testDivEl);
     executeIntervalTaskForDiv(testDivEl)
 };
 
-//function executeIntervalTask() {
-//    // waiting when init state of original <select> will be changed
-//    var count = 0;
-//    var interval = setInterval(function() {
-//
-//        var resultDivEl = document.getElementById("result");
-//        var prevValue = resultDivEl.innerHTML;
-//
-//        onChangeSelectHandler(); // if <select> element filled it will change 'resultDivEl.innerHTML'
-//        var curValue = resultDivEl.innerHTML;
-//
-//        if ((prevValue != curValue) || (count >= 20)) {
-//            clearInterval(interval);
-//        }
-//        count++;
-//    }, 500);
-//};
 
 function getSelectElForTestDiv(testDivEl) {
     return testDivEl.getElementsByTagName("select")[0];
 };
 
-//function getSelectEl() {
-//    var testDivEl = document.getElementById("testDiv");
-//    return testDiv.getElementsByTagName("select")[0];
-//};
 
 //TODO
 function onKeyUpSearch(searchInputEl) {
@@ -165,9 +114,6 @@ function onKeyUpSearch(searchInputEl) {
 
 function onClickResultHandler(resultDivEl) {
     var testDivEl = resultDivEl.closest(".testDiv");
-//    console.log("closest ");
-//    console.log(testDivEl);
-
     var toggleEl = testDivEl.querySelector(".hiddenSelect");
     if (toggleEl.style.display === "block") {
         hideHiddenSelect(toggleEl);
@@ -179,7 +125,6 @@ function onClickResultHandler(resultDivEl) {
 };
 
 function hideHiddenSelect(toggleEl) {
-//    var toggleEl = document.getElementById("hiddenSelect");
     if (toggleEl != null) {
         toggleEl.style.display = "none";
         curFocusedLi = null;
@@ -290,7 +235,6 @@ function clearFocusLi(li) {
 function selectNextLi(ulEl) {
     var currentIndex = (curFocusedLi == null) ? -1 : curFocusedLi.dataset.displayIndex;
     var nextIndex = ++currentIndex;
-//    var ulEl = document.getElementById("generatedUl");
     var liList = ulEl.getElementsByTagName("li");
     for (i = 0; i < liList.length; i++) {
         if (liList[i].dataset.displayIndex == nextIndex) {
@@ -305,10 +249,8 @@ function selectNextLi(ulEl) {
 
 // need use liList[i].dataset.displayIndex
 function moveScroll(ulEl, index) {
-//    var ulEl = document.getElementById("generatedUl");
     var elementsCount = ulEl.dataset.displayElements;
     var liList = ulEl.getElementsByTagName("li");
-    console.log(elementsCount);
     if (liList.length > 0 && elementsCount > 0) {
         var liHeight = parseFloat(window.getComputedStyle(liList[0], null).getPropertyValue("height"));
         var ulHeight = parseFloat(window.getComputedStyle(ulEl, null).getPropertyValue("height"));
@@ -333,7 +275,6 @@ function selectFirst(ulEl, liList) {
 
 function selectPrevLi(ulEl) {
     var liList = ulEl.getElementsByTagName("li");
-//    var liList = document.getElementById("generatedUl").getElementsByTagName("li");
     if (curFocusedLi == null || curFocusedLi.dataset.displayIndex <= 0) {
         selectLast(ulEl, liList);
         return;
