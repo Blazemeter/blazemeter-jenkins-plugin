@@ -32,10 +32,8 @@ function onChangeSelectHandlerForTestDiv(testDiv) {
 // START
 setTimeout(function() {
     var testDivs = getAllTestDivs();
-    console.log(testDivs);
     for (var i = 0; i < testDivs.length; i++) {
         var div = testDivs[i];
-        console.log(div);
         setNameToResultFromTestDiv(div, getSelectElForTestDiv(div).getAttribute("value"));
         executeIntervalTaskForDiv(div);
     }
@@ -47,7 +45,6 @@ function executeIntervalTaskForDiv(testDiv) {
     // waiting when init state of original <select> will be changed
     var count = 0;
     var interval = setInterval(function() {
-
         var resultDivEl = testDiv.querySelector("#result");
         var prevValue = resultDivEl.innerHTML;
 
@@ -55,9 +52,6 @@ function executeIntervalTaskForDiv(testDiv) {
         var curValue = resultDivEl.innerHTML;
 
         if ((prevValue != curValue) || (count >= 20)) {
-
-            console.log("stop interval");
-
             clearInterval(interval);
         }
         count++;
