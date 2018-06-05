@@ -44,9 +44,14 @@ setTimeout(function() {
 function executeIntervalTaskForDiv(testDiv) {
     // waiting when init state of original <select> will be changed
     var count = 0;
+    var prevValue;
+    var isFirst = true;
     var interval = setInterval(function() {
         var resultDivEl = testDiv.querySelector("#result");
-        var prevValue = resultDivEl.innerHTML;
+        if (isFirst) {
+            prevValue = resultDivEl.innerHTML;
+            isFirst = false;
+        }
 
         onChangeSelectHandlerForTestDiv(testDiv); // if <select> element filled it will change 'resultDivEl.innerHTML'
         var curValue = resultDivEl.innerHTML;
