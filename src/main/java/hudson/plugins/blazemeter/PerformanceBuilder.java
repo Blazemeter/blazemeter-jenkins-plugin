@@ -76,6 +76,11 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private String reportLinkName = "";
 
+    private String mainTestFile = "";
+
+    private String additionalTestFiles = "";
+
+
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
         this.credentialsId = credentialsId;
@@ -224,6 +229,24 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
     @DataBoundSetter
     public void setReportLinkName(String reportLinkName) {
         this.reportLinkName = reportLinkName;
+    }
+
+    public String getAdditionalTestFiles() {
+        return additionalTestFiles;
+    }
+
+    @DataBoundSetter
+    public void setAdditionalTestFiles(String additionalTestFiles) {
+        this.additionalTestFiles = additionalTestFiles;
+    }
+
+    public String getMainTestFile() {
+        return mainTestFile;
+    }
+
+    @DataBoundSetter
+    public void setMainTestFile(String mainTestFile) {
+        this.mainTestFile = mainTestFile;
     }
 
     private boolean validateTestId(TaskListener listener) {
