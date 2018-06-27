@@ -285,7 +285,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
                 envVars, workspace, listener,
                 ProxyConfiguration.load(), !(channel instanceof LocalChannel),
-                envVars.expand(reportLinkName), reportLinkId);
+                envVars.expand(reportLinkName), reportLinkId, mainTestFile, additionalTestFiles);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);
