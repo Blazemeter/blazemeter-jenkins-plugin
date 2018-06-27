@@ -47,6 +47,12 @@
         <f:entry title="${%Path to junit report}:" field="junitPath">
             <f:textbox field="junitPath"></f:textbox>
         </f:entry>
+        <f:entry title="${%Main Test File}:" field="mainTestFile">
+            <f:textbox field="mainTestFile"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Additional Test Files:}" field="additionalTestFiles">
+            <f:textarea name="additionalTestFiles" field="additionalTestFiles"/>
+        </f:entry>
         <f:entry title="${%Notes:}" field="notes">
             <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
         </f:entry>
