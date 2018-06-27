@@ -239,7 +239,9 @@ public class BzmBuild implements Callable<Result, Exception> {
                 FilePath child = workspace.child(path);
                 String remote = child.getRemote();
                 File file = new File(remote);
-                if (!file.exists()) {
+                if (file.exists()) {
+                    result.add(file);
+                } else {
                     logger.println("WARN: Additional test file does not exist: " + remote);
                 }
             }
