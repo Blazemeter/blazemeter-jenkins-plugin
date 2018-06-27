@@ -1,3 +1,8 @@
+#### v4.3 - upcoming
+
+- `FEATURE` - Update test files before running test
+- `FIXED` - Search field in Tests dropdown is broken when you add the second BlazeMeter build step
+
 #### v4.2 - 10.05.2018
 
 - `FEATURE` - Change BlazeMeter report link name. _By default max report link name length = 35, but you can increase this value using Java System property or Jenkins environment variable "bzm.reportLinkName.length"_
