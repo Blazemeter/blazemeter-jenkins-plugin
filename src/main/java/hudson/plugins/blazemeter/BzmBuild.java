@@ -242,7 +242,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 if (file.exists()) {
                     result.add(file);
                 } else {
-                    logger.println("WARN: Additional test file does not exist: " + remote);
+                    listener.error("Additional test file does not exist: " + remote);
+                    throw new RuntimeException("Additional test file does not exist: " + remote);
                 }
             }
         }
