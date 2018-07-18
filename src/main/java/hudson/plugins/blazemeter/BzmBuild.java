@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.Master;
+import com.blazemeter.api.explorer.test.SingleTest;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
@@ -221,7 +222,20 @@ public class BzmBuild implements Callable<Result, Exception> {
                 getAdditionalTestFiles(workspace),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
-                createCiPostProcess(utils, workspace));
+                createCiPostProcess(utils, workspace)) {
+            @Override
+            protected void updateTestFiles() throws IOException {
+                if (currentTest instanceof SingleTest && isSupportTestFiles(currentTest)) {
+                    SingleTest test = (SingleTest) currentTest;
+                    updateMainTestFile(test);
+                    updateAdditionalTestFiles(test);
+                } else {
+                    if ((mainTestFile != null) || (additionalTestFiles != null && !additionalTestFiles.isEmpty())) {
+                        notifier.notifyWarning("Current test does not support uploading script files");
+                    }
+                }
+            }
+        };
     }
 
     private List<File> getAdditionalTestFiles(FilePath workspace) {
@@ -232,7 +246,6 @@ public class BzmBuild implements Callable<Result, Exception> {
 
         String[] paths = additionalFiles.split("\\n");
         List<File> result = new ArrayList<>();
-        PrintStream logger = listener.getLogger();
 
         for (String path : paths) {
             if (StringUtils.isNotBlank(path)) {
