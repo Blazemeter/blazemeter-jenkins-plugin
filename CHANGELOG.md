@@ -2,7 +2,7 @@
 
 - `FEATURE` - Update test files before running test
 
-_Limitations: For Taurus and FunctionalApi tests will set 'Test type': JMeter if file has '.jmx' extension and Taurus - for '.yml' and '.yaml' files. Other 'Test types', please, set in the BlazeMeter application._
+_Limitations: For Taurus and FunctionalApi tests will set 'Test type': JMeter if file has '.jmx' extension and Taurus - for '.yml' and '.yaml' files. Other 'Test types', please, set in the BlazeMeter application. Supported test types: Taurus, FunctionalApi, JMeter_
 
 - `FIXED` - Search field in Tests dropdown is broken when you add the second BlazeMeter build step
 
