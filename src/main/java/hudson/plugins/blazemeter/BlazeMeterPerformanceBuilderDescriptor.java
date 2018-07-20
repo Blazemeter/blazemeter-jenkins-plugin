@@ -101,7 +101,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public FormValidation doCheckMainTestFile(@QueryParameter String value) {
-        if (value.endsWith(".jmx") || value.endsWith(".yml") || value.endsWith(".yaml")) {
+        if (StringUtils.isEmpty(value) || value.endsWith(".jmx") || value.endsWith(".yml") || value.endsWith(".yaml")) {
             return FormValidation.ok();
         } else {
             return FormValidation.warning("Unknown script type. Please, select 'Test type' in BlazeMeter web application");
