@@ -100,6 +100,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return "BlazeMeter";
     }
 
+    public FormValidation doCheckMainTestFile(@QueryParameter String value) {
+        if (value.endsWith(".jmx") || value.endsWith(".yml") || value.endsWith(".yaml")) {
+            return FormValidation.ok();
+        } else {
+            return FormValidation.warning("Unknown script type. Please, select 'Test type' in BlazeMeter web application");
+        }
+    }
+
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String credentialsId,
                                           @QueryParameter("workspaceId") String workspaceId,
                                           @QueryParameter("testId") String testId) throws FormValidation {
