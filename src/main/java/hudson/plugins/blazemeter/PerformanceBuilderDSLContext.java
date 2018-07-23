@@ -37,6 +37,9 @@ public class PerformanceBuilderDSLContext implements Context {
 
     String reportLinkName = "";
 
+    String mainTestFile = "";
+
+    String additionalTestFiles = "";
 
     public void credentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
@@ -78,4 +81,11 @@ public class PerformanceBuilderDSLContext implements Context {
         this.reportLinkName = reportLinkName;
     }
 
+    public void mainTestFile(String mainTestFile) {
+        this.mainTestFile = mainTestFile;
+    }
+
+    public void additionalTestFiles(String additionalTestFiles) {
+        this.additionalTestFiles = additionalTestFiles;
+    }
 }

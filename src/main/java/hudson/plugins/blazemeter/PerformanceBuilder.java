@@ -76,6 +76,11 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private String reportLinkName = "";
 
+    private String mainTestFile = "";
+
+    private String additionalTestFiles = "";
+
+
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
         this.credentialsId = credentialsId;
@@ -226,6 +231,24 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.reportLinkName = reportLinkName;
     }
 
+    public String getAdditionalTestFiles() {
+        return additionalTestFiles;
+    }
+
+    @DataBoundSetter
+    public void setAdditionalTestFiles(String additionalTestFiles) {
+        this.additionalTestFiles = additionalTestFiles;
+    }
+
+    public String getMainTestFile() {
+        return mainTestFile;
+    }
+
+    @DataBoundSetter
+    public void setMainTestFile(String mainTestFile) {
+        this.mainTestFile = mainTestFile;
+    }
+
     private boolean validateTestId(TaskListener listener) {
         if (StringUtils.isBlank(testId)) {
             listener.error(BzmJobNotifier.formatMessage("Please, reconfigure job and select valid credentials and test"));
@@ -262,7 +285,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
                 envVars, workspace, listener,
                 ProxyConfiguration.load(), !(channel instanceof LocalChannel),
-                envVars.expand(reportLinkName), reportLinkId);
+                envVars.expand(reportLinkName), reportLinkId, mainTestFile, additionalTestFiles);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);

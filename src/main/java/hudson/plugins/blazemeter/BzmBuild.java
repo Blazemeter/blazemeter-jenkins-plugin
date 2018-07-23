@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.Master;
+import com.blazemeter.api.explorer.test.SingleTest;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
@@ -25,7 +26,6 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JenkinsCiBuild;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
@@ -36,6 +36,8 @@ import org.jenkinsci.remoting.RoleChecker;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class BzmBuild implements Callable<Result, Exception> {
@@ -57,7 +59,10 @@ public class BzmBuild implements Callable<Result, Exception> {
     private TaskListener listener;
 
     private Master master;
-    private JenkinsCiBuild build;
+    private CiBuild build;
+
+    private String mainTestFile;
+    private String additionalTestFiles;
 
     private boolean isSlave;
     private ProxyConfiguration proxyConfiguration;
@@ -68,7 +73,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     String jobName, String buildId, String serverURL,
                     EnvVars envVars, FilePath workspace, TaskListener listener,
                     ProxyConfiguration proxyConfiguration, boolean isSlave,
-                    String reportLinkName, long reportLinkId) {
+                    String reportLinkName, long reportLinkId, String mainTestFile, String additionalTestFiles) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -84,6 +89,9 @@ public class BzmBuild implements Callable<Result, Exception> {
 
         this.reportLinkName = reportLinkName;
         this.reportLinkId = reportLinkId;
+
+        this.mainTestFile = mainTestFile;
+        this.additionalTestFiles = additionalTestFiles;
     }
 
     @Override
@@ -207,12 +215,69 @@ public class BzmBuild implements Callable<Result, Exception> {
                 new BzmJobLogger(logFile));
     }
 
-    private JenkinsCiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
-        return new JenkinsCiBuild(utils,
+    private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new CiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
+                getMainTestFile(workspace),
+                getAdditionalTestFiles(workspace),
                 envVars.expand(builder.getSessionProperties()),
                 envVars.expand(builder.getNotes()),
-                createCiPostProcess(utils, workspace));
+                createCiPostProcess(utils, workspace)) {
+            @Override
+            protected void updateTestFiles() throws IOException {
+                if (currentTest instanceof SingleTest && isSupportTestFiles(currentTest)) {
+                    SingleTest test = (SingleTest) currentTest;
+                    updateMainTestFile(test);
+                    updateAdditionalTestFiles(test);
+                } else {
+                    if ((mainTestFile != null) || (additionalTestFiles != null && !additionalTestFiles.isEmpty())) {
+                        notifier.notifyWarning("Current test does not support uploading script files");
+                    }
+                }
+            }
+        };
+    }
+
+    private List<File> getAdditionalTestFiles(FilePath workspace) {
+        final String additionalFiles = envVars.expand(additionalTestFiles);
+        if (StringUtils.isBlank(additionalFiles)) {
+            return null;
+        }
+
+        String[] paths = additionalFiles.split("\\n");
+        List<File> result = new ArrayList<>();
+
+        for (String path : paths) {
+            if (StringUtils.isNotBlank(path)) {
+                FilePath child = workspace.child(path);
+                String remote = child.getRemote();
+                File file = new File(remote);
+                if (file.exists()) {
+                    result.add(file);
+                } else {
+                    listener.error("Additional test file does not exist: " + remote);
+                    throw new RuntimeException("Additional test file does not exist: " + remote);
+                }
+            }
+        }
+        return result;
+    }
+
+    private File getMainTestFile(FilePath workspace) {
+        final String path = envVars.expand(mainTestFile);
+        if (StringUtils.isBlank(path)) {
+            return null;
+        }
+
+        FilePath child = workspace.child(path);
+        String remote = child.getRemote();
+        File file = new File(remote);
+        if (!file.exists()) {
+            listener.error("Main test file does not exist: " + remote);
+            throw new RuntimeException("Main test file does not exist: " + remote);
+        }
+
+        return file;
     }
 
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
