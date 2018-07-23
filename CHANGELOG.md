@@ -1,4 +1,4 @@
-#### v4.3 - upcoming
+#### v4.3 - 23.07.2018
 
 - `FEATURE` - Update test files before running test
 
