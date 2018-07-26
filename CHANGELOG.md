@@ -1,4 +1,4 @@
-#### v4.4 - upcoming
+#### v4.4 - 26.07.2018
 
 - `ADDED` - Validation for test files
 
