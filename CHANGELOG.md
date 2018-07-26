@@ -1,3 +1,7 @@
+#### v4.4 - 26.07.2018
+
+- `ADDED` - Validation for test files
+
 #### v4.3 - 23.07.2018
 
 - `FEATURE` - Update test files before running test
