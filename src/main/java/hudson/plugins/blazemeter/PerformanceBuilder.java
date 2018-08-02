@@ -15,6 +15,7 @@
 package hudson.plugins.blazemeter;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -80,6 +81,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private String additionalTestFiles = "";
 
+    private boolean isAbortJob = false;
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -249,6 +251,15 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.mainTestFile = mainTestFile;
     }
 
+    public boolean isAbortJob() {
+        return isAbortJob;
+    }
+
+    @DataBoundSetter
+    public void setAbortJob(boolean abortJob) {
+        isAbortJob = abortJob;
+    }
+
     private boolean validateTestId(TaskListener listener) {
         if (StringUtils.isBlank(testId)) {
             listener.error(BzmJobNotifier.formatMessage("Please, reconfigure job and select valid credentials and test"));
@@ -295,6 +306,9 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         try {
             Result result = channel.call(bzmBuild);
             run.setResult(result);
+            if (isAbortJob && result.equals(Result.FAILURE)) {
+                throw new AbortException("BlazeMeter test execution failed");
+            }
         } catch (InterruptedException e) {
             LOGGER.warning("Build has been aborted");
             // start new task for wait Slave
@@ -306,7 +320,11 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             listener.getLogger().println(BzmJobNotifier.formatMessage("Failure with exception: " + e.getMessage()));
             e.printStackTrace(listener.getLogger());
             run.setResult(Result.FAILURE);
+            if (isAbortJob) {
+                throw new AbortException("BlazeMeter test execution failed");
+            }
         } finally {
+            listener.error("finally before exit");
             reportUrlTask.cancel();
             timer.cancel();
             timer.purge();
