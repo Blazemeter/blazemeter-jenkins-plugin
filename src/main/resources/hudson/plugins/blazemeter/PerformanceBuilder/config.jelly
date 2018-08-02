@@ -59,6 +59,9 @@
         <f:entry title="${%Session properties}:" field="sessionProperties" description="${%SessionProperties}">
             <f:textbox field="sessionProperties"></f:textbox>
         </f:entry>
+        <f:entry title="${%Abort job if has fails}:" field="isAbortJob">
+             <f:checkbox/>
+        </f:entry>
         <f:entry title="${%Report link name}:" field="reportLinkName">
             <f:textbox field="reportLinkName"></f:textbox>
         </f:entry>

@@ -1,3 +1,7 @@
+#### v4.5 (coming soon)
+
+- `ADDED` - Abort job if BlazeMeter has fails
+
 #### v4.4 - 26.07.2018
 
 - `ADDED` - Validation for test files

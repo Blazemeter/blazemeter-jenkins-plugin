@@ -41,6 +41,8 @@ public class PerformanceBuilderDSLContext implements Context {
 
     String additionalTestFiles = "";
 
+    boolean isAbortJob = false;
+
     public void credentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
     }
@@ -87,5 +89,9 @@ public class PerformanceBuilderDSLContext implements Context {
 
     public void additionalTestFiles(String additionalTestFiles) {
         this.additionalTestFiles = additionalTestFiles;
+    }
+
+    public void isAbortJob(boolean abortJob) {
+        isAbortJob = abortJob;
     }
 }
