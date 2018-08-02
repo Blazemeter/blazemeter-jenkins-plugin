@@ -81,7 +81,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private String additionalTestFiles = "";
 
-    private boolean isAbortJob = false;
+    private boolean abortJob = false;
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -251,13 +251,13 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.mainTestFile = mainTestFile;
     }
 
-    public boolean isAbortJob() {
-        return isAbortJob;
+    public boolean getAbortJob() {
+        return abortJob;
     }
 
     @DataBoundSetter
     public void setAbortJob(boolean abortJob) {
-        isAbortJob = abortJob;
+        this.abortJob = abortJob;
     }
 
     private boolean validateTestId(TaskListener listener) {
@@ -303,12 +303,10 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(reportUrlTask, 20 * 1000, 10 * 1000);
+        Result result = Result.SUCCESS;
         try {
-            Result result = channel.call(bzmBuild);
+            result = channel.call(bzmBuild);
             run.setResult(result);
-            if (isAbortJob && result.equals(Result.FAILURE)) {
-                throw new AbortException("BlazeMeter test execution failed");
-            }
         } catch (InterruptedException e) {
             LOGGER.warning("Build has been aborted");
             // start new task for wait Slave
@@ -316,18 +314,19 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
             interrupt.start();
             interrupt.join();
             run.setResult(Result.ABORTED);
+            result = Result.ABORTED;
         } catch (Exception e) {
             listener.getLogger().println(BzmJobNotifier.formatMessage("Failure with exception: " + e.getMessage()));
             e.printStackTrace(listener.getLogger());
             run.setResult(Result.FAILURE);
-            if (isAbortJob) {
-                throw new AbortException("BlazeMeter test execution failed");
-            }
+            result = Result.FAILURE;
         } finally {
-            listener.error("finally before exit");
             reportUrlTask.cancel();
             timer.cancel();
             timer.purge();
+        }
+        if (abortJob && result.equals(Result.FAILURE)) {
+            throw new AbortException("BlazeMeter test execution failed");
         }
     }
 
