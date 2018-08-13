@@ -123,8 +123,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 return Result.ABORTED;
             } catch (Exception e) {
                 utils.getLogger().warn("Caught exception while waiting for build", e);
-                logger.println(BzmJobNotifier.formatMessage("Caught exception " + e.getMessage()));
-                return Result.FAILURE;
+                logger.println(BzmJobNotifier.formatMessage("Caught exception: " + e.getMessage()));
+                return e.getMessage().contains("Not enough available resources") ? Result.UNSTABLE : Result.FAILURE;
             }
 
             BuildResult buildResult = build.doPostProcess(master);
