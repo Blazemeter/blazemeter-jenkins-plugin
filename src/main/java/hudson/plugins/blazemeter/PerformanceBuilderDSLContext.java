@@ -92,6 +92,6 @@ public class PerformanceBuilderDSLContext implements Context {
     }
 
     public void abortJob(boolean abortJob) {
-        abortJob = abortJob;
+        this.abortJob = abortJob;
     }
 }
