@@ -1,4 +1,4 @@
-#### v4.5 (coming soon)
+#### v4.5 - 15.08.2018
 
 - `ADDED` - Abort job if BlazeMeter has fails
 - `CHANGES` - Mark build as unstable if got error: "Not enough available resources"
