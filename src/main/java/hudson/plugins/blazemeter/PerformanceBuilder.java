@@ -286,6 +286,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         }
 
         String serverUrlConfig = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getBlazeMeterURL();
+        boolean isUnstableIfNotStarted = BlazeMeterPerformanceBuilderDescriptor.getDescriptor().getIsUnstableIfNotStarted();
         String jobName = run.getFullDisplayName();
         VirtualChannel channel = launcher.getChannel();
 
@@ -296,7 +297,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                 jobName, run.getId(), StringUtils.isBlank(serverUrlConfig) ? Constants.A_BLAZEMETER_COM : serverUrlConfig,
                 envVars, workspace, listener,
                 ProxyConfiguration.load(), !(channel instanceof LocalChannel),
-                envVars.expand(reportLinkName), reportLinkId, mainTestFile, additionalTestFiles);
+                envVars.expand(reportLinkName), reportLinkId, mainTestFile, additionalTestFiles, isUnstableIfNotStarted);
 
 
         ReportUrlTask reportUrlTask = new ReportUrlTask(run, jobName, channel, reportLinkId);
