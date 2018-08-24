@@ -67,7 +67,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     private ProxyConfiguration proxyConfiguration;
     private long reportLinkId;
     private String reportLinkName;
-    private boolean isUnstableIfNotStarted;
+    private boolean isUnstableIfHasFails;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
@@ -75,7 +75,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     ProxyConfiguration proxyConfiguration, boolean isSlave,
                     String reportLinkName, long reportLinkId,
                     String mainTestFile, String additionalTestFiles,
-                    boolean isUnstableIfNotStarted) {
+                    boolean isUnstableIfHasFails) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -94,7 +94,7 @@ public class BzmBuild implements Callable<Result, Exception> {
 
         this.mainTestFile = mainTestFile;
         this.additionalTestFiles = additionalTestFiles;
-        this.isUnstableIfNotStarted = isUnstableIfNotStarted;
+        this.isUnstableIfHasFails = isUnstableIfHasFails;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     build.waitForFinish(master);
                 } else {
                     listener.error(BzmJobNotifier.formatMessage("Failed to start test"));
-                    return isUnstableIfNotStarted ? Result.UNSTABLE : Result.FAILURE;
+                    return isUnstableIfHasFails ? Result.UNSTABLE : Result.FAILURE;
                 }
             } catch (InterruptedException e) {
                 EnvVars.masterEnvVars.put("isInterrupted-" + jobName + "-" + buildId, "false");
@@ -132,7 +132,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     utils.getLogger().warn("Caught exception while waiting for build", e);
                     logger.println(BzmJobNotifier.formatMessage("Caught exception: " + e.getMessage()));
                 }
-                return  isUnstableIfNotStarted ? Result.UNSTABLE : Result.FAILURE;
+                return  isUnstableIfHasFails ? Result.UNSTABLE : Result.FAILURE;
             }
 
             BuildResult buildResult = build.doPostProcess(master);
