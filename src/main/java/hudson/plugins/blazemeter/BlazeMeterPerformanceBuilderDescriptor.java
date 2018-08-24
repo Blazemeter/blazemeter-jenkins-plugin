@@ -68,7 +68,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
     private String CHECK_CREDENTIALS_PROXY = "Check credentials, proxy settings";
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
-    private boolean isUnstableIfNotStarted = false;
+    private boolean isUnstableIfHasFails = false;
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
@@ -87,11 +87,11 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
     }
 
-    public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL, boolean isUnstableIfNotStarted) {
+    public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL, boolean isUnstableIfHasFails) {
         super(PerformanceBuilder.class);
         this.load();
         this.blazeMeterURL = blazeMeterURL;
-        this.isUnstableIfNotStarted = isUnstableIfNotStarted;
+        this.isUnstableIfHasFails = isUnstableIfHasFails;
         BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
     }
 
@@ -321,7 +321,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     public boolean configure(StaplerRequest req, JSONObject formData) throws Descriptor.FormException {
         String blazeMeterURL = formData.optString("blazeMeterURL");
         this.blazeMeterURL = blazeMeterURL.isEmpty() ? Constants.A_BLAZEMETER_COM : blazeMeterURL;
-        this.isUnstableIfNotStarted = formData.optBoolean("isUnstableIfNotStarted");
+        this.isUnstableIfHasFails = formData.optBoolean("isUnstableIfHasFails");
         this.save();
         return true;
     }
@@ -373,12 +373,12 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.blazeMeterURL = blazeMeterURL;
     }
 
-    public boolean getIsUnstableIfNotStarted() {
-        return isUnstableIfNotStarted;
+    public boolean getIsUnstableIfHasFails() {
+        return isUnstableIfHasFails;
     }
 
-    public void setIsUnstableIfNotStarted(boolean isUnstableIfNotStarted) {
-        this.isUnstableIfNotStarted = isUnstableIfNotStarted;
+    public void setIsUnstableIfHasFails(boolean isUnstableIfHasFails) {
+        this.isUnstableIfHasFails = isUnstableIfHasFails;
     }
 }
 
