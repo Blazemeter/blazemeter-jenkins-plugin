@@ -23,9 +23,8 @@ import hudson.FilePath;
 import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
-import hudson.plugins.blazemeter.utils.JenkinsCiBuild;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
@@ -59,7 +58,7 @@ public class BzmBuild implements Callable<Result, Exception> {
     private TaskListener listener;
 
     private Master master;
-    private JenkinsCiBuild build;
+    private CiBuild build;
 
     private String mainTestFile;
     private String additionalTestFiles;
@@ -110,7 +109,6 @@ public class BzmBuild implements Callable<Result, Exception> {
             try {
                 master = build.start();
                 if (master != null) {
-                    build.uploadPropertiesAndNotes(master);
                     String runId = jobName + "-" + buildId + "-" + reportLinkId;
                     EnvVars.masterEnvVars.put(runId, master.getId());
                     EnvVars.masterEnvVars.put(runId + "-" + master.getId(), build.getPublicReport());
@@ -130,12 +128,11 @@ public class BzmBuild implements Callable<Result, Exception> {
                 if (master == null) {
                     utils.getLogger().warn("Failed to start BlazeMeter test", e);
                     logger.println(BzmJobNotifier.formatMessage("Failed to start BlazeMeter test: " + e.getMessage()));
-                    return  isUnstableIfNotStarted ? Result.UNSTABLE : Result.FAILURE;
                 } else {
                     utils.getLogger().warn("Caught exception while waiting for build", e);
                     logger.println(BzmJobNotifier.formatMessage("Caught exception: " + e.getMessage()));
-                    return e.getMessage().contains("Not enough available resources") ? Result.UNSTABLE : Result.FAILURE;
                 }
+                return  isUnstableIfNotStarted ? Result.UNSTABLE : Result.FAILURE;
             }
 
             BuildResult buildResult = build.doPostProcess(master);
@@ -226,8 +223,8 @@ public class BzmBuild implements Callable<Result, Exception> {
                 new BzmJobLogger(logFile));
     }
 
-    private JenkinsCiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
-        return new JenkinsCiBuild(utils,
+    private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
+        return new CiBuild(utils,
                 Utils.getTestId(builder.getTestId()),
                 getMainTestFile(workspace),
                 getAdditionalTestFiles(workspace),
