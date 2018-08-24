@@ -47,10 +47,9 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         String serverUrl = desc.getBlazeMeterURL();
         try {
             BlazemeterCredentialsBAImpl credential = Utils.findCredentials(c.credentialsId, CredentialsScope.GLOBAL);
-            JenkinsBlazeMeterUtils bzmUtils = null;
             if (!StringUtils.isBlank(credential.getId())) {
                 logger.info("Credentials with id = " + c.credentialsId + " are present in credentials.");
-                bzmUtils = new JenkinsBlazeMeterUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
+                JenkinsBlazeMeterUtils bzmUtils = new JenkinsBlazeMeterUtils(credential.getUsername(), credential.getPassword().getPlainText(), serverUrl, notifier, logger);
                 User user = null;
                 try {
                     user = User.getUser(bzmUtils);

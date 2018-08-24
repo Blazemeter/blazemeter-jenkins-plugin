@@ -22,5 +22,8 @@
         <f:entry title="${%Server URL}" field="blazeMeterURL">
             <f:textbox style="width:20em;"/>
         </f:entry>
+        <f:entry title="${%Mark build as UNSTABLE if BlazeMeter does not respond with pass or fail}" field="isUnstableIfNotStarted">
+             <f:checkbox/>
+        </f:entry>
     </f:section>
 </j:jelly>
