@@ -29,6 +29,7 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
 
@@ -278,7 +279,15 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
-                workspace.getRemote(), utils);
+                workspace.getRemote(), utils) {
+
+            public boolean isErrorsFailed(JSONArray errors) {
+                if (isUnstableIfHasFails) {
+                    return false;
+                }
+                return super.isErrorsFailed(errors);
+            }
+        };
     }
 
     @Override
