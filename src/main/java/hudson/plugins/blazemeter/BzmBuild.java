@@ -15,7 +15,6 @@
 package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.Master;
-import com.blazemeter.api.explorer.test.SingleTest;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
@@ -24,12 +23,13 @@ import hudson.FilePath;
 import hudson.ProxyConfiguration;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Constants;
+import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
 
@@ -68,12 +68,15 @@ public class BzmBuild implements Callable<Result, Exception> {
     private ProxyConfiguration proxyConfiguration;
     private long reportLinkId;
     private String reportLinkName;
+    private boolean isUnstableIfHasFails;
 
     public BzmBuild(PerformanceBuilder builder, String apiId, String apiSecret,
                     String jobName, String buildId, String serverURL,
                     EnvVars envVars, FilePath workspace, TaskListener listener,
                     ProxyConfiguration proxyConfiguration, boolean isSlave,
-                    String reportLinkName, long reportLinkId, String mainTestFile, String additionalTestFiles) {
+                    String reportLinkName, long reportLinkId,
+                    String mainTestFile, String additionalTestFiles,
+                    boolean isUnstableIfHasFails) {
         this.builder = builder;
         this.apiId = apiId;
         this.apiSecret = apiSecret;
@@ -92,6 +95,7 @@ public class BzmBuild implements Callable<Result, Exception> {
 
         this.mainTestFile = mainTestFile;
         this.additionalTestFiles = additionalTestFiles;
+        this.isUnstableIfHasFails = isUnstableIfHasFails;
     }
 
     @Override
@@ -113,7 +117,7 @@ public class BzmBuild implements Callable<Result, Exception> {
                     build.waitForFinish(master);
                 } else {
                     listener.error(BzmJobNotifier.formatMessage("Failed to start test"));
-                    return Result.FAILURE;
+                    return isUnstableIfHasFails ? Result.UNSTABLE : Result.FAILURE;
                 }
             } catch (InterruptedException e) {
                 EnvVars.masterEnvVars.put("isInterrupted-" + jobName + "-" + buildId, "false");
@@ -122,9 +126,14 @@ public class BzmBuild implements Callable<Result, Exception> {
                 EnvVars.masterEnvVars.put("isInterrupted-" + jobName + "-" + buildId, "true");
                 return Result.ABORTED;
             } catch (Exception e) {
-                utils.getLogger().warn("Caught exception while waiting for build", e);
-                logger.println(BzmJobNotifier.formatMessage("Caught exception: " + e.getMessage()));
-                return e.getMessage().contains("Not enough available resources") ? Result.UNSTABLE : Result.FAILURE;
+                if (master == null) {
+                    utils.getLogger().warn("Failed to start BlazeMeter test", e);
+                    logger.println(BzmJobNotifier.formatMessage("Failed to start BlazeMeter test: " + e.getMessage()));
+                } else {
+                    utils.getLogger().warn("Caught exception while waiting for build", e);
+                    logger.println(BzmJobNotifier.formatMessage("Caught exception: " + e.getMessage()));
+                }
+                return  isUnstableIfHasFails ? Result.UNSTABLE : Result.FAILURE;
             }
 
             BuildResult buildResult = build.doPostProcess(master);
@@ -270,7 +279,15 @@ public class BzmBuild implements Callable<Result, Exception> {
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
         return new CiPostProcess(builder.isGetJtl(), builder.isGetJunit(),
                 envVars.expand(builder.getJtlPath()), envVars.expand(builder.getJunitPath()),
-                workspace.getRemote(), utils);
+                workspace.getRemote(), utils) {
+
+            public boolean isErrorsFailed(JSONArray errors) {
+                if (isUnstableIfHasFails) {
+                    return false;
+                }
+                return super.isErrorsFailed(errors);
+            }
+        };
     }
 
     @Override

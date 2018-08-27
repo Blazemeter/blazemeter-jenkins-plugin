@@ -1,3 +1,14 @@
+#### v4.6 - 27.08.2018
+
+- `ADDED` - Mark build as UNSTABLE if BlazeMeter does not respond with pass or fail (Manage Jenkins -> Configure System -> BlazeMeter Cloud).
+
+_If this setting is disabled then build will be marked as FAILED in case BlazeMeter does not respond with pass or fail. If test was not started and this setting is enabled then build will be marked as UNSTABLE_
+
+- `FIXED`: Retry Interceptor. Use Java property `bzm.request.retries.count` for config retries count (by default it is 3).
+
+_Will retry only `GET` requests in case if response code was not 2** or was throw `SocketTimeoutException`_
+
+
 #### v4.5 - 15.08.2018
 
 - `ADDED` - Abort job if BlazeMeter has fails
