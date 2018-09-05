@@ -15,7 +15,7 @@
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>4.7-SNAPSHOT-${jenkins.build.number}</version>
+    <version>4.6-SNAPSHOT-${jenkins.build.number}</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
