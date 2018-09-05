@@ -13,6 +13,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
     -->
+    <f:block>
+    <j:if test="${descriptor.hasUpdates()}">
+         <label class="warning">A new version of BlazeMeter's Jenkins plugin is available. Please got to <a href="/pluginManager">plugin manager page</a> to update</label>
+    </j:if>
+    </f:block>
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
         <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
     </f:entry>

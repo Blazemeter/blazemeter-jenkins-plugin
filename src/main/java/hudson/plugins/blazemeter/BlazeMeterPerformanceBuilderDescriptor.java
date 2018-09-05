@@ -24,6 +24,7 @@ import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
+import hudson.Plugin;
 import hudson.ProxyConfiguration;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
@@ -107,6 +108,17 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     @Override
     public String getDisplayName() {
         return "BlazeMeter";
+    }
+
+    public static boolean hasUpdates() {
+        Jenkins instance = Jenkins.getInstance();
+        if (instance != null) {
+            Plugin blazeMeterJenkinsPlugin = instance.getPlugin("BlazeMeterJenkinsPlugin");
+            if (blazeMeterJenkinsPlugin != null) {
+                return blazeMeterJenkinsPlugin.getWrapper().hasUpdate();
+            }
+        }
+        return false;
     }
 
     public FormValidation doCheckMainTestFile(@QueryParameter String value) {

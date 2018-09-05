@@ -271,6 +271,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     @Override
     public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+        checkUpdates(listener);
 
         if (!validateTestId(listener)) {
             run.setResult(Result.FAILURE);
@@ -329,6 +330,18 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         if (abortJob && result.equals(Result.FAILURE)) {
             throw new AbortException("BlazeMeter test execution failed");
         }
+    }
+
+    private void checkUpdates(TaskListener listener) {
+        if (BlazeMeterPerformanceBuilderDescriptor.hasUpdates()) {
+            listener.getLogger().print(BzmJobNotifier.formatMessage("A new version of BlazeMeter's Jenkins plugin is available. Please got to "));
+            try {
+                listener.hyperlink("/pluginManager", "plugin manager page");
+            } catch (IOException e) {
+                listener.getLogger().print("plugin manager page");
+            }
+            listener.getLogger().println(" to update");
+         }
     }
 
     private boolean validateCredentials(BlazemeterCredentials credential) {

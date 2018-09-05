@@ -1,3 +1,7 @@
+#### v4.7 - upcoming
+
+- `ADDED` - upgrade notifications
+
 #### v4.6 - 27.08.2018
 
 - `ADDED` - Mark build as UNSTABLE if BlazeMeter does not respond with pass or fail (Manage Jenkins -> Configure System -> BlazeMeter Cloud).
