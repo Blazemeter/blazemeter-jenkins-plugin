@@ -40,7 +40,7 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
     }
 
     public String getIconFileName() {
-        return "graph.gif";
+        return "/plugin/BlazeMeterJenkinsPlugin/blazemeterLogo.png";
     }
 
     public String getUrlName() {
