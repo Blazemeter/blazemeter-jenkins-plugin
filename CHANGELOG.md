@@ -1,4 +1,4 @@
-#### v4.7 - upcoming
+#### v4.7 - 29.10.2018
 
 - `ADDED` - upgrade notifications
 - `ADDED` - BlazeMeter logo to Report link
