@@ -14,82 +14,64 @@
 
 package hudson.plugins.blazemeter.utils.logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.FileHandler;
+import com.blazemeter.api.logging.impl.FileLogger;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
-public class BzmJobLogger implements com.blazemeter.api.logging.Logger {
+public class BzmJobLogger extends FileLogger {
 
-    private Logger logger = Logger.getLogger(BzmJobLogger.class.getName());
-    private Logger fileLogger;
-    private FileHandler fileHandler;
+    private Logger jenkinsLogger = Logger.getLogger(BzmJobLogger.class.getName());
 
     public BzmJobLogger(String logFile) {
-        File f = new File(logFile);
-        this.fileLogger = Logger.getLogger(f.getName());
-        try {
-            fileHandler = new FileHandler(logFile);
-        } catch (IOException ex) {
-            throw new RuntimeException("Cannot create file handler for log file", ex);
-        }
-        fileHandler.setFormatter(new SimpleFormatter());
-        fileLogger.addHandler(fileHandler);
-        fileLogger.setUseParentHandlers(false);
-        fileLogger.setLevel(Level.FINE);
-    }
-
-    public void close() {
-        fileHandler.close();
+        super(logFile);
     }
 
     @Override
     public void debug(String s) {
-        logger.log(Level.FINE, s);
-        fileLogger.log(Level.FINE, s);
+        super.debug(s);
+        jenkinsLogger.log(Level.FINE, s);
     }
 
     @Override
     public void debug(String s, Throwable throwable) {
-        logger.log(Level.FINE, s, throwable);
-        fileLogger.log(Level.FINE, s, throwable);
+        super.debug(s, throwable);
+        jenkinsLogger.log(Level.FINE, s, throwable);
     }
 
     @Override
     public void info(String s) {
-        logger.log(Level.INFO, s);
-        fileLogger.log(Level.INFO, s);
+        super.info(s);
+        jenkinsLogger.log(Level.INFO, s);
     }
 
     @Override
     public void info(String s, Throwable throwable) {
-        logger.log(Level.INFO, s, throwable);
-        fileLogger.log(Level.INFO, s, throwable);
+        super.info(s, throwable);
+        jenkinsLogger.log(Level.INFO, s, throwable);
     }
 
     @Override
     public void warn(String s) {
-        logger.log(Level.WARNING, s);
-        fileLogger.log(Level.WARNING, s);
+        super.warn(s);
+        jenkinsLogger.log(Level.WARNING, s);
     }
 
     @Override
     public void warn(String s, Throwable throwable) {
-        logger.log(Level.WARNING, s, throwable);
-        fileLogger.log(Level.WARNING, s, throwable);
+        super.warn(s, throwable);
+        jenkinsLogger.log(Level.WARNING, s, throwable);
     }
 
     @Override
     public void error(String s) {
-        logger.log(Level.SEVERE, s);
-        fileLogger.log(Level.SEVERE, s);
+        super.error(s);
+        jenkinsLogger.log(Level.SEVERE, s);
     }
 
     @Override
     public void error(String s, Throwable throwable) {
-        logger.log(Level.SEVERE, s, throwable);
-        fileLogger.log(Level.SEVERE, s, throwable);
+        super.error(s, throwable);
+        jenkinsLogger.log(Level.SEVERE, s, throwable);
     }
 }
