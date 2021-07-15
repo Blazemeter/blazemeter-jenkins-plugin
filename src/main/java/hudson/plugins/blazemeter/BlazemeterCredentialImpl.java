@@ -63,7 +63,6 @@ public class BlazemeterCredentialImpl extends BaseCredentials implements Standar
             return Messages.BlazemeterLegacyCredential_DisplayName();
         }
 
-        @Override
         public ListBoxModel doFillScopeItems() {
             ListBoxModel m = new ListBoxModel();
             m.add(CredentialsScope.GLOBAL.getDisplayName(), CredentialsScope.GLOBAL.toString());
