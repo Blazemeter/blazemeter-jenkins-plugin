@@ -1,3 +1,7 @@
+###  v4.8 - 15.07.2021
+
+- `FIXED` - Fixed Functional GUI test shows always success even though failed
+
 #### v4.7 - 29.10.2018
 
 - `ADDED` - upgrade notifications
