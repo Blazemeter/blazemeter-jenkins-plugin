@@ -15,8 +15,7 @@
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-
-    <version>4.8</version>
+    <version>4.10</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -39,8 +38,8 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-      <tag>BlazeMeterJenkinsPlugin-4.8</tag>
-  </scm>
+        <tag> BlazeMeterJenkinsPlugin-4.10</tag>
+    </scm>
 
     <licenses>
         <license>
@@ -65,7 +64,7 @@
         <dependency>
             <groupId>com.blazemeter</groupId>
             <artifactId>blazemeter-api-client</artifactId>
-            <version>1.15</version>
+            <version>1.16</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>

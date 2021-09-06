@@ -14,6 +14,7 @@
 package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.User;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
@@ -24,8 +25,11 @@ import hudson.Util;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+
+import java.util.Objects;
 
 @SuppressWarnings("unused") // read resolved by extension plugins
 public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials implements BlazemeterCredentials, StandardUsernamePasswordCredentials {
@@ -100,13 +104,34 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
             return "icon-credentials-userpass";
         }
 
+        public Boolean getAdministerStatus() {
+            return Objects.requireNonNull(Jenkins.getInstance()).hasPermission(Jenkins.ADMINISTER);
+        }
+
+        public Boolean getManageCredentialsStatus() {
+            Jenkins jenkins = Objects.requireNonNull(Jenkins.getInstance());
+            return jenkins.hasPermission(CredentialsProvider.CREATE) ||
+                    jenkins.hasPermission(CredentialsProvider.UPDATE) ||
+                    jenkins.hasPermission(CredentialsProvider.DELETE) ||
+                    jenkins.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
+                    jenkins.hasPermission(CredentialsProvider.VIEW);
+        }
+
+        public Boolean isPrivilegedUser() {
+            return getAdministerStatus() || getManageCredentialsStatus();
+        }
+
         public FormValidation doValidate(@QueryParameter("username") final String username,
                                          @QueryParameter("password") final String password) {
             String decryptedPassword = Secret.fromString(password).getPlainText();
             try {
-                JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
-                User.getUser(utils);
-                return FormValidation.ok("Successfully validated credentials.");
+                if (isPrivilegedUser()) {
+                    JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
+                    User.getUser(utils);
+                    return FormValidation.ok("Successfully validated credentials.");
+                } else {
+                    return FormValidation.error("You don't have required privileges to add/update credentials.");
+                }
             } catch (Exception e) {
                 return FormValidation.error(e.getMessage());
             }

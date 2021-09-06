@@ -108,6 +108,7 @@ public class BzmBuild implements Callable<Result, Exception> {
         try {
             build = createCiBuild(utils, wsp);
             try {
+                build.setWorkspaceId(builder.getWorkspaceId());
                 master = build.start();
                 if (master != null) {
                     String runId = jobName + "-" + buildId + "-" + reportLinkId;

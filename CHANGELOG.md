@@ -1,3 +1,13 @@
+
+### v4.10 - 06.09.2021
+
+- `FIXED` - fixed public report url issue for functional GUI
+
+
+### v4.9 - 18.08.2021
+
+- `FIXED` - Only administer user and manage credentials user can add/update blazemeter credentials
+
 ###  v4.8 - 15.07.2021
 
 - `FIXED` - Fixed Functional GUI test shows always success even though failed
