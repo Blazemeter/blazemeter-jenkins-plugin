@@ -116,9 +116,18 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
                     jenkins.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
                     jenkins.hasPermission(CredentialsProvider.VIEW);
         }
+        
+        public Boolean getProjectLevelCredentialsStatus() {
+            hudson.model.User currentUser = Objects.requireNonNull(hudson.model.User.current());
+            return currentUser.hasPermission(CredentialsProvider.CREATE) ||
+                    currentUser.hasPermission(CredentialsProvider.UPDATE) ||
+                    currentUser.hasPermission(CredentialsProvider.DELETE) ||
+                    currentUser.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
+                    currentUser.hasPermission(CredentialsProvider.VIEW);
+        }
 
         public Boolean isPrivilegedUser() {
-            return getAdministerStatus() || getManageCredentialsStatus();
+            return getAdministerStatus() || getManageCredentialsStatus() || getProjectLevelCredentialsStatus();
         }
 
         public FormValidation doValidate(@QueryParameter("username") final String username,
