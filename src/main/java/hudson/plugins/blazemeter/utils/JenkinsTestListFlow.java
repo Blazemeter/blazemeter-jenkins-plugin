@@ -37,6 +37,7 @@ public class JenkinsTestListFlow extends TestsListFlow {
         List<AbstractTest> tests = new ArrayList<>();
         tests.addAll(workspace.getSingleTests(limit, "name"));
         tests.addAll(workspace.getMultiTests(limit, "name"));
+        tests.addAll(workspace.getTestSuite(limit, "name"));
         return tests;
     }
 
