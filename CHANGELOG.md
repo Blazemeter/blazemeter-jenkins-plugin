@@ -1,3 +1,6 @@
+### v4.12 - 03-03-2022
+
+- `ADDED` - Added functional test suite feature
 
 ### v4.11 - 07.10.2021
 
