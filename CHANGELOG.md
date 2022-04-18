@@ -1,3 +1,7 @@
+### v4.15 - 18-04-2022
+
+- `FIXED` - Fixed proxy configuration issue
+
 ### v4.14 - 10-03-2022
 
 - `FIXED` - Fixed functional test suite feature video bug
