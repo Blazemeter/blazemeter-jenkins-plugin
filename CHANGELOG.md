@@ -1,3 +1,8 @@
+### v4.16 - 12-05-2022
+
+- `ADDED` - Added No data/ Not set Condition
+- `ADDED` - Added master id as a environment variables
+
 ### v4.15 - 18-04-2022
 
 - `FIXED` - Fixed proxy configuration issue
