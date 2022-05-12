@@ -29,6 +29,11 @@ import hudson.plugins.blazemeter.utils.Utils;
 import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
 import hudson.remoting.Callable;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
+import hudson.util.DescribableList;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
@@ -113,6 +118,10 @@ public class BzmBuild implements Callable<Result, Exception> {
                 if (master != null) {
                     String runId = jobName + "-" + buildId + "-" + reportLinkId;
                     EnvVars.masterEnvVars.put(runId, master.getId());
+
+                    // set master id as a Environment variable
+                    createGlobalEnvironmentVariables("masterId",master.getId());
+
                     EnvVars.masterEnvVars.put(runId + "-" + master.getId(), build.getPublicReport());
                     putLinkName(runId);
                     build.waitForFinish(master);
@@ -298,5 +307,24 @@ public class BzmBuild implements Callable<Result, Exception> {
 
     public CiBuild getBuild() {
         return build;
+    }
+    public void createGlobalEnvironmentVariables(String key, String value) throws IOException {
+        Jenkins instance = Jenkins.getInstance();
+
+        DescribableList<NodeProperty<?>, NodePropertyDescriptor> globalNodeProperties = instance.getGlobalNodeProperties();
+        List<EnvironmentVariablesNodeProperty> envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodeProperty.class);
+
+        EnvironmentVariablesNodeProperty newEnvVarsNodeProperty = null;
+        EnvVars envVars = null;
+
+        if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
+            newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
+            globalNodeProperties.add(newEnvVarsNodeProperty);
+            envVars = newEnvVarsNodeProperty.getEnvVars();
+        } else {
+            envVars = envVarsNodePropertyList.get(0).getEnvVars();
+        }
+        envVars.put(key, value);
+        instance.save();
     }
 }
