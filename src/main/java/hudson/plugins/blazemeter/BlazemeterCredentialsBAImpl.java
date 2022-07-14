@@ -22,14 +22,15 @@ import javax.annotation.CheckForNull;
 import javax.validation.constraints.NotNull;
 import hudson.Extension;
 import hudson.Util;
+import hudson.model.ModelObject;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
+import hudson.security.AccessControlled;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
-import java.util.Objects;
 
 @SuppressWarnings("unused") // read resolved by extension plugins
 public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials implements BlazemeterCredentials, StandardUsernamePasswordCredentials {
@@ -104,48 +105,39 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
             return "icon-credentials-userpass";
         }
 
-        public Boolean getAdministerStatus() {
-            return Objects.requireNonNull(Jenkins.getInstance()).hasPermission(Jenkins.ADMINISTER);
-        }
-
-        public Boolean getManageCredentialsStatus() {
-            Jenkins jenkins = Objects.requireNonNull(Jenkins.getInstance());
-            return jenkins.hasPermission(CredentialsProvider.CREATE) ||
-                    jenkins.hasPermission(CredentialsProvider.UPDATE) ||
-                    jenkins.hasPermission(CredentialsProvider.DELETE) ||
-                    jenkins.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
-                    jenkins.hasPermission(CredentialsProvider.VIEW);
-        }
-        
-        public Boolean getProjectLevelCredentialsStatus() {
-            hudson.model.User currentUser = Objects.requireNonNull(hudson.model.User.current());
-            return currentUser.hasPermission(CredentialsProvider.CREATE) ||
-                    currentUser.hasPermission(CredentialsProvider.UPDATE) ||
-                    currentUser.hasPermission(CredentialsProvider.DELETE) ||
-                    currentUser.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
-                    currentUser.hasPermission(CredentialsProvider.VIEW);
-        }
-
-        public Boolean isPrivilegedUser() {
-            return getAdministerStatus() || getManageCredentialsStatus() || getProjectLevelCredentialsStatus();
+        public Boolean checkPermissions(AccessControlled aclHolder) {
+            return aclHolder.hasPermission(CredentialsProvider.CREATE) ||
+                aclHolder.hasPermission(CredentialsProvider.UPDATE) ||
+                aclHolder.hasPermission(CredentialsProvider.DELETE) ||
+                aclHolder.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
+                aclHolder.hasPermission(CredentialsProvider.VIEW);
         }
 
         public FormValidation doValidate(@QueryParameter("username") final String username,
-                                         @QueryParameter("password") final String password) {
-            String decryptedPassword = Secret.fromString(password).getPlainText();
+                                         @QueryParameter("password") final String password,
+                                         @AncestorInPath ModelObject context) {
+
+            // Maybe a Folder
+            // Maybe be null in which case default to root Jenkins
+            AccessControlled aclHolder = context instanceof AccessControlled 
+                ? (AccessControlled) context 
+                : Jenkins.getInstance();
+            
+            if(aclHolder == null) {
+                return FormValidation.ok();
+            }
+            
+            checkPermissions(aclHolder);
+            
             try {
-                if (isPrivilegedUser()) {
-                    JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, decryptedPassword);
-                    User.getUser(utils);
-                    return FormValidation.ok("Successfully validated credentials.");
-                } else {
-                    return FormValidation.error("You don't have required privileges to add/update credentials.");
-                }
+                JenkinsBlazeMeterUtils utils = BlazeMeterPerformanceBuilderDescriptor.getBzmUtils(username, 
+                    Secret.fromString(password).getPlainText());
+                User.getUser(utils);
+                return FormValidation.ok();
             } catch (Exception e) {
                 return FormValidation.error(e.getMessage());
             }
         }
-
 
     }
 }
