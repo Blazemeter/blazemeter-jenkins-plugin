@@ -1,3 +1,7 @@
+### v4.17 - 03-08-2022
+
+- `ADDED` - Increased API connection timeout
+
 ### v4.16 - 12-05-2022
 
 - `ADDED` - Added No data/ Not set Condition
