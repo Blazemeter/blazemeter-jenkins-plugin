@@ -1,4 +1,4 @@
-### v4.17 - 03-08-2022
+### v4.17 - 04-08-2022
 
 - `ADDED` - Increased API connection timeout
 
