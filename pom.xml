@@ -82,12 +82,6 @@
             <artifactId>validation-api</artifactId>
             <version>1.0.0.GA</version>
         </dependency>
-        <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>access-modifier-annotation</artifactId>
-            <version>1.16</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <distributionManagement>
