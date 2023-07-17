@@ -1,0 +1,17 @@
+pipeline {
+    stages {
+        stage('Perform WhiteSource Scan') {
+            when {
+                expression {
+                    return params.PERFORM_WHITESOURCE_SCAN
+                }
+            }
+            steps {
+                script {
+                    def projectName = "BlazeMeterJenkinsPlugin"
+                    whiteSourceScan(projectName)
+                }
+            }
+        }
+    }
+}

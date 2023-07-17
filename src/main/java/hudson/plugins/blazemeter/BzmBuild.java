@@ -308,23 +308,27 @@ public class BzmBuild implements Callable<Result, Exception> {
     public CiBuild getBuild() {
         return build;
     }
-    public void createGlobalEnvironmentVariables(String key, String value) throws IOException {
-        Jenkins instance = Jenkins.getInstance();
+    public void createGlobalEnvironmentVariables(String key, String value) {
+        try {
+            Jenkins instance = Jenkins.getInstance();
 
-        DescribableList<NodeProperty<?>, NodePropertyDescriptor> globalNodeProperties = instance.getGlobalNodeProperties();
-        List<EnvironmentVariablesNodeProperty> envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodeProperty.class);
+            DescribableList<NodeProperty<?>, NodePropertyDescriptor> globalNodeProperties = instance.getGlobalNodeProperties();
+            List<EnvironmentVariablesNodeProperty> envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodeProperty.class);
 
-        EnvironmentVariablesNodeProperty newEnvVarsNodeProperty = null;
-        EnvVars envVars = null;
+            EnvironmentVariablesNodeProperty newEnvVarsNodeProperty = null;
+            EnvVars envVars = null;
 
-        if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
-            newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
-            globalNodeProperties.add(newEnvVarsNodeProperty);
-            envVars = newEnvVarsNodeProperty.getEnvVars();
-        } else {
-            envVars = envVarsNodePropertyList.get(0).getEnvVars();
+            if (envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0) {
+                newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
+                globalNodeProperties.add(newEnvVarsNodeProperty);
+                envVars = newEnvVarsNodeProperty.getEnvVars();
+            } else {
+                envVars = envVarsNodePropertyList.get(0).getEnvVars();
+            }
+            envVars.put(key, value);
+            instance.save();
+        }catch (Exception e){
+            LOGGER.warning("Exception caught by creating global environment variable");
         }
-        envVars.put(key, value);
-        instance.save();
     }
 }
