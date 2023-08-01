@@ -1,3 +1,11 @@
+### v4.19 - 18-07-2023
+
+- `FIXED` - Fixed test loader issue
+
+### v4.18 - 16-12-2022
+
+- `FIXED` - Fixed global environment variable issue
+
 ### v4.17 - 04-08-2022
 
 - `ADDED` - Increased API connection timeout
