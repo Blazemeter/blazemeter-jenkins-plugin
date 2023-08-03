@@ -15,25 +15,29 @@
     -->
     <f:block>
     <j:if test="${descriptor.hasUpdates()}">
-         <label class="warning">A new version of BlazeMeter's Jenkins plugin is available. Please got to <a href="/pluginManager">plugin manager page</a> to update</label>
+         <label class="warning">A new version of BlazeMeter's Jenkins plugin is available. Please go to <a href="/pluginManager">plugin manager page</a> to update</label>
     </j:if>
     </f:block>
     <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
         <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
     </f:entry>
     <f:entry title="${%Workspace ID:}" field="workspaceId">
-        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
+       <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
         <div class="testDiv">
-            <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
-            <div class="newSelectDiv">
+           <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
+           <div id="box" style="display:block">
+               <div id="load"><div class="loader" style="--b: 5px;--c:#000;width:20px;--n:20;--g:3deg"></div></div>
+               <div id="msg"><p>Please wait ...</p></div>
+           </div>
+           <div class="newSelectDiv" id="hideLoader" style="display:none">
                 <div id="result" onclick="onClickResultHandler(this)" class="setting-input select">Select test</div>
                 <div class="hiddenSelect">
                     <div class="searchInputDiv"/>
                     <div class="generatedUlDiv"/>
                 </div>
-            </div>
+           </div>
         </div>
     </f:entry>
     <f:entry title="${%Server url:}">
@@ -49,7 +53,7 @@
         <f:entry title="${%Path to jtl report}:" field="jtlPath">
             <f:textbox field="jtlPath"></f:textbox>
         </f:entry>
-        <f:entry title="${%Path to junit report}:" field="junitPath">
+        <f:entry title="${%Path to junit report}" field="junitPath">
             <f:textbox field="junitPath"></f:textbox>
         </f:entry>
         <f:entry title="${%Main Test File}:" field="mainTestFile">
@@ -71,8 +75,7 @@
             <f:textbox field="reportLinkName"></f:textbox>
         </f:entry>
     </f:advanced>
-
-     <style type="text/css">
+  <style type="text/css">
         .hiddenSelect {
             display: none;
             position: absolute;
@@ -165,6 +168,47 @@
                 top: 15px;
                 display: inline-block;
             }
+        }
+        #box{
+            background-color: white;
+            width: 32em;
+            height:2.25em;
+            border: 1px solid #c3c3c3;
+            padding: 2px;
+            margin: 2px;
+        }
+        #load{
+               margin-top: 1px;
+               margin-left: -2px;
+        }
+
+        .loader {
+            --b: 10px;
+            --n: 10;
+            --g: 10deg;
+            --c: red;
+            width:5px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            padding: 1px;
+            background: conic-gradient(#0000,var(--c)) content-box;
+            --_m:
+            repeating-conic-gradient(#0000 0deg,
+            #000 1deg calc(360deg/var(--n) - var(--g) - 1deg),
+            #0000     calc(360deg/var(--n) - var(--g)) calc(360deg/var(--n))),
+            radial-gradient(farthest-side,#0000 calc(98% - var(--b)),#000 calc(100% - var(--b)));
+            -webkit-mask: var(--_m);
+            mask: var(--_m);
+            -webkit-mask-composite: destination-in;
+            mask-composite: intersect;
+            animation: load 1s infinite steps(var(--n));
+        }
+        @keyframes load {
+            to{transform: rotate(1turn)}
+        }
+        #msg{
+               margin-top: -35px;
+               margin-left: 30px;
         }
      </style>
     <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>

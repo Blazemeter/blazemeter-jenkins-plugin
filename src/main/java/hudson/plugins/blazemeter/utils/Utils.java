@@ -22,6 +22,7 @@ import hudson.plugins.blazemeter.BlazemeterCredentialsBAImpl;
 import hudson.security.ACL;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,10 +77,14 @@ public class Utils {
 
     public static String version() {
         Properties props = new Properties();
-        try {
-            props.load(Utils.class.getResourceAsStream("/version.properties"));
-        } catch (IOException ex) {
-            props.setProperty(Constants.VERSION, "N/A");
+        ClassLoader classLoader = Utils.class.getClassLoader();
+        InputStream resourceAsStream = classLoader.getResourceAsStream("version.properties");
+        if (resourceAsStream != null) {
+            try {
+                props.load(resourceAsStream);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return props.getProperty(Constants.VERSION);
     }

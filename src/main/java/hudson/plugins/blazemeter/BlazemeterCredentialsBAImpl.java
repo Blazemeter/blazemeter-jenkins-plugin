@@ -19,6 +19,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 import hudson.Extension;
 import hudson.Util;
@@ -34,7 +35,7 @@ import java.util.Objects;
 @SuppressWarnings("unused") // read resolved by extension plugins
 public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials implements BlazemeterCredentials, StandardUsernamePasswordCredentials {
 
-    public static BlazemeterCredentialsBAImpl EMPTY = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, "", "", "", "");
+    public static final BlazemeterCredentialsBAImpl EMPTY = new BlazemeterCredentialsBAImpl(CredentialsScope.GLOBAL, "", "", "", "");
     /**
      * The username.
      */
@@ -116,16 +117,19 @@ public class BlazemeterCredentialsBAImpl extends BaseStandardCredentials impleme
                     jenkins.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
                     jenkins.hasPermission(CredentialsProvider.VIEW);
         }
-        
-        public Boolean getProjectLevelCredentialsStatus() {
-            hudson.model.User currentUser = Objects.requireNonNull(hudson.model.User.current());
-            return currentUser.hasPermission(CredentialsProvider.CREATE) ||
-                    currentUser.hasPermission(CredentialsProvider.UPDATE) ||
-                    currentUser.hasPermission(CredentialsProvider.DELETE) ||
-                    currentUser.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
-                    currentUser.hasPermission(CredentialsProvider.VIEW);
-        }
 
+
+        public Boolean getProjectLevelCredentialsStatus() {
+            hudson.model.User currentUser = hudson.model.User.current();
+            if (currentUser != null) {
+                return currentUser.hasPermission(CredentialsProvider.CREATE) ||
+                        currentUser.hasPermission(CredentialsProvider.UPDATE) ||
+                        currentUser.hasPermission(CredentialsProvider.DELETE) ||
+                        currentUser.hasPermission(CredentialsProvider.MANAGE_DOMAINS) ||
+                        currentUser.hasPermission(CredentialsProvider.VIEW);
+            }
+            return false;
+        }
         public Boolean isPrivilegedUser() {
             return getAdministerStatus() || getManageCredentialsStatus() || getProjectLevelCredentialsStatus();
         }

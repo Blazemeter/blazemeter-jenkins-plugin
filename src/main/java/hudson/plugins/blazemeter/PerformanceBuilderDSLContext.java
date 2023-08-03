@@ -17,7 +17,7 @@ import javaposse.jobdsl.dsl.Context;
 
 public class PerformanceBuilderDSLContext implements Context {
 
-    String workspaceId = "";
+//    String workspaceId = "";
 
     String credentialsId = "";
 
@@ -75,9 +75,9 @@ public class PerformanceBuilderDSLContext implements Context {
         this.getJunit = getJunit;
     }
 
-    public void workspaceId(String  workspaceId) {
-        this.workspaceId = workspaceId;
-    }
+//    public void workspaceId(String  workspaceId) {
+//        this.workspaceId = workspaceId;
+//    }
 
     public void reportLinkName(String reportLinkName) {
         this.reportLinkName = reportLinkName;

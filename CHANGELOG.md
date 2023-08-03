@@ -1,3 +1,7 @@
+### v4.19 - 03-08-2023
+
+- `ADDED` - Added loader while loading the tests
+
 ### v4.18 - 16-12-2022
 
 - `FIXED` - Fixed global environment variable issue

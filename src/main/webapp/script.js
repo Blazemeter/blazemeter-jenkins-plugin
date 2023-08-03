@@ -37,12 +37,14 @@ setTimeout(function() {
         setNameToResultFromTestDiv(div, getSelectElForTestDiv(div).getAttribute("value"));
         executeIntervalTaskForDiv(div);
     }
-
 }, 2000);
 // end of START
 
 function executeIntervalTaskForDiv(testDiv) {
     // waiting when init state of original <select> will be changed
+    document.getElementById("hideLoader").style.display = "none";
+    document.getElementById("box").style.display = "block";
+
     var count = 0;
     var prevValue;
     var isFirst = true;
@@ -56,7 +58,9 @@ function executeIntervalTaskForDiv(testDiv) {
         onChangeSelectHandlerForTestDiv(testDiv); // if <select> element filled it will change 'resultDivEl.innerHTML'
         var curValue = resultDivEl.innerHTML;
 
-        if ((prevValue != curValue) || (count >= 20)) {
+        if (prevValue != curValue || count > 70) {
+            document.getElementById("box").style.display = "none";
+            document.getElementById("hideLoader").style.display = "block";
             clearInterval(interval);
         }
         count++;

@@ -4,18 +4,18 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.580.1</version>
+        <version>4.53</version>
+        <relativePath/>
     </parent>
 
     <properties>
         <jenkins.build.number>local</jenkins.build.number>
-        <jenkins.version>2.361.4</jenkins.version>
     </properties>
 
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>4.18-SNAPSHOT</version>
+    <version>4.19-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -38,7 +38,7 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-        <tag> BlazeMeterJenkinsPlugin-4.18</tag>
+        <tag> BlazeMeterJenkinsPlugin-4.19</tag>
     </scm>
 
     <licenses>
@@ -48,6 +48,17 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.361.x</artifactId>
+                <version>1763.v092b_8980a_f5e</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
