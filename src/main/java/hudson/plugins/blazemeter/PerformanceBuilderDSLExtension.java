@@ -35,6 +35,7 @@ import java.util.List;
 
 @Extension(optional = true)
 public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
+    PerformanceBuilder pb = null;
     @DslExtensionMethod(context = StepContext.class)
     public Object blazeMeterTest(Runnable closure) {
         BzmServerLogger logger = new BzmServerLogger();
@@ -42,7 +43,6 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
         logger.info("Running 'blazeMeterTest' method from JOB DSL plugin...");
         PerformanceBuilderDSLContext c = new PerformanceBuilderDSLContext();
         executeInContext(closure, c);
-        PerformanceBuilder pb = null;
         BlazeMeterPerformanceBuilderDescriptor desc = BlazeMeterPerformanceBuilderDescriptor.getDescriptor();
         String serverUrl = desc.getBlazeMeterURL();
         try {

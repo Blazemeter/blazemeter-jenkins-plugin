@@ -1,6 +1,6 @@
-### v4.19 - 18-07-2023
+### v4.19 - 04-08-2023
 
-- `FIXED` - Fixed test loader issue
+- `ADDED` - Added loader while loading the tests
 
 ### v4.18 - 16-12-2022
 

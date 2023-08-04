@@ -19,12 +19,16 @@ import hudson.model.TaskListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class BzmJobNotifier implements UserNotifier {
 
     private final TaskListener listener;
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String PATTERN_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
 
 
     public BzmJobNotifier(TaskListener listener) {
@@ -32,8 +36,12 @@ public class BzmJobNotifier implements UserNotifier {
     }
 
     public static String formatMessage(String msg) {
-        Date date = new Date();
-        return "[" + dateFormat.format(date) + "]: " + msg;
+        Instant date = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT)
+                .withZone(ZoneId.systemDefault());
+        String formattedInstant = formatter.format(date);
+
+        return "[" + formattedInstant + "]: " + msg;
     }
 
     @Override

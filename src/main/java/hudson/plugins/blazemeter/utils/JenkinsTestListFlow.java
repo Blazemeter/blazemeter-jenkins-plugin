@@ -43,21 +43,22 @@ public class JenkinsTestListFlow extends TestsListFlow {
 
 
     public List<Workspace> getWorkspacesForUser(User user) {
-        List<Account> accounts = null;
+        List<Workspace> workspaces = new ArrayList<>();
         try {
-            accounts = user.getAccounts();
+            List<Account>  accounts = user.getAccounts();
+            for (Account account : accounts) {
+                try {
+                    workspaces.addAll(account.getWorkspaces());
+                } catch (Exception e) {
+                    getUtils().getNotifier().notifyError("Failed to get workspaces for account with id = " + account.getId() + ". Reason is: " + e.getMessage());
+                }
+            }
+            getUtils().getNotifier().notifyInfo("Got " + workspaces.size() + " workspaces from server.");
+
         } catch (Exception e) {
             getUtils().getNotifier().notifyError("Failed to get accounts for user with id = " + user.getId() + ". Reason is: " + e.getMessage());
         }
-        List<Workspace> workspaces = new ArrayList<>();
-        for (Account account : accounts) {
-            try {
-                workspaces.addAll(account.getWorkspaces());
-            } catch (Exception e) {
-                getUtils().getNotifier().notifyError("Failed to get workspaces for account with id = " + account.getId() + ". Reason is: " + e.getMessage());
-            }
-        }
-        getUtils().getNotifier().notifyInfo("Got " + workspaces.size() + " workspaces from server.");
+
         return workspaces;
     }
 

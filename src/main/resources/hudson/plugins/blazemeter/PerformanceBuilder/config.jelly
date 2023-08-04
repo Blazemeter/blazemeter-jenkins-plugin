@@ -1,228 +1,215 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-        xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-   <!--
-    Copyright 2018 BlazeMeter Inc.
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+     Copyright 2018 BlazeMeter Inc.
 
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-   -->
-   <f:block>
-   <j:if test="${descriptor.hasUpdates()}">
-        <label class="warning">A new version of BlazeMeter's Jenkins plugin is available. Please go to <a href="/pluginManager">plugin manager page</a> to update</label>
-   </j:if>
-   </f:block>
-   <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+     http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+    -->
+    <f:block>
+    <j:if test="${descriptor.hasUpdates()}">
+         <label class="warning">A new version of BlazeMeter's Jenkins plugin is available. Please go to <a href="/pluginManager">plugin manager page</a> to update</label>
+    </j:if>
+    </f:block>
+    <f:entry title="${%Credentials ID:}" field="credentialsId" description="${%GenerateCredentials}">
+        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
+    </f:entry>
+    <f:entry title="${%Workspace ID:}" field="workspaceId">
        <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
-   </f:entry>
-   <f:entry title="${%Workspace ID:}" field="workspaceId">
-      <f:select style="width:32em;background-color:white;" onchange="executeIntervalTask(this)"/>
-   </f:entry>
-   <f:entry title="${%BlazeMeter Test}:" field="testId">
-       <div class="testDiv">
-          <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
-          <div id="box" style="display:block">
-              <div id="load"><div class="loader" style="--b: 5px;--c:#000;width:20px;--n:20;--g:3deg"></div></div>
-              <div id="msg"><p>Please wait ...</p></div>
-          </div>
-          <div class="newSelectDiv" id="hideLoader" style="display:none">
-               <div id="result" onclick="onClickResultHandler(this)" class="setting-input select">Select test</div>
-               <div class="hiddenSelect">
-                   <div class="searchInputDiv"/>
-                   <div class="generatedUlDiv"/>
-               </div>
-          </div>
-       </div>
-   </f:entry>
-   <f:entry title="${%Server url:}">
-       <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
-   </f:entry>
-   <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
-       <f:checkbox/>
-   </f:entry>
-   <f:entry title="${%Download JUNIT report:}" description="If checked, download Junit report" field="getJunit">
-       <f:checkbox/>
-   </f:entry>
-   <f:advanced>
-       <f:entry title="${%Path to jtl report}:" field="jtlPath">
-           <f:textbox field="jtlPath"></f:textbox>
-       </f:entry>
-       <f:entry title="${%Path to junit report}" field="junitPath">
-           <f:textbox field="junitPath"></f:textbox>
-       </f:entry>
-       <f:entry title="${%Main Test File}:" field="mainTestFile">
-           <f:textbox field="mainTestFile"></f:textbox>
-       </f:entry>
-       <f:entry title="${%Additional Test Files:}" field="additionalTestFiles">
-           <f:textarea name="additionalTestFiles" field="additionalTestFiles"/>
-       </f:entry>
-       <f:entry title="${%Notes:}" field="notes">
-           <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
-       </f:entry>
-       <f:entry title="${%Session properties}:" field="sessionProperties" description="${%SessionProperties}">
-           <f:textbox field="sessionProperties"></f:textbox>
-       </f:entry>
-       <f:entry title="${%Abort job if has fails}:" field="abortJob">
-            <f:checkbox/>
-       </f:entry>
-       <f:entry title="${%Report link name}:" field="reportLinkName">
-           <f:textbox field="reportLinkName"></f:textbox>
-       </f:entry>
-   </f:advanced>
- <style type="text/css">
-       .hiddenSelect {
-           display: none;
-           position: absolute;
-           border: 1px solid #1E90FF;
-           width: 100%;
-           box-sizing: border-box;
-           background-color: white;
-           z-index: 1;
-       }
+    </f:entry>
+    <f:entry title="${%BlazeMeter Test}:" field="testId">
+        <div class="testDiv">
+           <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
+           <div id="box" style="display:block">
+               <div id="load"><div class="loader" style="--b: 5px;--c:#000;width:20px;--n:20;--g:3deg"></div></div>
+               <div id="msg"><p>Please wait ...</p></div>
+           </div>
+           <div class="newSelectDiv" id="hideLoader" style="display:none">
+                <div id="result" onclick="onClickResultHandler(this)" class="setting-input select">Select test</div>
+                <div class="hiddenSelect">
+                    <div class="searchInputDiv"/>
+                    <div class="generatedUlDiv"/>
+                </div>
+           </div>
+        </div>
+    </f:entry>
+    <f:entry title="${%Server url:}">
+        <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
+    </f:entry>
+    <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry title="${%Download JUNIT report:}" description="If checked, download Junit report" field="getJunit">
+        <f:checkbox/>
+    </f:entry>
+    <f:advanced>
+        <f:entry title="${%Path to jtl report}:" field="jtlPath">
+            <f:textbox field="jtlPath"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Path to junit report}" field="junitPath">
+            <f:textbox field="junitPath"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Main Test File}:" field="mainTestFile">
+            <f:textbox field="mainTestFile"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Additional Test Files:}" field="additionalTestFiles">
+            <f:textarea name="additionalTestFiles" field="additionalTestFiles"/>
+        </f:entry>
+        <f:entry title="${%Notes:}" field="notes">
+            <f:textarea name="notes" field="notes" previewEndpoint="/markupFormatter/previewDescription"/>
+        </f:entry>
+        <f:entry title="${%Session properties}:" field="sessionProperties" description="${%SessionProperties}">
+            <f:textbox field="sessionProperties"></f:textbox>
+        </f:entry>
+        <f:entry title="${%Abort job if has fails}:" field="abortJob">
+             <f:checkbox/>
+        </f:entry>
+        <f:entry title="${%Report link name}:" field="reportLinkName">
+            <f:textbox field="reportLinkName"></f:textbox>
+        </f:entry>
+    </f:advanced>
+  <style type="text/css">
+        .hiddenSelect {
+            display: none;
+            position: absolute;
+            border: 1px solid #1E90FF;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: white;
+            z-index: 1;
+        }
 
+        #result {
+            border-radius: 0;
+            min-height: 2.25em;
+            padding: 6px 10px;
+            color: #000000;
+            position: relative;
+        }
 
-       #result {
-           border-radius: 0;
-           min-height: 2.25em;
-           padding: 6px 10px;
-           color: #000000;
-           position: relative;
-       }
+        #searchInput {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0 !important;
+            outline: none;
+            padding: 0 10px !important;
+        }
 
+        .newSelectDiv {
+            width: 32em;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+            background-color: white;
+        }
 
-       #searchInput {
-           width: 100%;
-           box-sizing: border-box;
-           border-radius: 0 !important;
-           outline: none;
-           padding: 0 10px !important;
-       }
+        .newSelectDiv:after {
+            content:'';
+            width: 0;
+            height: 0;
+            display: inline-block;
+            border-top: 6px solid #000000;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            position: absolute;
+            right: 6px;
+            top: 15px;
+        }
 
+        #generatedUl {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #000000;
+            max-height: 17em;
+            overflow: auto;
+        }
 
-       .newSelectDiv {
-           width: 32em;
-           box-sizing: border-box;
-           cursor: pointer;
-           position: relative;
-           background-color: white;
-       }
-
-
-       .newSelectDiv:after {
-           content:'';
-           width: 0;
-           height: 0;
-           display: inline-block;
-           border-top: 6px solid #000000;
-           border-left: 3px solid transparent;
-           border-right: 3px solid transparent;
-           position: absolute;
-           right: 6px;
-           top: 15px;
-       }
-
-
-       #generatedUl {
-           list-style: none;
-           padding: 0;
-           margin: 0;
-           color: #000000;
-           max-height: 17em;
-           overflow: auto;
-       }
-
-
-       #generatedUl li {
-           cursor: pointer;
-           padding: 0 10px;
-       }
+        #generatedUl li {
+            cursor: pointer;
+            padding: 0 10px;
+        }
 
 
 
+        @media screen and (-moz-device-pixel-ratio) {
+            .newSelectDiv::before {
+                content: '';
+                display: inline-block;
+                border-top: 2px solid #ffffff;
+                width: 18px;
+                height: 30px;
+                position: absolute;
+                right: 1px;
+                top: 1px;
+                background: #f3f3f3;
+                border-left: 2px solid #ffffff;
+                border-bottom: 2px solid #848485;
+                border-right: 2px solid #848485;
+            }
 
+            .newSelectDiv::after {
+                content: '';
+                width: 0;
+                height: 0;
+                display: inline-block;
+                border-top: 4px solid #000000;
+                border-left: 3.5px solid transparent;
+                border-right: 3.5px solid transparent;
+                position: absolute;
+                right: 6px;
+                top: 15px;
+                display: inline-block;
+            }
+        }
+        #box{
+            background-color: white;
+            width: 32em;
+            height:2.25em;
+            border: 1px solid #c3c3c3;
+            padding: 2px;
+            margin: 2px;
+        }
+        #load{
+               margin-top: 1px;
+               margin-left: -2px;
+        }
 
-
-       @media screen and (-moz-device-pixel-ratio) {
-           .newSelectDiv::before {
-               content: '';
-               display: inline-block;
-               border-top: 2px solid #ffffff;
-               width: 18px;
-               height: 30px;
-               position: absolute;
-               right: 1px;
-               top: 1px;
-               background: #f3f3f3;
-               border-left: 2px solid #ffffff;
-               border-bottom: 2px solid #848485;
-               border-right: 2px solid #848485;
-           }
-
-
-           .newSelectDiv::after {
-               content: '';
-               width: 0;
-               height: 0;
-               display: inline-block;
-               border-top: 4px solid #000000;
-               border-left: 3.5px solid transparent;
-               border-right: 3.5px solid transparent;
-               position: absolute;
-               right: 6px;
-               top: 15px;
-               display: inline-block;
-           }
-       }
-       #box{
-           background-color: white;
-           width: 32em;
-           height:2.25em;
-           border: 1px solid #c3c3c3;
-           padding: 2px;
-           margin: 2px;
-       }
-       #load{
-              margin-top: 1px;
-              margin-left: -2px;
-       }
-
-
-       .loader {
-           --b: 10px;
-           --n: 10;
-           --g: 10deg;
-           --c: red;
-           width:5px;
-           aspect-ratio: 1;
-           border-radius: 50%;
-           padding: 1px;
-           background: conic-gradient(#0000,var(--c)) content-box;
-           --_m:
-           repeating-conic-gradient(#0000 0deg,
-           #000 1deg calc(360deg/var(--n) - var(--g) - 1deg),
-           #0000     calc(360deg/var(--n) - var(--g)) calc(360deg/var(--n))),
-           radial-gradient(farthest-side,#0000 calc(98% - var(--b)),#000 calc(100% - var(--b)));
-           -webkit-mask: var(--_m);
-           mask: var(--_m);
-           -webkit-mask-composite: destination-in;
-           mask-composite: intersect;
-           animation: load 1s infinite steps(var(--n));
-       }
-       @keyframes load {
-           to{transform: rotate(1turn)}
-       }
-       #msg{
-              margin-top: -35px;
-              margin-left: 30px;
-       }
-    </style>
-   <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
+        .loader {
+            --b: 10px;
+            --n: 10;
+            --g: 10deg;
+            --c: red;
+            width:5px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            padding: 1px;
+            background: conic-gradient(#0000,var(--c)) content-box;
+            --_m:
+            repeating-conic-gradient(#0000 0deg,
+            #000 1deg calc(360deg/var(--n) - var(--g) - 1deg),
+            #0000     calc(360deg/var(--n) - var(--g)) calc(360deg/var(--n))),
+            radial-gradient(farthest-side,#0000 calc(98% - var(--b)),#000 calc(100% - var(--b)));
+            -webkit-mask: var(--_m);
+            mask: var(--_m);
+            -webkit-mask-composite: destination-in;
+            mask-composite: intersect;
+            animation: load 1s infinite steps(var(--n));
+        }
+        @keyframes load {
+            to{transform: rotate(1turn)}
+        }
+        #msg{
+               margin-top: -35px;
+               margin-left: 30px;
+        }
+     </style>
+    <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
 </j:jelly>
-

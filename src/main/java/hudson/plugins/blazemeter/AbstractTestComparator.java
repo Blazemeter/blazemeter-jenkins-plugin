@@ -15,9 +15,10 @@ package hudson.plugins.blazemeter;
 
 import com.blazemeter.api.explorer.test.AbstractTest;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class AbstractTestComparator implements Comparator<AbstractTest> {
+public class AbstractTestComparator implements Comparator<AbstractTest>, Serializable {
     @Override
     public int compare(AbstractTest t1, AbstractTest t2) {
         return t1.getName().compareToIgnoreCase(t2.getName());

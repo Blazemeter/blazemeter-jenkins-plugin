@@ -73,19 +73,21 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String name = "My BlazeMeter Account";
     private static BlazeMeterPerformanceBuilderDescriptor descriptor;
 
-    public static String NO_TESTS = "no-tests";
+    public static void setDescriptor(BlazeMeterPerformanceBuilderDescriptor descriptor) {
+        BlazeMeterPerformanceBuilderDescriptor.descriptor = descriptor;
+    }
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         this.load();
-        BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
+        setDescriptor(this);
     }
 
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
         super(PerformanceBuilder.class);
         this.load();
         this.blazeMeterURL = blazeMeterURL;
-        BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
+        setDescriptor(this);
     }
 
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL, boolean isUnstableIfHasFails) {
@@ -93,7 +95,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.load();
         this.blazeMeterURL = blazeMeterURL;
         this.isUnstableIfHasFails = isUnstableIfHasFails;
-        BlazeMeterPerformanceBuilderDescriptor.descriptor = this;
+        setDescriptor(this);
     }
 
     public static BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
