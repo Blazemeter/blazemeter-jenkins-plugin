@@ -313,7 +313,6 @@ public class BzmBuild implements Callable<Result, Exception>, Serializable {
         PrintStream logger = listener.getLogger();
         try {
             Jenkins instance = Jenkins.getInstance();
-            logger.println(BzmJobNotifier.formatMessage("Create Global Environment Variables Started"));
             DescribableList<NodeProperty<?>, NodePropertyDescriptor> globalNodeProperties = instance.getGlobalNodeProperties();
             List<EnvironmentVariablesNodeProperty> envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodeProperty.class);
 
@@ -329,7 +328,6 @@ public class BzmBuild implements Callable<Result, Exception>, Serializable {
             }
             envVars.put(key, value);
             instance.save();
-            logger.println(BzmJobNotifier.formatMessage("Create Global Environment Variables Ended"));
         }
         catch (Exception e)
         {
