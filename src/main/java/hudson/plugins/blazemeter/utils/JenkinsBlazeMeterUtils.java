@@ -30,7 +30,7 @@ public class JenkinsBlazeMeterUtils extends BlazeMeterUtils {
     private static final String CLIENT_IDENTIFICATION = "&_clientId=CI_JENKINS&_clientVersion="
             + Utils.version();
 
-    public static String JENKINS_PLUGIN_INFO = APP_KEY + CLIENT_IDENTIFICATION;
+    public static final String JENKINS_PLUGIN_INFO = APP_KEY + CLIENT_IDENTIFICATION;
 
     public JenkinsBlazeMeterUtils(String apiKeyId, String apiKeySecret, String address, UserNotifier notifier, Logger logger) {
         super(apiKeyId, apiKeySecret, address, "", notifier, logger);
