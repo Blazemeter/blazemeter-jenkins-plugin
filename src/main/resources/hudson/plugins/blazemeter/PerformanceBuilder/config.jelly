@@ -43,6 +43,13 @@
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
+    <f:entry title="${%Configure Webhook URL for Teams}:" field="webhookUrl">
+             <f:textbox field="webhookUrl"></f:textbox>
+    </f:entry>
+    <f:entry title="${%Configure Webhook URL for Slack}:" field="webhookUrlSlack">
+                 <f:textbox field="webhookUrlSlack"></f:textbox>
+    </f:entry>
+
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
     </f:entry>

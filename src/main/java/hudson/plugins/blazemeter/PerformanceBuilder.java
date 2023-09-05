@@ -82,6 +82,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
     private String additionalTestFiles = "";
 
     private boolean abortJob = false;
+    private String webhookUrl ="";
+    private String webhookUrlSlack="";
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -101,7 +103,9 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                               String jtlPath,
                               String junitPath,
                               boolean getJtl,
-                              boolean getJunit
+                              boolean getJunit,
+                              String webhookUrl,
+                              String webhookUrlSlack
     ) {
         this.credentialsId = credentialsId;
         this.workspaceId = workspaceId;
@@ -113,6 +117,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
         this.notes = notes;
         this.sessionProperties = sessionProperties;
+        this.webhookUrl=webhookUrl;
+        this.webhookUrlSlack=webhookUrlSlack;
     }
 
 
@@ -153,6 +159,22 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
     @DataBoundSetter
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+    @DataBoundSetter
+    public void setWebhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
+    }
+    public String getWebhookUrlSlack() {
+        return webhookUrlSlack;
+    }
+
+    @DataBoundSetter
+    public void setWebhookUrlSlack(String webhookUrlSlack){
+        this.webhookUrlSlack=webhookUrlSlack;
     }
 
     public String getSessionProperties() {

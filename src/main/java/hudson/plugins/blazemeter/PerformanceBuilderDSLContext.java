@@ -22,6 +22,8 @@ public class PerformanceBuilderDSLContext implements Context {
     String testId = "";
 
     String notes = "";
+    String webhookUrl = "";
+    String webhookUrlSlack="";
 
     String sessionProperties = "";
 
@@ -38,6 +40,7 @@ public class PerformanceBuilderDSLContext implements Context {
     String mainTestFile = "";
 
     String additionalTestFiles = "";
+
 
     boolean abortJob = false;
 
@@ -86,6 +89,12 @@ public class PerformanceBuilderDSLContext implements Context {
 
     public void abortJob(boolean abortJob) {
         this.abortJob = abortJob;
+    }
+    public void webhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
+    }
+    public void webhookUrlSlack(String webhookUrlSlack) {
+        this.webhookUrlSlack = webhookUrlSlack;
     }
 
 }
