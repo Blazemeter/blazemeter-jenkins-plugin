@@ -83,7 +83,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
 
     private boolean abortJob = false;
     private String webhookUrl ="";
-    private String webhookUrlSlack="";
+    private String selectWebhook="";
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -105,7 +105,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                               boolean getJtl,
                               boolean getJunit,
                               String webhookUrl,
-                              String webhookUrlSlack
+                              String selectWebhook
     ) {
         this.credentialsId = credentialsId;
         this.workspaceId = workspaceId;
@@ -117,8 +117,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
         this.notes = notes;
         this.sessionProperties = sessionProperties;
-        this.webhookUrl=webhookUrl;
-        this.webhookUrlSlack=webhookUrlSlack;
+        this.webhookUrl = webhookUrl;
+        this.selectWebhook = selectWebhook;
     }
 
 
@@ -164,18 +164,14 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         return webhookUrl;
     }
 
+
     @DataBoundSetter
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }
-    public String getWebhookUrlSlack() {
-        return webhookUrlSlack;
-    }
-
     @DataBoundSetter
-    public void setWebhookUrlSlack(String webhookUrlSlack){
-        this.webhookUrlSlack=webhookUrlSlack;
-    }
+    public void setSelectWebhook(String selectWebhook) {this.selectWebhook = selectWebhook;}
+    public String getSelectWebhook(){ return selectWebhook;}
 
     public String getSessionProperties() {
         return sessionProperties;

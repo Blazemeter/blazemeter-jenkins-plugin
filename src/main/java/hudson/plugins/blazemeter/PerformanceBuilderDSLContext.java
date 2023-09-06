@@ -23,7 +23,7 @@ public class PerformanceBuilderDSLContext implements Context {
 
     String notes = "";
     String webhookUrl = "";
-    String webhookUrlSlack="";
+    String selectWebhook="";
 
     String sessionProperties = "";
 
@@ -40,6 +40,7 @@ public class PerformanceBuilderDSLContext implements Context {
     String mainTestFile = "";
 
     String additionalTestFiles = "";
+
 
 
     boolean abortJob = false;
@@ -93,8 +94,8 @@ public class PerformanceBuilderDSLContext implements Context {
     public void webhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }
-    public void webhookUrlSlack(String webhookUrlSlack) {
-        this.webhookUrlSlack = webhookUrlSlack;
+    public void selectWebhook(String selectWebhook) {
+        this.selectWebhook = selectWebhook;
     }
 
 }

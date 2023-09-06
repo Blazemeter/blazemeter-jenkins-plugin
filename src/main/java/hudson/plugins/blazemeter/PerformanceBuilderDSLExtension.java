@@ -68,7 +68,7 @@ public class PerformanceBuilderDSLExtension extends ContextExtensionPoint {
                         if (t.getId().equals(c.testId)) {
                             pb = new PerformanceBuilder(c.credentialsId, workspace.getId(), serverUrl,
                                     c.testId, c.notes, c.sessionProperties,
-                                    c.jtlPath, c.junitPath, c.getJtl, c.getJunit,c.webhookUrl,c.webhookUrlSlack);
+                                    c.jtlPath, c.junitPath, c.getJtl, c.getJunit,c.webhookUrl,c.selectWebhook);
                             pb.setReportLinkName(c.reportLinkName);
                             pb.setMainTestFile(c.mainTestFile);
                             pb.setAdditionalTestFiles(c.additionalTestFiles);
