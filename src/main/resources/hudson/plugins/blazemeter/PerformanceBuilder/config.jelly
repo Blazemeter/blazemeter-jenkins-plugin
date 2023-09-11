@@ -40,6 +40,14 @@
            </div>
         </div>
     </f:entry>
+
+    <f:entry title="Select an option" field="selecttestId">
+        <f:select id="myDropdown"/>
+    </f:entry>
+    <f:entry>
+        <button id ="load_more" type="button" onclick="loadMoreData()">Load More</button>
+    </f:entry>
+
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
@@ -211,5 +219,6 @@
                margin-left: 30px;
         }
      </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
 </j:jelly>

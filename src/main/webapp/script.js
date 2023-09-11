@@ -352,3 +352,64 @@ function enableScroll() {
         window.removeEventListener('DOMMouseScroll', preventDefault, false);
     }
 };
+function loadMoreData(){
+ var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://localhost:8080/my-plugin/", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                console.log("XHR =====> Response")
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var responseText = xhr.responseText;
+                        console.log("responseText"+responseText)
+
+                        try {
+                            var responseData = JSON.parse(responseText);
+                            var dropdown = document.getElementById("myDropdown");
+
+                            // Iterate over the JSON data and append options to the dropdown
+                            for (var key in responseData) {
+                            console.log("Key ======>"+ key)
+                                if (responseData.hasOwnProperty(key)) {
+                                    var option = document.createElement("option");
+                                    option.text = responseData[key];
+                                    option.value = key;
+                                    dropdown.appendChild(option);
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Error parsing JSON:", e);
+                        }
+                    } else {
+                        // Handle HTTP error
+                        console.error("HTTP Error:", xhr.status, xhr.statusText);
+                    }
+                }
+            };
+
+            xhr.send();
+//    $.ajax({          type: "GET",
+//                        url: "http://localhost:8080/my-plugin/",
+//                        dataType:"json",
+//                        success: function (response) {
+//                        alert("Hey Hi");
+//                        var responseData = JSON.parse(response.responseText);
+//                        var dropdown = document.getElementById("myDropdown");
+//                        dropdown.innerHTML = '';
+//                        // Iterate over the JSON data and append options to the dropdown
+//                          for (var key in responseData) {
+//                          console.log("key data:>"+key);
+//                              if (responseData.hasOwnProperty(key)) {
+//                                  var option = document.createElement("option");
+//                                  option.text = responseData[key];
+//                                  option.value = key;
+//                                  dropdown.appendChild(option);
+//                              }
+//                          }
+//                        },
+//                        error: function (error) {
+//                            console.log("error" + JSON.stringify(error));
+//                        }
+//                    });
+}
