@@ -35,9 +35,20 @@ public class JenkinsTestListFlow extends TestsListFlow {
 
     public List<AbstractTest> getAllTestsForWorkspaceWithException(Workspace workspace) throws Exception {
         List<AbstractTest> tests = new ArrayList<>();
-        tests.addAll(workspace.getSingleTests(limit, "name"));
-        tests.addAll(workspace.getMultiTests(limit, "name"));
-        tests.addAll(workspace.getTestSuite(limit, "name"));
+        int totalTestCount = workspace.getTotalTestListCount();
+        int skip = 0;
+        int loaderLimit = 10;
+        while (skip <= totalTestCount)
+        {
+            tests.addAll(workspace.getSingleTests(String.valueOf(loaderLimit), "name",String.valueOf(skip)));
+            skip += loaderLimit;
+            getUtils().getNotifier().notifyInfo("add loader in single test list :"+ skip);
+        return tests;
+        }
+//        tests.addAll(workspace.getSingleTests(limit, "name"));
+//        tests.addAll(workspace.getMultiTests(limit, "name"));
+//        tests.addAll(workspace.getTestSuite(limit, "name"));
+        System.out.println("limit"+limit);
         return tests;
     }
 
