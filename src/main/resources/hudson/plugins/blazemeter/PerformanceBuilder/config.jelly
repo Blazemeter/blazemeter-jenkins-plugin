@@ -26,7 +26,7 @@
     </f:entry>
     <f:entry title="${%BlazeMeter Test}:" field="testId">
         <div class="testDiv">
-           <f:select onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
+           <f:select id="myDropdown" onchange="onChangeSelectHandler()" style="width:32em;background-color:white;display:none;"/>
            <div id="box" style="display:block">
                <div id="load"><div class="loader" style="--b: 5px;--c:#000;width:20px;--n:20;--g:3deg"></div></div>
                <div id="msg"><p>Please wait ...</p></div>
@@ -39,12 +39,6 @@
                 </div>
            </div>
         </div>
-    </f:entry>
-    <f:entry title="Select an option" field="testId">
-        <f:select id="myDropdown"/>
-    </f:entry>
-    <f:entry>
-        <button id ="load_more" type="button" onclick="loadMoreData()">Load More</button>
     </f:entry>
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
@@ -101,13 +95,28 @@
         }
 
         #searchInput {
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 0 !important;
-            outline: none;
-            padding: 0 10px !important;
+<!--            width: 100%;-->
+<!--            box-sizing: border-box;-->
+<!--            border-radius: 0 !important;-->
+<!--            outline: none;-->
+<!--            padding: 0 10px !important;-->
         }
-
+      #search {
+      text-indent: -999px;
+      overflow: hidden;
+      width: 40px;
+      padding: 0;
+      margin: 0;
+      border: 1px solid transparent;
+      border-radius: inherit;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E") no-repeat center;
+      cursor: pointer;
+      opacity: 0.7;
+      margin-left: -39px;
+      }
+      .input-container{
+      display: flex;
+      }
         .newSelectDiv {
             width: 32em;
             box-sizing: border-box;
@@ -216,6 +225,7 @@
                margin-top: -35px;
                margin-left: 30px;
         }
+
      </style>
     <script src="${rootURL}/plugin/BlazeMeterJenkinsPlugin/script.js" type="text/javascript"/>
 </j:jelly>

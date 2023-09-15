@@ -204,7 +204,6 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
         private ListBoxModel testsList (Workspace workspace, String testId) throws Exception {
             ListBoxModel sortedTests = new ListBoxModel();
-
             JenkinsTestListFlow jenkinsTestListFlow = new JenkinsTestListFlow(workspace.getUtils(), System.getProperty("bzm.limit", "10000"));
 
             List<AbstractTest> tests = jenkinsTestListFlow.getAllTestsForWorkspaceWithException(workspace);

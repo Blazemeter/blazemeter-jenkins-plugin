@@ -26,7 +26,10 @@ function onChangeSelectHandlerForTestDiv(testDiv) {
     generatedUlDivEl.innerHTML = generatedUl;
 
     var searchInputDivEl = testDiv.querySelector(".searchInputDiv");
-    searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+    console.log
+    //searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
+    searchInputDivEl.innerHTML = '<div class="input-container"><input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/><button id="search" type="button" onclick="loadMoreData()">search</button></div>';
+
 };
 
 // START
@@ -90,6 +93,7 @@ function getSelectElForTestDiv(testDivEl) {
 
 function onKeyUpSearch(searchInputEl) {
     var text = searchInputEl.value.toLowerCase();
+    console.log("text==========>",text);
     var testDivEl = searchInputEl.closest(".testDiv");
     var ulEl = testDivEl.querySelector("#generatedUl");
     var liList = ulEl.getElementsByTagName("li");
@@ -136,7 +140,9 @@ function hideHiddenSelect(toggleEl) {
 function openHiddenSelect(testDivEl, toggleEl) {
     toggleEl.style.display = "block";
     var searchInputEl = toggleEl.querySelector("#searchInput");
+    var searchIcon= toggleEl.querySelector("search");
     searchInputEl.focus();
+    //searchIcon.focus();
     var generatedUlEl = toggleEl.querySelector("#generatedUl");
     var liList = generatedUlEl.getElementsByTagName("li");
     var resultDivEl = testDivEl.querySelector("#result");
@@ -180,7 +186,8 @@ function isGeneratedElement(event) {
     return (event.target.id == "result"
                    || event.target.id == "generatedUl"
                    || event.target.getAttribute("class") == "generatedLi"
-                   || event.target.id == "searchInput");
+                   || event.target.id == "searchInput"
+                   || event.target.id=="search");
 };
 
 document.onkeydown = function(event) {
@@ -352,9 +359,12 @@ function enableScroll() {
         window.removeEventListener('DOMMouseScroll', preventDefault, false);
     }
 };
+
 function loadMoreData(){
+var searchTestId =document.getElementById("searchInput").value;
+console.log("searchTestId",searchTestId);
  var xhr = new XMLHttpRequest();
-            xhr.open("GET", "http://localhost:8080/my-plugin/", true);
+            xhr.open("GET", "http://localhost:8080/my-plugin?searchTestId="+searchTestId, true);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function () {
@@ -378,6 +388,7 @@ function loadMoreData(){
                                     dropdown.appendChild(option);
                                 }
                             }
+
                         } catch (e) {
                             console.error("Error parsing JSON:", e);
                         }
@@ -389,27 +400,4 @@ function loadMoreData(){
             };
 
             xhr.send();
-//    $.ajax({          type: "GET",
-//                        url: "http://localhost:8080/my-plugin/",
-//                        dataType:"json",
-//                        success: function (response) {
-//                        alert("Hey Hi");
-//                        var responseData = JSON.parse(response.responseText);
-//                        var dropdown = document.getElementById("myDropdown");
-//                        dropdown.innerHTML = '';
-//                        // Iterate over the JSON data and append options to the dropdown
-//                          for (var key in responseData) {
-//                          console.log("key data:>"+key);
-//                              if (responseData.hasOwnProperty(key)) {
-//                                  var option = document.createElement("option");
-//                                  option.text = responseData[key];
-//                                  option.value = key;
-//                                  dropdown.appendChild(option);
-//                              }
-//                          }
-//                        },
-//                        error: function (error) {
-//                            console.log("error" + JSON.stringify(error));
-//                        }
-//                    });
 }

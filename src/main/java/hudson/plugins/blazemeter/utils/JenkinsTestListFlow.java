@@ -37,13 +37,13 @@ public class JenkinsTestListFlow extends TestsListFlow {
         List<AbstractTest> tests = new ArrayList<>();
         int totalTestCount = workspace.getTotalTestListCount();
         int skip = 0;
-        int loaderLimit = 10;
+        int loaderLimit = 100;
         while (skip <= totalTestCount)
         {
-            tests.addAll(workspace.getSingleTests(String.valueOf(loaderLimit), "name",String.valueOf(skip)));
+            tests.addAll(workspace.getAllTests(String.valueOf(loaderLimit), "name",String.valueOf(skip)));
             skip += loaderLimit;
             getUtils().getNotifier().notifyInfo("add loader in single test list :"+ skip);
-        return tests;
+            return tests;
         }
 //        tests.addAll(workspace.getSingleTests(limit, "name"));
 //        tests.addAll(workspace.getMultiTests(limit, "name"));
