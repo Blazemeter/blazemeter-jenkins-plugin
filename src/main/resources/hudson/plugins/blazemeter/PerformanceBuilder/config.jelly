@@ -43,6 +43,21 @@
     <f:entry title="${%Server url:}">
         <f:textbox disabled="true" style="width:32em;" value="${descriptor.getBlazeMeterURL()}"/>
     </f:entry>
+   <f:entry title="Webhook Notification:" >
+       <div class="selectWebhookDiv">
+           <div style="display: flex; align-items: center; ">
+               <f:radio name="selectWebhook" value="slack" checked="${instance.selectWebhook == 'slack'}"/>
+               <span style="margin-top: 3px; ">Slack</span>
+           </div>
+           <div style="display: flex; align-items: center;margin-left: 20px;">
+               <f:radio name="selectWebhook" value="teams" checked="${instance.selectWebhook == 'teams'}"/>
+               <span style="margin-top: 3px; ">Teams</span>
+           </div>
+       </div>
+       <f:entry title="${%Enter Webhook URL}:" field="webhookUrl">
+                   <f:textbox field="webhookUrl"></f:textbox>
+               </f:entry>
+   </f:entry>
     <f:entry title="${%Download JTL report:}" description="If checked, download JTL report" field="getJtl">
         <f:checkbox/>
     </f:entry>
@@ -123,6 +138,13 @@
             top: 15px;
         }
 
+       .selectWebhookDiv {
+                  display: flex;
+                  margin-left: 3px;
+                  margin-bottom: 7px;
+                  align-items: center;
+                  flex-direction: row;
+               }
         #generatedUl {
             list-style: none;
             padding: 0;

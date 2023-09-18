@@ -1,4 +1,8 @@
-### v4.19 - 04-08-2023
+### v4.20 - 18-09-2023
+
+- `ADDED` - Implemented webhook configuration for teams and slack
+
+### v4.19 - 09-08-2023
 
 - `ADDED` - Added loader while loading the tests
 
