@@ -7,7 +7,6 @@ function onChangeSelectHandler(event) {
 function onChangeSelectHandlerForTestDiv(testDiv) {
     var selectEl = getSelectElForTestDiv(testDiv);
     var options = selectEl.options;
-
     var generatedUlDivEl = testDiv.querySelector(".generatedUlDiv");
     var generatedUl = '<ul id="generatedUl" data-display-elements="' + options.length + '">';
     for (i = 0; i < options.length; i++) {
@@ -26,10 +25,8 @@ function onChangeSelectHandlerForTestDiv(testDiv) {
     generatedUlDivEl.innerHTML = generatedUl;
 
     var searchInputDivEl = testDiv.querySelector(".searchInputDiv");
-    console.log
     //searchInputDivEl.innerHTML = '<input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/>';
     searchInputDivEl.innerHTML = '<div class="input-container"><input type="text" onkeyup="onKeyUpSearch(this)" id="searchInput" name="searchInput" value="" class="setting-input" placeholder="Search Tests..."/><button id="search" type="button" onclick="loadMoreData()">search</button></div>';
-
 };
 
 // START
@@ -156,6 +153,7 @@ function openHiddenSelect(testDivEl, toggleEl) {
 };
 
 function onClickListElementHandler(li) {
+    console.log("list ===>",li);
     var testDivEl = li.closest(".testDiv");
     setNameToResultFromTestDiv(testDivEl, li.innerHTML);
     setValueToSelect(testDivEl, li);
@@ -177,8 +175,52 @@ document.onmousedown = function(event) {
 
 function setValueToSelect(testDivEl, li) {
     var selectEl = getSelectElForTestDiv(testDivEl);
-    selectEl.setAttribute("value", li.dataset.value);
-    selectEl.options[li.dataset.index].selected = true;
+//    selectEl.setAttribute("value", li.dataset.value);
+//    selectEl.options[li.dataset.index].selected = true;
+if (selectEl) {
+    var index = parseInt(li.dataset.index);
+     console.log("index===>",index);
+    if (!isNaN(index) && index >= 0 && index < selectEl.options.length) {
+      selectEl.options[index].selected = true;
+    }
+    else{
+    console.log("index is greater than 99");
+    var listItems = document.querySelectorAll('.generatedLi');
+     console.log("list Item",listItems.length);
+//    //li.dataset.index.selected=true;
+//    if (index >= 0 && index < listItems.length) {
+//            // Check if the index is valid
+//            var listItemToSelect = listItems[index];
+//
+//            // Deselect previously selected item (if any)
+//            var selectedListItem = document.querySelector('.generatedLi.selected');
+//            console.log("selectedListItem",selectedListItem);
+//            if (selectedListItem) {
+//                console.log("selectedListItem",selectedListItem)
+//                selectedListItem.classList.remove('selected');
+//            }
+//
+//            // Select the item at the specified index
+//            listItemToSelect.classList.add('selected');
+//
+//            // You can do further processing here if needed
+//            console.log("Selected item:", listItemToSelect.textContent);
+//        } else {
+//            console.log("Invalid index:", index);
+//        }
+         var selectElement = document.getElementById("myDropdown");
+         console.log("option before",selectElement);
+         var option = document.createElement("option");
+         option.value = li.dataset.value;
+         option.text  = li.textContent;
+         selectElement.append(option);
+         console.log("option after",selectElement);
+         selectElement.options[li.dataset.index].selected = true;
+
+
+    }
+  }
+
 };
 
 
@@ -359,33 +401,64 @@ function enableScroll() {
         window.removeEventListener('DOMMouseScroll', preventDefault, false);
     }
 };
-
+var appendedKeys = [];
 function loadMoreData(){
 var searchTestId =document.getElementById("searchInput").value;
 console.log("searchTestId",searchTestId);
+document.getElementById("hideLoader").style.display = "none";
+document.getElementById("box").style.display = "block";
  var xhr = new XMLHttpRequest();
             xhr.open("GET", "http://localhost:8080/my-plugin?searchTestId="+searchTestId, true);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function () {
-                console.log("XHR =====> Response")
+                console.log("XHR =====> Response");
                 if (xhr.readyState === 4) {
+                document.getElementById("box").style.display = "none";
+                document.getElementById("hideLoader").style.display = "block";
                     if (xhr.status === 200) {
                         var responseText = xhr.responseText;
                         console.log("responseText"+responseText)
 
                         try {
                             var responseData = JSON.parse(responseText);
-                            var dropdown = document.getElementById("myDropdown");
-
+                            var dropdown = document.getElementById("generatedUl");
+                            var dropdown1 = document.getElementById("myDropdown");
+                            var numberOfElements = dropdown.childElementCount;
                             // Iterate over the JSON data and append options to the dropdown
                             for (var key in responseData) {
-                            console.log("Key ======>"+ key)
+                            console.log("Key ======>"+ key);
                                 if (responseData.hasOwnProperty(key)) {
+                                if (!appendedKeys.includes(key)){
                                     var option = document.createElement("option");
+                                    var li = document.createElement('li');
+                                    li.className = 'generatedLi';
                                     option.text = responseData[key];
                                     option.value = key;
-                                    dropdown.appendChild(option);
+                                    li.setAttribute("data-value", key);
+                                    li.setAttribute('data-index', numberOfElements);
+                                    li.setAttribute('data-display-index', -1);
+                                    li.textContent = responseData[key];
+                                     // Add event listeners as needed
+                                        li.onclick = function() {
+                                          onClickListElementHandler(this);
+                                        };
+
+                                        li.onmouseover = function() {
+                                          focusLi(this);
+                                        };
+
+                                        li.onmouseout = function() {
+                                          clearFocusLi(this);
+                                        };
+                                        dropdown1.appendChild(option);
+                                        dropdown.appendChild(li);
+
+//                                    li.option[li.dataset.index].selected = true;
+                                     console.log("dropdown1",dropdown1);
+                                    console.log("dropdown",dropdown);
+                                    appendedKeys.push(key);
+                                    }
                                 }
                             }
 
@@ -401,3 +474,4 @@ console.log("searchTestId",searchTestId);
 
             xhr.send();
 }
+
