@@ -1,4 +1,3 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/18958ed195bf4df2817516b81670d951)](https://www.codacy.com/app/dzmitrykashlach/blazemeter-jenkins-plugin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Blazemeter/blazemeter-jenkins-plugin&amp;utm_campaign=Badge_Grade)
 #### 1. What's this?
 
 This is [jenkins](http://jenkins.io) plugin for running performance test at [load testing platform](http://blazemeter.com).

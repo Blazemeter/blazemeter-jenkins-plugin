@@ -39,6 +39,10 @@
 
 - `FIXED` - Users can add or update credentials at folder level
 
+### v4.11 - 07.10.2021
+
+- `FIXED` - Users can add or update credentials at folder level
+
 ### v4.10 - 06.09.2021
 
 - `FIXED` - fixed public report url issue for functional GUI
