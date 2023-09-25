@@ -82,6 +82,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
     private String additionalTestFiles = "";
 
     private boolean abortJob = false;
+    private String webhookUrl ="";
+    private String selectWebhook="";
 
     @DataBoundConstructor
     public PerformanceBuilder(String credentialsId, String workspaceId, String testId) {
@@ -101,7 +103,9 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
                               String jtlPath,
                               String junitPath,
                               boolean getJtl,
-                              boolean getJunit
+                              boolean getJunit,
+                              String webhookUrl,
+                              String selectWebhook
     ) {
         this.credentialsId = credentialsId;
         this.workspaceId = workspaceId;
@@ -113,6 +117,8 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         this.getJunit = getJunit;
         this.notes = notes;
         this.sessionProperties = sessionProperties;
+        this.webhookUrl = webhookUrl;
+        this.selectWebhook = selectWebhook;
     }
 
 
@@ -154,6 +160,18 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+
+    @DataBoundSetter
+    public void setWebhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
+    }
+    @DataBoundSetter
+    public void setSelectWebhook(String selectWebhook) {this.selectWebhook = selectWebhook;}
+    public String getSelectWebhook(){ return selectWebhook;}
 
     public String getSessionProperties() {
         return sessionProperties;
