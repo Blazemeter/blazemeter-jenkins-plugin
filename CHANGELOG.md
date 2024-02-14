@@ -1,3 +1,7 @@
+### v4.21 - 14-02-2024
+
+- `FIXED` - Fixed TT-3873 Tests are not getting fetched in the Jenkins BlazeMeter plugin
+
 ### v4.20 - 18-09-2023
 
 - `ADDED` - Implemented webhook configuration for teams and slack
