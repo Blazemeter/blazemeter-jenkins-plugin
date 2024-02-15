@@ -45,7 +45,6 @@ function executeIntervalTaskForDiv(testDiv) {
     document.getElementById("hideLoader").style.display = "none";
     document.getElementById("box").style.display = "block";
 
-    var count = 0;
     var prevValue;
     var isFirst = true;
     var interval = setInterval(function() {
@@ -58,12 +57,11 @@ function executeIntervalTaskForDiv(testDiv) {
         onChangeSelectHandlerForTestDiv(testDiv); // if <select> element filled it will change 'resultDivEl.innerHTML'
         var curValue = resultDivEl.innerHTML;
 
-        if (prevValue != curValue || count > 70) {
+        if (prevValue != curValue) {
             document.getElementById("box").style.display = "none";
             document.getElementById("hideLoader").style.display = "block";
             clearInterval(interval);
         }
-        count++;
     }, 500);
 };
 
