@@ -35,13 +35,13 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Release') {
-            steps {
-                script {
-                    sh 'mvn release:prepare release:perform'
-                }
-            }
-        }
+        //stage('Deploy Release') {
+        //    steps {
+        //        script {
+        //            sh 'mvn release:prepare release:perform'
+        //        }
+        //    }
+        //}
 
     }
 }
