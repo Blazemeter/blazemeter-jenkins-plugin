@@ -15,7 +15,7 @@
     <groupId>com.blazemeter.plugins</groupId>
     <artifactId>BlazeMeterJenkinsPlugin</artifactId>
     <packaging>hpi</packaging>
-    <version>4.20-SNAPSHOT</version>
+    <version>4.22-SNAPSHOT</version>
     <name>BlazeMeter plugin</name>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/BlazeMeter+Plugin</url>
     <description>This is a plugin which allows a developer to run a set of performance tests against the BlazeMeter Cluster</description>
@@ -38,7 +38,7 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-        <tag> BlazeMeterJenkinsPlugin-4.19</tag>
+        <tag> BlazeMeterJenkinsPlugin-4.21</tag>
     </scm>
 
     <licenses>
@@ -93,6 +93,12 @@
             <artifactId>validation-api</artifactId>
             <version>1.0.0.GA</version>
         </dependency>
+        <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>stapler</artifactId>
+            <version>1.263</version> <!-- Version from Jenkins BOM -->
+        </dependency>
+
 
     </dependencies>
 

@@ -1,17 +1,47 @@
 pipeline {
+    agent {
+        docker {
+            registryUrl 'https://us-docker.pkg.dev'
+            image 'verdant-bulwark-278/bzm-plugin-base-image/bzm-plugin-base-image:latest'
+            registryCredentialsId 'push-to-gar-enc'
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock -v $WORKSPACE:/build'
+        }
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: "10"))
+        ansiColor('xterm')
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        NEXUS_STAGING_CRED = credentials('blazerunner_nexus_staging_creds')
+        API_CLIENT_CRED = credentials('blazerunner_api_client_creds')
+    }
+
     stages {
-        stage('Perform WhiteSource Scan') {
-            when {
-                expression {
-                    return params.PERFORM_WHITESOURCE_SCAN
-                }
-            }
+        stage('Build Release') {
             steps {
                 script {
-                    def projectName = "BlazeMeterJenkinsPlugin"
-                    whiteSourceScan(projectName)
+                    sh'''
+                      sed 's/NEXUS-STAGING-USERNAME/${NEXUS_STAGING_CRED_USR}' settings.xml
+                      sed 's/NEXUS-STAGING-PASSWORD/${NEXUS_STAGING_CRED_PSW}' settings.xml
+                      sed 's/API-CLIENT-USERNAME/${API_CLIENT_CRED_USR}' settings.xml
+                      sed 's/API-CLIENT-PASSWORD/${API_CLIENT_CRED_PSW}' settings.xml
+                      mkdir /tmp/jenkinsci && git clone https://github.com/jenkinsci/blazemeter-plugin /tmp/jenkinsci && cd /tmp/jenkinsci && git pull https://github.com/Blazemeter/blazemeter-jenkins-plugin.git && cd /
+                      cp settings.xml ~/.m2/settings.xml
+                      '''
                 }
             }
         }
+        //stage('Deploy Release') {
+        //    steps {
+        //        script {
+        //            sh 'mvn release:prepare release:perform'
+        //        }
+        //    }
+        //}
+
     }
 }
