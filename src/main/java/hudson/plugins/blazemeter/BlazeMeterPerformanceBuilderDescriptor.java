@@ -54,6 +54,7 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 @Symbol({"blazeMeterTest"})
 @Extension
@@ -131,6 +132,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         }
     }
 
+    @RequirePOST
     public ListBoxModel doFillTestIdItems(@QueryParameter("credentialsId") String credentialsId,
                                           @QueryParameter("workspaceId") String workspaceId,
                                           @QueryParameter("testId") String testId) throws FormValidation {
@@ -237,6 +239,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return workspaces;
     }
 
+    @RequirePOST
     public ListBoxModel doFillWorkspaceIdItems(@QueryParameter("credentialsId") String credentialsId,
                                                @QueryParameter("workspaceId") String workspaceId) throws FormValidation {
         ListBoxModel items = new ListBoxModel();
@@ -290,7 +293,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         return workspacesList;
     }
 
-
+    @RequirePOST
     public ListBoxModel doFillCredentialsIdItems(@QueryParameter("credentialsId") String credentialsId) {
         ListBoxModel items = new ListBoxModel();
         try {
