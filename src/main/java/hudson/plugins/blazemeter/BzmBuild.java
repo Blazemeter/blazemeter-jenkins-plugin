@@ -26,19 +26,17 @@ import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JenkinsBlazeMeterUtils;
 import hudson.plugins.blazemeter.utils.Utils;
-import hudson.plugins.blazemeter.utils.logger.BzmJobLogger;
+import hudson.plugins.blazemeter.utils.logger.BzmServerLogger;
 import hudson.plugins.blazemeter.utils.notifier.BzmJobNotifier;
-import hudson.remoting.Callable;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import hudson.util.DescribableList;
-import jenkins.model.Jenkins;
-import net.sf.json.JSONArray;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.remoting.RoleChecker;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -46,8 +44,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
+import net.sf.json.JSONArray;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.remoting.RoleChecker;
 
-public class BzmBuild implements Callable<Result, Exception>, Serializable {
+public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(BzmBuild.class.getName());
 
@@ -115,7 +118,7 @@ public class BzmBuild implements Callable<Result, Exception>, Serializable {
         PrintStream logger = listener.getLogger();
         FilePath wsp = createWorkspaceDir(workspace);
         logger.println(BzmJobNotifier.formatMessage("BlazemeterJenkins plugin v." + Utils.version()));
-        JenkinsBlazeMeterUtils utils = createBzmUtils(createLogFile(wsp));
+        JenkinsBlazeMeterUtils utils = createBzmUtils();
         try {
             build = createCiBuild(utils, wsp);
             try {
@@ -245,10 +248,10 @@ public class BzmBuild implements Callable<Result, Exception>, Serializable {
         return wsp;
     }
 
-    private JenkinsBlazeMeterUtils createBzmUtils(String logFile) {
+    private JenkinsBlazeMeterUtils createBzmUtils() {
         return new JenkinsBlazeMeterUtils(apiId, apiSecret, serverURL,
                 new BzmJobNotifier(listener),
-                new BzmJobLogger(logFile));
+                new BzmServerLogger());
     }
 
     private CiBuild createCiBuild(JenkinsBlazeMeterUtils utils, FilePath workspace) {
