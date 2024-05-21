@@ -325,7 +325,7 @@ public class PerformanceBuilder extends Builder implements SimpleBuildStep, Seri
         timer.scheduleAtFixedRate(reportUrlTask, 20 * 1000, 10 * 1000);
         Result result = Result.SUCCESS;
         try {
-            result = channel.call(bzmBuild);
+            result = bzmBuild.call();
             run.setResult(result);
         } catch (InterruptedException e) {
             LOGGER.warning("Build has been aborted");
