@@ -170,7 +170,7 @@
                 <plugin><!-- Can be removed again when required core is updated to 1.428+ -->
                     <groupId>com.cloudbees</groupId>
                     <artifactId>maven-license-plugin</artifactId>
-                    <version>1.3</version>
+                    <version>1.10</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -1,3 +1,7 @@
+### v4.24 - 16-09-2024
+
+- `FIXED` - Fixed TT-4354: BlazeMeter Jenkins plugin fails to find file(s) on remote agents
+
 ### v4.23 - 21-05-2024
 
 - `FIXED` - Fixed TT-3886 - Unable to run the test via Jenkins plugin pipeline on remote agents

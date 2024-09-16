@@ -278,11 +278,19 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
                 FilePath child = workspace.child(path);
                 String remote = child.getRemote();
                 File file = new File(remote);
-                if (file.exists()) {
-                    result.add(file);
-                } else {
-                    listener.error("Additional test file does not exist: " + remote);
-                    throw new RuntimeException("Additional test file does not exist: " + remote);
+                try {
+                    if (child.exists()) {
+                        // Copy the file from remote agent to master for further processing
+                        // /var/tmp is a safe path as it's accessible to all the users
+                        File localFile = new File("/var/tmp/" + file.getName());
+                        child.copyTo(new FilePath(localFile));
+                        result.add(localFile);
+                    } else {
+                        listener.error("Additional test file does not exist: " + remote);
+                        throw new RuntimeException("Additional test file does not exist: " + remote);
+                    }
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException("Failed to check Additional file existence for: " + remote, e);
                 }
             }
         }
@@ -298,12 +306,22 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
         FilePath child = workspace.child(path);
         String remote = child.getRemote();
         File file = new File(remote);
-        if (!file.exists()) {
-            listener.error("Main test file does not exist: " + remote);
-            throw new RuntimeException("Main test file does not exist: " + remote);
-        }
+        File localFile = null;
+        try {
+            if (child.exists()) {
+                // Copy the file from remote agent to master for further processing
+                // /var/tmp is a safe path as it's accessible to all the users
+                localFile = new File("/var/tmp/" + file.getName());
+                child.copyTo(new FilePath(localFile));
+            } else {
+                listener.error("Main test file does not exist: " + remote);
+                throw new RuntimeException("Main test file does not exist: " + remote);
+            }
 
-        return file;
+            return localFile;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to check Main file existence for: " + remote, e);
+        }
     }
 
     private CiPostProcess createCiPostProcess(JenkinsBlazeMeterUtils utils, FilePath workspace) {
