@@ -42,8 +42,11 @@ setTimeout(function() {
 
 function executeIntervalTaskForDiv(testDiv) {
     // waiting when init state of original <select> will be changed
-    document.getElementById("hideLoader").style.display = "none";
-    document.getElementById("box").style.display = "block";
+    var hideLoader = testDiv.querySelector("#hideLoader");
+    var box = testDiv.querySelector("#box");
+
+    hideLoader.style.display = "none";
+    box.style.display = "block";
 
     var prevValue;
     var isFirst = true;
@@ -58,8 +61,8 @@ function executeIntervalTaskForDiv(testDiv) {
         var curValue = resultDivEl.innerHTML;
 
         if (prevValue != curValue) {
-            document.getElementById("box").style.display = "none";
-            document.getElementById("hideLoader").style.display = "block";
+            box.style.display = "none";
+            hideLoader.style.display = "block";
             clearInterval(interval);
         }
     }, 500);
