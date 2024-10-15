@@ -1,3 +1,7 @@
+### v4.25 - 15-10-2024
+
+- `FIXED` - Fix for TT-4420 with 2 BlazeMeter build steps, Test section just continues to spin
+
 ### v4.24 - 16-09-2024
 
 - `FIXED` - Fixed TT-4354: BlazeMeter Jenkins plugin fails to find file(s) on remote agents
