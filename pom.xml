@@ -38,7 +38,7 @@
         <connection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/blazemeter-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/blazemeter-plugin</url>
-        <tag> BlazeMeterJenkinsPlugin-4.24</tag>
+        <tag>@{project.artifactId}-@{project.version}</tag>
     </scm>
 
     <licenses>
