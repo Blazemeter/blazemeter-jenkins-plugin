@@ -1,3 +1,7 @@
+### v4.26 - 15-07-2025
+
+- `FIXED` - Fixed MOB-38674 - Jenkins build hangs for Blazemeter tests that take over an hour to execute
+
 ### v4.25 - 15-10-2024
 
 - `FIXED` - Fix for TT-4420 with 2 BlazeMeter build steps, Test section just continues to spin
